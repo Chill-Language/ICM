@@ -1,6 +1,17 @@
 # ICM
 The Interpreter of The Chill 0.1 Programming Language
 
+# Grammar
+
+Call Method : (FunctionName [Parameter])
+'[]' is Same as '()'.
+If 'a' is a function, using '(a ...)' to call it, use 'a' to get it self.
+```lisp
+(defun a(n) (+ n 1))
+(defun b(n) (- n 2))
+(let [c (+ a b)]) ; Same As (defun c(n) (+ (+ n 1) (- n 2)))
+```
+
 # Examples
 
 ```lisp
@@ -19,7 +30,7 @@ The Interpreter of The Chill 0.1 Programming Language
 
 (defun p(n)
   (if (<= n 1)
-    (1)
+    1
     (* n (p (- n 1)))
   )
 )
@@ -45,4 +56,3 @@ The Interpreter of The Chill 0.1 Programming Language
 (set )
 
 ```
-
