@@ -3,7 +3,7 @@ The Interpreter of The Chill 0.1 Programming Language
 
 # Examples
 
-'''lisp
+```lisp
 ; test01
 ; assign & calc
 
@@ -44,5 +44,5 @@ The Interpreter of The Chill 0.1 Programming Language
 ; type
 (set )
 
-'''
+```
 
