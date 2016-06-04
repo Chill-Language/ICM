@@ -15,8 +15,8 @@ void println(const T &obj)
 //   'NIL' is a real value for empty list or blank name. It's Allowed.
 //   'Null' is a reference for nullptr. It's Not Allowed.
 //  Example:
-//    println(*(Parameters*)nullptr);  // Shows 'Null'.
 //    println(*(new Parameters()));    // Shows 'NIL'.
+//    println(*(Parameters*)nullptr);  // Shows 'Null'.
 
 
 namespace ICM
@@ -33,13 +33,20 @@ namespace ICM
 		}
 	}
 	string ASTNode::to_string() const {
+		// Judge Null
+		if (this == nullptr)
+			return "Null";
+		// Main
 		string str;
-		if (type == AST_DATA) {
+		if (type == AST_NIL) {
+			str.append("<ASTNode | NIL>");
+		}
+		else if (type == AST_DATA) {
 			str.append("<ASTData | ");
-			//if (data)
+			if (data)
 				str.append(data->to_string());
-			//else
-				//str.append("NIL");
+			else
+				str.append("NIL");
 			str.append(">");
 		}
 		else if (type == AST_FUNC) {
@@ -61,38 +68,43 @@ namespace ICM
 		return str;
 	}
 	string Function::to_string() const {
+		// Judge Null
+		if (this == nullptr)
+			return "Null";
+		// Main
 		string str;
-		if (this) {
-			str.append("(FUNC | ");
-			if (type != FUNC_NIL)
-				str.append(std::to_string(this->id));
-			else
-				str.append("NIL");
+		str.append("(FUNC | ");
+		if (type != FUNC_NIL) {
+			str.append("(");
+			str.append(std::to_string(this->type));
+			str.append(",");
+			str.append(std::to_string(this->id));
 			str.append(")");
 		}
 		else {
-			str.append("Null");
+			str.append("NIL");
 		}
+		str.append(")");
+
 		return str;
 	}
 	string Parameters::to_string() const {
+		// Judge Null
+		if (this == nullptr)
+			return "Null";
+		// Main
 		string str;
-		if (this) {
-			str.append("[PARS |");
-			if (list.empty()) {
-				str.append(" NIL ");
-			}
-			else {
-				for (auto &l : list) {
-					str.append(" ");
-					str.append(l->to_string());
-				}
-			}
-			str.append("]");
+		str.append("[PARS |");
+		if (list.empty()) {
+			str.append(" NIL ");
 		}
 		else {
-			str.append("Null");
+			for (auto &l : list) {
+				str.append(" ");
+				str.append(l->to_string());
+			}
 		}
+		str.append("]");
 		return str;
 	}
 }
