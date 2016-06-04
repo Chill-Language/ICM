@@ -11,6 +11,13 @@ void println(const T &obj)
 	Output::println(obj.to_string());
 }
 
+// The Different of 'NIL' & 'Null' :
+//   'NIL' is a real value for empty list or blank name. It's Allowed.
+//   'Null' is a reference for nullptr. It's Not Allowed.
+//  Example:
+//    println(*(Parameters*)nullptr);  // Shows 'Null'.
+//    println(*(new Parameters()));    // Shows 'NIL'.
+
 
 namespace ICM
 {
@@ -29,7 +36,10 @@ namespace ICM
 		string str;
 		if (type == AST_DATA) {
 			str.append("<ASTData | ");
-			str.append(data->to_string());
+			//if (data)
+				str.append(data->to_string());
+			//else
+				//str.append("NIL");
 			str.append(">");
 		}
 		else if (type == AST_FUNC) {
@@ -52,27 +62,37 @@ namespace ICM
 	}
 	string Function::to_string() const {
 		string str;
-		str.append("(FUNC | ");
-		if (this)
-			str.append(std::to_string(this->id));
-		else
-			str.append("NIL");
-		str.append(")");
+		if (this) {
+			str.append("(FUNC | ");
+			if (type != FUNC_NIL)
+				str.append(std::to_string(this->id));
+			else
+				str.append("NIL");
+			str.append(")");
+		}
+		else {
+			str.append("Null");
+		}
 		return str;
 	}
 	string Parameters::to_string() const {
 		string str;
-		str.append("[PARS |");
 		if (this) {
-			for (auto &l : list) {
-				str.append(" ");
-				str.append(l->to_string());
+			str.append("[PARS |");
+			if (list.empty()) {
+				str.append(" NIL ");
 			}
+			else {
+				for (auto &l : list) {
+					str.append(" ");
+					str.append(l->to_string());
+				}
+			}
+			str.append("]");
 		}
 		else {
-			str.append(" NIL");
+			str.append("Null");
 		}
-		str.append("]");
 		return str;
 	}
 }
