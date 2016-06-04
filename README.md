@@ -43,8 +43,8 @@ If 'a' is a function, using '(a ...)' to call it, use 'a' to get it self.
 (let [a (list 9 7 6 3 1)]
      [b (list 2 4 5 8 0)])
 (+ a b) ; Output : 9 7 6 3 1 2 4 5 8 0
-(.+ a b) ; Output : 11 11 11 11 1
-(list.order (+ a b) '<)
+(foreach + a b) ; Output : 11 11 11 11 1
+(list.order (+ a b) <)
 ; Output : 0 1 2 3 4 5 6 7 8 9
 
 ; test05
