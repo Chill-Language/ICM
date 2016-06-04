@@ -9,9 +9,9 @@ namespace ICM
 	class Parameters;
 	class ASTNode;
 	// Types
-	enum FuncType { FUNC_DEF, FUNC_ADD };
+	enum FuncType { FUNC_NIL, FUNC_DEF, FUNC_ADD };
 	using FuncID = unsigned;
-	enum ASTNodeType { AST_DATA, AST_FUNC };
+	enum ASTNodeType { AST_NIL, AST_DATA, AST_FUNC };
 
 	// ObjectData
 	class ObjectData
@@ -62,7 +62,6 @@ namespace ICM
 		Parameters() {}
 		// Method
 		void push(ASTNode *node) { list.push_back(node); }
-		void push(ASTNode &node) { push(&node); }
 		std::string to_string() const;
 
 	private:
@@ -74,14 +73,7 @@ namespace ICM
 	{
 	public:
 		ASTNode() {}
-		explicit ASTNode(ObjectData &dat) :
-			ASTNode(&dat) {}
-		explicit ASTNode(Function &fun) :
-			ASTNode(&fun) {}
-		explicit ASTNode(Parameters &par) :
-			ASTNode(&par) {}
-		explicit ASTNode(Function &fun, Parameters &par) :
-			type(AST_FUNC), func(&fun), pars(&par) {}
+		explicit ASTNode(ASTNodeType type) { initialize(type); }
 
 		explicit ASTNode(ObjectData *dat) :
 			type(AST_DATA), data(dat) {}
@@ -98,9 +90,6 @@ namespace ICM
 			this->func->set(type, id);
 		}
 		void pushpars(ASTNode *node) {
-			this->pars->push(node);
-		}
-		void pushpars(ASTNode &node) {
 			this->pars->push(node);
 		}
 
