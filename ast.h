@@ -18,19 +18,38 @@ namespace ICM
 	{
 	public:
 		ObjectData() = default;
-		template <typename T> explicit ObjectData(const T &data) { setData(data); }
-		~ObjectData() { /*delete pointer;*/ }
-		template <typename T> void setData(const T & data) { if (!pointer) pointer = new T(data); else *getPointer<T>() = data; }
-		template <typename T> T* getPointer() { return (T*)pointer; }
-		template <typename T> const T* getPointer() const { return (const T*)pointer; }
-		template <typename T> T getData() const { return *getPointer<T>(); }
-		template <typename T> void release() { getPointer<T>()->~T(); }
-		std::string to_string() const {
-			/*System::charptr data(sizeof(void*) * 2 + 2);
-			sprintf(data, "0x%p", pointer);
-			return std::string(data);*/
-			return std::to_string(*(int*)pointer);
+		ObjectData(const ObjectData &obj) {}
+		template <typename T>
+		explicit ObjectData(const T &data) {
+			setData(data);
 		}
+		~ObjectData() { delete pointer; }
+
+		template <typename T>
+		void setData(const T & data) {
+			if (!pointer)
+				pointer = new T(data);
+			else
+				*getPointer<T>() = data;
+		}
+		template <typename T>
+		T* getPointer() {
+			return (T*)pointer;
+		}
+		template <typename T>
+		const T* getPointer() const {
+			return (const T*)pointer;
+		}
+		template <typename T>
+		T getData() const {
+			return *getPointer<T>();
+		}
+		template <typename T>
+		void release() {
+			getPointer<T>()->~T(); 
+		}
+
+		friend std::string to_string(const ObjectData *obj);
 
 	private:
 		void *pointer = nullptr;
@@ -47,11 +66,11 @@ namespace ICM
 			this->type = type;
 			this->id = id;
 		}
-		std::string to_string() const;
+		friend std::string to_string(const Function* func);
 
 	private:
 		// Members
-		FuncType type;
+		FuncType type = FUNC_NIL;
 		FuncID id = 0;
 	};
 
@@ -62,7 +81,7 @@ namespace ICM
 		Parameters() {}
 		// Method
 		void push(ASTNode *node) { list.push_back(node); }
-		std::string to_string() const;
+		friend std::string to_string(const Parameters *pars);
 
 	private:
 		std::vector<ASTNode*> list;
@@ -74,42 +93,54 @@ namespace ICM
 	public:
 		ASTNode() {}
 		explicit ASTNode(ASTNodeType type) { initialize(type); }
+		explicit ASTNode(ObjectData *dat) { initialize(dat); }
+		explicit ASTNode(Function *fun, Parameters *par) { initialize(fun, par); }
+		explicit ASTNode(Function *fun) : ASTNode(fun, nullptr) {}
+		explicit ASTNode(Parameters *par) : ASTNode(nullptr,par) {}
 
-		explicit ASTNode(ObjectData *dat) :
-			type(AST_DATA), data(dat) {}
-		explicit ASTNode(Function *fun) :
-			type(AST_FUNC), func(fun) {}
-		explicit ASTNode(Parameters *par) :
-			type(AST_FUNC), pars(par) {}
-		explicit ASTNode(Function *fun, Parameters *par) :
-			type(AST_FUNC), func(fun), pars(par) {}
+		void initialize(ASTNodeType type) {
+			this->type = type;
+			switch (type) {
+			case AST_DATA:
+				initialize(new ObjectData());
+				break;
+			case AST_FUNC:
+				initialize(new Function(), new Parameters());
+				break;
+			}
+		}
+		void initialize(Function *fun = nullptr, Parameters *par = nullptr) {
+			this->type = AST_FUNC;
+			this->fundata.func = fun;
+			this->fundata.pars = par;
+		}
+		void initialize(ObjectData *dat) {
+			this->type = AST_DATA;
+			this->objdata = dat;
+		}
 
-		void initialize(ASTNodeType type);
-
+		template <typename T>
+		void setdata(const T & data) {
+			this->objdata->setData(data);
+		}
 		void setfunc(FuncType type, FuncID id) {
-			this->func->set(type, id);
+			this->fundata.func->set(type, id);
 		}
 		void pushpars(ASTNode *node) {
-			this->pars->push(node);
+			this->fundata.pars->push(node);
 		}
 
-		std::string to_string() const;
+		friend std::string to_string(const ASTNode *astn);
 
 	protected:
 		// Members
 		ASTNodeType type;
-		Function *func = nullptr;
-		Parameters *pars = nullptr;
-		ObjectData *data = nullptr;
-	};
-
-	// AST
-	class AST
-	{
-	public:
-		AST() {}
-
-	private:
-		ASTNode *pointer;
+		union {
+			struct {
+				Function *func = nullptr;
+				Parameters *pars = nullptr;
+			} fundata;
+			ObjectData *objdata = nullptr;
+		};
 	};
 }
