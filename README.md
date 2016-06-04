@@ -9,7 +9,8 @@ If 'a' is a function, using '(a ...)' to call it, use 'a' to get it self.
 ```lisp
 (defun a(n) (+ n 1))
 (defun b(n) (- n 2))
-(let [c (+ a b)]) ; Same As (defun c(n) (+ (+ n 1) (- n 2)))
+(defun c(a b n) (+ (a n) (b n)))
+(c a b n) ; Same As (defun c(n) (+ (+ n 1) (- n 2)))
 ```
 
 # Examples
@@ -48,11 +49,3 @@ If 'a' is a function, using '(a ...)' to call it, use 'a' to get it self.
 
 ; test05
 ; lambda
-
-
-
-; test03
-; type
-(set )
-
-```
