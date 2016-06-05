@@ -1,5 +1,6 @@
 # Test Code
-```
+To Test The ASTNode, I give these codes:
+```cpp
 	ASTNode *root;
 	ASTNode *sub;
 	ASTNode *dat1, *dat2, *dat3;
