@@ -19,13 +19,22 @@ namespace ICM
 	public:
 		ObjectData() = default;
 		ObjectData(const ObjectData &obj) = default;
-		template <typename T> explicit ObjectData(const T &data);
+		template <typename T> explicit ObjectData(const T &data) { setData(data); }
 		~ObjectData() { delete pointer; }
+
 		template <typename T> void release();
 		ObjectData* clone() const;
 
 		template <typename T>
-		void setData(const T & data);
+		void setData(const T & data) {
+			if (!pointer) {
+				pointer = new T(data);
+				size = sizeof(T);
+			}
+			else {
+				*getPointer<T>() = data;
+			}
+		}
 
 		template <typename T>
 		T* getPointer() {
@@ -75,6 +84,9 @@ namespace ICM
 		void push(ASTNode *node) { list.push_back(node); }
 		friend std::string to_string(const Parameters *pars);
 
+		Parameters* clone() const; // Shallow Copy
+		Parameters* deep_clone() const; // Deep Copy
+
 	private:
 		std::vector<ASTNode*> list;
 	};
@@ -98,11 +110,12 @@ namespace ICM
 		void initialize(Function *fun = nullptr, Parameters *par = nullptr);
 		
 		void release();
-		ASTNode* clone() const;
+		ASTNode* clone() const; // Shallow Copy
+		ASTNode* deep_clone() const; // Deep Copy
 
 		template <typename T>
 		void setdata(const T & data) {
-			this->objdata->setData(data);
+			this->objdata->setData<T>(data);
 		}
 		void setfunc(FuncType type, FuncID id) {
 			this->fundata.func->set(type, id);
