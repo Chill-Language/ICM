@@ -32,29 +32,36 @@ using namespace ICM;
 
 int main(void)
 {
-	// (+ 5 6)
 	AST ast;
 	ASTNode *root;
-	ObjectData *dat1, *dat2;
-	ASTNode *adat1, *adat2;
+	ASTNode *sub;
+	ASTNode *dat1, *dat2, *dat3;
 
-	//ASTNode *root2 = new ASTNode();
-	//root2->initialize(AST_FUNC);
-
-	root = new ASTNode();
-	root->initialize(AST_FUNC);
+	// (+ 5 6)
+	root = new ASTNode(AST_FUNC);
 
 	root->setfunc(FUNC_DEF, 1);
-	dat1 = new ObjectData(5);
-	dat2 = new ObjectData(6);
-	adat1 = new ASTNode(dat1);
-	adat2 = new ASTNode(dat2);
+	dat1 = new ASTNode(AST_DATA);
+	dat2 = new ASTNode(AST_DATA);
+	dat1->setdata(5);
+	dat2->setdata(6);
 
-	root->pushpars(adat1);
-	root->pushpars(adat2);
+	root->pushpars(dat1);
+	root->pushpars(dat2);
 
 	println(root);
-	//println(*root2);
+
+	// (+ 7 (+ 5 6))
+	sub = root;
+	root = new ASTNode(AST_FUNC);
+	root->setfunc(FUNC_DEF, 1);
+	dat3 = new ASTNode(AST_DATA);
+	dat3->setdata(7);
+	root->pushpars(dat3);
+	root->pushpars(sub);
+
+	println(root);
+
 	
 
 	return 0;
