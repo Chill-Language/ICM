@@ -15,10 +15,6 @@ namespace ICM
 	// Method
 	// ObjectData
 	template <typename T>
-	explicit ObjectData::ObjectData(const T &data) {
-		setData(data);
-	}
-	template <typename T>
 	void ObjectData::release() {
 		getPointer<T>()->~T();
 		pointer = nullptr;
@@ -31,15 +27,20 @@ namespace ICM
 		}
 		return cpy;
 	}
-	template <typename T>
-	void ObjectData::setData(const T & data) {
-		if (!pointer) {
-			pointer = new T(data);
-			size = sizeof(T);
-		}
-		else {
-			*getPointer<T>() = data;
-		}
+	// Parameters
+	// Shallow Copy  /* TODO : If it can be deleted. */
+	Parameters* Parameters::clone() const {
+		Parameters *cpy = new Parameters();
+		for (auto &l : this->list)
+			cpy->list.push_back(l->clone());
+		return cpy;
+	}
+	// Deep Copy
+	Parameters* Parameters::deep_clone() const {
+		Parameters *cpy = new Parameters();
+		for (auto &l : this->list)
+			cpy->list.push_back(l->deep_clone());
+		return cpy;
 	}
 	// ASTNode
 	void ASTNode::initialize(ASTNodeType type) {
@@ -59,7 +60,7 @@ namespace ICM
 		this->type = AST_DATA;
 		this->objdata = dat;
 	}
-	void ASTNode::initialize(Function *fun = nullptr, Parameters *par = nullptr) {
+	void ASTNode::initialize(Function *fun, Parameters *par) {
 		this->type = AST_FUNC;
 		this->fundata.func = fun;
 		this->fundata.pars = par;
@@ -79,6 +80,7 @@ namespace ICM
 			;
 		}
 	}
+	// Shallow Copy
 	ASTNode* ASTNode::clone() const {
 		ASTNode *copy = new ASTNode();
 		copy->type = this->type;
@@ -87,8 +89,25 @@ namespace ICM
 			copy->objdata = this->objdata->clone();
 			break;
 		case AST_FUNC:
-			copy->fundata.func = this->fundata.func; // TODO
-			copy->fundata.pars = this->fundata.pars; // TODO
+			copy->fundata.func = this->fundata.func;
+			copy->fundata.pars = this->fundata.pars; /* Shallow */
+			break;
+		default:
+			;
+		}
+		return copy;
+	}
+	// Deep Copy
+	ASTNode* ASTNode::deep_clone() const {
+		ASTNode *copy = new ASTNode();
+		copy->type = this->type;
+		switch (this->type) {
+		case AST_DATA:
+			copy->objdata = this->objdata->clone();
+			break;
+		case AST_FUNC:
+			copy->fundata.func = this->fundata.func;
+			copy->fundata.pars = this->fundata.pars->deep_clone(); /* Deep */
 			break;
 		default:
 			;
