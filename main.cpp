@@ -62,6 +62,31 @@ int main(void)
 
 	println(root);
 
+	// (+ 5 6 7)
+	sub->pushpars(dat3);
+
+	println(sub);
+	println(root);
+
+	// The Differecnt of Ref & Cpy.
+	// * Ref
+	ASTNode *ref;
+	ref = new ASTNode(AST_FUNC);
+	ref->pushpars(dat3);
+	println(ref);
+	dat3->setdata(0);
+	ref->pushpars(dat3);
+	println(ref);
+	// * Cpy
+	ASTNode *cpy;
+	cpy = new ASTNode(AST_FUNC);
+	dat3->setdata(0);
+	cpy->pushpars(dat3->clone());
+	println(cpy);
+	dat3->setdata(1);
+	cpy->pushpars(dat3->clone());
+	println(cpy);
+
 	
 
 	return 0;
