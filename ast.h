@@ -46,7 +46,8 @@ namespace ICM
 		}
 		template <typename T>
 		void release() {
-			getPointer<T>()->~T(); 
+			getPointer<T>()->~T();
+			pointer = nullptr;
 		}
 
 		friend std::string to_string(const ObjectData *obj);
@@ -92,14 +93,17 @@ namespace ICM
 	{
 	public:
 		ASTNode() {}
+		// Create a Variables from Type.
 		explicit ASTNode(ASTNodeType type) { initialize(type); }
+		// Create a Reference from Pointer.
 		explicit ASTNode(ObjectData *dat) { initialize(dat); }
 		explicit ASTNode(Function *fun, Parameters *par) { initialize(fun, par); }
 		explicit ASTNode(Function *fun) : ASTNode(fun, nullptr) {}
-		explicit ASTNode(Parameters *par) : ASTNode(nullptr,par) {}
+		explicit ASTNode(Parameters *par) : ASTNode(nullptr, par) {}
+		~ASTNode() { release(); }
 
 		void initialize(ASTNodeType type) {
-			this->type = type;
+			this->reference = false;
 			switch (type) {
 			case AST_DATA:
 				initialize(new ObjectData());
@@ -107,6 +111,8 @@ namespace ICM
 			case AST_FUNC:
 				initialize(new Function(), new Parameters());
 				break;
+			default:
+				this->type = type;
 			}
 		}
 		void initialize(Function *fun = nullptr, Parameters *par = nullptr) {
@@ -117,6 +123,21 @@ namespace ICM
 		void initialize(ObjectData *dat) {
 			this->type = AST_DATA;
 			this->objdata = dat;
+		}
+		void release() {
+			if (reference)
+				return;
+			switch (type) {
+			case AST_DATA:
+				delete this->objdata;
+				break;
+			case AST_FUNC:
+				delete this->fundata.func;
+				delete this->fundata.pars;
+				break;
+			default:
+				;
+			}
 		}
 
 		template <typename T>
@@ -142,5 +163,6 @@ namespace ICM
 			} fundata;
 			ObjectData *objdata = nullptr;
 		};
+		bool reference = true;
 	};
 }
