@@ -18,19 +18,35 @@ namespace ICM
 	{
 	public:
 		ObjectData() = default;
-		ObjectData(const ObjectData &obj) {}
+		ObjectData(const ObjectData &obj) = default;
 		template <typename T>
 		explicit ObjectData(const T &data) {
 			setData(data);
 		}
 		~ObjectData() { delete pointer; }
+		template <typename T>
+		void release() {
+			getPointer<T>()->~T();
+			pointer = nullptr;
+			size = 0;
+		}
+		ObjectData* clone() const {
+			ObjectData *cpy = new ObjectData(*this);
+			if (this->size) {
+				cpy->pointer = memcpy((char*)malloc(this->size),this->pointer,this->size);
+			}
+			return cpy;
+		}
 
 		template <typename T>
 		void setData(const T & data) {
-			if (!pointer)
+			if (!pointer) {
 				pointer = new T(data);
-			else
+				size = sizeof(T);
+			}
+			else {
 				*getPointer<T>() = data;
+			}
 		}
 		template <typename T>
 		T* getPointer() {
@@ -44,16 +60,12 @@ namespace ICM
 		T getData() const {
 			return *getPointer<T>();
 		}
-		template <typename T>
-		void release() {
-			getPointer<T>()->~T();
-			pointer = nullptr;
-		}
 
 		friend std::string to_string(const ObjectData *obj);
 
 	private:
 		void *pointer = nullptr;
+		size_t size = 0;
 	};
 
 	// Function
@@ -115,14 +127,14 @@ namespace ICM
 				this->type = type;
 			}
 		}
+		void initialize(ObjectData *dat) {
+			this->type = AST_DATA;
+			this->objdata = dat;
+		}
 		void initialize(Function *fun = nullptr, Parameters *par = nullptr) {
 			this->type = AST_FUNC;
 			this->fundata.func = fun;
 			this->fundata.pars = par;
-		}
-		void initialize(ObjectData *dat) {
-			this->type = AST_DATA;
-			this->objdata = dat;
 		}
 		void release() {
 			if (reference)
@@ -139,6 +151,22 @@ namespace ICM
 				;
 			}
 		}
+		ASTNode* clone() {
+			ASTNode *copy = new ASTNode();
+			copy->type = this->type;
+			switch (this->type) {
+			case AST_DATA:
+				copy->objdata = this->objdata->clone();
+				break;
+			case AST_FUNC:
+				copy->fundata.func = this->fundata.func; // TODO
+				copy->fundata.pars = this->fundata.pars; // TODO
+				break;
+			default:
+				;
+			}
+			return copy;
+		}
 
 		template <typename T>
 		void setdata(const T & data) {
@@ -153,7 +181,7 @@ namespace ICM
 
 		friend std::string to_string(const ASTNode *astn);
 
-	protected:
+	private:
 		// Members
 		ASTNodeType type;
 		union {
