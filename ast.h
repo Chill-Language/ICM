@@ -20,16 +20,16 @@ namespace ICM
 		ObjectData() = default;
 		ObjectData(const ObjectData &obj) = default;
 		template <typename T> explicit ObjectData(const T &data) { setData(data); }
-		~ObjectData() { delete pointer; }
+		~ObjectData() { free(pointer); }
 
 		template <typename T> void release();
 		ObjectData* clone() const;
 
 		template <typename T>
-		void setData(const T & data) {
+		void setData(const T &data) {
 			if (!pointer) {
-				pointer = new T(data);
-				size = sizeof(T);
+				this->size = sizeof(T);
+				pointer = memcpy((char*)malloc(this->size), &data, this->size);
 			}
 			else {
 				*getPointer<T>() = data;
