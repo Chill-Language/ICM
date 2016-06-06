@@ -1,4 +1,5 @@
 #include <vector>
+#include <stack>
 #include "charptr.h"
 
 namespace ICM
@@ -138,5 +139,33 @@ namespace ICM
 			ObjectData *objdata = nullptr;
 		};
 		bool reference = true;
+	};
+
+	// AST
+	class AST
+	{
+	public:
+		AST() {}
+		AST* pushNode(ASTNodeType type);
+		int retNode();
+		template <typename T>
+		AST* setdata(const T & data) {
+			this->currptr->setdata<T>(data);
+			return this;
+		}
+		AST* setfunc(FuncType type, FuncID id) {
+			this->currptr->setfunc(type, id);
+			return this;
+		}
+		AST* pushpars(ASTNode *node) {
+			this->currptr->pushpars(node);
+			return this;
+		}
+		friend std::string to_string(const AST *ast);
+
+	private:
+		ASTNode *root = nullptr;
+		ASTNode *currptr = nullptr;
+		std::stack<ASTNode*> farthptrs;
 	};
 }
