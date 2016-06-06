@@ -1,10 +1,4 @@
 #include "ast.h"
-#include <string>
-#include <cstring>
-#include <stack>
-using std::string;
-using std::to_string;
-using std::stack;
 
 // The Different of 'NIL' & 'Null' :
 //   'NIL' is a real value for empty list or blank name. It's Allowed.
@@ -17,20 +11,6 @@ using std::stack;
 namespace ICM
 {
 	// Method
-	// ObjectData
-	template <typename T>
-	void ObjectData::release() {
-		getPointer<T>()->~T();
-		pointer = nullptr;
-		size = 0;
-	}
-	ObjectData* ObjectData::clone() const {
-		ObjectData *cpy = new ObjectData(*this);
-		if (this->size) {
-			cpy->pointer = memcpy((char*)malloc(this->size), this->pointer, this->size);
-		}
-		return cpy;
-	}
 	// Parameters
 	// Shallow Copy  /* TODO : If it can be deleted. */
 	Parameters* Parameters::clone() const {
@@ -146,93 +126,5 @@ namespace ICM
 		else {
 			return -1; // Error
 		}
-	}
-
-	// ToString
-	string to_string(const ObjectData *obj) {
-		if (obj->pointer == nullptr)
-			return "Null";
-		/*System::charptr data(sizeof(void*) * 2 + 2);
-		sprintf(data, "0x%p", pointer);
-		return std::string(data);*/
-		return std::to_string(*(int*)obj->pointer);
-	}
-	string to_string(const Function* func) {
-		// Judge Null
-		if (func == nullptr)
-			return "Null";
-		// Main
-		string str;
-		str.append("(FUNC | ");
-		if (func->type != FUNC_NIL) {
-			str.append("(");
-			str.append(std::to_string(func->type));
-			str.append(",");
-			str.append(std::to_string(func->id));
-			str.append(")");
-		}
-		else {
-			str.append("NIL");
-		}
-		str.append(")");
-
-		return str;
-	}
-	string to_string(const Parameters *pars) {
-		// Judge Null
-		if (pars == nullptr)
-			return "Null";
-		// Main
-		string str;
-		str.append("[PARS |");
-		if (pars->list.empty()) {
-			str.append(" NIL");
-		}
-		else {
-			for (auto &l : pars->list) {
-				str.append(" ");
-				str.append(to_string(l));
-			}
-		}
-		str.append("]");
-		return str;
-	}
-	string to_string(const ASTNode *astn) {
-		// Judge Null
-		if (astn == nullptr)
-			return "Null";
-		// Main
-		string str;
-		if (astn->type == AST_NIL) {
-			str.append("<AST | NIL>");
-		}
-		else if (astn->type == AST_DATA) {
-			str.append("<AST:Data | ");
-			if (astn->objdata)
-				str.append(ICM::to_string(astn->objdata));
-			else
-				str.append("NIL");
-			str.append(">");
-		}
-		else if (astn->type == AST_FUNC) {
-			str.append("<AST:Node | ");
-			if (astn->fundata.func)
-				str.append(to_string(astn->fundata.func));
-			else
-				str.append("NIL");
-			str.append(", ");
-			if (astn->fundata.pars)
-				str.append(to_string(astn->fundata.pars));
-			else
-				str.append("NIL");
-			str.append(">");
-		}
-		else {
-			str.append("ASTNodeTypeError");
-		}
-		return str;
-	}
-	string to_string(const AST *ast) {
-		return string("{AST | ") + to_string(ast->root) + string("}");
 	}
 }
