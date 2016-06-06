@@ -1,8 +1,10 @@
 #include "ast.h"
 #include <string>
 #include <cstring>
+#include <stack>
 using std::string;
 using std::to_string;
+using std::stack;
 
 // The Different of 'NIL' & 'Null' :
 //   'NIL' is a real value for empty list or blank name. It's Allowed.
@@ -116,6 +118,35 @@ namespace ICM
 		}
 		return copy;
 	}
+	// AST
+	AST* AST::pushNode(ASTNodeType type) {
+		if (root == nullptr) {
+			root = new ASTNode(type);
+			currptr = root;
+			farthptrs.push(currptr);
+		}
+		else {
+			ASTNode *tmp = new ASTNode(type);
+			if (currptr->type == AST_FUNC)
+				currptr->pushpars(tmp);
+			else
+				farthptrs.top()->pushpars(tmp);
+			currptr = tmp;
+			if (tmp->type == AST_FUNC)
+				farthptrs.push(currptr);
+		}
+		return this;
+	}
+	int AST::retNode() {
+		if (currptr != root) {
+			currptr = farthptrs.top();
+			farthptrs.pop();
+			return 0;
+		}
+		else {
+			return -1; // Error
+		}
+	}
 
 	// ToString
 	string to_string(const ObjectData *obj) {
@@ -200,5 +231,8 @@ namespace ICM
 			str.append("ASTNodeTypeError");
 		}
 		return str;
+	}
+	string to_string(const AST *ast) {
+		return string("{AST | ") + to_string(ast->root) + string("}");
 	}
 }
