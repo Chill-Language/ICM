@@ -1,7 +1,9 @@
 #include "prints.h"
 #include "ast.h"
+#include <stack>
 using std::string;
 using std::vector;
+using std::stack;
 using namespace System;
 
 template <typename T>
@@ -22,72 +24,71 @@ namespace ICM
 	{
 	public:
 		AST() {}
+		void pushNode(ASTNodeType type) {
+			if (root == nullptr) {
+				root = new ASTNode(type);
+				currptr = root;
+				farthptrs.push(currptr);
+			}
+			else {
+				ASTNode *tmp = new ASTNode(type);
+				if (currptr->type == AST_FUNC)
+					currptr->pushpars(tmp);
+				else
+					farthptrs.top()->pushpars(tmp);
+				currptr = tmp;
+				if (tmp->type == AST_FUNC)
+					farthptrs.push(currptr);
+			}
+		}
+		template <typename T>
+		void setdata(const T & data) {
+			this->currptr->setdata<T>(data);
+		}
+		void setfunc(FuncType type, FuncID id) {
+			this->currptr->setfunc(type, id);
+		}
+		void pushpars(ASTNode *node) {
+			this->currptr->pushpars(node);
+		}
+		void retNode() {
+			if (currptr != root) {
+				currptr = farthptrs.top();
+				farthptrs.pop();
+			}
+			else {
+				System::Output::println("Error in retNode().");
+			}
+		}
+		friend std::string to_string(const AST *ast);
 
 	private:
-		ASTNode *pointer;
+		ASTNode *root = nullptr;
+		ASTNode *currptr = nullptr;
+		stack<ASTNode*> farthptrs;
 	};
+
+	std::string to_string(const AST *ast)
+	{
+		return std::string("{AST | ") + to_string(ast->root) + std::string("}");
+	}
 }
 
 using namespace ICM;
 
 int main(void)
 {
-	AST ast;
-	ASTNode *root;
-	ASTNode *sub;
-	ASTNode *dat1, *dat2, *dat3;
-
+	AST *ast = new AST();
+	ASTNode *dat;
 	// (+ 5 6)
-	root = new ASTNode(AST_FUNC);
+	ast->pushNode(AST_FUNC);
+	ast->pushNode(AST_DATA);
+	ast->setdata(5);
+	ast->pushNode(AST_DATA);
+	ast->setdata(6);
+	//ast->retNode();
 
-	root->setfunc(FUNC_DEF, 1);
-	dat1 = new ASTNode(AST_DATA);
-	dat2 = new ASTNode(AST_DATA);
-	dat1->setdata(5);
-	dat2->setdata(6);
-
-	root->pushpars(dat1);
-	root->pushpars(dat2);
-
-	println(root);
-
-	// (+ 7 (+ 5 6))
-	sub = root;
-	root = new ASTNode(AST_FUNC);
-	root->setfunc(FUNC_DEF, 1);
-	dat3 = new ASTNode(AST_DATA);
-	dat3->setdata(7);
-	root->pushpars(dat3);
-	root->pushpars(sub);
-
-	println(root);
-
-	// (+ 5 6 7)
-	sub->pushpars(dat3);
-
-	println(sub);
-	println(root);
-
-	// The Differecnt of Ref & Cpy.
-	// * Ref
-	ASTNode *ref;
-	ref = new ASTNode(AST_FUNC);
-	ref->pushpars(dat3);
-	println(ref);
-	dat3->setdata(0);
-	ref->pushpars(dat3);
-	println(ref);
-	// * Cpy
-	ASTNode *cpy;
-	cpy = new ASTNode(AST_FUNC);
-	dat3->setdata(0);
-	cpy->pushpars(dat3->clone());
-	println(cpy);
-	dat3->setdata(1);
-	cpy->pushpars(dat3->clone());
-	println(cpy);
-
-	
+	println(ast);
 
 	return 0;
 }
