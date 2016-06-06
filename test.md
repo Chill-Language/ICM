@@ -1,4 +1,5 @@
 # Test Code
+# ASTNode
 To Test The ASTNode, I give these codes:
 ```cpp
 	ASTNode *root;
@@ -65,4 +66,33 @@ To Test The ASTNode, I give these codes:
 	deep_cpy = root->deep_clone(); // Deep Copy, Right!
 	sub->pushpars(root);
 	println(deep_cpy);
+```
+# AST
+```cpp
+	AST *ast;
+
+	// (+ 5 6)
+	ast = new AST();
+	
+	ast->pushNode(AST_FUNC)->setfunc(FUNC_DEF, 1); // ( +
+	ast->pushNode(AST_DATA)->setdata(5);           // 5
+	ast->pushNode(AST_DATA)->setdata(6);           // 6
+	ast->retNode();                                // )
+
+	println(ast);
+	delete ast;
+
+	// (+ 7 (+ 5 6))
+	ast = new AST();
+
+	ast->pushNode(AST_FUNC)->setfunc(FUNC_DEF, 1); // ( +
+	ast->pushNode(AST_DATA)->setdata(7);           // 7
+	ast->pushNode(AST_FUNC)->setfunc(FUNC_DEF, 1); // ( +
+	ast->pushNode(AST_DATA)->setdata(5);           // 5
+	ast->pushNode(AST_DATA)->setdata(6);           // 6
+	ast->retNode();                                // )
+	ast->retNode();                                // )
+
+	println(ast);
+	delete ast;
 ```
