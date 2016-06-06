@@ -125,6 +125,7 @@ namespace ICM
 		}
 
 		friend std::string to_string(const ASTNode *astn);
+		friend class AST;
 
 	private:
 		// Members
