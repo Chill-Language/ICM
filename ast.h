@@ -1,11 +1,10 @@
 #include <vector>
 #include <stack>
-#include "charptr.h"
+#include "objectdata.h"
 
 namespace ICM
 {
 	// Declare
-	class ObjectData;
 	class Function;
 	class Parameters;
 	class ASTNode;
@@ -13,49 +12,6 @@ namespace ICM
 	enum FuncType { FUNC_NIL, FUNC_DEF, FUNC_ADD };
 	using FuncID = unsigned;
 	enum ASTNodeType { AST_NIL, AST_DATA, AST_FUNC };
-
-	// ObjectData
-	class ObjectData
-	{
-	public:
-		ObjectData() = default;
-		ObjectData(const ObjectData &obj) = default;
-		template <typename T> explicit ObjectData(const T &data) { setData(data); }
-		~ObjectData() { free(pointer); }
-
-		template <typename T> void release();
-		ObjectData* clone() const;
-
-		template <typename T>
-		void setData(const T &data) {
-			if (!pointer) {
-				this->size = sizeof(T);
-				pointer = memcpy((char*)malloc(this->size), &data, this->size);
-			}
-			else {
-				*getPointer<T>() = data;
-			}
-		}
-
-		template <typename T>
-		T* getPointer() {
-			return (T*)pointer;
-		}
-		template <typename T>
-		const T* getPointer() const {
-			return (const T*)pointer;
-		}
-		template <typename T>
-		T getData() const {
-			return *getPointer<T>();
-		}
-
-		friend std::string to_string(const ObjectData *obj);
-
-	private:
-		void *pointer = nullptr;
-		size_t size = 0;
-	};
 
 	// Function
 	class Function
@@ -148,6 +104,10 @@ namespace ICM
 		AST() {}
 		AST* pushNode(ASTNodeType type);
 		int retNode();
+		bool isend() const {
+			return farthptrs.empty();
+		}
+		
 		template <typename T>
 		AST* setdata(const T & data) {
 			this->currptr->setdata<T>(data);
@@ -161,6 +121,8 @@ namespace ICM
 			this->currptr->pushpars(node);
 			return this;
 		}
+
+
 		friend std::string to_string(const AST *ast);
 
 	private:
