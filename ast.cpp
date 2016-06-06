@@ -1,8 +1,8 @@
 #include "ast.h"
 #include <string>
 #include <cstring>
+using std::string;
 using std::to_string;
-using std::string;    // Not Find 'std::to_string' in GCC 5.1, So Move 'using std::string;' Down.
 
 // The Different of 'NIL' & 'Null' :
 //   'NIL' is a real value for empty list or blank name. It's Allowed.
