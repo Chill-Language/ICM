@@ -1,7 +1,8 @@
 #include "ast.h"
-#include <cstring>
 #include <string>
-using std::to_string; // Not Find 'std::to_string' in GCC, So Delete 'using std::string'.
+#include <cstring>
+using std::to_string;
+using std::string;    // Not Find 'std::to_string' in GCC 5.1, So Move 'using std::string;' Down.
 
 // The Different of 'NIL' & 'Null' :
 //   'NIL' is a real value for empty list or blank name. It's Allowed.
@@ -117,7 +118,7 @@ namespace ICM
 	}
 
 	// ToString
-	std::string to_string(const ObjectData *obj) {
+	string to_string(const ObjectData *obj) {
 		if (obj->pointer == nullptr)
 			return "Null";
 		/*System::charptr data(sizeof(void*) * 2 + 2);
@@ -125,12 +126,12 @@ namespace ICM
 		return std::string(data);*/
 		return std::to_string(*(int*)obj->pointer);
 	}
-	std::string to_string(const Function* func) {
+	string to_string(const Function* func) {
 		// Judge Null
 		if (func == nullptr)
 			return "Null";
 		// Main
-		std::string str;
+		string str;
 		str.append("(FUNC | ");
 		if (func->type != FUNC_NIL) {
 			str.append("(");
@@ -146,12 +147,12 @@ namespace ICM
 
 		return str;
 	}
-	std::string to_string(const Parameters *pars) {
+	string to_string(const Parameters *pars) {
 		// Judge Null
 		if (pars == nullptr)
 			return "Null";
 		// Main
-		std::string str;
+		string str;
 		str.append("[PARS |");
 		if (pars->list.empty()) {
 			str.append(" NIL");
@@ -165,12 +166,12 @@ namespace ICM
 		str.append("]");
 		return str;
 	}
-	std::string to_string(const ASTNode *astn) {
+	string to_string(const ASTNode *astn) {
 		// Judge Null
 		if (astn == nullptr)
 			return "Null";
 		// Main
-		std::string str;
+		string str;
 		if (astn->type == AST_NIL) {
 			str.append("<AST | NIL>");
 		}
