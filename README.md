@@ -1,6 +1,15 @@
 # ICM (Building)
 The Interpreter of The Chill 0.1 Programming Language
 
+# How To Build
+At first, you shold add library what names 'Chill's Basic Library' from my GitHub, then, run 'compile.bat' for Windows or run 'complie.sh' on Linux. (To use GCC.)
+It need such files:
+macro.h
+convert_cstr.h
+prints.h
+charptr.h
+
+
 # Grammar
 
 Call Method : (FunctionName [Parameter])
