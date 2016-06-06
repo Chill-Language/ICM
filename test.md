@@ -1,5 +1,5 @@
 # Test Code
-# ASTNode
+## ASTNode
 To Test The ASTNode, I give these codes:
 ```cpp
 	ASTNode *root;
@@ -67,7 +67,7 @@ To Test The ASTNode, I give these codes:
 	sub->pushpars(root);
 	println(deep_cpy);
 ```
-# AST
+## AST
 ```cpp
 	AST *ast;
 
