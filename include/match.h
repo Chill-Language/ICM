@@ -1,16 +1,8 @@
 #include <string>
+#include "type.h"
 
 namespace ICM
 {
-	enum DefaultType {
-		T_Null,
-		T_LBracket,
-		T_RBracket,
-		T_Number,
-		T_String,
-		T_Comment,
-		T_Identifier, // Un Whole Match
-	};
 	enum NumType { n_bin, n_oct, n_dec, n_hex, n_err };
 
 	class MatchResult

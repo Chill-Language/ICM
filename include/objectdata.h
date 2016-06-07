@@ -21,7 +21,7 @@ namespace ICM
 		T* getPointer() {
 			return (T*)pointer;
 		}
-		template <typename T>
+		template <typename T = void>
 		const T* getPointer() const {
 			return (const T*)pointer;
 		}
@@ -29,8 +29,6 @@ namespace ICM
 		T getData() const {
 			return *getPointer<T>();
 		}
-
-		friend std::string to_string(const ObjectData *obj);
 
 	private:
 		void *pointer = nullptr;

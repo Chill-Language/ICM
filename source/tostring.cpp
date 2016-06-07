@@ -8,13 +8,34 @@ using std::to_string;
 namespace ICM
 {
 	// ToString
-	string to_string(const ObjectData *obj) {
-		if (obj->pointer == nullptr)
+	string to_string(DefaultType type)
+	{
+		switch (type) {
+		case T_Null:       return "Null";
+		case T_LBracket:   return "LBracket";
+		case T_RBracket:   return "RBracket";
+		case T_Number:     return "Number";
+		case T_Identifier: return "Identifier";
+		case T_String:     return "String";
+		case T_Comment:    return "Comment";
+		default:           return "";
+		}
+	}
+	string to_string(const ObjectData *obj, DefaultType type) {
+		if (obj->getPointer() == nullptr)
 			return "Null";
-		/*System::charptr data(sizeof(void*) * 2 + 2);
-		sprintf(data, "0x%p", pointer);
-		return std::string(data);*/
-		return std::to_string(*(int*)obj->pointer);
+		string str;
+		switch (type) {
+		case T_Number:
+			str = std::to_string(obj->getData<int>());
+			break;
+		case T_String:
+			str = obj->getData<std::string>();
+			break;
+		default:
+			str = std::to_string(obj->getData<int>());
+		}
+		return str;
 	}
 	string to_string(const Function* func) {
 		// Judge Null
@@ -67,8 +88,8 @@ namespace ICM
 		}
 		else if (astn->type == AST_DATA) {
 			str.append("<AST:Data | ");
-			if (astn->objdata)
-				str.append(ICM::to_string(astn->objdata));
+			if (astn->objdata.data)
+				str.append(to_string(astn->objdata.data, astn->objdata.type));
 			else
 				str.append("NIL");
 			str.append(">");
@@ -95,19 +116,6 @@ namespace ICM
 		return string("{AST | ") + to_string(ast->root) + string("}");
 	}
 	// MatchResult
-	const char *getTypeName(DefaultType type)
-	{
-		switch (type) {
-		case T_Null:       return "Null";
-		case T_LBracket:   return "LBracket";
-		case T_RBracket:   return "RBracket";
-		case T_Number:     return "Number";
-		case T_Identifier: return "Identifier";
-		case T_String:     return "String";
-		case T_Comment:    return "Comment";
-		default:              return "";
-		}
-	}
 	string to_string(const MatchResult *mr) {
 		// Judge Null
 		if (mr == nullptr)
@@ -115,7 +123,7 @@ namespace ICM
 		// Main
 		string str;
 		str.append("(");
-		str.append(getTypeName(mr->getType()));
+		str.append(to_string(mr->getType()));
 		str.append(", \'");
 		for (auto &c : *mr) str.push_back(c);
 		str.append("')");

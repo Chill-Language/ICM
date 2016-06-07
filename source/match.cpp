@@ -26,6 +26,12 @@ namespace ICM
 					findchar = '\n';
 					mode = 2;
 				}
+				else if (c == '"') {
+					type = T_String;
+					begin = currptr;
+					findchar = '"';
+					mode = 2;
+				}
 				else if (isdigit(c)) /* Number */ {
 					type = T_Number;
 					begin = currptr;
@@ -48,6 +54,8 @@ namespace ICM
 				break;
 			case 2:  // Match Long with findchar
 				if (c == findchar) {
+					if (!isBreakchar(c))
+						++currptr;
 					return MatchResult(type, begin, currptr);
 					findchar = '\0';
 				}

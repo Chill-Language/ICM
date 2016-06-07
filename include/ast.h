@@ -1,5 +1,6 @@
 #include <vector>
 #include <stack>
+#include "type.h"
 #include "objectdata.h"
 
 namespace ICM
@@ -55,14 +56,14 @@ namespace ICM
 		// Create a Variables from Type.
 		explicit ASTNode(ASTNodeType type) { initialize(type); }
 		// Create a Reference from Pointer.
-		explicit ASTNode(ObjectData *dat) { initialize(dat); }
+		explicit ASTNode(ObjectData *dat, DefaultType type = T_Null) { initialize(dat, type); }
 		explicit ASTNode(Function *fun, Parameters *par) { initialize(fun, par); }
 		explicit ASTNode(Function *fun) : ASTNode(fun, nullptr) {}
 		explicit ASTNode(Parameters *par) : ASTNode(nullptr, par) {}
 		~ASTNode() { release(); }
 
 		void initialize(ASTNodeType type);
-		void initialize(ObjectData *dat);
+		void initialize(ObjectData *dat, DefaultType type = T_Null);
 		void initialize(Function *fun = nullptr, Parameters *par = nullptr);
 		
 		void release();
@@ -71,7 +72,14 @@ namespace ICM
 
 		template <typename T>
 		void setdata(const T & data) {
-			this->objdata->setData<T>(data);
+			this->objdata.data->setData<T>(data);
+		}
+		template <typename T>
+		T getdata() {
+			return this->objdata.data->getData<T>();
+		}
+		void settype(DefaultType type) {
+			this->objdata.type = type;
 		}
 		void setfunc(FuncType type, FuncID id) {
 			this->fundata.func->set(type, id);
@@ -91,7 +99,10 @@ namespace ICM
 				Function *func = nullptr;
 				Parameters *pars = nullptr;
 			} fundata;
-			ObjectData *objdata = nullptr;
+			struct {
+				ObjectData *data = nullptr;
+				DefaultType type = T_Null;
+			} objdata;
 		};
 		bool reference = true;
 	};
@@ -110,6 +121,10 @@ namespace ICM
 		template <typename T>
 		AST* setdata(const T & data) {
 			this->currptr->setdata<T>(data);
+			return this;
+		}
+		AST* settype(DefaultType type) {
+			this->currptr->settype(type);
 			return this;
 		}
 		AST* setfunc(FuncType type, FuncID id) {
