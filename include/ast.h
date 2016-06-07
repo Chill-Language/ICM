@@ -17,7 +17,6 @@ namespace ICM
 	class Function
 	{
 	public:
-
 		Function() {}
 		Function(FuncType type, FuncID id) : type(type), id(id) {}
 		void set(FuncType type, FuncID id) {
@@ -121,7 +120,6 @@ namespace ICM
 			this->currptr->pushpars(node);
 			return this;
 		}
-
 
 		friend std::string to_string(const AST *ast);
 

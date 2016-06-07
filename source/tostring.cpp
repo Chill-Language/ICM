@@ -1,6 +1,7 @@
 #include <string>
 #include "charptr.h"
 #include "ast.h"
+#include "match.h"
 using std::string;
 using std::to_string;
 
@@ -92,5 +93,32 @@ namespace ICM
 	}
 	string to_string(const AST *ast) {
 		return string("{AST | ") + to_string(ast->root) + string("}");
+	}
+	// MatchResult
+	const char *getTypeName(DefaultType type)
+	{
+		switch (type) {
+		case T_Null:       return "Null";
+		case T_LBracket:   return "LBracket";
+		case T_RBracket:   return "RBracket";
+		case T_Number:     return "Number";
+		case T_Identifier: return "Identifier";
+		case T_String:     return "String";
+		case T_Comment:    return "Comment";
+		default:              return "";
+		}
+	}
+	string to_string(const MatchResult *mr) {
+		// Judge Null
+		if (mr == nullptr)
+			return "Null";
+		// Main
+		string str;
+		str.append("(");
+		str.append(getTypeName(mr->getType()));
+		str.append(", \'");
+		for (auto &c : *mr) str.push_back(c);
+		str.append("')");
+		return str;
 	}
 }
