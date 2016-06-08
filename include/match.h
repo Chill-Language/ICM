@@ -38,9 +38,11 @@ namespace ICM
 		static bool isBreakchar(char c) {
 			return isspace(c) || c == '(' || c == ')';
 		}
-
 		unsigned getCurLineNum() {
 			return linenum;
+		}
+		bool isend() {
+			return *currptr == '\0';
 		}
 
 	private:
