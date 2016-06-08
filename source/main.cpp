@@ -17,7 +17,7 @@ int main(void)
 {
 	AST *ast;
 
-	const char *text = "(+ 5 6) ; Add Two Numbers.";
+	const char *text = "(+ 5 6 (- 7 8)) ; Add Two Numbers.";
 	Match match(text);
 
 	ast = new AST();

@@ -43,13 +43,12 @@ namespace ICM
 			return "Null";
 		// Main
 		string str;
-		str.append("(FUNC | ");
+		str.append("F");
 		if (func->type != FUNC_NIL) {
 			str.append("(");
 			str.append(std::to_string(func->type));
 			str.append(",");
 			str.append(std::to_string(func->id));
-			str.append(")");
 		}
 		else {
 			str.append("NIL");
@@ -64,7 +63,7 @@ namespace ICM
 			return "Null";
 		// Main
 		string str;
-		str.append("[PARS |");
+		str.append("[P:");
 		if (pars->list.empty()) {
 			str.append(" NIL");
 		}
@@ -84,18 +83,18 @@ namespace ICM
 		// Main
 		string str;
 		if (astn->type == AST_NIL) {
-			str.append("<AST | NIL>");
+			str.append("<AST: NIL>");
 		}
 		else if (astn->type == AST_DATA) {
-			str.append("<AST:Data | ");
+			str.append("D(");
 			if (astn->objdata.data)
 				str.append(to_string(astn->objdata.data, astn->objdata.type));
 			else
 				str.append("NIL");
-			str.append(">");
+			str.append(")");
 		}
 		else if (astn->type == AST_FUNC) {
-			str.append("<AST:Node | ");
+			str.append("N< ");
 			if (astn->fundata.func)
 				str.append(to_string(astn->fundata.func));
 			else
@@ -105,7 +104,7 @@ namespace ICM
 				str.append(to_string(astn->fundata.pars));
 			else
 				str.append("NIL");
-			str.append(">");
+			str.append(" >");
 		}
 		else {
 			str.append("ASTNodeTypeError");
@@ -113,7 +112,7 @@ namespace ICM
 		return str;
 	}
 	string to_string(const AST *ast) {
-		return string("{AST | ") + to_string(ast->root) + string("}");
+		return string("{AST: ") + to_string(ast->root) + string("}");
 	}
 	// MatchResult
 	string to_string(const MatchResult *mr) {
