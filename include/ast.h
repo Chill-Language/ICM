@@ -1,3 +1,6 @@
+#ifndef _ICM_AST_H_
+#define _ICM_AST_H_
+
 #include <vector>
 #include <stack>
 #include "type.h"
@@ -144,3 +147,5 @@ namespace ICM
 		std::stack<ASTNode*> farthptrs;
 	};
 }
+
+#endif

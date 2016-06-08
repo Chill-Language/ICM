@@ -1,3 +1,6 @@
+#ifndef _ICM_OBJECTDATA_H_
+#define _ICM_OBJECTDATA_H_
+
 #include <string>
 
 namespace ICM
@@ -46,3 +49,5 @@ namespace ICM
 		}
 	}
 }
+
+#endif
