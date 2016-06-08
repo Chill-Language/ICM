@@ -13,7 +13,7 @@ using namespace ICM;
 
 int main(void)
 {
-	const char *text = "(+ 5 6 (- 7 8))";
+	const char *text = "(sum 5 6 (sum 7 8))";
 
 	KeyWordMap KeyWords {
 		KeyWord("+", 1),
@@ -25,13 +25,13 @@ int main(void)
 		KeyWord("<", 7),
 		KeyWord(">=", 8),
 		KeyWord("<=", 9),
+		KeyWord("sum", 1),
 	};
 
-	AST *ast;
 	Match match(text);
 
 	while (!match.isend()) {
-		ast = createAST(match, KeyWords);
+		AST *ast = createAST(match, KeyWords);
 		println(ast);
 		delete ast;
 	}

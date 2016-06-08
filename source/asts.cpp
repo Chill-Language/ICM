@@ -25,7 +25,14 @@ namespace ICM
 			}
 			else if (mr.getType() == T_Identifier) {
 				if (firstMatchBraket) {
-					ast->setfunc(FUNC_DEF, KeyWords.at(mr.getString()));
+					auto i = KeyWords.find(mr.getString());
+					if (i == KeyWords.end()) {
+						// TODO
+						ast->setfunc(FUNC_ADD, 0);
+					}
+					else {
+						ast->setfunc(FUNC_DEF, i->second);
+					}
 				}
 				else {
 					ast->pushNode(AST_DATA)->setdata(mr.getString());
