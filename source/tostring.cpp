@@ -1,7 +1,6 @@
 #include <string>
+#include "tostring.h"
 #include "charptr.h"
-#include "ast.h"
-#include "match.h"
 using std::string;
 using std::to_string;
 
@@ -43,9 +42,8 @@ namespace ICM
 			return "Null";
 		// Main
 		string str;
-		str.append("F");
+		str.append("F(");
 		if (func->type != FUNC_NIL) {
-			str.append("(");
 			str.append(std::to_string(func->type));
 			str.append(",");
 			str.append(std::to_string(func->id));

@@ -120,6 +120,10 @@ namespace ICM
 		bool isend() const {
 			return farthptrs.empty();
 		}
+		AST* reset() {
+			this->currptr = root;
+			return this;
+		}
 		
 		template <typename T>
 		AST* setdata(const T & data) {

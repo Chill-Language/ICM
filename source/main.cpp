@@ -1,6 +1,6 @@
 #include "prints.h"
 #include <map>
-#include "asts.h"
+#include "parser.h"
 using namespace System;
 
 template <typename T>
@@ -13,7 +13,7 @@ using namespace ICM;
 
 int main(void)
 {
-	const char *text = "(sum 5 6 (sum 7 8))";
+	const char *text = "(+ 5 6)";
 
 	KeyWordMap KeyWords {
 		KeyWord("+", 1),
@@ -25,8 +25,10 @@ int main(void)
 		KeyWord("<", 7),
 		KeyWord(">=", 8),
 		KeyWord("<=", 9),
-		KeyWord("sum", 1),
+		KeyWord("list",10),
 	};
+
+	// Parser
 
 	Match match(text);
 

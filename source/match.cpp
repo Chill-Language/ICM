@@ -9,6 +9,8 @@ namespace ICM
 		char findchar = '\0';
 		for (; *currptr; ++currptr) {
 			char c = *currptr;
+			if (c == '\n')
+				this->linenum++;
 			switch (mode)
 			{
 			case 0:  // No Match
@@ -49,12 +51,16 @@ namespace ICM
 				}
 				break;
 			case 1:  // Match Long without findchar
-				if (isBreakchar(c))
-					return MatchResult(type, begin, currptr);
+				if (isBreakchar(c)) {
+					auto mr = MatchResult(type, begin, currptr);
+					if (isspace(c))
+						++currptr;
+					return mr;
+				}
 				break;
 			case 2:  // Match Long with findchar
 				if (c == findchar) {
-					if (!isBreakchar(c))
+					if (!isBreakchar(c) || isspace(c))
 						++currptr;
 					return MatchResult(type, begin, currptr);
 					findchar = '\0';

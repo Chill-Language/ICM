@@ -49,7 +49,7 @@ namespace ICM
 		}
 
 	private:
-		unsigned linenum = 0;
+		unsigned linenum = 1;
 		const char *source;
 		const char *currptr;
 	};
