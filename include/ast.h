@@ -27,6 +27,12 @@ namespace ICM
 			this->type = type;
 			this->id = id;
 		}
+		FuncType getType() const {
+			return this->type;
+		}
+		FuncID getID() const {
+			return this->id;
+		}
 		friend std::string to_string(const Function* func);
 
 	private:
@@ -40,15 +46,20 @@ namespace ICM
 	{
 	public:
 		Parameters() {}
+		// Declare
+		using List = std::vector<ASTNode*>;
 		// Method
 		void push(ASTNode *node) { list.push_back(node); }
+		const List& getList() const {
+			return list;
+		}
 		friend std::string to_string(const Parameters *pars);
 
 		Parameters* clone() const; // Shallow Copy
 		Parameters* deep_clone() const; // Deep Copy
 
 	private:
-		std::vector<ASTNode*> list;
+		List list;
 	};
 
 	// ASTNode
@@ -72,14 +83,24 @@ namespace ICM
 		void release();
 		ASTNode* clone() const; // Shallow Copy
 		ASTNode* deep_clone() const; // Deep Copy
-
+		ASTNodeType getNodeType() const {
+			return this->type;
+		}
+		// Get
+		template <typename T>
+		T getdata() const {
+			return this->objdata.data->getData<T>();
+		}
+		const Function* getFunc() const {
+			return this->fundata.func;
+		}
+		const Parameters* getPars() const {
+			return this->fundata.pars;
+		}
+		// Set
 		template <typename T>
 		void setdata(const T & data) {
 			this->objdata.data->setData<T>(data);
-		}
-		template <typename T>
-		T getdata() {
-			return this->objdata.data->getData<T>();
 		}
 		void settype(DefaultType type) {
 			this->objdata.type = type;
@@ -117,6 +138,9 @@ namespace ICM
 		AST() {}
 		AST* pushNode(ASTNodeType type);
 		int retNode();
+		const ASTNode* getRoot() const {
+			return this->root;
+		}
 		bool isend() const {
 			return farthptrs.empty();
 		}

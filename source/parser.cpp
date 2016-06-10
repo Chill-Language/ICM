@@ -52,6 +52,6 @@ namespace ICM
 		}
 		if (!ast->isend())
 			printf("Error match ')' in line(%d).\n", match.getCurLineNum());
-		return ast;
+		return ast->reset();
 	}
 }
