@@ -38,6 +38,35 @@ e.g. `(list 1 2 3 5)`<br>
 '**[...]**' is same as '**(list ...)**'.<br>
 e.g. `[1 2 3 5]  ; same as (list 1 2 3 5)`
 
+### ***Assign*** : *(let AssignLists...)*<br>
+***let*** is a function with **variable parameter**.<br>
+***AssignList*** : *[AssignVars... AssignValue]*
+```lisp
+(let [a 5])
+(let (list b 6))
+(let [a 5] [b 6])
+
+(let [a b c d 7]) ; a = b = c = d = 7
+
+; c is a list of [a b]
+(let [c (list a b)])
+(let [c [a b]])
+```
+
+***cpy*** is similar with **let**, but it sets a value copy.
+
+```lisp
+(cpy [a 5])  ; same as (let [a 5])
+(let (b [5 6])) ; Assign to test.
+(let [c b])
+(cpy [d b]) ; different from (let [d b])
+
+(let [b.0 7]) ; b is now [7 6]
+(print b) ; [7 6]
+(print c) ; [7 6]
+(print d) ; [5 6]
+```
+
 # Examples
 
 ```lisp
