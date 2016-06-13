@@ -2,6 +2,7 @@
 #define _ICM_OBJECTDATA_H_
 
 #include <string>
+#include <cstring>
 
 namespace ICM
 {
