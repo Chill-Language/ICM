@@ -49,7 +49,7 @@ e.g. `[1 2 3 5]  ; same as (list 1 2 3 5)`
 
 ```lisp
 (cpy [a 5])  ; same as (let [a 5])
-(let (b [5 6])) ; Assign to test.
+(let [b [5 6]]) ; Assign to test.
 (let [c b])
 (cpy [d b]) ; different from (let [d b])
 
