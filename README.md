@@ -2,17 +2,9 @@
 The Interpreter of The Chill 0.1 Programming Language
 
 # How To Build
-At first, you should add library what names 'Chill's Basic Library' from my GitHub, then, run 'compile.bat' on Windows or run 'compile.sh' on Linux. (To use **GCC**.)<br>
+At first, you should download the source, then, run 'compile.bat' on Windows or run 'compile.sh' on Linux. (To use **GCC**.)<br>
 If you have **MSVC (Visual Studio)**, you can also create a project to build these files.<br>
 ***You should ensure that your compiler support C++11.***
-
-**It need these files:**<br>
-macro.h<br>
-convert_cstr.h<br>
-prints.h<br>
-charptr.h<br>
-file.h<br>
-
 
 # Grammar
 ### ***Call Function*** : *(FunctionName Parameters...)*<br>
