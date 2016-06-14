@@ -29,7 +29,7 @@ namespace ICM
 			str = std::to_string(obj->getData<int>());
 			break;
 		case T_String:
-			str = obj->getData<std::string>();
+			str = '"' + obj->getData<std::string>() + '"';
 			break;
 		default:
 			str = std::to_string(obj->getData<int>());
@@ -122,7 +122,7 @@ namespace ICM
 		str.append("(");
 		str.append(to_string(mr->getType()));
 		str.append(", \'");
-		for (auto &c : *mr) str.push_back(c);
+		str.append(mr->getString());
 		str.append("')");
 		return str;
 	}

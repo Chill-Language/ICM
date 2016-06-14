@@ -1,21 +1,17 @@
 #include "prints.h"
-#include <map>
 #include "parser.h"
+#include "memory.h"
+#include "tostring.h"
+#include <map>
 using namespace Common;
 using namespace ICM;
-
-template <typename T>
-void println(const T &obj)
-{
-	Output::println(to_string(obj));
-}
-
 
 const ASTNode* calcASTNode(const ASTNode *node)
 {
 	const ASTNode* result = nullptr;
 	ASTNode *tmp = nullptr;
 	int num = 0;
+	std::string str;
 
 	switch (node->getNodeType()) {
 	case AST_DATA:
@@ -27,16 +23,34 @@ const ASTNode* calcASTNode(const ASTNode *node)
 		auto type = func->getType();
 		auto id = func->getID();
 		auto list = pars->getList();
+		auto types = list.front()->getObjtype();
 		if (type == FUNC_DEF) {
 			// TODO
 			switch (id) {
 			case 1: // Add
-				num = 0;
-				for (auto &l : list)
-					num += calcASTNode(l)->getdata<int>();
-				tmp = new ASTNode(AST_DATA);
-				tmp->setdata<int>(num);
-				result = tmp;
+				if (types == T_Number) {
+					num = 0;
+					for (auto &l : list) {
+						auto tl = calcASTNode(l);
+						if (tl->getObjtype() == T_Number)
+							num += tl->getdata<int>();
+					}
+					tmp = new ASTNode(AST_DATA);
+					tmp->setdata<int>(num);
+					result = tmp;
+				}
+				else if (types == T_String) {
+					for (auto &l : list) {
+						auto tl = calcASTNode(l);
+						if (tl->getObjtype() == T_String) {
+							str += tl->getdata<std::string>();
+						}
+					}
+					tmp = new ASTNode(AST_DATA);
+					tmp->setObjtype(T_String);
+					tmp->setdata<std::string>(str);
+					result = tmp;
+				}
 				break;
 			case 2: // Sub
 				num = calcASTNode(list.at(0))->getdata<int>();
@@ -50,7 +64,6 @@ const ASTNode* calcASTNode(const ASTNode *node)
 		}
 		break;
 	}
-
 	return result;
 }
 
@@ -63,7 +76,7 @@ void runAST(const AST *ast)
 
 int main(void)
 {
-	const char *text = "(+ 5 6 (- 7 6))";
+	const char *text = "(+ \"Hello \" \"World!\")";
 
 	KeyWordMap KeyWords {
 		KeyWord("+", 1),

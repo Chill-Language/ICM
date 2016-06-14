@@ -7,6 +7,7 @@
 #define _SYSTEM_PRINTS_H_
 #include "macro.h"
 #include <string>
+#include <initializer_list>
 
 SYSTEM BEGIN
 namespace Convert
@@ -36,6 +37,21 @@ namespace Convert
 	inline std::string to_string(bool b)
 	{
 		return std::string((b == true) ? "T" : "F");
+	}
+	template <>
+	inline std::string to_string(char c)
+	{
+		std::string str;
+		str.push_back(c);
+		return str;
+	}
+	template <>
+	inline std::string to_string(const void *p)
+	{
+		size_t size = sizeof(void*) * 2 + 3;
+		char *str = new char[size];
+		sprintf_s(str, size, "0x%p", p);
+		return str;
 	}
 }
 
@@ -71,6 +87,27 @@ namespace Output
 		exit(-1);
 	}
 }
+template <typename T>
+inline void print(const T &obj)
+{
+	Output::print(to_string(obj));
+}
+template <>
+inline void print(const std::string &obj)
+{
+	Output::print(obj);
+}
+inline void println()
+{
+	Output::println();
+}
+template <typename T>
+inline void println(const T &obj)
+{
+	print(obj);
+	println();
+}
+
 END
 
 #endif

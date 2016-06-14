@@ -30,7 +30,7 @@ namespace ICM
 				}
 				else if (c == '"') {
 					type = T_String;
-					begin = currptr;
+					begin = currptr + 1;
 					findchar = '"';
 					mode = 2;
 				}
@@ -62,7 +62,7 @@ namespace ICM
 				if (c == findchar) {
 					if (!isBreakchar(c) || isspace(c))
 						++currptr;
-					return MatchResult(type, begin, currptr);
+					return MatchResult(type, begin, currptr - 1);
 					findchar = '\0';
 				}
 				break;

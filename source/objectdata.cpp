@@ -18,4 +18,14 @@ namespace ICM
 		}
 		return cpy;
 	}
+	void ObjectData::setData(const std::string &data) {
+		if (!pointer) {
+			pointer = new std::string(data);
+		}
+		else {
+			delete (std::string*)pointer;
+			pointer = new std::string(data);
+			//*(std::string*)pointer = std::string(data.c_str());
+		}
+	}
 }

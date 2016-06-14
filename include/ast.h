@@ -91,6 +91,9 @@ namespace ICM
 		T getdata() const {
 			return this->objdata.data->getData<T>();
 		}
+		const DefaultType getObjtype() const {
+			return this->objdata.type;
+		}
 		const Function* getFunc() const {
 			return this->fundata.func;
 		}
@@ -100,7 +103,7 @@ namespace ICM
 		// Set
 		template <typename T>
 		void setdata(const T & data) {
-			this->objdata.data->setData<T>(data);
+			this->objdata.data->setData(data);
 		}
 		void settype(DefaultType type) {
 			this->objdata.type = type;
@@ -110,6 +113,9 @@ namespace ICM
 		}
 		void pushpars(ASTNode *node) {
 			this->fundata.pars->push(node);
+		}
+		void setObjtype(const DefaultType type) {
+			this->objdata.type = type;
 		}
 
 		friend std::string to_string(const ASTNode *astn);

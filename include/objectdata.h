@@ -2,7 +2,6 @@
 #define _ICM_OBJECTDATA_H_
 
 #include <string>
-#include <cstring>
 
 namespace ICM
 {
@@ -20,6 +19,7 @@ namespace ICM
 
 		template <typename T>
 		void setData(const T &data);
+		void setData(const std::string &data);
 
 		template <typename T>
 		T* getPointer() {
