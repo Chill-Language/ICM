@@ -6,7 +6,7 @@
 #include "type.h"
 #include "memory.h"
 #include "charptr.h"
-#define self (*this)
+#include "prints.h"
 
 namespace ICM
 {
@@ -49,6 +49,9 @@ namespace ICM
 			std::string to_string() const {
 				return '"' + data.to_string() + '"';
 			}
+			std::string get_data() const {
+				return data.to_string();
+			}
 			DefaultType get_type() const {
 				return T_String;
 			}
@@ -65,6 +68,8 @@ namespace ICM
 				result.add(l);
 			return result;
 		}
+		template <typename T>
+		void print(const T &t);
 	}
 }
 

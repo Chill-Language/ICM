@@ -1,6 +1,19 @@
 # ICM (Building)
 The Interpreter of The Chill 0.1 Programming Language
 
+Now the "Hello World!" program can be run!
+
+```
+Input:
+(print (+ "Hello " "World!"))
+
+AST:
+{AST: N< F(1,11), [P: N< F(1,1), [P: D("Hello ") D("World!")] >] >}
+
+Output:
+Hello World!
+```
+
 # How To Build
 At first, you should download the source, then, run 'compile.bat' on Windows or run 'compile.sh' on Linux. (To use **GCC**.)<br>
 If you have **MSVC (Visual Studio)**, you can also create a project to build these files.<br>

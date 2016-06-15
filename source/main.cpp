@@ -57,6 +57,9 @@ const ASTNode* calcASTNode(const ASTNode *node)
 					result = tmp;
 				}
 				break;
+			case 11: // Print
+				Objects::print(calcASTNode(list.at(0))->getdata<String>());
+				break;
 			case 2: // Sub
 				Number num = calcASTNode(list.at(0))->getdata<Number>();
 				for (auto p = list.begin() + 1; p != list.end(); ++p)
@@ -74,14 +77,21 @@ const ASTNode* calcASTNode(const ASTNode *node)
 
 void runAST(const AST *ast)
 {
-	println(ast);
-	println(calcASTNode(ast->getRoot()));
+	Common::Output::print("Output: \n");
+	calcASTNode(ast->getRoot());
+	println();
 }
 
 
 int main(void)
 {
-	const char *text = "(+ \"Hello \" \"World!\")";
+	const char *text = "(print (+ \"Hello \" \"World!\"))";
+
+	Common::Output::print("Input: \n");
+	Common::Output::println(text);
+	println();
+
+
 
 	KeyWordMap KeyWords {
 		KeyWord("+", 1),
@@ -94,6 +104,7 @@ int main(void)
 		KeyWord(">=", 8),
 		KeyWord("<=", 9),
 		KeyWord("list",10),
+		KeyWord("print",11),
 	};
 
 	// Parser
@@ -102,9 +113,13 @@ int main(void)
 
 	while (!match.isend()) {
 		AST *ast = createAST(match, KeyWords);
+		Common::Output::print("AST: \n");
+		println(ast);
+		println();
 		runAST(ast);
 		delete ast;
 	}
+	println();
 
 	return 0;
 }

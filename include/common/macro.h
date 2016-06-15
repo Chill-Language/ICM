@@ -15,4 +15,6 @@
 #define PROGRAMS(ARGC,ARGS) int main(int ARGC, char *ARGS[])
 #define PROGRAME            return 0;
 
+#define self (*this)
+
 SYSTEM BEGIN END
