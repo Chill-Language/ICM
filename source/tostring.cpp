@@ -1,6 +1,7 @@
 #include <string>
 #include "tostring.h"
 #include "charptr.h"
+#include "objects.h"
 using std::string;
 using std::to_string;
 
@@ -26,10 +27,10 @@ namespace ICM
 		string str;
 		switch (type) {
 		case T_Number:
-			str = std::to_string(obj->getData<int>());
+			str = obj->getData<Objects::Number>().to_string();
 			break;
 		case T_String:
-			str = '"' + obj->getData<std::string>() + '"';
+			str = obj->getData<Objects::String>().to_string();
 			break;
 		default:
 			str = std::to_string(obj->getData<int>());

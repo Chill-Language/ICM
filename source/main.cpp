@@ -1,19 +1,22 @@
 #include "prints.h"
 #include "parser.h"
-#include "memory.h"
+#include "objects.h"
 #include "tostring.h"
+#include "objects.h"
 #include <map>
 using namespace Common;
 using namespace ICM;
 
 const ASTNode* calcASTNode(const ASTNode *node)
 {
+	using namespace Objects;
+
 	const ASTNode* result = nullptr;
 	ASTNode *tmp = nullptr;
-	int num = 0;
-	std::string str;
 
 	switch (node->getNodeType()) {
+	case AST_NIL:
+		break;
 	case AST_DATA:
 		result = node;
 		break;
@@ -29,35 +32,37 @@ const ASTNode* calcASTNode(const ASTNode *node)
 			switch (id) {
 			case 1: // Add
 				if (types == T_Number) {
-					num = 0;
+					DataList<Number> listnum;
 					for (auto &l : list) {
 						auto tl = calcASTNode(l);
 						if (tl->getObjtype() == T_Number)
-							num += tl->getdata<int>();
+							listnum.push_back(tl->getdata<Number>());
 					}
+
 					tmp = new ASTNode(AST_DATA);
-					tmp->setdata<int>(num);
+					tmp->setdata<Number>(Objects::sum(listnum));
 					result = tmp;
 				}
 				else if (types == T_String) {
+					DataList<String> liststr;
 					for (auto &l : list) {
 						auto tl = calcASTNode(l);
 						if (tl->getObjtype() == T_String) {
-							str += tl->getdata<std::string>();
+							liststr.push_back(tl->getdata<String>());
 						}
 					}
 					tmp = new ASTNode(AST_DATA);
 					tmp->setObjtype(T_String);
-					tmp->setdata<std::string>(str);
+					tmp->setdata<String>(Objects::sum(liststr));
 					result = tmp;
 				}
 				break;
 			case 2: // Sub
-				num = calcASTNode(list.at(0))->getdata<int>();
+				Number num = calcASTNode(list.at(0))->getdata<Number>();
 				for (auto p = list.begin() + 1; p != list.end(); ++p)
-					num -= calcASTNode(*p)->getdata<int>();
+					num.sub(calcASTNode(*p)->getdata<Number>());
 				tmp = new ASTNode(AST_DATA);
-				tmp->setdata<int>(num);
+				tmp->setdata<Number>(num);
 				result = tmp;
 				break;
 			}

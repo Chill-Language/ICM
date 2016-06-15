@@ -1,4 +1,5 @@
 #include "parser.h"
+#include "objects.h"
 
 namespace ICM
 {
@@ -40,10 +41,10 @@ namespace ICM
 				firstMatchBraket = false;
 			}
 			else if (mr.getType() == T_Number) {
-				ast->pushNode(AST_DATA)->setdata(atoi(mr.getString().c_str()))->settype(T_Number);
+				ast->pushNode(AST_DATA)->setdata<Objects::Number>(atoi(mr.getString().c_str()))->settype(T_Number);
 			}
 			else if (mr.getType() == T_String) {
-				ast->pushNode(AST_DATA)->setdata<std::string>(mr.getString())->settype(T_String);
+				ast->pushNode(AST_DATA)->setdata<Objects::String>(mr.getString())->settype(T_String);
 			}
 			if (emptybreak && ast->isend()) {
 				break;

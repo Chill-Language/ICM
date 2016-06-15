@@ -50,7 +50,7 @@ namespace Convert
 	{
 		size_t size = sizeof(void*) * 2 + 3;
 		char *str = new char[size];
-		sprintf_s(str, size, "0x%p", p);
+		snprintf(str, size, "0x%p", p);
 		return str;
 	}
 }

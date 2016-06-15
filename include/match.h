@@ -27,9 +27,9 @@ namespace ICM
 
 	private:
 		DefaultType type = T_Null;
-		int addmsg = 0; // Additional Message
 		const char *beginPtr = nullptr;
 		const char *endPtr = nullptr;
+		int addmsg = 0; // Additional Message
 	};
 
 	class Match
@@ -46,6 +46,9 @@ namespace ICM
 		}
 		bool isend() {
 			return *currptr == '\0';
+		}
+		void reset() {
+			this->currptr = this->source;
 		}
 
 	private:
