@@ -20,7 +20,6 @@ namespace ICM
 
 		template <typename T>
 		void setData(const T &data);
-		void setData(const Objects::String &data);
 
 		template <typename T>
 		T* getPointer() {
@@ -42,13 +41,10 @@ namespace ICM
 
 	template <typename T>
 	void ObjectData::setData(const T &data) {
-		if (!pointer) {
-			this->size = sizeof(T);
-			pointer = memcpy((char*)malloc(this->size), &data, this->size);
-		}
-		else {
+		if (!pointer)
+			pointer = new T(data);
+		else
 			*getPointer<T>() = data;
-		}
 	}
 }
 

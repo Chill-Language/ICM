@@ -5,7 +5,7 @@
 #include <vector>
 #include "type.h"
 #include "memory.h"
-#include "prints.h"
+#include "charptr.h"
 #define self (*this)
 
 namespace ICM
@@ -40,35 +40,21 @@ namespace ICM
 		class String
 		{
 		public:
-			String(const std::string &dat = "")
-			{
-				data = (Common::Memory::copyOf<char>(dat.c_str(), dat.length() + 1));
-				//Common::println();
-			}
-			String(const String &dat)
-			{
-				data = (Common::Memory::copyOf<char>(dat.data, std::string(dat.data).length() + 1));
-			}
-			~String() {
-
-				if (data)
-					delete[] data;
-			}
+			String(const std::string &dat = "") : data(dat) {}
+			String(const String &dat) : data(dat.data) {}
 			String& add(const String &b) {
-				std::string str = std::string(self.data) + std::string(b.data);
-				data = (Common::Memory::copyOf<char>(str.c_str(), str.length() + 1));
-				//self.data += b.data;
+				data = Common::charptr(self.data.to_string() + b.data.to_string());
 				return self;
 			}
 			std::string to_string() const {
-				return '"' + std::string(data) + '"';
+				return '"' + data.to_string() + '"';
 			}
 			DefaultType get_type() const {
 				return T_String;
 			}
 
 		private:
-			char *data = nullptr;
+			Common::charptr data;
 		};
 
 		// Default Function

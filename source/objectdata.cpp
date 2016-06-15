@@ -19,12 +19,4 @@ namespace ICM
 		}
 		return cpy;
 	}
-	void ObjectData::setData(const Objects::String &data) {
-		if (!pointer) {
-			pointer = new Objects::String(data);
-		}
-		else {
-			*(Objects::String*)pointer = data;
-		}
-	}
 }
