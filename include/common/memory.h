@@ -19,7 +19,7 @@ namespace Memory
 	// New
 	template <typename T>
 	inline T* create(size_t length) {
-		return malloc(length);
+		return (T*)malloc(length);
 	}
 
 	template <typename T>

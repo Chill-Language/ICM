@@ -62,7 +62,7 @@ namespace ICM
 			delete this->fundata.pars;
 			break;
 		default:
-			;
+			break;
 		}
 	}
 	// Shallow Copy
@@ -79,7 +79,7 @@ namespace ICM
 			copy->fundata.pars = this->fundata.pars; /* Shallow */
 			break;
 		default:
-			;
+			break;
 		}
 		return copy;
 	}
@@ -97,7 +97,7 @@ namespace ICM
 			copy->fundata.pars = this->fundata.pars->deep_clone(); /* Deep */
 			break;
 		default:
-			;
+			break;
 		}
 		return copy;
 	}

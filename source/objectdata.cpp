@@ -1,4 +1,5 @@
 #include "objectdata.h"
+#include "objects.h"
 #include <cstring>
 #include <cstdlib>
 
@@ -18,14 +19,12 @@ namespace ICM
 		}
 		return cpy;
 	}
-	void ObjectData::setData(const std::string &data) {
+	void ObjectData::setData(const Objects::String &data) {
 		if (!pointer) {
-			pointer = new std::string(data);
+			pointer = new Objects::String(data);
 		}
 		else {
-			delete (std::string*)pointer;
-			pointer = new std::string(data);
-			//*(std::string*)pointer = std::string(data.c_str());
+			*(Objects::String*)pointer = data;
 		}
 	}
 }
