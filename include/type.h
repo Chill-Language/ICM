@@ -3,6 +3,7 @@
 
 enum DefaultType {
 	T_Null,
+	T_Nil,
 	T_LBracket,
 	T_RBracket,
 	T_Number,

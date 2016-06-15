@@ -104,7 +104,7 @@ inline void println()
 template <typename T>
 inline void println(const T &obj)
 {
-	print(obj);
+	Common::print(obj);
 	println();
 }
 

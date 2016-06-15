@@ -14,7 +14,18 @@ namespace ICM
 	{
 		template <typename T> using DataList = std::vector<T>;
 
-		class Number
+		class Object
+		{
+		public:
+			virtual std::string to_string() const {
+				return "Object";
+			}
+			virtual DefaultType get_type() const {
+				return T_Nil;
+			}
+		};
+
+		class Number : public Object
 		{
 		public:
 			Number(int dat = 0) : data(dat) {}
@@ -37,7 +48,7 @@ namespace ICM
 			int data;
 		};
 
-		class String
+		class String : public Object
 		{
 		public:
 			String(const std::string &dat = "") : data(dat) {}
@@ -70,6 +81,8 @@ namespace ICM
 		}
 		template <typename T>
 		void print(const T &t);
+
+		std::string to_string(const Object &obj);
 	}
 }
 

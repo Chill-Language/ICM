@@ -12,6 +12,7 @@ namespace ICM
 	{
 		switch (type) {
 		case T_Null:       return "Null";
+		case T_Nil:        return "Nil";
 		case T_LBracket:   return "LBracket";
 		case T_RBracket:   return "RBracket";
 		case T_Number:     return "Number";

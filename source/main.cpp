@@ -91,8 +91,6 @@ int main(void)
 	Common::Output::println(text);
 	println();
 
-
-
 	KeyWordMap KeyWords {
 		KeyWord("+", 1),
 		KeyWord("-", 2),
