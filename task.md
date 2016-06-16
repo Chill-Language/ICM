@@ -1,4 +1,4 @@
-### 1. Object Class to manage ObjectData.
+### 1. Object Class to manage ObjectData. (Done.)
 ### 2. '\\n'... in 'String' need to indicate different.
 ### 3. Function Object & Call.
 ### 4. 'defun', 'list', 'range'...

@@ -6,50 +6,36 @@
 
 namespace ICM
 {
-	// ObjectData
 	class ObjectData
 	{
 	public:
 		ObjectData() = default;
-		ObjectData(const ObjectData &obj) = default;
-		template <typename T> explicit ObjectData(const T &data) { setData(data); }
-		~ObjectData() { free(pointer); }
+		explicit ObjectData(Objects::Object *dat) : pointer(dat) {}
 
-		template <typename T> void release();
-		ObjectData* clone() const;
+		ObjectData* clone() const {
+			return new ObjectData(pointer->clone());
+		}
+		void setData(const ObjectPtr &data) {
+			pointer = data;
+		}
 
-		template <typename T>
-		void setData(const T &data);
+		Objects::Object* getPointer() {
+			return pointer.get();
+		}
+		Objects::Object& getData() {
+			return *getPointer();
+		}
 
-		template <typename T>
-		T* getPointer() {
-			return (T*)pointer;
+		const Objects::Object* getPointer() const {
+			return pointer.get();
 		}
-		template <typename T = void>
-		const T* getPointer() const {
-			return (const T*)pointer;
-		}
-		template <typename T>
-		const T& getData() const {
-			return *getPointer<T>();
-		}
-		template <typename T>
-		T& getData() {
-			return *getPointer<T>();
+		const Objects::Object& getData() const {
+			return *getPointer();
 		}
 
 	private:
-		void *pointer = nullptr;
-		size_t size = 0;
+		ObjectPtr pointer = nullptr;
 	};
-
-	template <typename T>
-	void ObjectData::setData(const T &data) {
-		if (!pointer)
-			pointer = new T(data);
-		else
-			*getPointer<T>() = data;
-	}
 }
 
 #endif

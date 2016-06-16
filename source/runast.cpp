@@ -38,7 +38,7 @@ namespace ICM
 								listnum.push_back(tl->getdata<Number>());
 						}
 						tmp = new ASTNode(AST_DATA);
-						tmp->setdata<Number>(Objects::sum(listnum));
+						tmp->setdata(Objects::sum(listnum));
 						result = tmp;
 					}
 					else if (types == T_String) {

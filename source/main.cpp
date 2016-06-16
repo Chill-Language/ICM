@@ -8,7 +8,7 @@ using namespace ICM;
 
 int main(void)
 {
-	const char *text = "(+ 5 6)";
+	const char *text = "(+ \"Hello \" \"World!\")";
 
 	Match match(text);
 

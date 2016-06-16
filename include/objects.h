@@ -17,11 +17,15 @@ namespace ICM
 		class Object
 		{
 		public:
+			virtual ~Object() {}
 			virtual std::string to_string() const {
 				return "Object";
 			}
 			virtual DefaultType get_type() const {
 				return T_Nil;
+			}
+			virtual Object* clone() const {
+				return new Object(*this);
 			}
 		};
 
@@ -43,6 +47,9 @@ namespace ICM
 			DefaultType get_type() const {
 				return T_Number;
 			}
+			Number* clone() const {
+				return new Number(*this);
+			}
 
 		private:
 			int data;
@@ -52,6 +59,7 @@ namespace ICM
 		{
 		public:
 			explicit String(const std::string &dat = "") : data(dat) {}
+
 			String& add(const String &b) {
 				data = Common::charptr(self.data.to_string() + b.data.to_string());
 				return self;
@@ -65,9 +73,13 @@ namespace ICM
 			DefaultType get_type() const {
 				return T_String;
 			}
+			String* clone() const {
+				return new String(*(this->data.clone()));
+			}
 
 		private:
 			Common::charptr data;
+			explicit String(const Common::charptr &dat) : data(dat) {}
 		};
 
 		class Identifier : public Object
@@ -79,6 +91,9 @@ namespace ICM
 			}
 			DefaultType get_type() const {
 				return T_Identifier;
+			}
+			Identifier* clone() const {
+				return new Identifier(name.to_string());
 			}
 
 		private:
@@ -97,6 +112,14 @@ namespace ICM
 		void print(const T &t);
 
 		std::string to_string(const Object &obj);
+	}
+
+	using ObjectPtr = std::shared_ptr<Objects::Object>;
+
+	template <typename T>
+	inline std::shared_ptr<T> getObjPtr(const T &obj)
+	{
+		return std::make_shared<T>(obj);
 	}
 }
 

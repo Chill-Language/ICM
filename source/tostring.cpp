@@ -27,20 +27,23 @@ namespace ICM
 		if (obj->getPointer() == nullptr)
 			return "Null";
 		string str;
-		switch (type) {
+		/*switch (type) {
 		case T_Number:
-			str = obj->getData<Objects::Number>().to_string();
+			str = obj->getData().to_string();
 			break;
 		case T_String:
-			str = obj->getData<Objects::String>().to_string();
+			str = obj->getData().to_string();
 			break;
 		case T_Identifier:
-			str = obj->getData<Objects::Identifier>().to_string();
+			str = obj->getData().to_string();
 			break;
 		default:
 			str = std::string("Error Type.");
-		}
-		return str;
+		}*/
+		auto ptr = ((Objects::Number*)(obj->getPointer()));
+
+		return ptr->to_string();
+		//return obj->getData().to_string();
 	}
 	string to_string(const Function* func) {
 		// Judge Null

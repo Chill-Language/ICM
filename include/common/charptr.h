@@ -18,6 +18,7 @@ public:
 	explicit charptr(const std::string &str) : charptr(str.c_str(), str.length()) {}
 	operator char*() { return data.get(); }
 	std::string to_string() const { return data.get(); }
+	charptr* clone() const { return new charptr(data.get(), length); }
 	size_t getLength() const { return length; }
 
 private:

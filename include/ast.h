@@ -88,8 +88,8 @@ namespace ICM
 		}
 		// Get
 		template <typename T>
-		T getdata() const {
-			return this->objdata.data->getData<T>();
+		T& getdata() const {
+			return *((T*)(this->objdata.data->getPointer()));
 		}
 		const DefaultType getObjtype() const {
 			return this->objdata.type;
@@ -102,8 +102,12 @@ namespace ICM
 		}
 		// Set
 		template <typename T>
-		void setdata(const T & data) {
-			this->objdata.type = data.get_type();
+		void setdata(const T &data) {
+			setdata(getObjPtr(data));
+		}
+		template <typename T>
+		void setdata(const std::shared_ptr<T> &data) {
+			this->objdata.type = data->get_type();
 			this->objdata.data->setData(data);
 		}
 		void settype(DefaultType type) {
@@ -155,10 +159,14 @@ namespace ICM
 			this->currptr = root;
 			return this;
 		}
-		
 		template <typename T>
-		AST* setdata(const T & data) {
-			this->currptr->setdata<T>(data);
+		AST* setdata(const T &data) {
+			return setdata(getObjPtr(data));
+		}
+
+		template <typename T>
+		AST* setdata(const std::shared_ptr<T> &data) {
+			this->currptr->setdata(data);
 			return this;
 		}
 		AST* settype(DefaultType type) {
