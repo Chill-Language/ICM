@@ -1,5 +1,5 @@
-#ifndef _ICM_ASTS_H_
-#define _ICM_ASTS_H_
+#ifndef _ICM_PARSER_H_
+#define _ICM_PARSER_H_
 
 #include "ast.h"
 #include "match.h"

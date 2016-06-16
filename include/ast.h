@@ -103,6 +103,7 @@ namespace ICM
 		// Set
 		template <typename T>
 		void setdata(const T & data) {
+			this->objdata.type = data.get_type();
 			this->objdata.data->setData(data);
 		}
 		void settype(DefaultType type) {

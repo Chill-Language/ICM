@@ -35,7 +35,7 @@ namespace ICM
 	class Match
 	{
 	public:
-		Match(const char *source) : source(source), currptr(source) {}
+		explicit Match(const char *source) : source(source), currptr(source) {}
 
 		MatchResult matchNext();
 		static bool isBreakchar(char c) {

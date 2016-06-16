@@ -30,7 +30,11 @@ namespace ICM
 			return (const T*)pointer;
 		}
 		template <typename T>
-		T getData() const {
+		const T& getData() const {
+			return *getPointer<T>();
+		}
+		template <typename T>
+		T& getData() {
 			return *getPointer<T>();
 		}
 

@@ -36,15 +36,15 @@ namespace ICM
 					}
 				}
 				else {
-					ast->pushNode(AST_DATA)->setdata(mr.getString());
+					ast->pushNode(AST_DATA)->setdata(Objects::String(mr.getString()));
 				}
 				firstMatchBraket = false;
 			}
 			else if (mr.getType() == T_Number) {
-				ast->pushNode(AST_DATA)->setdata<Objects::Number>(atoi(mr.getString().c_str()))->settype(T_Number);
+				ast->pushNode(AST_DATA)->setdata(Objects::Number(atoi(mr.getString().c_str())))->settype(T_Number);
 			}
 			else if (mr.getType() == T_String) {
-				ast->pushNode(AST_DATA)->setdata<Objects::String>(mr.getString())->settype(T_String);
+				ast->pushNode(AST_DATA)->setdata(Objects::String(mr.getString()))->settype(T_String);
 			}
 			if (emptybreak && ast->isend()) {
 				break;

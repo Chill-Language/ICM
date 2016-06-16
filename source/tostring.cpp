@@ -2,6 +2,7 @@
 #include "tostring.h"
 #include "charptr.h"
 #include "objects.h"
+#include "prints.h"
 using std::string;
 using std::to_string;
 
@@ -34,7 +35,7 @@ namespace ICM
 			str = obj->getData<Objects::String>().to_string();
 			break;
 		default:
-			str = std::to_string(obj->getData<int>());
+			str = std::string("Error Type.");
 		}
 		return str;
 	}

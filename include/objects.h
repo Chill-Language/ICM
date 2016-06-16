@@ -28,7 +28,7 @@ namespace ICM
 		class Number : public Object
 		{
 		public:
-			Number(int dat = 0) : data(dat) {}
+			explicit Number(int dat = 0) : data(dat) {}
 			Number& add(const Number &b) {
 				self.data += b.data;
 				return self;
@@ -51,7 +51,7 @@ namespace ICM
 		class String : public Object
 		{
 		public:
-			String(const std::string &dat = "") : data(dat) {}
+			explicit String(const std::string &dat = "") : data(dat) {}
 			String(const String &dat) : data(dat.data) {}
 			String& add(const String &b) {
 				data = Common::charptr(self.data.to_string() + b.data.to_string());

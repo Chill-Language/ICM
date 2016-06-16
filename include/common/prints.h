@@ -97,6 +97,10 @@ inline void print(const std::string &obj)
 {
 	Output::print(obj);
 }
+inline void print(const char *obj)
+{
+	Output::print(obj);
+}
 inline void println()
 {
 	Output::println();
