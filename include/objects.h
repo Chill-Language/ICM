@@ -52,7 +52,6 @@ namespace ICM
 		{
 		public:
 			explicit String(const std::string &dat = "") : data(dat) {}
-			String(const String &dat) : data(dat.data) {}
 			String& add(const String &b) {
 				data = Common::charptr(self.data.to_string() + b.data.to_string());
 				return self;
@@ -69,6 +68,21 @@ namespace ICM
 
 		private:
 			Common::charptr data;
+		};
+
+		class Identifier : public Object
+		{
+		public:
+			explicit Identifier(const std::string &dat = "") : name(dat) {}
+			std::string to_string() const {
+				return name.to_string();
+			}
+			DefaultType get_type() const {
+				return T_Identifier;
+			}
+
+		private:
+			Common::charptr name;
 		};
 
 		// Default Function

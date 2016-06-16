@@ -34,6 +34,9 @@ namespace ICM
 		case T_String:
 			str = obj->getData<Objects::String>().to_string();
 			break;
+		case T_Identifier:
+			str = obj->getData<Objects::Identifier>().to_string();
+			break;
 		default:
 			str = std::string("Error Type.");
 		}

@@ -1,6 +1,6 @@
 // Name:	     prints.h
-// Date:	     06/14/2016
-// Version:      2.0.0.0
+// Date:	     06/16/2016
+// Version:      2.1.0.0
 // Description:  Basic on 'to_string', using 'printf'.
 
 #ifndef _SYSTEM_PRINTS_H_
@@ -23,29 +23,20 @@ namespace Convert
 		return std::string(s);
 	}
 	//   Value to Template
-	template <typename T>
-	inline std::string to_string(T value)
-	{
-		return std::to_string(value);
-	}
-	template <>
 	inline std::string to_string(std::nullptr_t null)
 	{
 		return std::string("Null");
 	}
-	template <>
 	inline std::string to_string(bool b)
 	{
 		return std::string((b == true) ? "T" : "F");
 	}
-	template <>
 	inline std::string to_string(char c)
 	{
 		std::string str;
 		str.push_back(c);
 		return str;
 	}
-	template <>
 	inline std::string to_string(const void *p)
 	{
 		size_t size = sizeof(void*) * 2 + 3;
@@ -61,7 +52,9 @@ namespace Output
 	template <typename T>
 	inline void print(const T &obj)
 	{
-		printf("%s", Convert::to_string(obj).c_str());
+		using Convert::to_string;
+		using std::to_string;
+		printf("%s", to_string(obj).c_str());
 	}
 	inline void print(const char *str)
 	{
@@ -87,6 +80,7 @@ namespace Output
 		exit(-1);
 	}
 }
+/*
 template <typename T>
 inline void print(const T &obj)
 {
@@ -111,7 +105,7 @@ inline void println(const T &obj)
 	Common::print(obj);
 	println();
 }
-
+*/
 END
 
 #endif

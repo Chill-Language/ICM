@@ -78,6 +78,6 @@ namespace ICM
 	void runAST(const AST *ast)
 	{
 		auto a = calcASTNode(ast->getRoot());
-		Common::println(a);
+		Common::Output::println(a);
 	}
 }

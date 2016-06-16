@@ -2,19 +2,17 @@
 #include "parser.h"
 #include "runast.h"
 #include <map>
-using std::to_string;
 using namespace Common;
+using namespace Output;
 using namespace ICM;
 
 int main(void)
 {
 	const char *text = "(+ 5 6)";
 
-	print("Input: \n");
-	println(text);
-	println();
+	Match match(text);
 
-	KeyWordMap KeyWords {
+	KeyWordMap KeyWords{
 		KeyWord("+", 1),
 		KeyWord("-", 2),
 		KeyWord("*", 3),
@@ -28,9 +26,11 @@ int main(void)
 		KeyWord("print",11),
 	};
 
-	// Parser
+	// Main
 
-	Match match(text);
+	print("Input: \n");
+	println(text);
+	println();
 
 	while (!match.isend()) {
 		AST *ast = createAST(match, KeyWords);
@@ -42,6 +42,7 @@ int main(void)
 		println();
 		delete ast;
 	}
+
 	println();
 
 	return 0;
