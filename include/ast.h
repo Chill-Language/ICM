@@ -70,14 +70,14 @@ namespace ICM
 		// Create a Variables from Type.
 		explicit ASTNode(ASTNodeType type) { initialize(type); }
 		// Create a Reference from Pointer.
-		explicit ASTNode(ObjectData *dat, DefaultType type = T_Null) { initialize(dat, type); }
+		explicit ASTNode(ObjectData *dat) { initialize(dat); }
 		explicit ASTNode(Function *fun, Parameters *par) { initialize(fun, par); }
 		explicit ASTNode(Function *fun) : ASTNode(fun, nullptr) {}
 		explicit ASTNode(Parameters *par) : ASTNode(nullptr, par) {}
 		~ASTNode() { release(); }
 
 		void initialize(ASTNodeType type);
-		void initialize(ObjectData *dat, DefaultType type = T_Null);
+		void initialize(ObjectData *dat);
 		void initialize(Function *fun = nullptr, Parameters *par = nullptr);
 		
 		void release();
@@ -90,9 +90,6 @@ namespace ICM
 		template <typename T>
 		T& getdata() const {
 			return *((T*)(this->objdata.data->getPointer()));
-		}
-		const DefaultType getObjtype() const {
-			return this->objdata.type;
 		}
 		const Function* getFunc() const {
 			return this->fundata.func;
@@ -107,11 +104,7 @@ namespace ICM
 		}
 		template <typename T>
 		void setdata(const std::shared_ptr<T> &data) {
-			this->objdata.type = data->get_type();
 			this->objdata.data->setData(data);
-		}
-		void settype(DefaultType type) {
-			this->objdata.type = type;
 		}
 		void setfunc(FuncType type, FuncID id) {
 			this->fundata.func->set(type, id);
@@ -119,8 +112,8 @@ namespace ICM
 		void pushpars(ASTNode *node) {
 			this->fundata.pars->push(node);
 		}
-		void setObjtype(const DefaultType type) {
-			this->objdata.type = type;
+		DefaultType getObjtype() const {
+			return objdata.data->getPointer()->get_type();
 		}
 
 		friend std::string to_string(const ASTNode *astn);
@@ -136,7 +129,6 @@ namespace ICM
 			} fundata;
 			struct {
 				ObjectData *data = nullptr;
-				DefaultType type = T_Null;
 			} objdata;
 		};
 		bool reference = true;
@@ -167,10 +159,6 @@ namespace ICM
 		template <typename T>
 		AST* setdata(const std::shared_ptr<T> &data) {
 			this->currptr->setdata(data);
-			return this;
-		}
-		AST* settype(DefaultType type) {
-			this->currptr->settype(type);
 			return this;
 		}
 		AST* setfunc(FuncType type, FuncID id) {

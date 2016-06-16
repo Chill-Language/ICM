@@ -25,7 +25,7 @@ namespace ICM
 			auto type = func->getType();
 			auto id = func->getID();
 			auto list = pars->getList();
-			auto types = list.front()->getObjtype();
+			auto types = list.front()->getdata<Object>().get_type();
 			if (type == FUNC_DEF) {
 				// TODO
 				switch (id) {

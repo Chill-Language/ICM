@@ -23,27 +23,10 @@ namespace ICM
 		default:           return "";
 		}
 	}
-	string to_string(const ObjectData *obj, DefaultType type) {
+	string to_string(const ObjectData *obj) {
 		if (obj->getPointer() == nullptr)
 			return "Null";
-		string str;
-		/*switch (type) {
-		case T_Number:
-			str = obj->getData().to_string();
-			break;
-		case T_String:
-			str = obj->getData().to_string();
-			break;
-		case T_Identifier:
-			str = obj->getData().to_string();
-			break;
-		default:
-			str = std::string("Error Type.");
-		}*/
-		auto ptr = ((Objects::Number*)(obj->getPointer()));
-
-		return ptr->to_string();
-		//return obj->getData().to_string();
+		return obj->getData().to_string();
 	}
 	string to_string(const Function* func) {
 		// Judge Null
@@ -95,7 +78,7 @@ namespace ICM
 		else if (astn->type == AST_DATA) {
 			str.append("D(");
 			if (astn->objdata.data)
-				str.append(to_string(astn->objdata.data, astn->objdata.type));
+				str.append(to_string(astn->objdata.data));
 			else
 				str.append("NIL");
 			str.append(")");

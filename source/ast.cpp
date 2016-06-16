@@ -40,10 +40,9 @@ namespace ICM
 			this->type = type;
 		}
 	}
-	void ASTNode::initialize(ObjectData *dat, DefaultType type) {
+	void ASTNode::initialize(ObjectData *dat) {
 		this->type = AST_DATA;
 		this->objdata.data = dat;
-		this->objdata.type = type;
 	}
 	void ASTNode::initialize(Function *fun, Parameters *par) {
 		this->type = AST_FUNC;
@@ -72,7 +71,6 @@ namespace ICM
 		switch (this->type) {
 		case AST_DATA:
 			copy->objdata.data = this->objdata.data->clone();
-			copy->objdata.type = this->objdata.type;
 			break;
 		case AST_FUNC:
 			copy->fundata.func = this->fundata.func;
@@ -90,7 +88,6 @@ namespace ICM
 		switch (this->type) {
 		case AST_DATA:
 			copy->objdata.data = this->objdata.data->clone();
-			copy->objdata.type = this->objdata.type;
 			break;
 		case AST_FUNC:
 			copy->fundata.func = this->fundata.func;
