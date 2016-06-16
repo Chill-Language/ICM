@@ -1,8 +1,6 @@
-#include <string>
+#include "basic.h"
 #include "tostring.h"
-#include "charptr.h"
 #include "objects.h"
-#include "prints.h"
 using std::string;
 using std::to_string;
 
@@ -77,8 +75,8 @@ namespace ICM
 		}
 		else if (astn->type == AST_DATA) {
 			str.append("D(");
-			if (astn->objdata.data)
-				str.append(to_string(astn->objdata.data));
+			if (astn->objdata)
+				str.append(to_string(astn->objdata));
 			else
 				str.append("NIL");
 			str.append(")");

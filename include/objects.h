@@ -1,19 +1,12 @@
 #ifndef _ICM_OBJECTS_H_
 #define _ICM_OBJECTS_H_
 
-#include <string>
-#include <vector>
-#include "type.h"
-#include "memory.h"
-#include "charptr.h"
-#include "prints.h"
+#include "basic.h"
 
 namespace ICM
 {
 	namespace Objects
 	{
-		template <typename T> using DataList = std::vector<T>;
-
 		class Object
 		{
 		public:
@@ -114,10 +107,11 @@ namespace ICM
 		std::string to_string(const Object &obj);
 	}
 
-	using ObjectPtr = std::shared_ptr<Objects::Object>;
+	using DataList = std::vector<Objects::Object*>;
+	using ObjectPtr = autoptr<Objects::Object>;
 
 	template <typename T>
-	inline std::shared_ptr<T> getObjPtr(const T &obj)
+	inline autoptr<T> getObjPtr(const T &obj)
 	{
 		return std::make_shared<T>(obj);
 	}

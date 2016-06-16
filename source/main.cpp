@@ -1,9 +1,7 @@
-#include "prints.h"
+#include "basic.h"
 #include "parser.h"
 #include "runast.h"
-#include <map>
-using namespace Common;
-using namespace Output;
+
 using namespace ICM;
 
 int main(void)

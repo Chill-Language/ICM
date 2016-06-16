@@ -1,6 +1,7 @@
 #ifndef _ICM_TOSTRING_
 #define _ICM_TOSTRING_
-#include <string>
+
+#include "basic.h"
 #include "ast.h"
 #include "match.h"
 

@@ -1,9 +1,7 @@
 #ifndef _ICM_AST_H_
 #define _ICM_AST_H_
 
-#include <vector>
-#include <stack>
-#include "type.h"
+#include "basic.h"
 #include "objectdata.h"
 
 namespace ICM
@@ -89,7 +87,7 @@ namespace ICM
 		// Get
 		template <typename T>
 		T& getdata() const {
-			return *((T*)(this->objdata.data->getPointer()));
+			return *((T*)(this->objdata->getPointer()));
 		}
 		const Function* getFunc() const {
 			return this->fundata.func;
@@ -103,8 +101,8 @@ namespace ICM
 			setdata(getObjPtr(data));
 		}
 		template <typename T>
-		void setdata(const std::shared_ptr<T> &data) {
-			this->objdata.data->setData(data);
+		void setdata(const autoptr<T> &data) {
+			this->objdata->setData(data);
 		}
 		void setfunc(FuncType type, FuncID id) {
 			this->fundata.func->set(type, id);
@@ -113,7 +111,7 @@ namespace ICM
 			this->fundata.pars->push(node);
 		}
 		DefaultType getObjtype() const {
-			return objdata.data->getPointer()->get_type();
+			return objdata->getPointer()->get_type();
 		}
 
 		friend std::string to_string(const ASTNode *astn);
@@ -127,9 +125,7 @@ namespace ICM
 				Function *func = nullptr;
 				Parameters *pars = nullptr;
 			} fundata;
-			struct {
-				ObjectData *data = nullptr;
-			} objdata;
+			ObjectData *objdata = nullptr;
 		};
 		bool reference = true;
 	};
@@ -157,7 +153,7 @@ namespace ICM
 		}
 
 		template <typename T>
-		AST* setdata(const std::shared_ptr<T> &data) {
+		AST* setdata(const autoptr<T> &data) {
 			this->currptr->setdata(data);
 			return this;
 		}

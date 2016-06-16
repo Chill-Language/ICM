@@ -1,7 +1,7 @@
 #ifndef _ICM_OBJECTDATA_H_
 #define _ICM_OBJECTDATA_H_
 
-#include <string>
+#include "basic.h"
 #include "objects.h"
 
 namespace ICM

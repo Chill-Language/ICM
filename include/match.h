@@ -1,8 +1,7 @@
 #ifndef _ICM_MATCH_H_
 #define _ICM_MATCH_H_
 
-#include <string>
-#include "type.h"
+#include "basic.h"
 
 namespace ICM
 {
