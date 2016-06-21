@@ -7,7 +7,7 @@ using namespace ICM;
 int main(void)
 {
 	//const char *text = "(+ \"Hello \" \"World!\")";
-	const char *text = "(+ 5 (- 6 7))";
+	const char *text = "(print (+ 5 6))";
 
 	Match match(text);
 
@@ -16,13 +16,14 @@ int main(void)
 		KeyWord("-", 2),
 		KeyWord("*", 3),
 		KeyWord("/", 4),
-		KeyWord("=", 5),
-		KeyWord(">", 6),
-		KeyWord("<", 7),
-		KeyWord(">=", 8),
-		KeyWord("<=", 9),
-		KeyWord("list",10),
-		KeyWord("print",11),
+		KeyWord("%", 5),
+		KeyWord("=", 10),
+		KeyWord(">", 11),
+		KeyWord("<", 12),
+		KeyWord(">=", 13),
+		KeyWord("<=", 14),
+		KeyWord("list",20),
+		KeyWord("print",21),
 	};
 
 	// Main

@@ -40,6 +40,18 @@ namespace ICM
 				self.data -= b.data;
 				return self;
 			}
+			Number& mul(const Number &b) {
+				self.data *= b.data;
+				return self;
+			}
+			Number& div(const Number &b) {
+				self.data /= b.data;
+				return self;
+			}
+			Number& mod(const Number &b) {
+				self.data %= b.data;
+				return self;
+			}
 			std::string to_string() const {
 				return std::to_string(data);
 			}
@@ -123,7 +135,7 @@ namespace ICM
 		{
 			// Default Function
 			template <typename T>
-			ObjectPtr sum(const DataList &list) {
+			ObjectPtr add(const DataList &list) {
 				T *result = new T;
 				for (auto &l : list)
 					result->add(*((T*)l.get()));
@@ -131,9 +143,18 @@ namespace ICM
 			}
 			template <typename T>
 			ObjectPtr sub(const DataList &list);
+			template <typename T>
+			ObjectPtr mul(const DataList &list);
+			template <typename T>
+			ObjectPtr div(const DataList &list);
+			template <typename T>
+			ObjectPtr mod(const DataList &list);
 
-			ObjectPtr sum(const DataList &list);
+			ObjectPtr add(const DataList &list);
 			ObjectPtr sub(const DataList &list);
+			ObjectPtr mul(const DataList &list);
+			ObjectPtr div(const DataList &list);
+			ObjectPtr mod(const DataList &list);
 
 			void print(const ObjectPtr &p);
 		}

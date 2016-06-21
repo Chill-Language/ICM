@@ -33,13 +33,12 @@ namespace ICM
 			auto type = func->getType();
 			auto id = func->getID();
 			auto list = pars->getList();
-			auto types = list.front()->getdata()->get_type();
 			if (type == FUNC_DEF) {
 				// TODO
 				switch (id) {
 				case 1: // Add
 					tmp = new ASTNode(AST_DATA);
-					tmp->setdata(Objects::Func::sum(createList(list)));
+					tmp->setdata(Objects::Func::add(createList(list)));
 					result = tmp;
 					break;
 				case 2: // Sub
@@ -47,7 +46,22 @@ namespace ICM
 					tmp->setdata(Objects::Func::sub(createList(list)));
 					result = tmp;
 					break;
-				case 11: // Print
+				case 3: // Mul
+					tmp = new ASTNode(AST_DATA);
+					tmp->setdata(Objects::Func::mul(createList(list)));
+					result = tmp;
+					break;
+				case 4: // Div
+					tmp = new ASTNode(AST_DATA);
+					tmp->setdata(Objects::Func::div(createList(list)));
+					result = tmp;
+					break;
+				case 5: // Mod
+					tmp = new ASTNode(AST_DATA);
+					tmp->setdata(Objects::Func::mod(createList(list)));
+					result = tmp;
+					break;
+				case 21: // Print
 					Objects::Func::print(calcASTNode(list.at(0))->getdata());
 					break;
 				}
@@ -60,6 +74,7 @@ namespace ICM
 	void runAST(const AST *ast)
 	{
 		auto a = calcASTNode(ast->getRoot());
+		Common::Output::println();
 		Common::Output::println(a);
 	}
 }
