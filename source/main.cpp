@@ -7,11 +7,12 @@ using namespace ICM;
 int main(void)
 {
 	//const char *text = "(+ \"Hello \" \"World!\")";
-	const char *text = "(print (+ 5 6))";
+	const char *text = "(print T)";
 
 	Match match(text);
 
-	KeyWordMap KeyWords{
+	KeyWordMap KeyWords
+	{
 		KeyWord("+", 1),
 		KeyWord("-", 2),
 		KeyWord("*", 3),

@@ -30,6 +30,7 @@ namespace ICM
 		T_Nil,
 		T_LBracket,
 		T_RBracket,
+		T_Boolean,
 		T_Number,
 		T_String,
 		T_Comment,

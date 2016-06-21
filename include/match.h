@@ -15,7 +15,8 @@ namespace ICM
 			: type(type), beginPtr(begin), endPtr(begin + 1), addmsg(0) { }
 		MatchResult(DefaultType type, const char *begin, const char *end, int addmsg = 0)
 			: type(type), beginPtr(begin), endPtr(end), addmsg(addmsg) { }
-
+		
+		void setType(DefaultType type) { this->type = type; }
 		DefaultType getType() const { return type; }
 		std::string getString() const { return std::string(begin(), end()); }
 		int getAddMsg() const { return addmsg; }

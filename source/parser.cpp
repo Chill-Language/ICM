@@ -11,13 +11,16 @@ namespace ICM
 		switch (type)
 		{
 		case ICM::T_Null:
-			object = new Object();
+			object = nullptr;
 			break;
 		case ICM::T_Nil:
-			object = new Object();
+			object = new Nil();
 			break;
 		case ICM::T_Number:
 			object = new Number(atoi(str.c_str()));
+			break;
+		case ICM::T_Boolean:
+			object = new Boolean(str == "T");
 			break;
 		case ICM::T_String:
 			object = new String(str);
@@ -48,7 +51,7 @@ namespace ICM
 		mr = match.matchNext();
 		while (mr.begin() != mr.end()) {
 			if (mr.getString()[0] != '\n') {
-				//printf("%s\n",to_string(&mr).c_str());
+				//println(to_string(&mr));
 			}
 			if (mr.getType() == T_LBracket) {
 				ast->pushNode(AST_FUNC);
@@ -74,7 +77,7 @@ namespace ICM
 				}
 				firstMatchBraket = false;
 			}
-			else if (mr.getType() == T_Number || mr.getType() == T_String) {
+			else if (mr.getType() == T_Number || mr.getType() == T_String || mr.getType() == T_Boolean) {
 				setData(ast, mr);
 			}
 

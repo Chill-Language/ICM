@@ -10,9 +10,8 @@ namespace ICM
 		class Object
 		{
 		public:
-			//Object() {}
 			virtual ~Object() {}
-			virtual std::string to_string() const {
+			virtual string to_string() const {
 				return "Object";
 			}
 			virtual DefaultType get_type() const {
@@ -21,16 +20,40 @@ namespace ICM
 			virtual Object* clone() const {
 				return new Object(*this);
 			}
-		
+		};
+
+		class Nil : public Object
+		{
+		public:
+			Nil() {}
+			string to_string() const {
+				return "Nil";
+			}
+			Nil* clone() const {
+				return new Nil(*this);
+			}
+
+		};
+		class Boolean : public Object
+		{
+		public:
+			Boolean() {}
+			Boolean(bool b) : data(b) {}
+			string to_string() const {
+				return Convert::to_string(data);
+			}
+			Boolean* clone() const {
+				return new Boolean(*this);
+			}
+
 		private:
-			//Object(const Object&) {}
+			bool data = false;
 		};
 
 		class Number : public Object
 		{
 		public:
 			explicit Number(int dat = 0) : data(dat) {}
-			//Number(const Number &num) : data(num.data) {}
 
 			Number& add(const Number &b) {
 				self.data += b.data;
@@ -52,7 +75,7 @@ namespace ICM
 				self.data %= b.data;
 				return self;
 			}
-			std::string to_string() const {
+			string to_string() const {
 				return std::to_string(data);
 			}
 			DefaultType get_type() const {
@@ -111,20 +134,6 @@ namespace ICM
 			Common::charptr name;
 		};
 	}
-
-	/*class ObjectPtr
-	{
-	public:
-		ObjectPtr(Objects::Object *p) : ptr(p) {}
-		Objects::Object* get() { return ptr; }
-		const Objects::Object* get() const { return ptr; }
-		Objects::Object* operator->() { return ptr; }
-		const Objects::Object* operator->() const { return ptr; }
-		bool operator==(void *p) const { return ptr == p; }
-		operator bool() const { return ptr != nullptr; }
-
-		Objects::Object *ptr;
-	};*/
 
 	using ObjectPtr = autoptr<Objects::Object>;
 	using DataList = std::vector<ObjectPtr>;

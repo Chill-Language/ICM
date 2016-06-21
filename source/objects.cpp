@@ -13,9 +13,6 @@ namespace ICM
 			void print(const ObjectPtr &p) {
 				switch (p->get_type())
 				{
-				case T_Number:
-					Common::Output::print(p->to_string());
-					break;
 				case T_String:
 					Common::Output::print(getData<String>(p).get_data());
 					break;

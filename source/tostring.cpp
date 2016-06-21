@@ -15,6 +15,7 @@ namespace ICM
 		case T_LBracket:   return "LBracket";
 		case T_RBracket:   return "RBracket";
 		case T_Number:     return "Number";
+		case T_Boolean:    return "Boolean";
 		case T_Identifier: return "Identifier";
 		case T_String:     return "String";
 		case T_Comment:    return "Comment";
