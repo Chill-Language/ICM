@@ -20,6 +20,14 @@ namespace ICM
 					break;
 				}
 			}
+			template <>
+			ObjectPtr sub<Number>(const DataList &list) {
+				Number *result = new Number(*(Number*)(list.front().get()));
+				result->add(*(Number*)(list.front().get()));
+				for (auto &l : list)
+					result->sub(*(Number*)(l.get()));
+				return ObjectPtr(result);
+			}
 
 			ObjectPtr sum(const DataList &list) {
 				Object* result;
@@ -31,6 +39,21 @@ namespace ICM
 					break;
 				case T_String:
 					return sum<String>(list);
+					break;
+				default:
+					result = new Object();
+					break;
+				}
+				return ObjectPtr(result);
+			}
+
+			ObjectPtr sub(const DataList &list) {
+				Object* result;
+				auto type = list.front()->get_type();
+				switch (type)
+				{
+				case T_Number:
+					return sub<Number>(list);
 					break;
 				default:
 					result = new Object();

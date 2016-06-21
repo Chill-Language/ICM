@@ -6,7 +6,8 @@ using namespace ICM;
 
 int main(void)
 {
-	const char *text = "(+ \"Hello \" \"World!\")";
+	//const char *text = "(+ \"Hello \" \"World!\")";
+	const char *text = "(+ 5 (- 6 7))";
 
 	Match match(text);
 

@@ -129,7 +129,11 @@ namespace ICM
 					result->add(*((T*)l.get()));
 				return ObjectPtr(result);
 			}
+			template <typename T>
+			ObjectPtr sub(const DataList &list);
+
 			ObjectPtr sum(const DataList &list);
+			ObjectPtr sub(const DataList &list);
 
 			void print(const ObjectPtr &p);
 		}
