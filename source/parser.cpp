@@ -3,6 +3,40 @@
 
 namespace ICM
 {
+	using namespace Objects;
+
+	ObjectPtr getData(DefaultType type, const string &str)
+	{
+		Object *object;
+		switch (type)
+		{
+		case ICM::T_Null:
+			object = new Object();
+			break;
+		case ICM::T_Nil:
+			object = new Object();
+			break;
+		case ICM::T_Number:
+			object = new Number(atoi(str.c_str()));
+			break;
+		case ICM::T_String:
+			object = new String(str);
+			break;
+		case ICM::T_Identifier:
+			object = new Identifier(str);
+			break;
+		default:
+			object = new Object();
+			break;
+		}
+		return ObjectPtr(object);
+	}
+
+	inline void setData(AST *ast, const MatchResult &mr)
+	{
+		auto data = getData(mr.getType(), mr.getString());
+		ast->pushNode(AST_DATA)->setdata(data);
+	}
 	AST* createAST(Match &match, const KeyWordMap &KeyWords)
 	{
 		AST *ast = new AST();
@@ -36,16 +70,14 @@ namespace ICM
 					}
 				}
 				else {
-					ast->pushNode(AST_DATA)->setdata(Objects::Identifier(mr.getString()));
+					setData(ast, mr);
 				}
 				firstMatchBraket = false;
 			}
-			else if (mr.getType() == T_Number) {
-				ast->pushNode(AST_DATA)->setdata(Objects::Number(atoi(mr.getString().c_str())));
+			else if (mr.getType() == T_Number || mr.getType() == T_String) {
+				setData(ast, mr);
 			}
-			else if (mr.getType() == T_String) {
-				ast->pushNode(AST_DATA)->setdata(Objects::String(mr.getString()));
-			}
+
 			if (emptybreak && ast->isend()) {
 				break;
 			}

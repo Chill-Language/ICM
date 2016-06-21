@@ -21,10 +21,10 @@ namespace ICM
 		default:           return "";
 		}
 	}
-	string to_string(const ObjectData *obj) {
-		if (obj->getPointer() == nullptr)
+	string to_string(const ObjectPtr &obj) {
+		if (obj == nullptr)
 			return "Null";
-		return obj->getData().to_string();
+		return obj->to_string();
 	}
 	string to_string(const Function* func) {
 		// Judge Null

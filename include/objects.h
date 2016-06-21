@@ -10,6 +10,7 @@ namespace ICM
 		class Object
 		{
 		public:
+			//Object() {}
 			virtual ~Object() {}
 			virtual std::string to_string() const {
 				return "Object";
@@ -20,12 +21,17 @@ namespace ICM
 			virtual Object* clone() const {
 				return new Object(*this);
 			}
+		
+		private:
+			//Object(const Object&) {}
 		};
 
 		class Number : public Object
 		{
 		public:
 			explicit Number(int dat = 0) : data(dat) {}
+			//Number(const Number &num) : data(num.data) {}
+
 			Number& add(const Number &b) {
 				self.data += b.data;
 				return self;
@@ -92,28 +98,43 @@ namespace ICM
 		private:
 			Common::charptr name;
 		};
-
-		// Default Function
-		template <typename T>
-		T sum(const DataList<T> &list) {
-			T result;
-			for (auto &l : list)
-				result.add(l);
-			return result;
-		}
-		template <typename T>
-		void print(const T &t);
-
-		std::string to_string(const Object &obj);
 	}
 
-	using DataList = std::vector<Objects::Object*>;
-	using ObjectPtr = autoptr<Objects::Object>;
-
-	template <typename T>
-	inline autoptr<T> getObjPtr(const T &obj)
+	/*class ObjectPtr
 	{
-		return std::make_shared<T>(obj);
+	public:
+		ObjectPtr(Objects::Object *p) : ptr(p) {}
+		Objects::Object* get() { return ptr; }
+		const Objects::Object* get() const { return ptr; }
+		Objects::Object* operator->() { return ptr; }
+		const Objects::Object* operator->() const { return ptr; }
+		bool operator==(void *p) const { return ptr == p; }
+		operator bool() const { return ptr != nullptr; }
+
+		Objects::Object *ptr;
+	};*/
+
+	using ObjectPtr = autoptr<Objects::Object>;
+	using DataList = std::vector<ObjectPtr>;
+
+	namespace Objects
+	{
+		namespace Func
+		{
+			// Default Function
+			template <typename T>
+			ObjectPtr sum(const DataList &list) {
+				T *result = new T;
+				for (auto &l : list)
+					result->add(*((T*)l.get()));
+				return ObjectPtr(result);
+			}
+			ObjectPtr sum(const DataList &list);
+
+			void print(const ObjectPtr &p);
+		}
+
+		std::string to_string(const Object &obj);
 	}
 }
 

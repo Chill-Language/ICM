@@ -2,7 +2,7 @@
 #define _ICM_AST_H_
 
 #include "basic.h"
-#include "objectdata.h"
+#include "objects.h"
 
 namespace ICM
 {
@@ -68,16 +68,16 @@ namespace ICM
 		// Create a Variables from Type.
 		explicit ASTNode(ASTNodeType type) { initialize(type); }
 		// Create a Reference from Pointer.
-		explicit ASTNode(ObjectData *dat) { initialize(dat); }
+		explicit ASTNode(const ObjectPtr &dat) { initialize(dat); }
 		explicit ASTNode(Function *fun, Parameters *par) { initialize(fun, par); }
 		explicit ASTNode(Function *fun) : ASTNode(fun, nullptr) {}
 		explicit ASTNode(Parameters *par) : ASTNode(nullptr, par) {}
 		~ASTNode() { release(); }
 
 		void initialize(ASTNodeType type);
-		void initialize(ObjectData *dat);
+		void initialize(const ObjectPtr &dat);
 		void initialize(Function *fun = nullptr, Parameters *par = nullptr);
-		
+
 		void release();
 		ASTNode* clone() const; // Shallow Copy
 		ASTNode* deep_clone() const; // Deep Copy
@@ -85,9 +85,8 @@ namespace ICM
 			return this->type;
 		}
 		// Get
-		template <typename T>
-		T& getdata() const {
-			return *((T*)(this->objdata->getPointer()));
+		const ObjectPtr& getdata() const {
+			return this->objdata;
 		}
 		const Function* getFunc() const {
 			return this->fundata.func;
@@ -96,13 +95,8 @@ namespace ICM
 			return this->fundata.pars;
 		}
 		// Set
-		template <typename T>
-		void setdata(const T &data) {
-			setdata(getObjPtr(data));
-		}
-		template <typename T>
-		void setdata(const autoptr<T> &data) {
-			this->objdata->setData(data);
+		void setdata(const ObjectPtr &pdata) {
+			this->objdata = pdata;
 		}
 		void setfunc(FuncType type, FuncID id) {
 			this->fundata.func->set(type, id);
@@ -111,7 +105,7 @@ namespace ICM
 			this->fundata.pars->push(node);
 		}
 		DefaultType getObjtype() const {
-			return objdata->getPointer()->get_type();
+			return objdata->get_type();
 		}
 
 		friend std::string to_string(const ASTNode *astn);
@@ -125,7 +119,7 @@ namespace ICM
 				Function *func = nullptr;
 				Parameters *pars = nullptr;
 			} fundata;
-			ObjectData *objdata = nullptr;
+			ObjectPtr objdata = nullptr;
 		};
 		bool reference = true;
 	};
@@ -147,14 +141,9 @@ namespace ICM
 			this->currptr = root;
 			return this;
 		}
-		template <typename T>
-		AST* setdata(const T &data) {
-			return setdata(getObjPtr(data));
-		}
 
-		template <typename T>
-		AST* setdata(const autoptr<T> &data) {
-			this->currptr->setdata(data);
+		AST* setdata(const ObjectPtr &pdata) {
+			this->currptr->setdata(pdata);
 			return this;
 		}
 		AST* setfunc(FuncType type, FuncID id) {

@@ -25,48 +25,48 @@ namespace ICM
 			auto type = func->getType();
 			auto id = func->getID();
 			auto list = pars->getList();
-			auto types = list.front()->getdata<Object>().get_type();
+			auto types = list.front()->getdata()->get_type();
 			if (type == FUNC_DEF) {
 				// TODO
 				switch (id) {
 				case 1: // Add
 					if (types == T_Number) {
-						DataList<Number> listnum;
+						DataList listnum;
 						for (auto &l : list) {
 							auto tl = calcASTNode(l);
 							if (tl->getObjtype() == T_Number)
-								listnum.push_back(tl->getdata<Number>());
+								listnum.push_back(tl->getdata());
 						}
 						tmp = new ASTNode(AST_DATA);
-						tmp->setdata(Objects::sum(listnum));
+						tmp->setdata(Objects::Func::sum(listnum));
 						result = tmp;
 					}
 					else if (types == T_String) {
-						DataList<String> liststr;
+						DataList liststr;
 						for (auto &l : list) {
 							auto tl = calcASTNode(l);
 							if (tl->getObjtype() == T_String) {
-								liststr.push_back(tl->getdata<String>());
+								liststr.push_back(tl->getdata());
 							}
 						}
 						tmp = new ASTNode(AST_DATA);
-						tmp->setdata(Objects::sum(liststr));
+						tmp->setdata(Objects::Func::sum(liststr));
 						result = tmp;
 					}
 					break;
 				case 11: // Print
 					if (types == T_String)
-						Objects::print(calcASTNode(list.at(0))->getdata<String>());
+						Objects::Func::print(calcASTNode(list.at(0))->getdata());
 					else if (types == T_Number)
-						Objects::print(calcASTNode(list.at(0))->getdata<Number>());
+						Objects::Func::print(calcASTNode(list.at(0))->getdata());
 					break;
 				case 2: // Sub
-					Number num = calcASTNode(list.at(0))->getdata<Number>();
+					/*Number num = calcASTNode(list.at(0))->getdata();
 					for (auto p = list.begin() + 1; p != list.end(); ++p)
-						num.sub(calcASTNode(*p)->getdata<Number>());
+						num.sub(calcASTNode(*p)->getdata());
 					tmp = new ASTNode(AST_DATA);
-					tmp->setdata(num);
-					result = tmp;
+					tmp->setdata(getObjPtr(num));
+					result = tmp;*/
 					break;
 				}
 			}

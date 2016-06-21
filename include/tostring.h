@@ -8,7 +8,7 @@
 namespace ICM
 {
 	std::string to_string(DefaultType type);
-	std::string to_string(const ObjectData *obj, DefaultType type);
+	std::string to_string(const ObjectPtr &obj);
 	std::string to_string(const Function* func);
 	std::string to_string(const Parameters *pars);
 	std::string to_string(const ASTNode *astn);
