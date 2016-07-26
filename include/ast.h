@@ -6,63 +6,18 @@
 
 namespace ICM
 {
-	// Declare
-	class Function;
-	class Parameters;
-	class ASTNode;
 	// Types
 	enum FuncType { FUNC_NIL, FUNC_DEF, FUNC_ADD };
 	using FuncID = unsigned;
 	enum ASTNodeType { AST_NIL, AST_DATA, AST_FUNC };
 
-	// Function
-	class Function
-	{
-	public:
-		Function() {}
-		Function(FuncType type, FuncID id) : type(type), id(id) {}
-		void set(FuncType type, FuncID id) {
-			this->type = type;
-			this->id = id;
-		}
-		FuncType getType() const {
-			return this->type;
-		}
-		FuncID getID() const {
-			return this->id;
-		}
-		friend std::string to_string(const Function* func);
-
-	private:
-		// Members
-		FuncType type = FUNC_NIL;
-		FuncID id = 0;
-	};
-
-	// Parameters
-	class Parameters
-	{
-	public:
-		Parameters() {}
-		// Declare
-		using List = std::vector<ASTNode*>;
-		// Method
-		void push(ASTNode *node) { list.push_back(node); }
-		const List& getList() const {
-			return list;
-		}
-		friend std::string to_string(const Parameters *pars);
-
-		Parameters* clone() const; // Shallow Copy
-		Parameters* deep_clone() const; // Deep Copy
-
-	private:
-		List list;
-	};
-
 	// ASTNode
 	class ASTNode
 	{
+	public:
+		// Declare
+		class Function;
+		class Parameters;
 	public:
 		ASTNode() {}
 		// Create a Variables from Type.
@@ -122,6 +77,52 @@ namespace ICM
 			ObjectPtr objdata = nullptr;
 		};
 		bool reference = true;
+
+	public:
+		// Function
+		class Function
+		{
+		public:
+			Function() {}
+			Function(FuncType type, FuncID id) : type(type), id(id) {}
+			void set(FuncType type, FuncID id) {
+				this->type = type;
+				this->id = id;
+			}
+			FuncType getType() const {
+				return this->type;
+			}
+			FuncID getID() const {
+				return this->id;
+			}
+			friend std::string to_string(const Function* func);
+
+		private:
+			// Members
+			FuncType type = FUNC_NIL;
+			FuncID id = 0;
+		};
+
+		// Parameters
+		class Parameters
+		{
+		public:
+			Parameters() {}
+			// Declare
+			using List = std::vector<ASTNode*>;
+			// Method
+			void push(ASTNode *node) { list.push_back(node); }
+			const List& getList() const {
+				return list;
+			}
+			friend std::string to_string(const Parameters *pars);
+
+			Parameters* clone() const; // Shallow Copy
+			Parameters* deep_clone() const; // Deep Copy
+
+		private:
+			List list;
+		};
 	};
 
 	// AST

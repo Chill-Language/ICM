@@ -7,7 +7,7 @@ using namespace ICM;
 int main(void)
 {
 	//const char *text = "(+ \"Hello \" \"World!\")";
-	const char *text = "(print T)";
+	const char *text = "(+ 5 7 9)";
 
 	Match match(text);
 
@@ -17,7 +17,7 @@ int main(void)
 		KeyWord("-", 2),
 		KeyWord("*", 3),
 		KeyWord("/", 4),
-		KeyWord("%", 5),
+		KeyWord("%%", 5),
 		KeyWord("=", 10),
 		KeyWord(">", 11),
 		KeyWord("<", 12),
@@ -34,7 +34,7 @@ int main(void)
 	println();
 
 	while (!match.isend()) {
-		AST *ast = createAST(match, KeyWords);
+		AST *ast = Parser::createAST(match, KeyWords);
 		print("AST: \n");
 		println(ast);
 		println();

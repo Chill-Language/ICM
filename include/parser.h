@@ -6,7 +6,10 @@
 
 namespace ICM
 {
-	AST* createAST(Match &match, const KeyWordMap &KeyWords);
+	namespace Parser
+	{
+		AST* createAST(Match &match, const KeyWordMap &KeyWords);
+	}
 }
 
 #endif

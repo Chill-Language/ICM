@@ -12,14 +12,14 @@ namespace ICM
 	// Method
 	// Parameters
 	// Shallow Copy  /* TODO : If it can be deleted. */
-	Parameters* Parameters::clone() const {
+	ASTNode::Parameters* ASTNode::Parameters::clone() const {
 		Parameters *cpy = new Parameters();
 		for (auto &l : this->list)
 			cpy->list.push_back(l->clone());
 		return cpy;
 	}
 	// Deep Copy
-	Parameters* Parameters::deep_clone() const {
+	ASTNode::Parameters* ASTNode::Parameters::deep_clone() const {
 		Parameters *cpy = new Parameters();
 		for (auto &l : this->list)
 			cpy->list.push_back(l->deep_clone());

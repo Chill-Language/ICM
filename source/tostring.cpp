@@ -27,7 +27,7 @@ namespace ICM
 			return "Null";
 		return obj->to_string();
 	}
-	string to_string(const Function* func) {
+	string to_string(const ASTNode::Function* func) {
 		// Judge Null
 		if (func == nullptr)
 			return "Null";
@@ -46,7 +46,7 @@ namespace ICM
 
 		return str;
 	}
-	string to_string(const Parameters *pars) {
+	string to_string(const ASTNode::Parameters *pars) {
 		// Judge Null
 		if (pars == nullptr)
 			return "Null";
