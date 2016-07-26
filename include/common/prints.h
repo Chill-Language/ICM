@@ -7,7 +7,6 @@
 #define _SYSTEM_PRINTS_H_
 #include "macro.h"
 #include <string>
-#include <initializer_list>
 
 SYSTEM BEGIN
 namespace Convert
@@ -42,6 +41,20 @@ namespace Convert
 		size_t size = sizeof(void*) * 2 + 3;
 		char *str = new char[size];
 		snprintf(str, size, "0x%p", p);
+		return str;
+	}
+	template <typename Iter, typename Func>
+	std::string to_string(Iter begin, Iter end, Func func) {
+		std::string str;
+		str.append("[");
+		if (begin != end) {
+			str.append(func(*begin++));
+			while (begin != end) {
+				str.append(", ");
+				str.append(func(*begin++));
+			}
+		}
+		str.append("]");
 		return str;
 	}
 }
@@ -80,32 +93,6 @@ namespace Output
 		exit(-1);
 	}
 }
-/*
-template <typename T>
-inline void print(const T &obj)
-{
-	Output::print(to_string(obj));
-}
-template <>
-inline void print(const std::string &obj)
-{
-	Output::print(obj);
-}
-inline void print(const char *obj)
-{
-	Output::print(obj);
-}
-inline void println()
-{
-	Output::println();
-}
-template <typename T>
-inline void println(const T &obj)
-{
-	Common::print(obj);
-	println();
-}
-*/
 END
 
 #endif

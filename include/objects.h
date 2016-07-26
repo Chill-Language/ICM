@@ -15,7 +15,7 @@ namespace ICM
 				return "Object";
 			}
 			virtual DefaultType get_type() const {
-				return T_Nil;
+				return T_Object;
 			}
 			virtual Object* clone() const {
 				return new Object(*this);
@@ -137,6 +137,9 @@ namespace ICM
 
 	using ObjectPtr = autoptr<Objects::Object>;
 	using DataList = std::vector<ObjectPtr>;
+	using FuncPtr = std::function<ObjectPtr(const DataList&)>;
+	
+	ObjectPtr createObject(DefaultType type, const string &str);
 
 	namespace Objects
 	{

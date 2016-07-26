@@ -47,7 +47,7 @@ public:
 		return a == r.a && b == r.b;
 	}
 
-	template <typename T> friend std::string to_string(const Range<T> &r);
+	template <typename R> friend std::string to_string(const Range<R> &r);
 
 	// Calculation
 	const T& min() const {
@@ -90,22 +90,11 @@ Range<T> range(T a, T b)
 template <typename T>
 std::string to_string(const Range<T> &r)
 {
-	auto str = "range(" +
-		Convert::to_string<T>(r.a) + "," + Convert::to_string<T>(r.b)
-		+ ")";
-	return str;
-}
+	using Convert::to_string;
+	using std::to_string;
 
-template <>
-std::string to_string(const Range<const char*> &r)
-{
-	typedef const void *t;
-	auto str = "range(" +
-		Convert::to_string<t>(r.a) + "," + Convert::to_string<t>(r.b)
-		+ ")";
-	return str;
+	return "range(" + to_string(r.a) + "," + to_string(r.b) + ")";
 }
-
 END
 
 #endif

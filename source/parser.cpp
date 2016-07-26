@@ -7,36 +7,6 @@ namespace ICM
 	{
 		using namespace Objects;
 
-		ObjectPtr createObject(DefaultType type, const string &str)
-		{
-			Object *object;
-			switch (type)
-			{
-			case ICM::T_Null:
-				object = nullptr;
-				break;
-			case ICM::T_Nil:
-				object = new Nil();
-				break;
-			case ICM::T_Number:
-				object = new Number(atoi(str.c_str()));
-				break;
-			case ICM::T_Boolean:
-				object = new Boolean(str == "T");
-				break;
-			case ICM::T_String:
-				object = new String(str);
-				break;
-			case ICM::T_Identifier:
-				object = new Identifier(str);
-				break;
-			default:
-				object = new Object();
-				break;
-			}
-			return ObjectPtr(object);
-		}
-
 		inline void pushObject(AST *ast, const MatchResult &mr)
 		{
 			auto data = createObject(mr.getType(), mr.getString());
@@ -71,7 +41,7 @@ namespace ICM
 							ast->setfunc(FUNC_ADD, 0);
 						}
 						else {
-							ast->setfunc(FUNC_DEF, i->second);
+							ast->setfunc(FUNC_DEF, i->second.id);
 						}
 					}
 					else {

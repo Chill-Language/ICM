@@ -3,6 +3,7 @@
 
 #include "ast.h"
 #include "match.h"
+#include "keyword.h"
 
 namespace ICM
 {

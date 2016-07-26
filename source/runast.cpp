@@ -2,6 +2,10 @@
 #include "runast.h"
 #include "objects.h"
 #include "tostring.h"
+#include "keyword.h"
+
+extern ICM::KeyWordMap KeyWords;
+extern std::vector<ICM::FuncPtr> FuncMap;
 
 namespace ICM
 {
@@ -19,7 +23,6 @@ namespace ICM
 		using namespace Objects;
 
 		const ASTNode* result = nullptr;
-		ASTNode *tmp = nullptr;
 
 		switch (node->getNodeType()) {
 		case AST_NIL:
@@ -34,37 +37,10 @@ namespace ICM
 			auto id = func->getID();
 			auto list = pars->getList();
 			if (type == FUNC_DEF) {
-				// TODO
-				switch (id) {
-				case 1: // Add
-					tmp = new ASTNode(AST_DATA);
-					tmp->setdata(Objects::Func::add(createList(list)));
-					result = tmp;
-					break;
-				case 2: // Sub
-					tmp = new ASTNode(AST_DATA);
-					tmp->setdata(Objects::Func::sub(createList(list)));
-					result = tmp;
-					break;
-				case 3: // Mul
-					tmp = new ASTNode(AST_DATA);
-					tmp->setdata(Objects::Func::mul(createList(list)));
-					result = tmp;
-					break;
-				case 4: // Div
-					tmp = new ASTNode(AST_DATA);
-					tmp->setdata(Objects::Func::div(createList(list)));
-					result = tmp;
-					break;
-				case 5: // Mod
-					tmp = new ASTNode(AST_DATA);
-					tmp->setdata(Objects::Func::mod(createList(list)));
-					result = tmp;
-					break;
-				case 21: // Print
-					Objects::Func::print(calcASTNode(list.at(0))->getdata());
-					break;
-				}
+				ASTNode *tmp = nullptr;
+				tmp = new ASTNode(AST_DATA);
+				tmp->setdata(FuncMap[id](createList(list)));
+				result = tmp;
 			}
 			break;
 		}

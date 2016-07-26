@@ -1,31 +1,34 @@
 #include "basic.h"
 #include "parser.h"
 #include "runast.h"
+#include "tostring.h"
+#include "keyword.h"
+#include "function.h"
 
 using namespace ICM;
 
+//namespace ICM
+//{
+	extern ICM::KeyWordMap KeyWords;
+//}
+
+void test()
+{
+}
+
 int main(void)
 {
-	//const char *text = "(+ \"Hello \" \"World!\")";
-	const char *text = "(+ 5 7 9)";
+	const char *text = "(print (+ \"Hello \" \"World!\"))";
+	//const char *text = "(+ 1 7)";
+	//const char *text = "(+ 1 \"7\")";
 
 	Match match(text);
 
-	KeyWordMap KeyWords
-	{
-		KeyWord("+", 1),
-		KeyWord("-", 2),
-		KeyWord("*", 3),
-		KeyWord("/", 4),
-		KeyWord("%%", 5),
-		KeyWord("=", 10),
-		KeyWord(">", 11),
-		KeyWord("<", 12),
-		KeyWord(">=", 13),
-		KeyWord("<=", 14),
-		KeyWord("list",20),
-		KeyWord("print",21),
-	};
+	createFuncMap();
+	createKeyWords();
+
+	// Test
+	test();
 
 	// Main
 

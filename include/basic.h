@@ -9,10 +9,12 @@
 #include <vector>
 #include <stack>
 #include <map>
+#include <functional>
 //  common
 #include "prints.h"
 #include "memory.h"
 #include "charptr.h"
+#include "range.h"
 
 // Declares
 
@@ -20,7 +22,6 @@
 using std::string;
 using std::to_string;
 using namespace Common;
-using namespace Output;
 
 namespace ICM
 {
@@ -30,6 +31,7 @@ namespace ICM
 		T_Nil,
 		T_LBracket,
 		T_RBracket,
+		T_Object,
 		T_Boolean,
 		T_Number,
 		T_String,
@@ -37,12 +39,40 @@ namespace ICM
 		T_Identifier, // Un Whole Match
 	};
 
-	// KeyWord
-	using KeyWordMap = std::map<std::string, int>;
-	using KeyWord = KeyWordMap::value_type;
-
 	// AutoPtr
 	template <typename T> using autoptr = std::shared_ptr<T>;
+
+	std::string to_string();
+}
+
+// Output
+template <typename T>
+inline void print(const T &obj)
+{
+	using ICM::to_string;
+	using Convert::to_string;
+	using std::to_string;
+
+	Common::Output::print(to_string(obj));
+}
+template <>
+inline void print(const std::string &obj)
+{
+	Common::Output::print(obj);
+}
+inline void print(const char *obj)
+{
+	Common::Output::print(obj);
+}
+inline void println()
+{
+	Common::Output::println();
+}
+template <typename T>
+inline void println(const T &obj)
+{
+	print(obj);
+	println();
 }
 
 #endif
