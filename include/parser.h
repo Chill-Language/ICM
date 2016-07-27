@@ -10,6 +10,7 @@ namespace ICM
 	namespace Parser
 	{
 		AST* createAST(Match &match, const KeyWordMap &KeyWords);
+		ObjectPtr createObject(DefaultType type, const string &str);
 	}
 }
 

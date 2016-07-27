@@ -1,137 +1,99 @@
 #include "objects.h"
+#include "tostring.h" // TODO
 
 namespace ICM
 {
 	namespace Objects
 	{
+		std::string to_string_unfeined_function(const std::string &name, DefaultType type)
+		{
+			return "Function '"+ name + "' is undefined for type(" + ICM::to_string(type) + ")";
+		}
+
+		Object* Object::add(const Object *obj)
+		{
+			std::string msg(to_string_unfeined_function("+", get_type()));
+			println(msg);
+			return new Error(msg);
+		}
+
+		ObjectPtr createObject(DefaultType type)
+		{
+			using namespace Objects;
+
+			Object *object;
+			switch (type)
+			{
+			case ICM::T_Number:
+				object = new Number();
+				break;
+			case ICM::T_String:
+				object = new String();
+				break;
+			default:
+				object = new Object();
+				break;
+			}
+			return ObjectPtr(object);
+		}
+
 		namespace Func
 		{
+
 			template <typename T>
-			T& getData(const ObjectPtr &op) {
-				return *(T*)(op.get());
+			T* getPointer(const ObjectPtr &op) {
+				return (T*)(op.get());
 			}
 			void print(const ObjectPtr &p) {
 				switch (p->get_type())
 				{
 				case T_String:
-					Common::Output::print(getData<String>(p).get_data());
+					Common::Output::print(getPointer<String>(p)->get_data());
 					break;
 				default:
 					Common::Output::print(p->to_string());
 					break;
 				}
 			}
-			template <>
-			ObjectPtr sub<Number>(const DataList &list) {
-				Number *result = new Number(getData<Number>(list.front()));
-				result->add(*(Number*)(list.front().get()));
-				for (auto &l : list)
-					result->sub(getData<Number>(l));
-				return ObjectPtr(result);
-			}
-			template <>
-			ObjectPtr mul<Number>(const DataList &list) {
-				Number *result = new Number(1);
-				for (auto &l : list)
-					result->mul(getData<Number>(l));
-				return ObjectPtr(result);
-			}
-			template <>
-			ObjectPtr div<Number>(const DataList &list) {
-				Number *result = new Number(getData<Number>(list.front()));
-				result->mul(getData<Number>(list.front()));
-				for (auto &l : list)
-					result->div(*(Number*)(l.get()));
-				return ObjectPtr(result);
-			}
 
-			template <>
-			ObjectPtr mod<Number>(const DataList &list) {
-				Number *result = new Number(getData<Number>(list.front()));
-				result->mod(getData<Number>(list.at(1)));
-				return ObjectPtr(result);
-			}
+			template <typename Func>
+			ObjectPtr default_num_varfunc(const DataList &list, Func func, const std::string &name);
 
 			ObjectPtr add(const DataList &list) {
-				Object* result;
-				auto type = list.front()->get_type();
-				switch (type)
-				{
-				case T_Number:
-					return add<Number>(list);
-					break;
-				case T_String:
-					return add<String>(list);
-					break;
-				default:
-					result = new Object();
-					break;
-				}
-				return ObjectPtr(result);
-			}
-
-			ObjectPtr temp_num_func(const DataList &list, const ObjectPtr &op) {
-				Object* result;
-				auto type = list.front()->get_type();
-				switch (type)
-				{
-				case T_Number:
-					return op;
-					break;
-				default:
-					result = new Object();
-					break;
-				}
+				Object *front = list.front().get();
+				Object *result = front->clone();
+				for (auto i : Range<size_t>(1, list.size() - 1))
+					result->add(list[i].get());
 				return ObjectPtr(result);
 			}
 
 			ObjectPtr sub(const DataList &list) {
-				return temp_num_func(list, sub<Number>(list));
+				return default_num_varfunc(list, [](Number *num, Object *obj) { return num->sub(obj); }, "-");
 			}
 			ObjectPtr mul(const DataList &list) {
-				return temp_num_func(list, mul<Number>(list));
+				return default_num_varfunc(list, [](Number *num, Object *obj) { return num->mul(obj); }, "*");
 			}
 			ObjectPtr div(const DataList &list) {
-				return temp_num_func(list, div<Number>(list));
+				return default_num_varfunc(list, [](Number *num, Object *obj) { return num->div(obj); }, "/");
 			}
-			ObjectPtr mod(const DataList &list) {
-				return temp_num_func(list, mod<Number>(list));
+
+			template <typename Func>
+			ObjectPtr default_num_varfunc(const DataList &list, Func func, const std::string &name) {
+				ObjectPtr result;
+				if (list.front()->get_type() == T_Number) {
+					Number *tmp = (Number*)list.front().get()->clone();
+					for (auto i : Range<size_t>(1, list.size() - 1))
+						func(tmp, list[i].get());
+					result = ObjectPtr(tmp);
+				}
+				else {
+					result = ObjectPtr(new Error(to_string_unfeined_function(name, list.front()->get_type())));
+				}
+				return result;
 			}
 		}
 		std::string to_string(const Object &obj) {
 			return obj.to_string();
 		}
-	}
-
-	ObjectPtr createObject(DefaultType type, const string &str)
-	{
-		using namespace Objects;
-
-		Object *object;
-		switch (type)
-		{
-		case ICM::T_Null:
-			object = nullptr;
-			break;
-		case ICM::T_Nil:
-			object = new Nil();
-			break;
-		case ICM::T_Number:
-			object = new Number(atoi(str.c_str()));
-			break;
-		case ICM::T_Boolean:
-			object = new Boolean(str == "T");
-			break;
-		case ICM::T_String:
-			object = new String(str);
-			break;
-		case ICM::T_Identifier:
-			object = new Identifier(str);
-			break;
-		default:
-			object = new Object();
-			break;
-		}
-		return ObjectPtr(object);
 	}
 }

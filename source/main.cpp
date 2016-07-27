@@ -19,7 +19,7 @@ void test()
 int main(void)
 {
 	const char *text = "(print (+ \"Hello \" \"World!\"))";
-	//const char *text = "(+ 1 7)";
+	//const char *text = "(* 100 5 5)";
 	//const char *text = "(+ 1 \"7\")";
 
 	Match match(text);

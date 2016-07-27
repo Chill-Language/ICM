@@ -12,12 +12,12 @@ namespace ICM
 		using namespace ICM::Objects;
 		
 		FuncMap = {
-			[](DLR dl) { return createObject(T_Object, ""); },
-			[](DLR dl) { return real_func(dl, [](DLR dl) { return Func::add(dl); }, "+"); },
-			[](DLR dl) { return real_func(dl, [](DLR dl) { return Func::sub(dl); }, "-"); },
-			[](DLR dl) { return real_func(dl, [](DLR dl) { return Func::mul(dl); }, "*"); },
-			[](DLR dl) { return real_func(dl, [](DLR dl) { return Func::div(dl); }, "/"); },
-			[](DLR dl) { Func::print(dl.at(0)); return createObject(T_Object, ""); },
+			[](DLR dl) { return createObject(T_Object); },
+			[](DLR dl) { return real_func(dl, Func::add, "+"); },
+			[](DLR dl) { return real_func(dl, Func::sub, "-"); },
+			[](DLR dl) { return real_func(dl, Func::mul, "*"); },
+			[](DLR dl) { return real_func(dl, Func::div, "/"); },
+			[](DLR dl) { Func::print(dl.at(0)); return createObject(T_Object); },
 		};
 	}
 	void createKeyWords()

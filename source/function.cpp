@@ -14,6 +14,6 @@ namespace ICM
 		else {
 			println("Error for Matching Types in function '" + name + "'.");
 		}
-		return createObject(T_Object, "");
+		return createObject(T_Object);
 	}
 }

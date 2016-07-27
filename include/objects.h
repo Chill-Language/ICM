@@ -20,6 +20,22 @@ namespace ICM
 			virtual Object* clone() const {
 				return new Object(*this);
 			}
+			virtual Object* add(const Object *obj);
+		};
+
+		class Error : public Object
+		{
+		public:
+			Error(std::string msg = "") : msg(msg) {}
+			string to_string() const {
+				return "Error(" + msg + ")";
+			}
+			DefaultType get_type() const {
+				return T_Error;
+			}
+
+		private:
+			std::string msg;
 		};
 
 		class Nil : public Object
@@ -28,6 +44,9 @@ namespace ICM
 			Nil() {}
 			string to_string() const {
 				return "Nil";
+			}
+			DefaultType get_type() const {
+				return T_Nil;
 			}
 			Nil* clone() const {
 				return new Nil(*this);
@@ -55,26 +74,27 @@ namespace ICM
 		public:
 			explicit Number(int dat = 0) : data(dat) {}
 
-			Number& add(const Number &b) {
-				self.data += b.data;
-				return self;
+			Object* add(const Object *obj) {
+				((Number*)this)->data += ((Number*)obj)->data;
+				return this;
 			}
-			Number& sub(const Number &b) {
-				self.data -= b.data;
-				return self;
+			Object* sub(const Object *obj) {
+				((Number*)this)->data -= ((Number*)obj)->data;
+				return this;
 			}
-			Number& mul(const Number &b) {
-				self.data *= b.data;
-				return self;
+			Object* mul(const Object *obj) {
+				((Number*)this)->data *= ((Number*)obj)->data;
+				return this;
 			}
-			Number& div(const Number &b) {
-				self.data /= b.data;
-				return self;
+			Object* div(const Object *obj) {
+				((Number*)this)->data /= ((Number*)obj)->data;
+				return this;
 			}
-			Number& mod(const Number &b) {
-				self.data %= b.data;
-				return self;
+			Object* mod(const Object *obj) {
+				((Number*)this)->data %= ((Number*)obj)->data;
+				return this;
 			}
+
 			string to_string() const {
 				return std::to_string(data);
 			}
@@ -87,6 +107,14 @@ namespace ICM
 
 		private:
 			int data;
+			int& get_data(Object *obj)
+			{
+				return ((Number*)obj)->data;
+			}
+			const int& get_data(const Object *obj) const
+			{
+				return ((Number*)obj)->data;
+			}
 		};
 
 		class String : public Object
@@ -94,9 +122,9 @@ namespace ICM
 		public:
 			explicit String(const std::string &dat = "") : data(dat) {}
 
-			String& add(const String &b) {
-				data = Common::charptr(self.data.to_string() + b.data.to_string());
-				return self;
+			Object* add(const Object *obj) {
+				data = Common::charptr(self.data.to_string() + ((String*)obj)->data.to_string());
+				return this;
 			}
 			std::string to_string() const {
 				return '"' + data.to_string() + '"';
@@ -138,30 +166,13 @@ namespace ICM
 	using ObjectPtr = autoptr<Objects::Object>;
 	using DataList = std::vector<ObjectPtr>;
 	using FuncPtr = std::function<ObjectPtr(const DataList&)>;
-	
-	ObjectPtr createObject(DefaultType type, const string &str);
 
 	namespace Objects
 	{
+		ObjectPtr createObject(DefaultType type);
+
 		namespace Func
 		{
-			// Default Function
-			template <typename T>
-			ObjectPtr add(const DataList &list) {
-				T *result = new T;
-				for (auto &l : list)
-					result->add(*((T*)l.get()));
-				return ObjectPtr(result);
-			}
-			template <typename T>
-			ObjectPtr sub(const DataList &list);
-			template <typename T>
-			ObjectPtr mul(const DataList &list);
-			template <typename T>
-			ObjectPtr div(const DataList &list);
-			template <typename T>
-			ObjectPtr mod(const DataList &list);
-
 			ObjectPtr add(const DataList &list);
 			ObjectPtr sub(const DataList &list);
 			ObjectPtr mul(const DataList &list);

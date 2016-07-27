@@ -28,10 +28,11 @@ namespace ICM
 	// Type
 	enum DefaultType {
 		T_Null,
+		T_Object,
 		T_Nil,
+		T_Error,
 		T_LBracket,
 		T_RBracket,
-		T_Object,
 		T_Boolean,
 		T_Number,
 		T_String,
