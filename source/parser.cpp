@@ -54,18 +54,21 @@ namespace ICM
 
 			mr = match.matchNext();
 			while (mr.begin() != mr.end()) {
+
 				if (mr.getString()[0] != '\n') {
-					//println(to_string(&mr));
+					//println(&mr);
 				}
-				if (mr.getType() == T_LBracket) {
+
+				switch (mr.getType()) {
+				case T_LBracket:
 					ast->pushNode(AST_FUNC);
 					firstMatchBraket = true;
 					emptybreak = true;
-				}
-				else if (mr.getType() == T_RBracket) {
+					break;
+				case T_RBracket:
 					ast->retNode();
-				}
-				else if (mr.getType() == T_Identifier) {
+					break;
+				case T_Identifier:
 					if (firstMatchBraket) {
 						auto i = KeyWords.find(mr.getString());
 						if (i == KeyWords.end()) {
@@ -80,9 +83,18 @@ namespace ICM
 						pushObject(ast, mr);
 					}
 					firstMatchBraket = false;
-				}
-				else if (mr.getType() == T_Number || mr.getType() == T_String || mr.getType() == T_Boolean) {
-					pushObject(ast, mr);
+					break;
+				case T_Number: case T_String: case T_Boolean:
+					if (firstMatchBraket) {
+						printf("Error '%s' is not function in line(%d).\n", mr.getString().c_str(), match.getCurLineNum());
+						return nullptr;
+					}
+					else {
+						pushObject(ast, mr);
+						break;
+					}
+				default:
+					break;
 				}
 
 				if (emptybreak && ast->isend()) {

@@ -16,6 +16,34 @@ namespace ICM
 			println(msg);
 			return new Error(msg);
 		}
+		Object* Number::add(const Object *obj)
+		{
+			((Number*)this)->data += ((Number*)obj)->data;
+			return this;
+		}
+		Object* Number::sub(const Object *obj)
+		{
+			((Number*)this)->data -= ((Number*)obj)->data;
+			return this;
+		}
+		Object* Number::mul(const Object *obj)
+		{
+			((Number*)this)->data *= ((Number*)obj)->data;
+			return this;
+		}
+		Object* Number::div(const Object *obj)
+		{
+			if ((((Number*)obj)->data))
+				((Number*)this)->data /= ((Number*)obj)->data;
+			else
+				println("Error of dived zero.");
+			return this;
+		}
+		Object* Number::mod(const Object *obj)
+		{
+			((Number*)this)->data %= ((Number*)obj)->data;
+			return this;
+		}
 
 		ObjectPtr createObject(DefaultType type)
 		{

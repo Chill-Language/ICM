@@ -13,21 +13,30 @@ void test()
 
 int main(void)
 {
-	const bool LoopMatch = true;
-	//const char *text = "(print (+ \"Hello \" \"World!\"))";
-
+	// Initialize
 	createFuncMap();
 	createKeyWords();
+
+	const bool LoopMatch = true;
+
+	// Init Text
+	const char *init_text = "(print (+ \"Hello \" \"World!\"))";
+	//const char *init_text = "(2 + 5)";
+	//const char *init_text = "(/ 5 0)";
+	//const char *init_text = "(+ + +)";
+
+	charptr text(LoopMatch ? charptr(0xff) : charptr(init_text));
 
 	// Test
 	test();
 
-	charptr text(0xff);
-
+	// Loop
 	do {
-		if (LoopMatch)
+		print("> ");
+		if (LoopMatch) {
 			fgets((char*)text, 0xff, stdin);
-		text[text.length() - 1] = '\0';
+			text[text.length() - 1] = '\0';
+		}
 
 		Match match(text);
 
@@ -39,16 +48,19 @@ int main(void)
 
 		while (!match.isend()) {
 			AST *ast = Parser::createAST(match, KeyWords);
-			print("AST: \n");
-			println(ast);
-			println();
-			print("Output: \n");
-			runAST(ast);
-			println();
-			delete ast;
+			if (ast != nullptr) {
+				print("AST: \n");
+				println(ast);
+				println();
+				print("Output: \n");
+				runAST(ast);
+				println();
+				delete ast;
+			}
+			else {
+				break;
+			}
 		}
-
-		println();
 	} while (LoopMatch);
 
 	return 0;

@@ -17,7 +17,7 @@ namespace ICM
 			[](DLR dl) { return real_func(dl, Func::sub, "-"); },
 			[](DLR dl) { return real_func(dl, Func::mul, "*"); },
 			[](DLR dl) { return real_func(dl, Func::div, "/"); },
-			[](DLR dl) { Func::print(dl.at(0)); return createObject(T_Object); },
+			[](DLR dl) { Func::print(dl.at(0)); return dl.at(0); },
 		};
 	}
 	void createKeyWords()

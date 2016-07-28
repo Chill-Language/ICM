@@ -116,7 +116,7 @@ namespace ICM
 		return this;
 	}
 	int AST::retNode() {
-		if (currptr != root) {
+		if (!farthptrs.empty()) {
 			currptr = farthptrs.top();
 			farthptrs.pop();
 			return 0;

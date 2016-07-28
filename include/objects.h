@@ -74,26 +74,11 @@ namespace ICM
 		public:
 			explicit Number(int dat = 0) : data(dat) {}
 
-			Object* add(const Object *obj) {
-				((Number*)this)->data += ((Number*)obj)->data;
-				return this;
-			}
-			Object* sub(const Object *obj) {
-				((Number*)this)->data -= ((Number*)obj)->data;
-				return this;
-			}
-			Object* mul(const Object *obj) {
-				((Number*)this)->data *= ((Number*)obj)->data;
-				return this;
-			}
-			Object* div(const Object *obj) {
-				((Number*)this)->data /= ((Number*)obj)->data;
-				return this;
-			}
-			Object* mod(const Object *obj) {
-				((Number*)this)->data %= ((Number*)obj)->data;
-				return this;
-			}
+			Object* add(const Object *obj);
+			Object* sub(const Object *obj);
+			Object* mul(const Object *obj);
+			Object* div(const Object *obj);
+			Object* mod(const Object *obj);
 
 			string to_string() const {
 				return std::to_string(data);
