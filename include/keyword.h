@@ -23,4 +23,7 @@ namespace ICM
 	void createKeyWords();
 }
 
+extern std::vector<ICM::FuncPtr> FuncMap;
+extern ICM::KeyWordMap KeyWords;
+
 #endif

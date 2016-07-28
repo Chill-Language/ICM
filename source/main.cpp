@@ -7,22 +7,14 @@
 
 using namespace ICM;
 
-//namespace ICM
-//{
-	extern ICM::KeyWordMap KeyWords;
-//}
-
 void test()
 {
 }
 
 int main(void)
 {
-	const char *text = "(print (+ \"Hello \" \"World!\"))";
-	//const char *text = "(* 100 5 5)";
-	//const char *text = "(+ 1 \"7\")";
-
-	Match match(text);
+	const bool LoopMatch = true;
+	//const char *text = "(print (+ \"Hello \" \"World!\"))";
 
 	createFuncMap();
 	createKeyWords();
@@ -30,24 +22,34 @@ int main(void)
 	// Test
 	test();
 
-	// Main
+	charptr text(0xff);
 
-	print("Input: \n");
-	println(text);
-	println();
+	do {
+		if (LoopMatch)
+			fgets((char*)text, 0xff, stdin);
+		text[text.length() - 1] = '\0';
 
-	while (!match.isend()) {
-		AST *ast = Parser::createAST(match, KeyWords);
-		print("AST: \n");
-		println(ast);
+		Match match(text);
+
+		// Main
+
+		print("Input: \n");
+		println(text.to_string());
 		println();
-		print("Output: \n");
-		runAST(ast);
-		println();
-		delete ast;
-	}
 
-	println();
+		while (!match.isend()) {
+			AST *ast = Parser::createAST(match, KeyWords);
+			print("AST: \n");
+			println(ast);
+			println();
+			print("Output: \n");
+			runAST(ast);
+			println();
+			delete ast;
+		}
+
+		println();
+	} while (LoopMatch);
 
 	return 0;
 }

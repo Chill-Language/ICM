@@ -4,9 +4,6 @@
 #include "tostring.h"
 #include "keyword.h"
 
-extern ICM::KeyWordMap KeyWords;
-extern std::vector<ICM::FuncPtr> FuncMap;
-
 namespace ICM
 {
 	const ASTNode* calcASTNode(const ASTNode *node);
@@ -49,8 +46,9 @@ namespace ICM
 
 	void runAST(const AST *ast)
 	{
+		using Common::Output::println;
 		auto a = calcASTNode(ast->getRoot());
-		Common::Output::println();
-		Common::Output::println(a);
+		println();
+		println(a);
 	}
 }
