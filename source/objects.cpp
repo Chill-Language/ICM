@@ -10,12 +10,7 @@ namespace ICM
 			return "Function '"+ name + "' is undefined for type(" + ICM::to_string(type) + ")";
 		}
 
-		Object* Object::add(const Object *obj)
-		{
-			std::string msg(to_string_unfeined_function("+", get_type()));
-			println(msg);
-			return new Error(msg);
-		}
+		// Number
 		Object* Number::add(const Object *obj)
 		{
 			((Number*)this)->data += ((Number*)obj)->data;
@@ -44,6 +39,11 @@ namespace ICM
 			((Number*)this)->data %= ((Number*)obj)->data;
 			return this;
 		}
+		// String
+		Object* String::add(const Object *obj) {
+			data = Common::charptr(self.data.to_string() + ((String*)obj)->data.to_string());
+			return this;
+		}
 
 		ObjectPtr createObject(DefaultType type)
 		{
@@ -67,11 +67,12 @@ namespace ICM
 
 		namespace Func
 		{
-
+			// Get Pointer
 			template <typename T>
 			T* getPointer(const ObjectPtr &op) {
-				return (T*)(op.get());
+				return static_cast<T*>(op.get());
 			}
+
 			void print(const ObjectPtr &p) {
 				switch (p->get_type())
 				{
@@ -88,11 +89,25 @@ namespace ICM
 			ObjectPtr default_num_varfunc(const DataList &list, Func func, const std::string &name);
 
 			ObjectPtr add(const DataList &list) {
-				Object *front = list.front().get();
-				Object *result = front->clone();
-				for (auto i : Range<size_t>(1, list.size() - 1))
-					result->add(list[i].get());
-				return ObjectPtr(result);
+				ObjectPtr result;
+
+				ObjectPtr front = list.front();
+				if (front->get_type() == T_Number) {
+					Number *tmp = getPointer<Number>(front)->clone();
+					for (auto i : Range<size_t>(1, list.size() - 1))
+						tmp->add(list[i].get());
+					result = ObjectPtr(tmp);
+				}
+				else if (front->get_type() == T_String) {
+					String *tmp = getPointer<String>(front)->clone();
+					for (auto i : Range<size_t>(1, list.size() - 1))
+						tmp->add(list[i].get());
+					result = ObjectPtr(tmp);
+				}
+				else {
+					result = ObjectPtr(new Error(to_string_unfeined_function("+", list.front()->get_type())));
+				}
+				return result;
 			}
 
 			ObjectPtr sub(const DataList &list) {
@@ -119,9 +134,6 @@ namespace ICM
 				}
 				return result;
 			}
-		}
-		std::string to_string(const Object &obj) {
-			return obj.to_string();
 		}
 	}
 }

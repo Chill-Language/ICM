@@ -36,7 +36,7 @@ namespace ICM
 			if (type == FUNC_DEF) {
 				ASTNode *tmp = nullptr;
 				tmp = new ASTNode(AST_DATA);
-				tmp->setdata(FuncMap[id](createList(list)));
+				tmp->setdata(FuncTable[id].getFuncPtr()(createList(list)));
 				result = tmp;
 			}
 			break;

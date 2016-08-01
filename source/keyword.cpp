@@ -1,40 +1,40 @@
 #include "keyword.h"
 #include "function.h"
 
-std::vector<ICM::FuncPtr> FuncMap;
-ICM::KeyWordMap KeyWords;
+ICM::FuncTableType FuncTable;
 
 namespace ICM
 {
-	void createFuncMap()
+
+	FuncTableType::FuncTableType() {
+		data.push_back(FuncTableBase(0, "", nullptr));
+	}
+
+	void FuncTableType::add(const string &name, const FuncPtr &func) {
+		count++;
+		data.push_back(FuncTableBase(count, name, func));
+		keymap[name] = count;
+	}
+	const FuncTableBase& FuncTableType::operator[](size_t id) const {
+		return data[id];
+	}
+	size_t FuncTableType::find(const string &name) const {
+		auto iter = keymap.find(name);
+		if (iter != keymap.end())
+			return iter->second;
+		return 0;
+	}
+
+	// Create Defaulr FuncTable
+	void createDefaultFuncTable()
 	{
 		using DLR = const DataList&;
 		using namespace ICM::Objects;
-		
-		FuncMap = {
-			[](DLR dl) { return createObject(T_Object); },
-			[](DLR dl) { return real_func(dl, Func::add, "+"); },
-			[](DLR dl) { return real_func(dl, Func::sub, "-"); },
-			[](DLR dl) { return real_func(dl, Func::mul, "*"); },
-			[](DLR dl) { return real_func(dl, Func::div, "/"); },
-			[](DLR dl) { Func::print(dl.at(0)); return dl.at(0); },
-		};
-	}
-	void createKeyWords()
-	{
-		KeyWords = {
-			KeyWord("+",{ 1, FuncMap[1] }),
-			KeyWord("-",{ 2, FuncMap[2] }),
-			KeyWord("*",{ 3, FuncMap[3] }),
-			KeyWord("/",{ 4, FuncMap[4] }),
-			KeyWord("%%",{ 211 }),
-			KeyWord("=",{ 10 }),
-			KeyWord(">",{ 11 }),
-			KeyWord("<",{ 12 }),
-			KeyWord(">=",{ 13 }),
-			KeyWord("<=",{ 14 }),
-			KeyWord("list",{ 20 }),
-			KeyWord("print",{ 5, FuncMap[5] }),
-		};
+
+		FuncTable.add("+", [](DLR dl) { return real_func(dl, Func::add, "+"); });
+		FuncTable.add("-", [](DLR dl) { return real_func(dl, Func::sub, "-"); });
+		FuncTable.add("*", [](DLR dl) { return real_func(dl, Func::mul, "*"); });
+		FuncTable.add("/", [](DLR dl) { return real_func(dl, Func::div, "/"); });
+		FuncTable.add("print", [](DLR dl) { Func::print(dl.at(0)); return dl.at(0); });
 	}
 }

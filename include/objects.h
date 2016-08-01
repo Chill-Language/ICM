@@ -20,7 +20,6 @@ namespace ICM
 			virtual Object* clone() const {
 				return new Object(*this);
 			}
-			virtual Object* add(const Object *obj);
 		};
 
 		class Error : public Object
@@ -107,10 +106,7 @@ namespace ICM
 		public:
 			explicit String(const std::string &dat = "") : data(dat) {}
 
-			Object* add(const Object *obj) {
-				data = Common::charptr(self.data.to_string() + ((String*)obj)->data.to_string());
-				return this;
-			}
+			Object* add(const Object *obj);
 			std::string to_string() const {
 				return '"' + data.to_string() + '"';
 			}

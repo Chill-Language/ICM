@@ -14,8 +14,7 @@ void test()
 int main(void)
 {
 	// Initialize
-	createFuncMap();
-	createKeyWords();
+	createDefaultFuncTable();
 
 	const bool LoopMatch = true;
 
@@ -47,7 +46,7 @@ int main(void)
 		println();
 
 		while (!match.isend()) {
-			AST *ast = Parser::createAST(match, KeyWords);
+			AST *ast = Parser::createAST(match);
 			if (ast != nullptr) {
 				print("AST: \n");
 				println(ast);

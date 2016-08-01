@@ -44,7 +44,7 @@ namespace ICM
 			auto data = createObject(mr.getType(), mr.getString());
 			ast->pushNode(AST_DATA)->setdata(data);
 		}
-		AST* createAST(Match &match, const KeyWordMap &KeyWords)
+		AST* createAST(Match &match)
 		{
 			AST *ast = new AST();
 			MatchResult mr;
@@ -70,13 +70,14 @@ namespace ICM
 					break;
 				case T_Identifier:
 					if (firstMatchBraket) {
-						auto i = KeyWords.find(mr.getString());
-						if (i == KeyWords.end()) {
-							// TODO
-							ast->setfunc(FUNC_ADD, 0);
+						auto i = FuncTable.find(mr.getString());
+						if (i != 0) {
+							// Default Function
+							ast->setfunc(FUNC_DEF, i);
 						}
 						else {
-							ast->setfunc(FUNC_DEF, i->second.id);
+							// TODO
+							ast->setfunc(FUNC_ADD, 0);
 						}
 					}
 					else {
