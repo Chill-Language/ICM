@@ -8,10 +8,11 @@ Input:
 (print (+ "Hello " "World!"))
 
 AST:
-{AST: N< F(1,11), [P: N< F(1,1), [P: D("Hello ") D("World!")] >] >}
+{AST: N< F(1,5), [P: N< F(1,1), [P: D("Hello ") D("World!")] >] >}
 
 Output:
 Hello World!
+D("Hello World!")
 ```
 
 # How To Build
@@ -25,16 +26,16 @@ Function is an object in **Chill** Lang.<br>
 If '***a***' is a function, using '***(a ...)***' to call it, use '***a***' to get it self.<br>
 ```lisp
 ; Example :
-(defun a (n)
+(defun a [n]
   (+ n 1))
-(defun b (n)
+(defun b [n]
   (- n 2))
-(defun add_func (ta tb n)
-  (+ (ta n) (tb n)))
+(defun add_func [fa fb n]
+  (+ (fa n) (fb n)))
 (add_func a b n)
 
 ; Same As :
-(defun add_func (n)
+(defun add_func [n]
   (+ (+ n 1) (- n 2)))
 (add_func n)
 ```
@@ -88,9 +89,10 @@ e.g. `[1 2 3 5]  ; same as (list 1 2 3 5)`
 ; test02
 ; function & call
 
-(defun p(n)
+(defun p [n]
   (if (<= n 1)
     1
+  else
     (* n (p (- n 1)))
   )
 )
@@ -103,7 +105,7 @@ e.g. `[1 2 3 5]  ; same as (list 1 2 3 5)`
      [b (list 2 4 5 8 0)])
 (+ a b) ; Output : 9 7 6 3 1 2 4 5 8 0
 (foreach + a b) ; Output : 11 11 11 11 1
-(list.order (+ a b) <)
+(order (+ a b) <)
 ; Output : 0 1 2 3 4 5 6 7 8 9
 
 ; test05
