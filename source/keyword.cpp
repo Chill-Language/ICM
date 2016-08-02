@@ -7,12 +7,12 @@ namespace ICM
 {
 
 	FuncTableType::FuncTableType() {
-		data.push_back(FuncTableBase(0, "", nullptr));
+		data.push_back(FuncTableBase(0, "", nullptr, FuncParameter()));
 	}
 
-	void FuncTableType::add(const string &name, const FuncPtr &func) {
+	void FuncTableType::add(const string &name, const FuncPtr &func, const FuncParameter &pars) {
 		count++;
-		data.push_back(FuncTableBase(count, name, func));
+		data.push_back(FuncTableBase(count, name, func, pars));
 		keymap[name] = count;
 	}
 	const FuncTableBase& FuncTableType::operator[](size_t id) const {
@@ -25,17 +25,19 @@ namespace ICM
 		return 0;
 	}
 
-	// Create Defaulr FuncTable
+	// Create Default FuncTable
 	void createDefaultFuncTable()
 	{
-		using DLR = const DataList&;
-		using namespace ICM::Objects;
+		using namespace ICM::Objects::Func;
 
-		FuncTable.add("+", [](DLR dl) { return real_func(dl, Func::add, "+"); });
-		FuncTable.add("-", [](DLR dl) { return real_func(dl, Func::sub, "-"); });
-		FuncTable.add("*", [](DLR dl) { return real_func(dl, Func::mul, "*"); });
-		FuncTable.add("/", [](DLR dl) { return real_func(dl, Func::div, "/"); });
-		FuncTable.add("print", [](DLR dl) { return Func::print(dl); });
-		FuncTable.add("list", [](DLR dl) { return Func::list(dl); });
+		FuncTable.add("+", add, FuncParameter(FPT_VaryIdentical, 0, { T_Vary }));
+		FuncTable.add("-", sub, FuncParameter(FPT_VaryIdentical, 0, { T_Number }));
+		FuncTable.add("*", mul, FuncParameter(FPT_VaryIdentical, 0, { T_Number }));
+		FuncTable.add("/", div, FuncParameter(FPT_VaryIdentical, 0, { T_Number }));
+		FuncTable.add("%", mod, FuncParameter(FPT_VaryIdentical, 0, { T_Number }));
+		FuncTable.add("=", equ, FuncParameter(FPT_Vary, 0));
+		FuncTable.add("print", print, FuncParameter(FPT_Vary, 0));
+		FuncTable.add("list", list, FuncParameter(FPT_Vary, 0));
+		//FuncTable.add("let", let, FuncParameter(FPT_VaryIdentical, 0, { T_List }));
 	}
 }

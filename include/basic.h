@@ -33,6 +33,7 @@ namespace ICM
 		T_Null,
 		T_Object,
 		T_Nil,
+		T_Vary,
 		T_Error,
 		T_LBracket,
 		T_RBracket,

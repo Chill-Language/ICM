@@ -8,6 +8,25 @@ namespace ICM
 	namespace Objects
 	{
 		//=======================================
+		// * Declarations
+		//=======================================
+		class Object;
+		class Error;
+		class Nil;
+		class Boolean;
+		class Number;
+		class String;
+		class List;
+		class Identifier;
+	}
+
+	using ObjectPtr = autoptr<Objects::Object>;
+	using DataList = std::vector<ObjectPtr>;
+	using FuncPtr = std::function<ObjectPtr(const DataList&)>;
+
+	namespace Objects
+	{
+		//=======================================
 		// * Class Object
 		//=======================================
 		class Object
@@ -23,12 +42,15 @@ namespace ICM
 			virtual Object* clone() const {
 				return new Object(*this);
 			}
+			// Method
+			virtual Boolean* equ(const ObjectPtr &obj) const;
+
+		protected:
+			bool type_equal(const ObjectPtr &obj) const {
+				return this->get_type() == obj->get_type();
+			}
 		};
 	}
-
-	using ObjectPtr = autoptr<Objects::Object>;
-	using DataList = std::vector<ObjectPtr>;
-	using FuncPtr = std::function<ObjectPtr(const DataList&)>;
 
 	namespace Objects
 	{
@@ -38,7 +60,7 @@ namespace ICM
 		class Error : public Object
 		{
 		public:
-			Error(std::string msg = "") : msg(msg) {}
+			explicit Error(std::string msg = "") : msg(msg) {}
 			string to_string() const {
 				return "Error(" + msg + ")";
 			}
@@ -57,6 +79,8 @@ namespace ICM
 		{
 		public:
 			Nil() {}
+
+			Boolean* equ(const ObjectPtr &obj) const;
 			string to_string() const {
 				return "Nil";
 			}
@@ -76,7 +100,9 @@ namespace ICM
 		{
 		public:
 			Boolean() {}
-			Boolean(bool b) : data(b) {}
+			explicit Boolean(bool b) : data(b) {}
+
+			Boolean* equ(const ObjectPtr &obj) const;
 			string to_string() const {
 				return Convert::to_string(data);
 			}
@@ -96,6 +122,7 @@ namespace ICM
 		public:
 			explicit Number(int dat = 0) : data(dat) {}
 
+			Boolean* equ(const ObjectPtr &obj) const;
 			Number* add(const Number *obj);
 			Number* sub(const Number *obj);
 			Number* mul(const Number *obj);
@@ -132,6 +159,7 @@ namespace ICM
 		public:
 			explicit String(const std::string &dat = "") : data(dat) {}
 
+			Boolean* equ(const ObjectPtr &obj) const;
 			String* add(const String *obj);
 			std::string to_string() const {
 				return '"' + data.to_string() + '"';
@@ -159,14 +187,16 @@ namespace ICM
 		public:
 			explicit List(const DataList &dl) : data(dl) {}
 
+			Boolean* List::equ(const ObjectPtr &obj) const;
 			List* push(const ObjectPtr &objp);
 			List* push(const DataList &dl);
+			List* add(const List *dl);
 
 			string to_string() const;
 			DefaultType get_type() const {
 				return T_List;
 			}
-			Object* clone() const {
+			List* clone() const {
 				return new List(*this);
 			}
 
@@ -207,6 +237,7 @@ namespace ICM
 			ObjectPtr mul(const DataList &list);
 			ObjectPtr div(const DataList &list);
 			ObjectPtr mod(const DataList &list);
+			ObjectPtr equ(const DataList &list);
 			ObjectPtr list(const DataList &list);
 			ObjectPtr print(const DataList &list);
 		}

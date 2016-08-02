@@ -3,6 +3,7 @@
 #include "objects.h"
 #include "tostring.h"
 #include "keyword.h"
+#include "function.h"
 
 namespace ICM
 {
@@ -39,7 +40,8 @@ namespace ICM
 			if (type == FUNC_DEF) {
 				ASTNode *tmp = nullptr;
 				tmp = new ASTNode(AST_DATA);
-				tmp->setdata(FuncTable[id].getFuncPtr()(createList(list)));
+				auto &tmpp = checkCall(FuncTable[id], createList(list));
+				tmp->setdata(tmpp);
 				result = tmp;
 			}
 			break;
