@@ -10,6 +10,7 @@
 #include <stack>
 #include <map>
 #include <functional>
+#include <algorithm>
 //  common
 #include "prints.h"
 #include "memory.h"
@@ -35,9 +36,12 @@ namespace ICM
 		T_Error,
 		T_LBracket,
 		T_RBracket,
+		T_LSBracket,
+		T_RSBracket,
 		T_Boolean,
 		T_Number,
 		T_String,
+		T_Symbol,
 		T_Comment,
 		T_Identifier, // Un Whole Match
 	};

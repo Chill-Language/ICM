@@ -15,39 +15,35 @@ int main(void)
 {
 	// Initialize
 	createDefaultFuncTable();
-
-	const bool LoopMatch = true;
-
-	// Init Text
-	const char *init_text = "(print (+ \"Hello \" \"World!\"))";
-	//const char *init_text = "(2 + 5)";
-	//const char *init_text = "(/ 5 0)";
-	//const char *init_text = "(+ + +)";
-
-	charptr text(LoopMatch ? charptr(0xff) : charptr(init_text));
+	const bool LoopMatch = !true;
 
 	// Test
 	test();
 
+	// Init Text
+	const char *init_text = "(print (+ \"Hello \" \"World!\"))";
+
+	charptr text(LoopMatch ? charptr(0xff) : charptr(init_text));
+
 	// Loop
 	do {
-		print("> ");
+		// Input
 		if (LoopMatch) {
+			print("> ");
 			fgets((char*)text, 0xff, stdin);
 			text[text.length() - 1] = '\0';
 		}
-
-		Match match(text);
-
-		// Main
-
-		print("Input: \n");
-		println(text.to_string());
+		else {
+			print("Input: \n");
+			println(text.to_string());
+		}
 		println();
 
+		// Main
+		Match match(text);
 		while (!match.isend()) {
 			AST *ast = Parser::createAST(match);
-			if (ast != nullptr) {
+			if (ast && ast->getRoot()) {
 				print("AST: \n");
 				println(ast);
 				println();

@@ -21,6 +21,9 @@ namespace ICM
 
 		const ASTNode* result = nullptr;
 
+		if (node == nullptr)
+			return result;
+
 		switch (node->getNodeType()) {
 		case AST_NIL:
 			break;
@@ -49,6 +52,7 @@ namespace ICM
 		using Common::Output::println;
 		auto a = calcASTNode(ast->getRoot());
 		println();
+		println("\nResult:");
 		println(a);
 	}
 }

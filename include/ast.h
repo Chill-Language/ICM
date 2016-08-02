@@ -135,6 +135,9 @@ namespace ICM
 		const ASTNode* getRoot() const {
 			return this->root;
 		}
+		bool empty() const {
+			return root == nullptr;
+		}
 		bool isend() const {
 			return farthptrs.empty();
 		}

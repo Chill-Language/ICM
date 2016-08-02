@@ -53,6 +53,19 @@ namespace ICM
 			bool emptybreak = false;
 
 			mr = match.matchNext();
+			while (mr.getType() == T_Null || mr.getType() == T_Comment) {
+				if (mr.begin() != mr.end()) {
+					mr = match.matchNext();
+				}
+				else
+					return nullptr;
+			}
+
+			if (mr.getType() != T_LBracket) {
+				printf("Syntax Error in line(%d).\n", match.getCurLineNum());
+				return nullptr;
+			}
+
 			while (mr.begin() != mr.end()) {
 
 				if (mr.getString()[0] != '\n') {
@@ -103,8 +116,13 @@ namespace ICM
 				}
 				mr = match.matchNext();
 			}
-			if (!ast->isend())
+			if (ast->empty())
+				return nullptr;
+
+			if (!ast->isend()) {
 				printf("Error match ')' in line(%d).\n", match.getCurLineNum());
+				return nullptr;
+			}
 			return ast->reset();
 		}
 	}

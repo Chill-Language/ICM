@@ -15,10 +15,13 @@ namespace ICM
 		case T_Nil:        return "Nil";
 		case T_LBracket:   return "LBracket";
 		case T_RBracket:   return "RBracket";
+		case T_LSBracket:  return "LSBracket";
+		case T_RSBracket:  return "RSBracket";
 		case T_Number:     return "Number";
 		case T_Boolean:    return "Boolean";
 		case T_Identifier: return "Identifier";
 		case T_String:     return "String";
+		case T_Symbol:     return "Symbol";
 		case T_Comment:    return "Comment";
 		default:           return "";
 		}
