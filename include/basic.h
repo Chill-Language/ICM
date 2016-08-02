@@ -42,6 +42,7 @@ namespace ICM
 		T_Number,
 		T_String,
 		T_Symbol,
+		T_List,
 		T_Comment,
 		T_Identifier, // Un Whole Match
 	};

@@ -7,6 +7,9 @@ namespace ICM
 {
 	namespace Objects
 	{
+		//=======================================
+		// * Class Object
+		//=======================================
 		class Object
 		{
 		public:
@@ -21,7 +24,17 @@ namespace ICM
 				return new Object(*this);
 			}
 		};
+	}
 
+	using ObjectPtr = autoptr<Objects::Object>;
+	using DataList = std::vector<ObjectPtr>;
+	using FuncPtr = std::function<ObjectPtr(const DataList&)>;
+
+	namespace Objects
+	{
+		//=======================================
+		// * Class Error
+		//=======================================
 		class Error : public Object
 		{
 		public:
@@ -37,6 +50,9 @@ namespace ICM
 			std::string msg;
 		};
 
+		//=======================================
+		// * Class Nil
+		//=======================================
 		class Nil : public Object
 		{
 		public:
@@ -52,6 +68,10 @@ namespace ICM
 			}
 
 		};
+
+		//=======================================
+		// * Class Boolean
+		//=======================================
 		class Boolean : public Object
 		{
 		public:
@@ -68,16 +88,19 @@ namespace ICM
 			bool data = false;
 		};
 
+		//=======================================
+		// * Class Number
+		//=======================================
 		class Number : public Object
 		{
 		public:
 			explicit Number(int dat = 0) : data(dat) {}
 
-			Object* add(const Object *obj);
-			Object* sub(const Object *obj);
-			Object* mul(const Object *obj);
-			Object* div(const Object *obj);
-			Object* mod(const Object *obj);
+			Number* add(const Number *obj);
+			Number* sub(const Number *obj);
+			Number* mul(const Number *obj);
+			Number* div(const Number *obj);
+			Number* mod(const Number *obj);
 
 			string to_string() const {
 				return std::to_string(data);
@@ -101,12 +124,15 @@ namespace ICM
 			}
 		};
 
+		//=======================================
+		// * Class String
+		//=======================================
 		class String : public Object
 		{
 		public:
 			explicit String(const std::string &dat = "") : data(dat) {}
 
-			Object* add(const Object *obj);
+			String* add(const String *obj);
 			std::string to_string() const {
 				return '"' + data.to_string() + '"';
 			}
@@ -125,6 +151,32 @@ namespace ICM
 			explicit String(const Common::charptr &dat) : data(dat) {}
 		};
 
+		//=======================================
+		// * Class List
+		//=======================================
+		class List : public Object
+		{
+		public:
+			explicit List(const DataList &dl) : data(dl) {}
+
+			List* push(const ObjectPtr &objp);
+			List* push(const DataList &dl);
+
+			string to_string() const;
+			DefaultType get_type() const {
+				return T_List;
+			}
+			Object* clone() const {
+				return new List(*this);
+			}
+
+		private:
+			DataList data;
+		};
+
+		//=======================================
+		// * Class Identifier
+		//=======================================
 		class Identifier : public Object
 		{
 		public:
@@ -144,10 +196,6 @@ namespace ICM
 		};
 	}
 
-	using ObjectPtr = autoptr<Objects::Object>;
-	using DataList = std::vector<ObjectPtr>;
-	using FuncPtr = std::function<ObjectPtr(const DataList&)>;
-
 	namespace Objects
 	{
 		ObjectPtr createObject(DefaultType type);
@@ -159,8 +207,8 @@ namespace ICM
 			ObjectPtr mul(const DataList &list);
 			ObjectPtr div(const DataList &list);
 			ObjectPtr mod(const DataList &list);
-
-			void print(const ObjectPtr &p);
+			ObjectPtr list(const DataList &list);
+			ObjectPtr print(const DataList &list);
 		}
 
 		std::string to_string(const Object &obj);

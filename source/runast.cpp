@@ -30,7 +30,7 @@ namespace ICM
 		case AST_DATA:
 			result = node;
 			break;
-		case AST_FUNC:
+		case AST_NODE:
 			auto func = node->getFunc();
 			auto pars = node->getPars();
 			auto type = func->getType();

@@ -35,6 +35,7 @@ namespace ICM
 		FuncTable.add("-", [](DLR dl) { return real_func(dl, Func::sub, "-"); });
 		FuncTable.add("*", [](DLR dl) { return real_func(dl, Func::mul, "*"); });
 		FuncTable.add("/", [](DLR dl) { return real_func(dl, Func::div, "/"); });
-		FuncTable.add("print", [](DLR dl) { Func::print(dl.at(0)); return dl.at(0); });
+		FuncTable.add("print", [](DLR dl) { return Func::print(dl); });
+		FuncTable.add("list", [](DLR dl) { return Func::list(dl); });
 	}
 }

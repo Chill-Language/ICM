@@ -15,13 +15,14 @@ int main(void)
 {
 	// Initialize
 	createDefaultFuncTable();
-	const bool LoopMatch = !true;
+	const bool LoopMatch = true;
 
 	// Test
 	test();
 
 	// Init Text
-	const char *init_text = "(print (+ \"Hello \" \"World!\"))";
+	const char *init_text = "(print (list 5 6 7) \" \" 3)";
+	//const char *init_text = "(print (+ \"Hello \" \"World!\"))";
 
 	charptr text(LoopMatch ? charptr(0xff) : charptr(init_text));
 

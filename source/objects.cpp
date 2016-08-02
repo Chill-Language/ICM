@@ -10,59 +10,60 @@ namespace ICM
 			return "Function '"+ name + "' is undefined for type(" + ICM::to_string(type) + ")";
 		}
 
-		// Number
-		Object* Number::add(const Object *obj)
+		//=======================================
+		// * Class Number
+		//=======================================
+		Number* Number::add(const Number *obj)
 		{
-			((Number*)this)->data += ((Number*)obj)->data;
+			this->data += obj->data;
 			return this;
 		}
-		Object* Number::sub(const Object *obj)
+		Number* Number::sub(const Number *obj)
 		{
-			((Number*)this)->data -= ((Number*)obj)->data;
+			this->data -= obj->data;
 			return this;
 		}
-		Object* Number::mul(const Object *obj)
+		Number* Number::mul(const Number *obj)
 		{
-			((Number*)this)->data *= ((Number*)obj)->data;
+			this->data *= obj->data;
 			return this;
 		}
-		Object* Number::div(const Object *obj)
+		Number* Number::div(const Number *obj)
 		{
-			if ((((Number*)obj)->data))
-				((Number*)this)->data /= ((Number*)obj)->data;
+			if (obj->data != 0)
+				this->data /= obj->data;
 			else
 				println("Error of dived zero.");
 			return this;
 		}
-		Object* Number::mod(const Object *obj)
+		Number* Number::mod(const Number *obj)
 		{
-			((Number*)this)->data %= ((Number*)obj)->data;
-			return this;
-		}
-		// String
-		Object* String::add(const Object *obj) {
-			data = Common::charptr(self.data.to_string() + ((String*)obj)->data.to_string());
+			this->data %= obj->data;
 			return this;
 		}
 
-		ObjectPtr createObject(DefaultType type)
-		{
-			using namespace Objects;
+		//=======================================
+		// * Class String
+		//=======================================
+		String* String::add(const String *obj) {
+			data = Common::charptr(self.data.to_string() + obj->data.to_string());
+			return this;
+		}
 
-			Object *object;
-			switch (type)
-			{
-			case ICM::T_Number:
-				object = new Number();
-				break;
-			case ICM::T_String:
-				object = new String();
-				break;
-			default:
-				object = new Object();
-				break;
-			}
-			return ObjectPtr(object);
+		//=======================================
+		// * Class List
+		//=======================================
+		List* List::push(const ObjectPtr &op) {
+			data.push_back(op);
+			return this;
+		}
+		List* List::push(const DataList &dl) {
+			data.insert(data.end(), dl.begin(),dl.end());
+			return this;
+		}
+
+		string List::to_string() const {
+			return ICM::to_string(data);
 		}
 
 		namespace Func
@@ -84,6 +85,15 @@ namespace ICM
 					break;
 				}
 			}
+			ObjectPtr print(const DataList &dl) {
+				for (auto &op : dl)
+					print(op);
+				return list(dl);
+			}
+			ObjectPtr list(const DataList &dl) {
+				return ObjectPtr(new List(dl));
+			}
+
 
 			template <typename Func>
 			ObjectPtr default_num_varfunc(const DataList &list, Func func, const std::string &name);
@@ -95,13 +105,13 @@ namespace ICM
 				if (front->get_type() == T_Number) {
 					Number *tmp = getPointer<Number>(front)->clone();
 					for (auto i : Range<size_t>(1, list.size() - 1))
-						tmp->add(list[i].get());
+						tmp->add(getPointer<Number>(list[i]));
 					result = ObjectPtr(tmp);
 				}
 				else if (front->get_type() == T_String) {
 					String *tmp = getPointer<String>(front)->clone();
 					for (auto i : Range<size_t>(1, list.size() - 1))
-						tmp->add(list[i].get());
+						tmp->add(getPointer<String>(list[i]));
 					result = ObjectPtr(tmp);
 				}
 				else {
@@ -111,22 +121,22 @@ namespace ICM
 			}
 
 			ObjectPtr sub(const DataList &list) {
-				return default_num_varfunc(list, [](Number *num, Object *obj) { return num->sub(obj); }, "-");
+				return default_num_varfunc(list, [](Number *num, Number *obj) { return num->sub(obj); }, "-");
 			}
 			ObjectPtr mul(const DataList &list) {
-				return default_num_varfunc(list, [](Number *num, Object *obj) { return num->mul(obj); }, "*");
+				return default_num_varfunc(list, [](Number *num, Number *obj) { return num->mul(obj); }, "*");
 			}
 			ObjectPtr div(const DataList &list) {
-				return default_num_varfunc(list, [](Number *num, Object *obj) { return num->div(obj); }, "/");
+				return default_num_varfunc(list, [](Number *num, Number *obj) { return num->div(obj); }, "/");
 			}
 
 			template <typename Func>
 			ObjectPtr default_num_varfunc(const DataList &list, Func func, const std::string &name) {
 				ObjectPtr result;
 				if (list.front()->get_type() == T_Number) {
-					Number *tmp = (Number*)list.front().get()->clone();
+					Number *tmp = getPointer<Number>(list.front())->clone();
 					for (auto i : Range<size_t>(1, list.size() - 1))
-						func(tmp, list[i].get());
+						func(tmp, getPointer<Number>(list[i]));
 					result = ObjectPtr(tmp);
 				}
 				else {

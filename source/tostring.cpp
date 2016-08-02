@@ -22,6 +22,7 @@ namespace ICM
 		case T_Identifier: return "Identifier";
 		case T_String:     return "String";
 		case T_Symbol:     return "Symbol";
+		case T_List:       return "List";
 		case T_Comment:    return "Comment";
 		default:           return "";
 		}
@@ -89,7 +90,7 @@ namespace ICM
 				str.append("NIL");
 			str.append(")");
 		}
-		else if (astn->type == AST_FUNC) {
+		else if (astn->type == AST_NODE) {
 			str.append("N< ");
 			if (astn->fundata.func)
 				str.append(to_string(astn->fundata.func));

@@ -42,7 +42,7 @@ namespace ICM
 		inline void pushObject(AST *ast, const MatchResult &mr)
 		{
 			auto data = createObject(mr.getType(), mr.getString());
-			ast->pushNode(AST_DATA)->setdata(data);
+			ast->pushData(data);
 		}
 		AST* createAST(Match &match)
 		{
@@ -54,14 +54,13 @@ namespace ICM
 
 			mr = match.matchNext();
 			while (mr.getType() == T_Null || mr.getType() == T_Comment) {
-				if (mr.begin() != mr.end()) {
+				if (mr.begin() != mr.end())
 					mr = match.matchNext();
-				}
 				else
 					return nullptr;
 			}
 
-			if (mr.getType() != T_LBracket) {
+			if (mr.getType() != T_LBracket && mr.getType() != T_LSBracket) {
 				printf("Syntax Error in line(%d).\n", match.getCurLineNum());
 				return nullptr;
 			}
@@ -74,11 +73,20 @@ namespace ICM
 
 				switch (mr.getType()) {
 				case T_LBracket:
-					ast->pushNode(AST_FUNC);
+					ast->pushNode();
 					firstMatchBraket = true;
 					emptybreak = true;
 					break;
 				case T_RBracket:
+					ast->retNode();
+					break;
+				case T_LSBracket:
+					ast->pushNode();
+					ast->setFunc(FUNC_DEF, FuncTable.find("list"));
+					firstMatchBraket = false;
+					emptybreak = true;
+					break;
+				case T_RSBracket:
 					ast->retNode();
 					break;
 				case T_Identifier:
@@ -86,11 +94,11 @@ namespace ICM
 						auto i = FuncTable.find(mr.getString());
 						if (i != 0) {
 							// Default Function
-							ast->setfunc(FUNC_DEF, i);
+							ast->setFunc(FUNC_DEF, i);
 						}
 						else {
 							// TODO
-							ast->setfunc(FUNC_ADD, 0);
+							ast->setFunc(FUNC_ADD, 0);
 						}
 					}
 					else {

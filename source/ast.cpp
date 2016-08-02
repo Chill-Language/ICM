@@ -32,7 +32,7 @@ namespace ICM
 		case AST_DATA:
 			initialize(ObjectPtr());
 			break;
-		case AST_FUNC:
+		case AST_NODE:
 			initialize(new Function(), new Parameters());
 			break;
 		default:
@@ -44,7 +44,7 @@ namespace ICM
 		this->objdata = dat;
 	}
 	void ASTNode::initialize(Function *fun, Parameters *par) {
-		this->type = AST_FUNC;
+		this->type = AST_NODE;
 		this->fundata.func = fun;
 		this->fundata.pars = par;
 	}
@@ -54,7 +54,7 @@ namespace ICM
 		switch (type) {
 		case AST_DATA:
 			break;
-		case AST_FUNC:
+		case AST_NODE:
 			delete this->fundata.func;
 			delete this->fundata.pars;
 			break;
@@ -70,7 +70,7 @@ namespace ICM
 		case AST_DATA:
 			copy->objdata = ObjectPtr(this->objdata->clone());
 			break;
-		case AST_FUNC:
+		case AST_NODE:
 			copy->fundata.func = this->fundata.func;
 			copy->fundata.pars = this->fundata.pars; /* Shallow */
 			break;
@@ -87,7 +87,7 @@ namespace ICM
 		case AST_DATA:
 			copy->objdata = ObjectPtr(this->objdata->clone());
 			break;
-		case AST_FUNC:
+		case AST_NODE:
 			copy->fundata.func = this->fundata.func;
 			copy->fundata.pars = this->fundata.pars->deep_clone(); /* Deep */
 			break;
@@ -96,24 +96,20 @@ namespace ICM
 		}
 		return copy;
 	}
+
 	// AST
-	AST* AST::pushNode(ASTNodeType type) {
+	void AST::pushNode() {
 		if (root == nullptr) {
-			root = new ASTNode(type);
+			root = new ASTNode(AST_NODE);
 			currptr = root;
 			farthptrs.push(currptr);
 		}
 		else {
-			ASTNode *tmp = new ASTNode(type);
-			if (currptr->type == AST_FUNC)
-				currptr->pushpars(tmp);
-			else
-				farthptrs.top()->pushpars(tmp);
+			ASTNode *tmp = new ASTNode(AST_NODE);
+			currptr->pushpars(tmp);
+			farthptrs.push(currptr);
 			currptr = tmp;
-			if (tmp->type == AST_FUNC)
-				farthptrs.push(currptr);
 		}
-		return this;
 	}
 	int AST::retNode() {
 		if (!farthptrs.empty()) {
@@ -124,5 +120,15 @@ namespace ICM
 		else {
 			return -1; // Error
 		}
+	}
+	void AST::pushData(const ObjectPtr &op) {
+		if (root == nullptr)
+			pushNode();
+		ASTNode *tmp = new ASTNode(AST_DATA);
+		tmp->setdata(op);
+		currptr->pushpars(tmp);
+	}
+	void AST::setFunc(FuncType type, FuncID id) {
+		currptr->setfunc(type, id);
 	}
 }

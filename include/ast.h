@@ -9,7 +9,7 @@ namespace ICM
 	// Types
 	enum FuncType { FUNC_NIL, FUNC_DEF, FUNC_ADD };
 	using FuncID = unsigned;
-	enum ASTNodeType { AST_NIL, AST_DATA, AST_FUNC };
+	enum ASTNodeType { AST_NIL, AST_DATA, AST_NODE };
 
 	// ASTNode
 	class ASTNode
@@ -130,8 +130,11 @@ namespace ICM
 	{
 	public:
 		AST() {}
-		AST* pushNode(ASTNodeType type);
+		void pushNode();
 		int retNode();
+		void pushData(const ObjectPtr &op);
+		void setFunc(FuncType type, FuncID id);
+
 		const ASTNode* getRoot() const {
 			return this->root;
 		}
@@ -143,19 +146,6 @@ namespace ICM
 		}
 		AST* reset() {
 			this->currptr = root;
-			return this;
-		}
-
-		AST* setdata(const ObjectPtr &pdata) {
-			this->currptr->setdata(pdata);
-			return this;
-		}
-		AST* setfunc(FuncType type, FuncID id) {
-			this->currptr->setfunc(type, id);
-			return this;
-		}
-		AST* pushpars(ASTNode *node) {
-			this->currptr->pushpars(node);
 			return this;
 		}
 
