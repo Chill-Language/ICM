@@ -1,10 +1,11 @@
 #include "function.h"
-#include "keyword.h"
 
 namespace ICM
 {
-	void FuncParameter::initialize()
-	{
+	//=======================================
+	// * Class FuncParameter
+	//=======================================
+	void FuncParameter::initialize() {
 		switch (type) {
 		case FPT_Void:
 			this->fixed_size = 0;
@@ -67,8 +68,11 @@ namespace ICM
 		return true;
 	}
 
+	//=======================================
+	// * Function
+	//=======================================
 	// Check Call
-	ObjectPtr checkCall(const FuncTableBase &ftb, const DataList &dl)
+	ObjectPtr checkCall(const FuncTableUnit &ftb, const DataList &dl)
 	{
 		if (ftb.getParameter().checkType(dl)) {
 			return ftb.getFuncPtr()(dl);

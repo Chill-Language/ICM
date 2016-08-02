@@ -14,7 +14,7 @@ void test()
 int main(void)
 {
 	// Initialize
-	createDefaultFuncTable();
+	createDefFuncTable();
 	const bool LoopMatch = true;
 
 	// Test

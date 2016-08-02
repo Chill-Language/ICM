@@ -131,6 +131,7 @@ namespace ICM
 	public:
 		AST() {}
 		void pushNode();
+		void pushNode(ASTNode *node);
 		int retNode();
 		void pushData(const ObjectPtr &op);
 		void setFunc(FuncType type, FuncID id);

@@ -187,7 +187,7 @@ namespace ICM
 		public:
 			explicit List(const DataList &dl) : data(dl) {}
 
-			Boolean* List::equ(const ObjectPtr &obj) const;
+			Boolean* equ(const ObjectPtr &obj) const;
 			List* push(const ObjectPtr &objp);
 			List* push(const DataList &dl);
 			List* add(const List *dl);
@@ -239,6 +239,7 @@ namespace ICM
 			ObjectPtr mod(const DataList &list);
 			ObjectPtr equ(const DataList &list);
 			ObjectPtr list(const DataList &list);
+			ObjectPtr let(const DataList &dl);
 			ObjectPtr print(const DataList &list);
 		}
 

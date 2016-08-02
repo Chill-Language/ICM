@@ -82,7 +82,7 @@ namespace ICM
 					break;
 				case T_LSBracket:
 					ast->pushNode();
-					ast->setFunc(FUNC_DEF, FuncTable.find("list"));
+					ast->setFunc(FUNC_DEF, DefFuncTable.find("list"));
 					firstMatchBraket = false;
 					emptybreak = true;
 					break;
@@ -91,17 +91,30 @@ namespace ICM
 					break;
 				case T_Identifier:
 					if (firstMatchBraket) {
-						auto i = FuncTable.find(mr.getString());
-						if (i != 0) {
+						size_t i;
+						if ((i = DefFuncTable.find(mr.getString()))) {
 							// Default Function
 							ast->setFunc(FUNC_DEF, i);
 						}
-						else {
-							// TODO
-							ast->setFunc(FUNC_ADD, 0);
+						else if ((i = AddFuncTable.find(mr.getString()))) {
+							// Adden Function
+							ast->setFunc(FUNC_ADD, i);
 						}
 					}
 					else {
+						size_t i;
+						if ((i = DefVariableTable.find(mr.getString()))) {
+							// Default Variable
+							ASTNode *node = DefVariableTable[i].getNode();
+							ast->pushNode(node);
+							break;
+						}
+						else if ((i = AddVariableTable.find(mr.getString()))) {
+							// Default Variable
+							ASTNode *node = AddVariableTable[i].getNode();
+							ast->pushNode(node);
+							break;
+						}
 						pushObject(ast, mr);
 					}
 					firstMatchBraket = false;

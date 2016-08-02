@@ -40,8 +40,7 @@ namespace ICM
 			if (type == FUNC_DEF) {
 				ASTNode *tmp = nullptr;
 				tmp = new ASTNode(AST_DATA);
-				auto &tmpp = checkCall(FuncTable[id], createList(list));
-				tmp->setdata(tmpp);
+				tmp->setdata(checkCall(DefFuncTable[id], createList(list)));
 				result = tmp;
 			}
 			break;

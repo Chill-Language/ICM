@@ -53,6 +53,7 @@ namespace ICM
 			return;
 		switch (type) {
 		case AST_DATA:
+			this->objdata.~shared_ptr();
 			break;
 		case AST_NODE:
 			delete this->fundata.func;
@@ -110,6 +111,9 @@ namespace ICM
 			farthptrs.push(currptr);
 			currptr = tmp;
 		}
+	}
+	void AST::pushNode(ASTNode *node) {
+		currptr->pushpars(node);
 	}
 	int AST::retNode() {
 		if (!farthptrs.empty()) {

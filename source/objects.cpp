@@ -1,5 +1,6 @@
 #include "objects.h"
-#include "tostring.h" // TODO
+#include "tostring.h"
+#include "keyword.h"
 
 namespace ICM
 {
@@ -123,6 +124,10 @@ namespace ICM
 			}
 			ObjectPtr list(const DataList &dl) {
 				return ObjectPtr(new List(dl));
+			}
+			ObjectPtr let(const DataList &dl) {
+				AddVariableTable.add(dl[0]->to_string(), new ASTNode(dl[1]));
+				return dl[1];
 			}
 
 
