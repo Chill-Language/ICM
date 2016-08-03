@@ -1,5 +1,5 @@
 #include "parser.h"
-#include "objects.h"
+#include "objectsdef.h"
 
 namespace ICM
 {

@@ -79,7 +79,7 @@ namespace ICM
 		}
 		else {
 			std::string errinfo = "Matching Types in function '" + ftb.getName() + "'.";
-			return ObjectPtr(new Objects::Error(errinfo));
+			return createError(errinfo);
 		}
 	}
 }
