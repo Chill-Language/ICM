@@ -20,6 +20,10 @@ namespace ICM
 		DefFuncTable.add("/", div, FuncParameter(FPT_VaryIdentical, 0, { T_Number }));
 		DefFuncTable.add("%", mod, FuncParameter(FPT_VaryIdentical, 0, { T_Number }));
 		DefFuncTable.add("=", equ, FuncParameter(FPT_Vary, 0));
+		DefFuncTable.add("++", inc, FuncParameter(FPT_Fixed, 1, { T_Number }));
+		DefFuncTable.add("inc", inc, FuncParameter(FPT_Fixed, 1, { T_Number }));
+		DefFuncTable.add("--", dec, FuncParameter(FPT_Fixed, 1, { T_Number }));
+		DefFuncTable.add("dec", dec, FuncParameter(FPT_Fixed, 1, { T_Number }));
 		DefFuncTable.add("print", print, FuncParameter(FPT_Vary, 0));
 		DefFuncTable.add("list", list, FuncParameter(FPT_Vary, 0));
 		DefFuncTable.add("let", let, FuncParameter(FPT_Fixed, 2, { T_Identifier, T_Vary }));

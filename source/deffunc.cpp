@@ -2,6 +2,7 @@
 #include "objectsdef.h"
 #include "tostring.h"
 #include "keyword.h"
+#include "tostring.h"
 
 namespace ICM
 {
@@ -34,8 +35,14 @@ namespace ICM
 			return ObjectPtr(new List(dl));
 		}
 		ObjectPtr let(const DataList &dl) {
-			AddVariableTable.add(dl[0]->to_string(), new ASTNode(dl[1]));
-			return dl[1];
+			string name = getPointer<Identifier>(dl[0])->getName();
+			size_t id = AddVariableTable.find(name);
+			Identifier *data;
+			data = (id) ? AddVariableTable[id].getData() : getPointer<Identifier>(dl[0]);
+			data->setValue(new ASTNode(dl[1]));
+			if (!id)
+				AddVariableTable.add(name, data);
+			return ObjectPtr(data);
 		}
 		ObjectPtr dcall(const DataList &dl) {
 			string name = getPointer<Identifier>(dl[1])->getName();
@@ -44,10 +51,16 @@ namespace ICM
 			else
 				return createError("Error in match function(" + name + ").");
 		}
-
-
-		template <typename Func>
-		ObjectPtr default_num_varfunc(const DataList &list, Func func, const std::string &name);
+		ObjectPtr inc(const DataList &dl) {
+			autoptr<Number> tmp(new Number(1));
+			getPointer<Number>(dl[0])->add(tmp.get());
+			return dl[0];
+		}
+		ObjectPtr dec(const DataList &dl) {
+			autoptr<Number> tmp(new Number(1));
+			getPointer<Number>(dl[0])->sub(tmp.get());
+			return dl[0];
+		}
 
 		template <typename T>
 		ObjectPtr add(const DataList &list) {
@@ -58,26 +71,17 @@ namespace ICM
 		}
 
 		ObjectPtr add(const DataList &list) {
-			ObjectPtr result;
-
 			if (list.empty())
 				return ObjectPtr(new Number(0));
 
 			ObjectPtr front = list.front();
 			switch (front->get_type()) {
-			case T_Number:
-				result = add<Number>(list);
-				break;
-			case T_String:
-				result = add<String>(list);
-				break;
-			case T_List:
-				result = add<List>(list);
-				break;
+			case T_Number: return add<Number>(list);
+			case T_String: return add<String>(list);
+			case T_List:   return add<List>(list);
 			default:
-				result = createError(to_string_unfeined_function("+", list.front()->get_type()));
+				return createError(to_string_unfeined_function("+", list.front()->get_type()));
 			}
-			return result;
 		}
 
 		template <typename T>
@@ -93,34 +97,30 @@ namespace ICM
 			return result;
 		}
 
+		template <typename Func>
+		ObjectPtr default_num_varfunc(const DataList &list, Func func);
+
 		ObjectPtr sub(const DataList &list) {
-			return default_num_varfunc(list, [](Number *num, Number *obj) { return num->sub(obj); }, "-");
+			return default_num_varfunc(list, [](Number *num, Number *obj) { return num->sub(obj); });
 		}
 		ObjectPtr mul(const DataList &list) {
-			return default_num_varfunc(list, [](Number *num, Number *obj) { return num->mul(obj); }, "*");
+			return default_num_varfunc(list, [](Number *num, Number *obj) { return num->mul(obj); });
 		}
 		ObjectPtr div(const DataList &list) {
-			return default_num_varfunc(list, [](Number *num, Number *obj) { return num->div(obj); }, "/");
+			return default_num_varfunc(list, [](Number *num, Number *obj) { return num->div(obj); });
 		}
 		ObjectPtr mod(const DataList &list) {
-			return default_num_varfunc(list, [](Number *num, Number *obj) { return num->mod(obj); }, "%");
+			return default_num_varfunc(list, [](Number *num, Number *obj) { return num->mod(obj); });
 		}
 
 		template <typename Func>
-		ObjectPtr default_num_varfunc(const DataList &list, Func func, const std::string &name) {
-			ObjectPtr result;
+		ObjectPtr default_num_varfunc(const DataList &list, Func func) {
 			if (list.empty())
 				return ObjectPtr(new Number(0));
-			if (list.front()->get_type() == T_Number) {
-				Number *tmp = getPointer<Number>(list.front())->clone();
-				for (auto i : Range<size_t>(1, list.size() - 1))
-					func(tmp, getPointer<Number>(list[i]));
-				result = ObjectPtr(tmp);
-			}
-			else {
-				result = createError(to_string_unfeined_function(name, list.front()->get_type()));
-			}
-			return result;
+			Number *tmp = getPointer<Number>(list.front())->clone();
+			for (auto i : Range<size_t>(1, list.size() - 1))
+				func(tmp, getPointer<Number>(list[i]));
+			return ObjectPtr(tmp);
 		}
 	}
 }

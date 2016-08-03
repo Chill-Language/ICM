@@ -39,11 +39,6 @@ namespace ICM
 			return ObjectPtr(object);
 		}
 
-		inline void pushObject(AST *ast, const MatchResult &mr)
-		{
-			auto data = createObject(mr.getType(), mr.getString());
-			ast->pushData(data);
-		}
 		AST* createAST(Match &match)
 		{
 			AST *ast = new AST();
@@ -100,24 +95,31 @@ namespace ICM
 							// Adden Function
 							ast->setFunc(FUNC_ADD, i);
 						}
+						firstMatchBraket = false;
 					}
 					else {
 						size_t i;
+
 						if ((i = DefVariableTable.find(mr.getString()))) {
 							// Default Variable
-							ASTNode *node = DefVariableTable[i].getNode();
+							ASTNode *node = DefVariableTable[i].getData()->getValue();
 							ast->pushNode(node);
-							break;
 						}
 						else if ((i = AddVariableTable.find(mr.getString()))) {
 							// Default Variable
-							ASTNode *node = AddVariableTable[i].getNode();
-							ast->pushNode(node);
-							break;
+
+							//ASTNode *node = AddVariableTable[i].getData()->getValue();
+							//ast->pushNode(node);
+
+							ObjectPtr data(AddVariableTable[i].getData());
+							ast->pushData(data);
 						}
-						pushObject(ast, mr);
+						else {
+							ASTNode *astnode = new ASTNode(ObjectPtr(new Nil()));
+							ObjectPtr data(new Identifier(mr.getString(), astnode));
+							ast->pushData(data);
+						}
 					}
-					firstMatchBraket = false;
 					break;
 				case T_Number: case T_String: case T_Boolean:
 					if (firstMatchBraket) {
@@ -125,7 +127,8 @@ namespace ICM
 						return nullptr;
 					}
 					else {
-						pushObject(ast, mr);
+						ObjectPtr data = createObject(mr.getType(), mr.getString());
+						ast->pushData(data);
 						break;
 					}
 				default:

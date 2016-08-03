@@ -2,7 +2,9 @@
 #define _ICM_OBJECTSDEF_H_
 
 #include "basic.h"
+#include "ast.h"
 #include "objects.h"
+#include "tostring.h"
 
 namespace ICM
 {
@@ -164,13 +166,32 @@ namespace ICM
 		class Identifier : public Object
 		{
 		public:
-			explicit Identifier(const std::string &dat = "") : name(dat) {}
+			explicit Identifier(const std::string &name = "") : name(name) {}
+			Identifier(const std::string &name, ASTNode *node) : name(name) {
+				setValue(node);
+			}
 
 			std::string getName() const {
 				return name.to_string();
 			}
+			const ASTNode *getValue() const {
+				return data.get();
+			}
+			ASTNode *getValue() {
+				return data.get();
+			}
+			void setValue(ASTNode *node) {
+				if (node->getNodeType() == AST_DATA && node->getObjtype() == T_Identifier)
+					this->data = getPointer<Identifier>(node->getdata())->data;
+				else
+					this->data = autoptr<ASTNode>(node);
+			}
+			DefaultType getValueType() const {
+				return this->data->getObjtype();
+			}
+
 			std::string to_string() const {
-				return name.to_string();
+				return name.to_string() + "(" + ICM::to_string(data.get()) + ")";
 			}
 			DefaultType get_type() const {
 				return T_Identifier;
@@ -181,6 +202,7 @@ namespace ICM
 
 		private:
 			Common::charptr name;
+			autoptr<ASTNode> data;
 		};
 	}
 }

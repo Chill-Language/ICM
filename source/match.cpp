@@ -9,6 +9,7 @@ namespace ICM
 		const char *begin = currptr;
 		int mode = 0;
 		vector<char> findchars;
+		vector<char> ignorechars;
 		static const char breakfindchars[] = " \n\t()[]"; // include '\0'
 
 		while (true) {
@@ -38,12 +39,14 @@ namespace ICM
 					goto EndMatch;
 				case ';':  /* Comment */
 					findchars = { '\n', '\0' };
+					ignorechars = { '\\' };
 					type = T_Comment;
 					begin = currptr;
 					mode = 1;
 					break;
 				case '"':  /* String */
 					findchars = { '"', '\0' };
+					ignorechars = { '\\' };
 					type = T_String;
 					begin = currptr + 1;
 					mode = 1;

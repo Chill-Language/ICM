@@ -23,6 +23,7 @@ namespace ICM
 	{
 	public:
 		using TypeList = std::vector<DefaultType>;
+		using DataListPtr = autoptr<DataList>;
 
 		FuncParameter()
 			: type(FPT_Void) {}
@@ -37,13 +38,15 @@ namespace ICM
 			initialize();
 		}
 
-		bool checkType(const DataList &list) const;
+		DataListPtr checkType(const DataList &list) const;
 
 
 	private:
 		void initialize();
-		bool checkTypeList(const DataList &list, unsigned size) const;
-		bool checkTypeList(const DataList &list, unsigned begindex, unsigned endindex) const;
+		DataListPtr getDataListPtr(const DataList &list) const;
+		ObjectPtr checkSub(ObjectPtr ptr, DefaultType checktype) const;
+		DataListPtr checkTypeList(const DataList &list, unsigned size) const;
+		DataListPtr checkTypeList(const DataList &list, unsigned begindex, unsigned endindex) const;
 
 
 	private:
@@ -57,20 +60,21 @@ namespace ICM
 	//=======================================
 	class VariableTableUnit
 	{
+		using Identifier = Objects::Identifier;
 	public:
 		VariableTableUnit() = default;
-		VariableTableUnit(size_t id, const string &name, ASTNode *data)
+		VariableTableUnit(size_t id, const string &name, Identifier *data)
 			: id(id), name(name), data(data) {}
 
 		size_t getID() const { return id; }
 		const string& getName() const { return name; }
-		const ASTNode *getNode() const { return data; }
-		ASTNode *getNode() { return data; }
+		const Identifier *getData() const { return data; }
+		Identifier *getData() { return data; }
 
 	private:
 		size_t id = 0;
 		string name;
-		ASTNode *data = nullptr;
+		Identifier *data = nullptr;
 	};
 
 	//=======================================
