@@ -89,6 +89,9 @@ namespace ICM
 		string List::to_string() const {
 			return ICM::to_string(data);
 		}
+		string List::to_output() const {
+			return Common::Convert::to_string(data.begin(), data.end(), [](const ObjectPtr &op) { return op->to_output(); });
+		}
 
 		//=======================================
 		// * Class Identifier
@@ -125,5 +128,12 @@ namespace ICM
 	ObjectPtr createError(const string &errinfo)
 	{
 		return ObjectPtr(new Objects::Error(errinfo));
+	}
+	// Adjust ObjectPtr
+	ObjectPtr adjustObjectPtr(const ObjectPtr &ptr) {
+		if (ptr->get_type() == T_Identifier)
+			return getPointer<Objects::Identifier>(ptr)->getRefNode()->getdata();
+		else
+			return ptr;
 	}
 }

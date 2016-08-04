@@ -10,7 +10,7 @@ namespace ICM
 		int mode = 0;
 		vector<char> findchars;
 		vector<char> ignorechars;
-		static const char breakfindchars[] = " \n\t()[]"; // include '\0'
+		static const char breakfindchars[] = " \n\t()[];"; // include '\0'
 
 		while (true) {
 			char c = *currptr;
@@ -39,14 +39,14 @@ namespace ICM
 					goto EndMatch;
 				case ';':  /* Comment */
 					findchars = { '\n', '\0' };
-					ignorechars = { '\\' };
+					//ignorechars = { '\\' };
 					type = T_Comment;
 					begin = currptr;
 					mode = 1;
 					break;
 				case '"':  /* String */
 					findchars = { '"', '\0' };
-					ignorechars = { '\\' };
+					//ignorechars = { '\\' };
 					type = T_String;
 					begin = currptr + 1;
 					mode = 1;
@@ -94,7 +94,7 @@ namespace ICM
 		EndMatch:
 		if (mr.getType() == T_Identifier) {
 			if (mr.getString() == "Nil")
-				mr.setType(T_Nil);
+				;//mr.setType(T_Nil);
 			else if (mr.getString() == "T" || mr.getString() == "F")
 				mr.setType(T_Boolean);
 		}

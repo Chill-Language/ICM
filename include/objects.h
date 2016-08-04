@@ -31,6 +31,7 @@ namespace ICM
 		return static_cast<T*>(op.get());
 	}
 	ObjectPtr createError(const string &errinfo);
+	ObjectPtr adjustObjectPtr(const ObjectPtr &ptr);
 	std::string to_string(const Objects::Object &obj);
 
 	namespace Objects

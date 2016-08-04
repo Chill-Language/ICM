@@ -152,6 +152,7 @@ namespace ICM
 			List* add(const List *dl);
 
 			string to_string() const;
+			string to_output() const;
 			DefaultType get_type() const {
 				return T_List;
 			}

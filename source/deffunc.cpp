@@ -73,15 +73,13 @@ namespace ICM
 			}
 		}
 
-		template <typename T>
-		ObjectPtr equ(const DataList &list) {
-			return ObjectPtr(list[0]->equ(getPointer<T>(list[1])));
-		}
-
 		ObjectPtr equ(const DataList &list) {
 			ObjectPtr result;
 
-			result = ObjectPtr(list[0]->equ(list[1]));
+			if (list.size() < 2)
+				return ObjectPtr(new Error("Args 1 for 2."));
+
+			result = ObjectPtr(adjustObjectPtr(list[0])->equ(adjustObjectPtr(list[1])));
 
 			return result;
 		}

@@ -42,7 +42,6 @@ namespace ICM
 
 	private:
 		void initialize();
-		ObjectPtr adjustObjectPtr(const ObjectPtr &ptr) const;
 		bool checkSub(ObjectPtr ptr, DefaultType checktype, DataList &dlp) const;
 		bool checkTypeList(const DataList &list, unsigned size, DataList &dlp) const;
 		bool checkTypeList(const DataList &list, unsigned begindex, unsigned endindex, DataList &dlp) const;

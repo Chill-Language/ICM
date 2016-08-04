@@ -74,12 +74,6 @@ namespace ICM
 				return false;
 		return true;
 	}
-	ObjectPtr FuncParameter::adjustObjectPtr(const ObjectPtr &ptr) const {
-		if (ptr->get_type() == T_Identifier)
-			return getPointer<Objects::Identifier>(ptr)->getRefNode()->getdata();
-		else
-			return ptr;
-	}
 	bool FuncParameter::checkSub(ObjectPtr ptr, DefaultType checktype, DataList &dlp) const {
 		ptr = (checktype == T_Identifier) ? ptr : adjustObjectPtr(ptr);
 		DefaultType currtype = ptr->get_type();
