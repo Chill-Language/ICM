@@ -76,7 +76,8 @@ namespace ICM
 		class Number : public Object
 		{
 		public:
-			explicit Number(int dat = 0) : data(dat) {}
+			using Type = int;
+			explicit Number(Type dat = 0) : data(dat) {}
 
 			Boolean* equ(const ObjectPtr &obj) const;
 			Number* add(const Number *obj);
@@ -84,6 +85,11 @@ namespace ICM
 			Number* mul(const Number *obj);
 			Number* div(const Number *obj);
 			Number* mod(const Number *obj);
+
+			bool operator<(const Number &obj);
+			bool operator<=(const Number &obj);
+			bool operator>(const Number &obj);
+			bool operator>=(const Number &obj);
 
 			string to_string() const {
 				return std::to_string(data);
@@ -96,12 +102,12 @@ namespace ICM
 			}
 
 		private:
-			int data;
-			int& get_data(Object *obj)
+			Type data;
+			Type& get_data(Object *obj)
 			{
 				return ((Number*)obj)->data;
 			}
-			const int& get_data(const Object *obj) const
+			const Type& get_data(const Object *obj) const
 			{
 				return ((Number*)obj)->data;
 			}
@@ -150,6 +156,12 @@ namespace ICM
 			List* push(const ObjectPtr &objp);
 			List* push(const DataList &dl);
 			List* add(const List *dl);
+			DataList::iterator begin() {
+				return data.begin();
+			}
+			DataList::iterator end() {
+				return data.end();
+			}
 
 			string to_string() const;
 			string to_output() const;

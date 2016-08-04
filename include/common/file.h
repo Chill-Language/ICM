@@ -128,6 +128,7 @@ private:
 		pointer = fopen(path, mode);
 		if (!pointer) {
 			FILE *tmp = fopen(path, ((mode[1] == 't') ? "wt+" : "wb+"));
+			//fopen(path, ((mode[1] == 't') ? "wt+" : "wb+"));
 			if (tmp)
 				fclose(tmp);
 			else
@@ -141,6 +142,14 @@ private:
 			fclose(pointer);
 		pointer = nullptr;
 	}
+#ifdef _MSC_VER
+	inline FILE* fopen(const char *buffer, const char *mode)
+	{
+		FILE *file;
+		fopen_s(&file, buffer, mode);
+		return file;
+	}
+#endif
 public:
 	typedef const char * const Const;
 	static Const LOAD_TEXT;

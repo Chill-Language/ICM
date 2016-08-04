@@ -56,6 +56,18 @@ namespace ICM
 			this->data %= obj->data;
 			return this;
 		}
+		bool Number::operator<(const Number &obj) {
+			return self.data < obj.data;
+		}
+		bool Number::operator<=(const Number &obj) {
+			return self.data <= obj.data;
+		}
+		bool Number::operator>(const Number &obj) {
+			return self.data > obj.data;
+		}
+		bool Number::operator>=(const Number &obj) {
+			return self.data >= obj.data;
+		}
 
 		//=======================================
 		// * Class String

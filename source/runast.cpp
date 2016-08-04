@@ -39,12 +39,9 @@ namespace ICM
 			listnum.push_back(calcASTNode(l)->getdata());
 		return listnum;
 	}
-	void runAST(const AST *ast)
+	ASTNode* runAST(const AST *ast)
 	{
 		using Common::Output::println;
-		auto a = calcASTNode(ast->getRoot());
-		println();
-		println("\nResult:");
-		println(a);
+		return calcASTNode(ast->getRoot());
 	}
 }

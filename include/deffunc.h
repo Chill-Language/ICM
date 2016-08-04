@@ -18,7 +18,15 @@ namespace ICM
 		CallFunc list;
 		CallFunc let;
 		CallFunc print;
+		CallFunc println;
 		CallFunc dcall;
+		CallFunc exit;
+		CallFunc system;
+		CallFunc order;
+		CallFunc n_small;
+		CallFunc n_smallequal;
+		CallFunc n_large;
+		CallFunc n_largeequal;
 	}
 }
 

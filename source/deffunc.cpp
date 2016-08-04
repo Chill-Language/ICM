@@ -20,6 +20,11 @@ namespace ICM
 				Common::Output::print(op->to_output());
 			return list(dl);
 		}
+		ObjectPtr println(const DataList &dl) {
+			for (auto &op : dl)
+				Common::Output::println(op->to_output());
+			return list(dl);
+		}
 		ObjectPtr list(const DataList &dl) {
 			return ObjectPtr(new List(dl));
 		}
@@ -40,6 +45,39 @@ namespace ICM
 			else
 				return createError("Error in match function(" + name + ").");
 		}
+		ObjectPtr system(const DataList &dl) {
+			int i = std::system(getPointer<Objects::String>(dl[0])->get_data().c_str());
+			return ObjectPtr(new Number(i));
+		}
+		ObjectPtr exit(const DataList &dl) {
+			std::exit(0);
+			return nullptr;
+		}
+		ObjectPtr n_small(const DataList &dl) {
+			bool result = getPointer<Number>(dl[0])->operator<(*getPointer<Number>(dl[1]));
+			return ObjectPtr(new Boolean(result));
+		}
+		ObjectPtr n_smallequal(const DataList &dl) {
+			bool result = getPointer<Number>(dl[0])->operator<=(*getPointer<Number>(dl[1]));
+			return ObjectPtr(new Boolean(result));
+		}
+		ObjectPtr n_large(const DataList &dl) {
+			bool result = getPointer<Number>(dl[0])->operator>(*getPointer<Number>(dl[1]));
+			return ObjectPtr(new Boolean(result));
+		}
+		ObjectPtr n_largeequal(const DataList &dl) {
+			bool result = getPointer<Number>(dl[0])->operator>=(*getPointer<Number>(dl[1]));
+			return ObjectPtr(new Boolean(result));
+		}
+
+		ObjectPtr order(const DataList &dl) {
+			List *list = getPointer<List>(dl[0]);
+			std::sort(list->begin(), list->end(), [](const ObjectPtr &a, const ObjectPtr &b) {
+				return getPointer<Number>(a)->operator<(*getPointer<Number>(b));
+			});
+			return ObjectPtr(list);
+		}
+
 		ObjectPtr inc(const DataList &dl) {
 			autoptr<Number> tmp(new Number(1));
 			getPointer<Number>(dl[0])->add(tmp.get());
