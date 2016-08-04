@@ -27,80 +27,66 @@ namespace ICM
 			break;
 		}
 	}
-	FuncParameter::DataListPtr FuncParameter::checkType(const DataList &list) const {
+	bool FuncParameter::checkType(const DataList &list, DataList &dlp) const {
 		switch (type) {
 		case FPT_Void:
-			return list.empty() ? getDataListPtr(list) : nullptr;
+			return list.empty();
 		case FPT_Fixed:
 			if (list.size() != fixed_size)
-				return nullptr;
-			return checkTypeList(list, fixed_size);
+				return false;
+			return checkTypeList(list, fixed_size, dlp);
 		case FPT_Vary:
 			if (list.size() < fixed_size)
-				return nullptr;
-			if (checkTypeList(list, fixed_size) == nullptr)
-				return nullptr;
-			return getDataListPtr(list);
-		case FPT_VaryIdentical: {
-			if (list.size() < fixed_size) return nullptr;
-			DataListPtr p1 = checkTypeList(list, fixed_size);
-			if (p1 == nullptr) return nullptr;
-			DataListPtr p2 = checkTypeList(list, fixed_size, list.size());
-			if (p2 == nullptr) return nullptr;
-			DataListPtr dp(new DataList());
-			for (auto &e : *p1) dp->push_back(e);
-			for (auto &e : *p2) dp->push_back(e);
-			return dp;
-		}
+				return false;
+			if (!checkTypeList(list, fixed_size, dlp))
+				return false;
+			for (auto i : Range<size_t>(fixed_size, list.size() - 1))
+				dlp.push_back(list[i]);
+			return true;
+		case FPT_VaryIdentical:
+			if (list.size() < fixed_size)
+				return false;
+			if (!checkTypeList(list, fixed_size, dlp))
+				return false;
+			return checkTypeList(list, fixed_size, list.size(), dlp);
 		default:
-			return nullptr;
+			return false;
 		}
 	}
-	FuncParameter::DataListPtr FuncParameter::getDataListPtr(const DataList &list) const {
-		DataListPtr dlp(new DataList());
-		for (auto &e : list)
-			dlp->push_back(e);
-		return dlp;
+	bool FuncParameter::checkTypeList(const DataList &list, size_t size, DataList &dlp) const {
+		for (auto i : Range<size_t>(0, size - 1))
+			if (!checkSub(list[i], typelist[i], dlp))
+				return false;
+		return true;
 	}
-	ObjectPtr FuncParameter::checkSub(ObjectPtr ptr, DefaultType checktype) const {
-		DefaultType currtype = ptr->get_type();
-		if (currtype == T_Identifier && checktype != T_Identifier) {
-			ptr = getPointer<Objects::Identifier>(ptr)->getValue()->getdata();
-			currtype = ptr->get_type();
-		}
-		if (currtype != checktype && checktype != T_Vary)
-			return nullptr;
-		return ptr;
-	}
-
-	FuncParameter::DataListPtr FuncParameter::checkTypeList(const DataList &list, size_t size) const {
-		DataListPtr dlp(new DataList());
-		for (auto i : Range<size_t>(0, size - 1)) {
-			ObjectPtr ptr = checkSub(list[i], typelist[i]);
-			if (ptr == nullptr)
-				return nullptr;
-			dlp->push_back(ptr);
-		}
-		return dlp;
-	}
-	FuncParameter::DataListPtr FuncParameter::checkTypeList(const DataList &list, size_t bid, size_t eid) const {
-		DataListPtr dlp(new DataList());
+	bool FuncParameter::checkTypeList(const DataList &list, size_t bid, size_t eid, DataList &dlp) const {
 		if (list.empty())
-			return dlp;
+			return true;
 		DefaultType vartype = typelist.back();
 		if (vartype == T_Vary) {
 			ObjectPtr op = list[bid];
 			vartype = op->get_type();
 			if (vartype == T_Identifier)
-				vartype = getPointer<Objects::Identifier>(op)->getValueType();
+				vartype = adjustObjectPtr(op)->get_type();
 		}
-		for (auto i : Range<size_t>(bid, eid - 1)) {
-			ObjectPtr ptr = checkSub(list[i], vartype);
-			if (ptr == nullptr)
-				return nullptr;
-			dlp->push_back(ptr);
-		}
-		return dlp;
+		for (auto i : Range<size_t>(bid, eid - 1))
+			if (!checkSub(list[i], vartype, dlp))
+				return false;
+		return true;
+	}
+	ObjectPtr FuncParameter::adjustObjectPtr(const ObjectPtr &ptr) const {
+		if (ptr->get_type() == T_Identifier)
+			return getPointer<Objects::Identifier>(ptr)->getRefNode()->getdata();
+		else
+			return ptr;
+	}
+	bool FuncParameter::checkSub(ObjectPtr ptr, DefaultType checktype, DataList &dlp) const {
+		ptr = (checktype == T_Identifier) ? ptr : adjustObjectPtr(ptr);
+		DefaultType currtype = ptr->get_type();
+		if (currtype != checktype && checktype != T_Vary)
+			return false;
+		dlp.push_back(ptr);
+		return true;
 	}
 
 	//=======================================
@@ -109,9 +95,11 @@ namespace ICM
 	// Check Call
 	ObjectPtr checkCall(const FuncTableUnit &ftb, const DataList &dl)
 	{
-		auto p = ftb.getParameter().checkType(dl);
-		if (p) {
-			return ftb.getFuncPtr()(*p.get());
+		DataList ndl;
+		if (ftb.getParameter().checkType(dl, ndl)) {
+			//println(dl);
+			//println(ndl);
+			return ftb.getFuncPtr()(ndl);
 		}
 		else {
 			std::string errinfo = "Matching Types in function '" + ftb.getName() + "'.";

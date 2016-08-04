@@ -117,6 +117,9 @@ namespace ICM
 
 			Boolean* equ(const ObjectPtr &obj) const;
 			String* add(const String *obj);
+			std::string to_output() const {
+				return data.to_string();
+			}
 			std::string to_string() const {
 				return '"' + data.to_string() + '"';
 			}
@@ -174,25 +177,13 @@ namespace ICM
 			std::string getName() const {
 				return name.to_string();
 			}
-			const ASTNode *getValue() const {
-				return data.get();
-			}
-			ASTNode *getValue() {
-				return data.get();
-			}
-			void setValue(ASTNode *node) {
-				if (node->getNodeType() == AST_DATA && node->getObjtype() == T_Identifier)
-					this->data = getPointer<Identifier>(node->getdata())->data;
-				else
-					this->data = autoptr<ASTNode>(node);
-			}
-			DefaultType getValueType() const {
-				return this->data->getObjtype();
-			}
+			ASTNode* getRefNode();
+			ASTNode* getDatNode();
+			void setValue(ASTNode *node);
+			DefaultType getValueType() const;
+			std::string to_string() const;
+			string to_output() const;
 
-			std::string to_string() const {
-				return name.to_string() + "(" + ICM::to_string(data.get()) + ")";
-			}
 			DefaultType get_type() const {
 				return T_Identifier;
 			}
@@ -202,7 +193,7 @@ namespace ICM
 
 		private:
 			Common::charptr name;
-			autoptr<ASTNode> data;
+			ASTNode* data;
 		};
 	}
 }

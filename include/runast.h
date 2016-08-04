@@ -4,7 +4,8 @@
 
 namespace ICM
 {
-	const ASTNode* calcASTNode(const ASTNode *node);
+	ASTNode* calcASTNode(const ASTNode *node);
+	DataList createList(const std::vector<ASTNode*> &list);
 	void runAST(const AST *ast);
 }
 

@@ -38,15 +38,14 @@ namespace ICM
 			initialize();
 		}
 
-		DataListPtr checkType(const DataList &list) const;
-
+		bool checkType(const DataList &list, DataList &dlp) const;
 
 	private:
 		void initialize();
-		DataListPtr getDataListPtr(const DataList &list) const;
-		ObjectPtr checkSub(ObjectPtr ptr, DefaultType checktype) const;
-		DataListPtr checkTypeList(const DataList &list, unsigned size) const;
-		DataListPtr checkTypeList(const DataList &list, unsigned begindex, unsigned endindex) const;
+		ObjectPtr adjustObjectPtr(const ObjectPtr &ptr) const;
+		bool checkSub(ObjectPtr ptr, DefaultType checktype, DataList &dlp) const;
+		bool checkTypeList(const DataList &list, unsigned size, DataList &dlp) const;
+		bool checkTypeList(const DataList &list, unsigned begindex, unsigned endindex, DataList &dlp) const;
 
 
 	private:

@@ -7,8 +7,31 @@
 
 namespace ICM
 {
-	const ASTNode* calcASTNode(const ASTNode *node);
+	ASTNode* calcASTNode(const ASTNode *node)
+	{
+		if (node == nullptr)
+			return nullptr;
 
+		switch (node->getNodeType()) {
+		case AST_NIL:
+			return nullptr;
+		case AST_DATA:
+			return const_cast<ASTNode*>(node);
+		case AST_NODE: {
+			auto func = node->getFunc();
+			if (func->getType() == FUNC_DEF) {
+				auto id = func->getID();
+				auto &list = node->getPars()->getList();
+				ASTNode* result = new ASTNode(AST_DATA);
+				ObjectPtr data = checkCall(DefFuncTable[id], createList(list));
+				result->setdata(data);
+				return result;
+			}
+		}
+		default:
+			return nullptr;
+		}
+	}
 	DataList createList(const std::vector<ASTNode*> &list)
 	{
 		DataList listnum;
@@ -16,38 +39,6 @@ namespace ICM
 			listnum.push_back(calcASTNode(l)->getdata());
 		return listnum;
 	}
-	const ASTNode* calcASTNode(const ASTNode *node)
-	{
-		using namespace Objects;
-
-		const ASTNode* result = nullptr;
-
-		if (node == nullptr)
-			return result;
-
-		switch (node->getNodeType()) {
-		case AST_NIL:
-			break;
-		case AST_DATA:
-			result = node;
-			break;
-		case AST_NODE:
-			auto func = node->getFunc();
-			auto pars = node->getPars();
-			auto type = func->getType();
-			auto id = func->getID();
-			auto list = pars->getList();
-			if (type == FUNC_DEF) {
-				ASTNode *tmp = nullptr;
-				tmp = new ASTNode(AST_DATA);
-				tmp->setdata(checkCall(DefFuncTable[id], createList(list)));
-				result = tmp;
-			}
-			break;
-		}
-		return result;
-	}
-
 	void runAST(const AST *ast)
 	{
 		using Common::Output::println;

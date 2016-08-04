@@ -102,7 +102,7 @@ namespace ICM
 
 						if ((i = DefVariableTable.find(mr.getString()))) {
 							// Default Variable
-							ASTNode *node = DefVariableTable[i].getData()->getValue();
+							ASTNode *node = DefVariableTable[i].getData()->getRefNode();
 							ast->pushNode(node);
 						}
 						else if ((i = AddVariableTable.find(mr.getString()))) {

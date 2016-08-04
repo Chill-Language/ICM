@@ -108,6 +108,9 @@ namespace ICM
 		}
 		return str;
 	}
+	string to_string(const ASTNodePtr &anp) {
+		return to_string(anp.get());
+	}
 	string to_string(const AST *ast) {
 		return string("{AST: ") + to_string(ast->root) + string("}");
 	}

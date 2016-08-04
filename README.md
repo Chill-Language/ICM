@@ -104,8 +104,11 @@ e.g. `[1 2 3 5]  ; same as (list 1 2 3 5)`
 
 (let a 5)
 (let b a)
+(print b) ; 5
 (inc a)
-(print b)
+(print b) ; 6
+(let a 0)
+(print b) ; 6
 
 ; test04
 ; list

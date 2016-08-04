@@ -15,20 +15,9 @@ namespace ICM
 			return "Function '" + name + "' is undefined for type(" + ICM::to_string(type) + ")";
 		}
 
-		void print(const ObjectPtr &p) {
-			switch (p->get_type())
-			{
-			case T_String:
-				Common::Output::print(getPointer<String>(p)->get_data());
-				break;
-			default:
-				Common::Output::print(p->to_string());
-				break;
-			}
-		}
 		ObjectPtr print(const DataList &dl) {
 			for (auto &op : dl)
-				print(op);
+				Common::Output::print(op->to_output());
 			return list(dl);
 		}
 		ObjectPtr list(const DataList &dl) {
@@ -39,7 +28,7 @@ namespace ICM
 			size_t id = AddVariableTable.find(name);
 			Identifier *data;
 			data = (id) ? AddVariableTable[id].getData() : getPointer<Identifier>(dl[0]);
-			data->setValue(new ASTNode(dl[1]));
+			data->setValue(new ASTNode(dl[1])); // TODO
 			if (!id)
 				AddVariableTable.add(name, data);
 			return ObjectPtr(data);

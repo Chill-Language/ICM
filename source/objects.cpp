@@ -1,6 +1,7 @@
 #include "objectsdef.h"
 #include "tostring.h"
 #include "keyword.h"
+#include "runast.h"
 
 namespace ICM
 {
@@ -85,9 +86,35 @@ namespace ICM
 			data.insert(data.end(), dl->data.begin(), dl->data.end());
 			return this;
 		}
-
 		string List::to_string() const {
 			return ICM::to_string(data);
+		}
+
+		//=======================================
+		// * Class Identifier
+		//=======================================
+		ASTNode* Identifier::getRefNode() {
+			return data;
+		}
+		ASTNode* Identifier::getDatNode() {
+			return calcASTNode(getRefNode());
+		}
+
+		void Identifier::setValue(ASTNode *node) {
+			if (node->getNodeType() == AST_DATA && node->getObjtype() == T_Identifier)
+				this->data = getPointer<Identifier>(node->getdata())->data;
+			else
+				this->data = node;
+		}
+		DefaultType Identifier::getValueType() const {
+			return this->data->getObjtype();
+		}
+
+		string Identifier::to_string() const {
+			return name.to_string() + "(" + ICM::to_string(data) + ")";
+		}
+		string Identifier::to_output() const {
+			return data->getdata()->to_output();
 		}
 	}
 

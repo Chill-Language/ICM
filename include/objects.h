@@ -45,6 +45,9 @@ namespace ICM
 			virtual string to_string() const {
 				return "Object";
 			}
+			virtual string to_output() const {
+				return to_string();
+			}
 			virtual DefaultType get_type() const {
 				return T_Object;
 			}
