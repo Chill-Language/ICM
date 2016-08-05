@@ -42,10 +42,8 @@ int main(int argc, char *argv[])
 			text[text.length() - 1] = '\0';
 		}
 		else {
-			//print("Input: \n");
-			//println(text.to_string());
+			//println("Input: \n", text.to_string());
 		}
-		//println();
 
 		// Main
 		Match match(text);
@@ -53,17 +51,13 @@ int main(int argc, char *argv[])
 			AST *ast = Parser::createAST(match);
 			if (ast && ast->getRoot()) {
 				if (LoopMatch) {
-					print("AST: \n");
-					println(ast);
-					println();
-					print("Output: \n");
+					println("\nAST: \n", ast, "\n");
+					println("Output: ");
 				}
 				ASTNode *data = runAST(ast);
 				if (LoopMatch) {
 					println();
-					println("\nResult:");
-					println(data);
-					println();
+					println("\nResult:\n", data, "\n");
 				}
 				delete ast;
 			}

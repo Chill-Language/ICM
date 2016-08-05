@@ -22,7 +22,8 @@ namespace ICM
 		}
 		ObjectPtr println(const DataList &dl) {
 			for (auto &op : dl)
-				Common::Output::println(op->to_output());
+				Common::Output::print(op->to_output());
+			Common::Output::println();
 			return list(dl);
 		}
 		ObjectPtr list(const DataList &dl) {

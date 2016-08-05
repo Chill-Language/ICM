@@ -29,8 +29,8 @@ namespace ICM
 		DefFuncTable.add("inc", inc, FuncParameter(FPT_Fixed, 1, { T_Number }));
 		DefFuncTable.add("--", dec, FuncParameter(FPT_Fixed, 1, { T_Number }));
 		DefFuncTable.add("dec", dec, FuncParameter(FPT_Fixed, 1, { T_Number }));
-		DefFuncTable.add("print", print, FuncParameter(FPT_Vary, 0));
-		DefFuncTable.add("println", println, FuncParameter(FPT_Vary, 0));
+		DefFuncTable.add("print", DefFunc::print, FuncParameter(FPT_Vary, 0));
+		DefFuncTable.add("println", DefFunc::println, FuncParameter(FPT_Vary, 0));
 		DefFuncTable.add("list", list, FuncParameter(FPT_Vary, 0));
 		DefFuncTable.add("order", order, FuncParameter(FPT_Fixed, 1, { T_List }));
 		DefFuncTable.add("let", let, FuncParameter(FPT_Fixed, 2, { T_Identifier, T_Vary }));

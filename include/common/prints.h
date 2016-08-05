@@ -73,6 +73,12 @@ namespace Output
 	{
 		printf("%s", str);
 	}
+	template <typename First, typename... Rest>
+	void print(const First& first, const Rest&... rest)
+	{
+		print(first);
+		print(rest...);
+	}
 	
 	// Pintln
 	inline void println()
@@ -83,6 +89,13 @@ namespace Output
 	inline void println(const T &obj)
 	{
 		print<T>(obj);
+		println();
+	}
+	template <typename First, typename... Rest>
+	void println(const First& first, const Rest&... rest)
+	{
+		print(first);
+		print(rest...);
 		println();
 	}
 	
