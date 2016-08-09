@@ -12,6 +12,7 @@ namespace ICM
 		CallFunc mul;
 		CallFunc div;
 		CallFunc mod;
+		CallFunc rem;
 		CallFunc equ;
 		CallFunc inc;
 		CallFunc dec;

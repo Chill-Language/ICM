@@ -10,6 +10,7 @@ namespace ICM
 		int mode = 0;
 		vector<char> findchars;
 		vector<char> ignorechars;
+		bool firstfind = false;
 		static const char breakfindchars[] = " \n\t()[];"; // include '\0'
 
 		while (true) {
@@ -57,6 +58,12 @@ namespace ICM
 					begin = currptr + 1;
 					mode = 1;
 					break;
+				case '-': /* (Maybe) Number */
+					type = T_Number;
+					begin = currptr;
+					mode = 3;
+					firstfind = false;
+					break;
 				default:
 					if (isdigit(c)) /* Number */ {
 						type = T_Number;
@@ -82,6 +89,22 @@ namespace ICM
 				if (std::find(std::begin(breakfindchars), std::end(breakfindchars), c) != std::end(breakfindchars)) {
 					mr = MatchResult(type, begin, currptr);
 					goto EndMatch;
+				}
+				break;
+			case 3:  // Match Long with function find
+				if (isdigit(c)) {
+					firstfind = true;
+				}
+				else {
+					if (firstfind) {
+						mr = MatchResult(type, begin, currptr);
+						goto EndMatch;
+					}
+					else {
+						currptr -= 2;
+						type = T_Identifier;
+						mode = 2;
+					}
 				}
 				break;
 			default:

@@ -138,6 +138,9 @@ namespace ICM
 		ObjectPtr mod(const DataList &list) {
 			return default_num_varfunc(list, [](Number *num, Number *obj) { return num->mod(obj); });
 		}
+		ObjectPtr rem(const DataList &list) {
+			return default_num_varfunc(list, [](Number *num, Number *obj) { return num->rem(obj); });
+		}
 
 		template <typename Func>
 		ObjectPtr default_num_varfunc(const DataList &list, Func func) {

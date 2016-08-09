@@ -46,14 +46,15 @@ namespace ICM
 			return this;
 		}
 		Number* Number::div(const Number *obj) {
-			if (obj->data != 0)
-				this->data /= obj->data;
-			else
-				println("Error of dived zero.");
+			this->data /= obj->data;
 			return this;
 		}
 		Number* Number::mod(const Number *obj) {
-			this->data %= obj->data;
+			this->data = Common::Number::mod(this->data, obj->data);
+			return this;
+		}
+		Number* Number::rem(const Number *obj) {
+			this->data = Common::Number::rem(this->data, obj->data);
 			return this;
 		}
 		bool Number::operator<(const Number &obj) {

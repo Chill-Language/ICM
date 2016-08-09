@@ -5,6 +5,7 @@
 #include "ast.h"
 #include "objects.h"
 #include "tostring.h"
+#include "number.h"
 
 namespace ICM
 {
@@ -76,7 +77,7 @@ namespace ICM
 		class Number : public Object
 		{
 		public:
-			using Type = int;
+			using Type = Common::Number::Rational;
 			explicit Number(Type dat = 0) : data(dat) {}
 
 			Boolean* equ(const ObjectPtr &obj) const;
@@ -85,6 +86,7 @@ namespace ICM
 			Number* mul(const Number *obj);
 			Number* div(const Number *obj);
 			Number* mod(const Number *obj);
+			Number* rem(const Number *obj);
 
 			bool operator<(const Number &obj);
 			bool operator<=(const Number &obj);
@@ -92,7 +94,7 @@ namespace ICM
 			bool operator>=(const Number &obj);
 
 			string to_string() const {
-				return std::to_string(data);
+				return Common::Number::to_string(data);
 			}
 			DefaultType get_type() const {
 				return T_Number;
