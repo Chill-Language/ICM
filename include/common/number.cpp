@@ -134,7 +134,7 @@ namespace Number
 					Rational n = get_num(str.substr(0, i2));
 					std::string substr(str.substr(i2 + 1, std::string::npos));
 					Rational r = get_num(substr);
-					Rational::Type m = (Rational::Type)std::powl(10, substr.size());
+					Rational::Type m = (Rational::Type)powl(10, substr.size());
 					return r / m + n;
 				}
 			}

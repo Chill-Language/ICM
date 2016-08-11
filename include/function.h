@@ -60,8 +60,8 @@ namespace ICM
 			}
 
 		private:
-			Signature sign;
 			FuncPtr func;
+			Signature sign;
 		};
 	}
 
@@ -119,7 +119,17 @@ namespace ICM
 		Table() {
 			data.push_back(Unit());
 		}
-
+		void add(const string &name, const char *nameref) {
+			add(name, string(nameref));
+		}
+		void add(const string &name, const string &nameref) {
+			size_t id = find(nameref);
+			if (id) {
+				count++;
+				data.push_back(Unit());
+				keymap[name] = id;
+			}
+		}
 		template <typename... Args>
 		void add(const string &name, const Args&... args) {
 			count++;

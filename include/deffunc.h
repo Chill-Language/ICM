@@ -23,7 +23,8 @@ namespace ICM
 		CallFunc dcall;
 		CallFunc exit;
 		CallFunc system;
-		CallFunc order;
+		CallFunc sort;
+		CallFunc sort_f;
 		CallFunc n_small;
 		CallFunc n_smallequal;
 		CallFunc n_large;

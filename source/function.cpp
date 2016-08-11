@@ -34,6 +34,7 @@ namespace ICM
 			return true;
 		}
 		bool Signature::checkSub(ObjectPtr ptr, DefaultType checktype, DataList &dlp) const {
+			if (checktype == T_Function) checktype = T_Identifier; // TODO
 			ptr = (checktype == T_Identifier) ? ptr : adjustObjectPtr(ptr);
 			DefaultType currtype = ptr->get_type();
 			if (currtype != checktype && checktype != T_Vary)

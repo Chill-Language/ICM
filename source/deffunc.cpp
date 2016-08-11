@@ -15,6 +15,12 @@ namespace ICM
 			return "Function '" + name + "' is undefined for type(" + ICM::to_string(type) + ")";
 		}
 
+		ObjectPtr callDefFunc(const string &name, const DataList &dl) {
+			if (DefFuncTable.find(name))
+				return checkCall(DefFuncTable[name], dl);
+			else
+				return createError("Error in match function(" + name + ").");
+		}
 		ObjectPtr print(const DataList &dl) {
 			for (auto &op : dl)
 				Common::Output::print(op->to_output());
@@ -41,10 +47,7 @@ namespace ICM
 		}
 		ObjectPtr dcall(const DataList &dl) {
 			string name = getPointer<Identifier>(dl[1])->getName();
-			if (DefFuncTable.find(name))
-				return checkCall(DefFuncTable[name], DataList({ dl[0],dl[2] }));
-			else
-				return createError("Error in match function(" + name + ").");
+			return callDefFunc(name, DataList({ dl[0], dl[2] }));
 		}
 		ObjectPtr system(const DataList &dl) {
 			int i = std::system(getPointer<Objects::String>(dl[0])->get_data().c_str());
@@ -71,10 +74,20 @@ namespace ICM
 			return ObjectPtr(new Boolean(result));
 		}
 
-		ObjectPtr order(const DataList &dl) {
+		ObjectPtr sort(const DataList &dl) {
 			List *list = getPointer<List>(dl[0]);
 			std::sort(list->begin(), list->end(), [](const ObjectPtr &a, const ObjectPtr &b) {
 				return getPointer<Number>(a)->operator<(*getPointer<Number>(b));
+			});
+			return ObjectPtr(list);
+		}
+		// TODO
+		ObjectPtr sort_f(const DataList &dl) {
+			string name = getPointer<Identifier>(dl[1])->getName();
+
+			List *list = getPointer<List>(dl[0]);
+			std::sort(list->begin(), list->end(), [&](const ObjectPtr &a, const ObjectPtr &b) -> bool {
+				return (bool)*getPointer<Boolean>(callDefFunc(name, DataList({ a, b })));
 			});
 			return ObjectPtr(list);
 		}

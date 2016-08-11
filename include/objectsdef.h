@@ -66,6 +66,7 @@ namespace ICM
 			Boolean* clone() const {
 				return new Boolean(*this);
 			}
+			operator bool() const { return data; }
 
 		private:
 			bool data = false;

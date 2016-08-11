@@ -78,9 +78,11 @@ namespace ICM
 		DefFuncTable.add("inc", Lst{
 			F(inc, S({ T_Identifier }, T_Identifier)), // I -> I
 		});
+		DefFuncTable.add("++", "inc");
 		DefFuncTable.add("dec", Lst{
 			F(dec, S({ T_Identifier }, T_Identifier)), // I -> I
 		});
+		DefFuncTable.add("--", "dec");
 		DefFuncTable.add("print", Lst{
 			F(DefFunc::print, S({}, T_List)),               // Void -> L
 			F(DefFunc::print, S({ T_Vary }, T_List, true)), // Var* -> L
@@ -94,7 +96,8 @@ namespace ICM
 			F(list, S({ T_Vary }, T_List, true)), // Var* -> L
 		});
 		DefFuncTable.add("sort", Lst{
-			F(order, S({ T_List }, T_List)), // L -> L
+			F(sort, S({ T_List }, T_List)), // L -> L
+			F(sort_f, S({ T_List, T_Function }, T_List)), // (L F) -> L
 		});
 		DefFuncTable.add("let", Lst{
 			F(let, S({ T_Identifier }, T_Identifier)), // I -> I
