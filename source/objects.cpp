@@ -103,7 +103,7 @@ namespace ICM
 			return ICM::to_string(data);
 		}
 		string List::to_output() const {
-			return Common::Convert::to_string(data.begin(), data.end(), [](const ObjectPtr &op) { return op->to_output(); });
+			return Common::Convert::to_string<'[',']'>(data.begin(), data.end(), [](const ObjectPtr &op) { return op->to_output(); });
 		}
 
 		//=======================================

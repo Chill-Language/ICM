@@ -4,6 +4,7 @@
 #include "basic.h"
 #include "ast.h"
 #include "match.h"
+#include "function.h"
 
 namespace ICM
 {
@@ -15,6 +16,7 @@ namespace ICM
 	std::string to_string(const ASTNode *astn);
 	std::string to_string(const AST *ast);
 	std::string to_string(const MatchResult *mr);
+	std::string to_string(const Function::Signature &sign);
 }
 
 #endif

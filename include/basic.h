@@ -11,6 +11,7 @@
 #include <map>
 #include <functional>
 #include <algorithm>
+#include <initializer_list>
 //  common
 #include "prints.h"
 #include "memory.h"
@@ -31,21 +32,25 @@ namespace ICM
 	// Type
 	enum DefaultType {
 		T_Null,
-		T_Object,
-		T_Nil,
-		T_Vary,
-		T_Error,
 		T_LBracket,
 		T_RBracket,
 		T_LSBracket,
 		T_RSBracket,
-		T_Boolean,
-		T_Number,
-		T_String,
-		T_Symbol,
-		T_List,
 		T_Comment,
-		T_Identifier, // Un Whole Match
+		T_Object,     // Obj
+		T_Nil,        // Nil
+		T_Vary,       // Var *
+		T_Error,      // Err
+		T_Identifier, // Idt
+		T_Argument,   // Arg *
+		T_List,       // L
+		T_Disperse,   // D   *
+		T_Number,     // N
+		T_String,     // S
+		T_Char,       // C
+		T_Function,   // F
+		T_Boolean,    // Bool
+		T_Symbol,     // Sym
 	};
 
 	// AutoPtr
@@ -57,6 +62,14 @@ namespace ICM
 namespace ICM
 {
 	// Output
+	template <char B = '[', char E = ']', char D = ',', typename T>
+	inline std::string to_string(const std::vector<T> &vec) {
+		using std::to_string;
+		using ICM::to_string;
+		using Common::Convert::to_string;
+
+		return to_string<B, E, D>(vec.begin(), vec.end(), [](const T &t) { return to_string(t); });
+	}
 	template <typename T>
 	inline void print(const T &obj)
 	{

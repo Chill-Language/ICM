@@ -12,18 +12,23 @@ namespace ICM
 	{
 		switch (type) {
 		case T_Null:       return "Null";
-		case T_Nil:        return "Nil";
 		case T_LBracket:   return "LBracket";
 		case T_RBracket:   return "RBracket";
 		case T_LSBracket:  return "LSBracket";
 		case T_RSBracket:  return "RSBracket";
+		case T_Comment:    return "Comment";
+
+		case T_Object:     return "Object";
+		case T_Nil:        return "Nil";
+
+		case T_Identifier: return "Identifier";
+		case T_Argument:   return "Argument";
 		case T_Number:     return "Number";
 		case T_Boolean:    return "Boolean";
-		case T_Identifier: return "Identifier";
 		case T_String:     return "String";
 		case T_Symbol:     return "Symbol";
 		case T_List:       return "List";
-		case T_Comment:    return "Comment";
+		case T_Vary:       return "Vary";
 		default:           return "";
 		}
 	}
@@ -33,7 +38,7 @@ namespace ICM
 		return obj->to_string();
 	}
 	string to_string(const DataList &list) {
-		return Convert::to_string(list.begin(), list.end(), [](const ObjectPtr &obj) { return to_string(obj); });
+		return Convert::to_string<'[', ']'>(list.begin(), list.end(), [](const ObjectPtr &obj) { return to_string(obj); });
 	}
 	string to_string(const ASTNode::Function* func) {
 		// Judge Null
@@ -126,6 +131,33 @@ namespace ICM
 		str.append(", \'");
 		str.append(mr->getString());
 		str.append("')");
+		return str;
+	}
+	// Function
+	inline std::string to_string(const Function::Signature::List &list) {
+		return Convert::to_string(list.begin(), list.end());
+	}
+	std::string to_string(const Function::Signature &sign) {
+		using Convert::to_string;
+		using ICM::to_string;
+
+		std::string str;
+		const auto &its = sign.getInType();
+		const auto &ots = sign.getOutType();
+		if (!its.empty()) {
+			if (its.size() != 1) str.push_back('(');
+			str.append(to_string(its.begin(), its.end()));
+			if (sign.isLastArgs()) str.push_back('*');
+			if (its.size() != 1) str.push_back(')');
+		}
+		else {
+			str.append("Void");
+		}
+		str.append(" -> ");
+		if (ots.size() == 1)
+			str.append(to_string(ots.front()));
+		else
+			str.append(to_string(ots));
 		return str;
 	}
 }

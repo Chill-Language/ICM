@@ -19,9 +19,9 @@ namespace Memory
 	// New
 	template <typename T>
 	inline T* create(size_t length) {
-		return (T*)malloc(length);
+		//return (T*)malloc(length);
+		return new T[length]();
 	}
-
 	template <typename T>
 	inline T* create(size_t length, const T &inc) {
 		T* ptr = create<T>(length);
@@ -29,6 +29,11 @@ namespace Memory
 			*ptr = inc;
 			++ptr;
 		}
+	}
+
+	template <typename T>
+	inline void free(T *p) {
+		delete[] p;
 	}
 
 	template <typename T>

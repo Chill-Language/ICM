@@ -8,32 +8,6 @@ namespace ICM
 	{
 		using namespace Objects;
 
-		Common::Number::Rational to_number(const string &str) {
-			using Common::Number::Rational;
-			size_t i1 = str.find('/');
-			size_t i2 = str.find('.');
-
-			if (i1 != string::npos) {
-				if (i1 == str.rfind('/') && i2 == string::npos)
-					return Rational(std::stoi(str.substr(0, i1)), std::stoi(str.substr(i1 + 1, string::npos)));
-			}
-			else {
-				if (i2 != string::npos) {
-					if (i2 == str.rfind('.')) {
-						int n = std::stoi(str.substr(0, i2));
-						string substr = str.substr(i2 + 1, string::npos);
-						int r = std::stoi(substr);
-						int m = std::pow(10, substr.size());
-						return Rational(r, m) + n;
-					}
-				}
-				else {
-					return Rational(std::stoi(str));
-				}
-			}
-			return Rational(0, 0);
-		}
-
 		ObjectPtr createObject(DefaultType type, const string &str)
 		{
 			using namespace Objects;
@@ -48,7 +22,7 @@ namespace ICM
 				object = new Nil();
 				break;
 			case ICM::T_Number:
-				object = new Number(to_number(str.c_str()));
+				object = new Number(Common::Number::to_rational(str.c_str()));
 				break;
 			case ICM::T_Boolean:
 				object = new Boolean(str == "T");

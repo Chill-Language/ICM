@@ -43,19 +43,30 @@ namespace Convert
 		snprintf(str, size, "0x%p", p);
 		return str;
 	}
-	template <typename Iter, typename Func>
+	template <char B = '\0', char E = '\0', char D = '\0', typename Iter, typename Func>
 	std::string to_string(Iter begin, Iter end, Func func) {
 		std::string str;
-		str.append("[");
+		if (B != '\0')
+			str.push_back(B);
 		if (begin != end) {
 			str.append(func(*begin++));
 			while (begin != end) {
-				str.append(", ");
+				if (D != '\0')
+					str.push_back(D);
+				str.append(" ");
 				str.append(func(*begin++));
 			}
 		}
-		str.append("]");
+		if (E != '\0')
+			str.push_back(E);
 		return str;
+	}
+	template <char B = '\0', char E = '\0', char D = '\0', typename Iter>
+	inline std::string to_string(Iter begin, Iter end) {
+		using std::to_string;
+		using Convert::to_string;
+
+		return to_string<B, E, D>(begin, end, [](const auto &e) { return to_string(e); });
 	}
 }
 

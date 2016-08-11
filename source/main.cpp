@@ -10,6 +10,19 @@ using namespace ICM;
 
 void test()
 {
+	using Sign = Function::Signature;
+
+	/*vector<Sign> vec;
+	vec.push_back(Sign({}, T_Number));
+	vec.push_back(Sign({ T_Number, T_Number }, T_Number));
+	vec.push_back(Sign({ T_Number }, T_Number));
+	vec.push_back(Sign({ T_Number }, T_Number, true));
+	vec.push_back(Sign({ T_String, T_String }, T_String));
+	vec.push_back(Sign({ T_String }, T_String));
+	vec.push_back(Sign({ T_String }, T_String, true));
+	vec.push_back(Sign({ T_List, T_List }, T_List));
+	vec.push_back(Sign({ T_List }, T_List));
+	vec.push_back(Sign({ T_List }, T_List, true));*/
 }
 
 int main(int argc, char *argv[])

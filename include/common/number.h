@@ -5,8 +5,8 @@
 #ifndef _SYSTEM_NUMBER_H_
 #define _SYSTEM_NUMBER_H_
 #include "macro.h"
-#include "prints.h"
 #include <cmath>
+#include <string>
 
 SYSTEM BEGIN
 namespace Number
@@ -34,18 +34,19 @@ namespace Number
 	class Rational
 	{
 	public:
-		Rational(int num = 0, int den = 1) {
+		using Type = long long;
+		Rational(Type num = 0, Type den = 1) {
 			initialize(num, den);
 		}
-		void initialize(int n, int d);
+		void initialize(Type n, Type d);
 		Rational& operator+=(const Rational &r);
 		Rational& operator-=(const Rational &r);
 		Rational& operator*=(const Rational &r);
 		Rational& operator/=(const Rational &r);
 
 	public:
-		int num; // Numerator
-		int den; // Denominator
+		Type num; // Numerator
+		Type den; // Denominator
 	};
 	// Basic
 	const Rational operator-(const Rational &sr);
@@ -54,21 +55,22 @@ namespace Number
 	const Rational operator-(const Rational &sr, const Rational &r);
 	const Rational operator*(const Rational &sr, const Rational &r);
 	const Rational operator/(const Rational &sr, const Rational &r);
-	int ceil(const Rational &sr);
-	int floor(const Rational &sr);
+	Rational::Type ceil(const Rational &sr);
+	Rational::Type floor(const Rational &sr);
 	const Rational abs(const Rational &sr);
 	const Rational mod(const Rational &sr, const Rational &r);
 	const Rational rem(const Rational &sr, const Rational &r);
 	// Compare
-	int compare(const Rational &sr, const Rational &r);
+	Rational::Type compare(const Rational &sr, const Rational &r);
 	bool operator>(const Rational &sr, const Rational &r);
 	bool operator>=(const Rational &sr, const Rational &r);
 	bool operator==(const Rational &sr, const Rational &r);
 	bool operator!=(const Rational &sr, const Rational &r);
 	bool operator<(const Rational &sr, const Rational &r);
 	bool operator<=(const Rational &sr, const Rational &r);
-	// To String
+	// Convert
 	std::string to_string(const Rational &rat);
+	Rational to_rational(const std::string &str);
 }
 END
 

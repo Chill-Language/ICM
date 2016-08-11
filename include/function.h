@@ -3,55 +3,67 @@
 
 #include "ast.h"
 #include "objects.h"
+#include "lightlist.h"
 
 namespace ICM
 {
 	//=======================================
-	// * Enum FuncParaType
+	// * Namespace Function
 	//=======================================
-	enum FuncParaType {
-		FPT_Void,
-		FPT_Fixed,
-		FPT_Vary,
-		FPT_VaryIdentical,
-	};
-
-	//=======================================
-	// * Class FuncParameter
-	//=======================================
-	class FuncParameter
+	namespace Function
 	{
-	public:
-		using TypeList = std::vector<DefaultType>;
-		using DataListPtr = autoptr<DataList>;
+		//=======================================
+		// * Class Signature
+		//=======================================
+		class Signature
+		{
+		public:
+			using List = lightlist<DefaultType>;
+			using InitList = std::initializer_list<DefaultType>;
 
-		FuncParameter()
-			: type(FPT_Void) {}
+			Signature() = default;
+			Signature(const InitList &intype, DefaultType outtype, bool last_is_args = false)
+				: InType(intype), OutType(outtype), last_is_args(last_is_args) {}
+			Signature(const InitList &intype, const InitList &outtype, bool last_is_args = false)
+				: InType(intype), OutType(outtype), last_is_args(last_is_args) {}
 
-		FuncParameter(FuncParaType type, unsigned fixed_size)
-			: type(type), fixed_size(fixed_size) {
-			initialize();
-		}
+			const List& getInType() const { return InType; }
+			const List& getOutType() const { return OutType; }
+			bool isLastArgs() const { return last_is_args; }
 
-		FuncParameter(FuncParaType type, unsigned fixed_size, const TypeList &typelist)
-			: type(type), fixed_size(fixed_size), typelist(typelist) {
-			initialize();
-		}
+			bool checkType(const DataList &list, DataList &dlp) const;
 
-		bool checkType(const DataList &list, DataList &dlp) const;
+		private:
+			List InType;
+			List OutType;
+			bool last_is_args;
 
-	private:
-		void initialize();
-		bool checkSub(ObjectPtr ptr, DefaultType checktype, DataList &dlp) const;
-		bool checkTypeList(const DataList &list, unsigned size, DataList &dlp) const;
-		bool checkTypeList(const DataList &list, unsigned begindex, unsigned endindex, DataList &dlp) const;
+			bool checkSub(ObjectPtr ptr, DefaultType checktype, DataList &dlp) const;
+		};
 
+		//=======================================
+		// * Class FuncObject
+		//=======================================
+		class FuncObject
+		{
+		public:
+			FuncObject() = default;
+			FuncObject(const FuncPtr &func, const Signature &sign)
+				: func(func), sign(sign) {}
 
-	private:
-		FuncParaType type = FPT_Void;
-		unsigned fixed_size = 0;
-		TypeList typelist;
-	};
+			template <typename... Args>
+			bool checkType(Args&... args) const {
+				return sign.checkType(args...);
+			}
+			ObjectPtr call(const DataList &dl) const {
+				return func(dl);
+			}
+
+		private:
+			Signature sign;
+			FuncPtr func;
+		};
+	}
 
 	//=======================================
 	// * Class VariableTableUnit
@@ -82,19 +94,19 @@ namespace ICM
 	{
 	public:
 		FuncTableUnit() = default;
-		FuncTableUnit(size_t id, const string &name, const FuncPtr &func, const FuncParameter &pars)
-			: id(id), name(name), func(func), pars(pars) {}
+		FuncTableUnit(size_t id, const string &name, const std::initializer_list<Function::FuncObject> &func)
+			: id(id), name(name), func(func) {}
 
 		size_t getID() const { return id; }
 		const string& getName() const { return name; }
-		const FuncPtr& getFuncPtr() const { return func; }
-		const FuncParameter& getParameter() const { return pars; }
+		const vector<Function::FuncObject> getFunc() const { return func; }
+		const size_t size() const { return func.size(); }
+		const Function::FuncObject& operator[](size_t i) const { return func[i]; }
 
 	private:
 		size_t id = 0;
 		string name;
-		FuncPtr func;
-		FuncParameter pars;
+		vector<Function::FuncObject> func;
 	};
 
 	//=======================================
@@ -140,7 +152,7 @@ namespace ICM
 	using FuncTable = Table<FuncTableUnit>;
 
 	//=======================================
-	// * Function
+	// * Functions
 	//=======================================
 	ObjectPtr checkCall(const ICM::FuncTableUnit &ftb, const ICM::DataList &dl);
 }

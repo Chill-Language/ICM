@@ -6,7 +6,7 @@ namespace Number
 	//--------------------
 	// * Class Rational
 	//--------------------
-	void Rational::initialize(int n, int d) {
+	void Rational::initialize(Rational::Type n, Rational::Type d) {
 		if (d == 0) {
 			num = 1;
 			den = 0;
@@ -19,7 +19,7 @@ namespace Number
 		}
 		num = std::abs(n);
 		den = std::abs(d);
-		int r = gcd(num, den);
+		auto r = gcd(num, den);
 		if (r) {
 			num /= r;
 			den /= r;
@@ -64,13 +64,13 @@ namespace Number
 	const Rational operator/(const Rational &sr, const Rational &r) {
 		return Rational(sr.num * r.den, sr.den * r.num);
 	}
-	int ceil(const Rational &sr) {
-		return (int)std::ceil((double)(sr.num) / sr.den);
+	Rational::Type ceil(const Rational &sr) {
+		return (Rational::Type)std::ceil((long double)(sr.num) / sr.den);
 	}
-	int floor(const Rational &sr) {
-		return (int)std::floor((double)(sr.num) / sr.den);
+	Rational::Type floor(const Rational &sr) {
+		return (Rational::Type)std::floor((long double)(sr.num) / sr.den);
 	}
-	int fix(const Rational &sr) {
+	Rational::Type fix(const Rational &sr) {
 		return (sr.num > 0) ? floor(sr) : ceil(sr);
 	}
 	const Rational abs(const Rational &sr) {
@@ -85,7 +85,7 @@ namespace Number
 	//--------------------
 	// * Compare
 	//--------------------
-	int compare(const Rational &sr, const Rational &r) {
+	Rational::Type compare(const Rational &sr, const Rational &r) {
 		return sr.num * r.den - r.num * sr.den;
 	}
 	bool operator>(const Rational &sr, const Rational &r) {
@@ -107,7 +107,7 @@ namespace Number
 		return compare(sr, r) <= 0;
 	}
 	//--------------------
-	// * To String
+	// * Convert
 	//--------------------
 	std::string to_string(const Rational &rat)
 	{
@@ -117,6 +117,39 @@ namespace Number
 		if (rat.den != 1)
 			result += std::string("/") + std::to_string(rat.den);
 		return result;
+	}
+	Rational get_num(const std::string &str);
+	Rational to_rational(const std::string &str)
+	{
+		size_t i1 = str.find('/');
+		size_t i2 = str.find('.');
+
+		if (i1 != std::string::npos) {
+			if (i1 == str.rfind('/') && i2 == std::string::npos)
+				return Rational(std::stoi(str.substr(0, i1)), std::stoi(str.substr(i1 + 1, std::string::npos)));
+		}
+		else {
+			if (i2 != std::string::npos) {
+				if (i2 == str.rfind('.')) {
+					Rational n = get_num(str.substr(0, i2));
+					std::string substr(str.substr(i2 + 1, std::string::npos));
+					Rational r = get_num(substr);
+					Rational::Type m = (Rational::Type)std::powl(10, substr.size());
+					return r / m + n;
+				}
+			}
+			else {
+				return get_num(str);
+			}
+		}
+		return Rational(0, 0);
+	}
+	Rational get_num(const std::string &str)
+	{
+		if (str.size() > 18)
+			return Rational(0, 0);
+		else
+			return Rational(std::stoll(str));
 	}
 }
 END
