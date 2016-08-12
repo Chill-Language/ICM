@@ -17,6 +17,7 @@ namespace ICM
 		class Number;
 		class String;
 		class List;
+		class Disperse;
 		class Identifier;
 	}
 
@@ -50,13 +51,15 @@ namespace ICM
 				return to_string();
 			}
 			virtual DefaultType get_type() const {
-				return T_Object;
+				return Type;
 			}
 			virtual Object* clone() const {
 				return new Object(*this);
 			}
 			// Method
 			virtual Boolean* equ(const ObjectPtr &obj) const;
+			// Const
+			static const DefaultType Type = T_Object;
 
 		protected:
 			bool type_equal(const ObjectPtr &obj) const {

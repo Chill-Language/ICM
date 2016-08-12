@@ -105,6 +105,22 @@ namespace ICM
 		string List::to_output() const {
 			return Common::Convert::to_string<'[',']'>(data.begin(), data.end(), [](const ObjectPtr &op) { return op->to_output(); });
 		}
+		
+		//=======================================
+		// * Class Disperse
+		//=======================================
+		Boolean* Disperse::equ(const ObjectPtr &obj) const {
+			return new Boolean(this->data == getPointer<Disperse>(obj)->data);
+		}
+		string Disperse::to_string() const {
+			return Convert::to_string(data.begin(), data.end(), [](const ObjectPtr &op) { return ICM::to_string(op); });
+		}
+		string Disperse::to_output() const {
+			string str;
+			for (auto &op : data)
+				str.append(op->to_output());
+			return str;
+		}
 
 		//=======================================
 		// * Class Identifier

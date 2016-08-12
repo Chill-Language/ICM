@@ -39,7 +39,7 @@ namespace ICM
 		T_Comment,
 		T_Object,     // Obj
 		T_Nil,        // Nil
-		T_Vary,       // Var *
+		T_Vary,       // Var
 		T_Error,      // Err
 		T_Identifier, // Idt
 		T_Argument,   // Arg *
@@ -62,14 +62,6 @@ namespace ICM
 namespace ICM
 {
 	// Output
-	template <char B = '[', char E = ']', char D = ',', typename T>
-	inline std::string to_string(const std::vector<T> &vec) {
-		using std::to_string;
-		using ICM::to_string;
-		using Common::Convert::to_string;
-
-		return to_string<B, E, D>(vec.begin(), vec.end(), [](const T &t) { return to_string(t); });
-	}
 	template <typename T>
 	inline void print(const T &obj)
 	{

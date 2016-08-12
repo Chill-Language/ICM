@@ -56,12 +56,28 @@ namespace ICM
 				return sign.checkType(args...);
 			}
 			ObjectPtr call(const DataList &dl) const {
+				// If there was a crash, make sure that the pointer 'func' is effective.
 				return func(dl);
 			}
 
 		private:
 			FuncPtr func;
 			Signature sign;
+		};
+
+		//=======================================
+		// * Class FuncInitObject
+		//=======================================
+		class FuncInitObject
+		{
+		public:
+			FuncObject get_f() {
+				return FuncObject(std::bind((&FuncInitObject::func), this, std::placeholders::_1), sign());
+			}
+
+		protected:
+			virtual Signature sign() const = 0;
+			virtual ObjectPtr func(const DataList &list) const = 0;
 		};
 	}
 
@@ -95,18 +111,24 @@ namespace ICM
 	public:
 		FuncTableUnit() = default;
 		FuncTableUnit(size_t id, const string &name, const std::initializer_list<Function::FuncObject> &func)
-			: id(id), name(name), func(func) {}
+			: id(id), name(name), is_ref(false), func(func) {}
+		FuncTableUnit(size_t id, const string &name, const std::initializer_list<Function::FuncInitObject*> &func)
+			: id(id), name(name), is_ref(true) {
+			for (auto *p : func)
+				funcp.push_back(autoptr<Function::FuncInitObject>(p));
+		}
 
 		size_t getID() const { return id; }
 		const string& getName() const { return name; }
-		const vector<Function::FuncObject> getFunc() const { return func; }
-		const size_t size() const { return func.size(); }
-		const Function::FuncObject& operator[](size_t i) const { return func[i]; }
+		const size_t size() const { return is_ref ? funcp.size() : func.size(); }
+		Function::FuncObject operator[](size_t i) const { return is_ref ? funcp[i]->get_f() : func[i]; }
 
 	private:
 		size_t id = 0;
 		string name;
+		bool is_ref = false;
 		vector<Function::FuncObject> func;
+		vector<autoptr<Function::FuncInitObject>> funcp;
 	};
 
 	//=======================================

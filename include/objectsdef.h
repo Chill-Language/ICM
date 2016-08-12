@@ -22,8 +22,10 @@ namespace ICM
 				return "Error(" + msg + ")";
 			}
 			DefaultType get_type() const {
-				return T_Error;
+				return Type;
 			}
+			// Const
+			static const DefaultType Type = T_Error;
 
 		private:
 			std::string msg;
@@ -42,11 +44,13 @@ namespace ICM
 				return "Nil";
 			}
 			DefaultType get_type() const {
-				return T_Nil;
+				return Type;
 			}
 			Nil* clone() const {
 				return new Nil(*this);
 			}
+			// Const
+			static const DefaultType Type = T_Nil;
 
 		};
 
@@ -66,7 +70,12 @@ namespace ICM
 			Boolean* clone() const {
 				return new Boolean(*this);
 			}
+			DefaultType get_type() const {
+				return Type;
+			}
 			operator bool() const { return data; }
+			// Const
+			static const DefaultType Type = T_Boolean;
 
 		private:
 			bool data = false;
@@ -78,8 +87,8 @@ namespace ICM
 		class Number : public Object
 		{
 		public:
-			using Type = Common::Number::Rational;
-			explicit Number(Type dat = 0) : data(dat) {}
+			using NumType = Common::Number::Rational;
+			explicit Number(NumType dat = 0) : data(dat) {}
 
 			Boolean* equ(const ObjectPtr &obj) const;
 			Number* add(const Number *obj);
@@ -98,19 +107,21 @@ namespace ICM
 				return Common::Number::to_string(data);
 			}
 			DefaultType get_type() const {
-				return T_Number;
+				return Type;
 			}
 			Number* clone() const {
 				return new Number(*this);
 			}
+			// Const
+			static const DefaultType Type = T_Number;
 
 		private:
-			Type data;
-			Type& get_data(Object *obj)
+			NumType data;
+			NumType& get_data(Object *obj)
 			{
 				return ((Number*)obj)->data;
 			}
-			const Type& get_data(const Object *obj) const
+			const NumType& get_data(const Object *obj) const
 			{
 				return ((Number*)obj)->data;
 			}
@@ -136,11 +147,13 @@ namespace ICM
 				return data.to_string();
 			}
 			DefaultType get_type() const {
-				return T_String;
+				return Type;
 			}
 			String* clone() const {
 				return new String(*(this->data.clone()));
 			}
+			// Const
+			static const DefaultType Type = T_String;
 
 		private:
 			Common::charptr data;
@@ -165,15 +178,54 @@ namespace ICM
 			DataList::iterator end() {
 				return data.end();
 			}
+			const DataList& get_data() const {
+				return data;
+			}
 
 			string to_string() const;
 			string to_output() const;
 			DefaultType get_type() const {
-				return T_List;
+				return Type;
 			}
 			List* clone() const {
 				return new List(*this);
 			}
+			// Const
+			static const DefaultType Type = T_List;
+
+		private:
+			DataList data;
+		};
+
+		//=======================================
+		// * Class Disperse
+		//=======================================
+		class Disperse : public Object
+		{
+		public:
+			explicit Disperse(const DataList &dl) : data(dl) {}
+
+			Boolean* equ(const ObjectPtr &obj) const;
+			DataList::iterator begin() {
+				return data.begin();
+			}
+			DataList::iterator end() {
+				return data.end();
+			}
+			const DataList& get_data() const {
+				return data;
+			}
+
+			string to_string() const;
+			string to_output() const;
+			DefaultType get_type() const {
+				return Type;
+			}
+			Disperse* clone() const {
+				return new Disperse(*this);
+			}
+			// Const
+			static const DefaultType Type = T_Disperse;
 
 		private:
 			DataList data;
@@ -201,11 +253,13 @@ namespace ICM
 			string to_output() const;
 
 			DefaultType get_type() const {
-				return T_Identifier;
+				return Type;
 			}
 			Identifier* clone() const {
 				return new Identifier(name.to_string());
 			}
+			// Const
+			static const DefaultType Type = T_Identifier;
 
 		private:
 			Common::charptr name;
