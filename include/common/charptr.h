@@ -13,8 +13,8 @@ SYSTEM BEGIN
 class charptr
 {
 public:
-	explicit charptr(size_t len) : _capacity(len + 1), data(new char[_capacity]()) {}
-	explicit charptr(const char *ptr, size_t len) : _capacity(len + 1), data(Memory::copyOf(ptr, _capacity)) {}
+	explicit charptr(size_t len) : _capacity(len + 1), data(Memory::create<char>(_capacity), Memory::free<char>) {}
+	explicit charptr(const char *ptr, size_t len) : _capacity(len + 1), data(Memory::copyOf(ptr, _capacity), Memory::free<char>) {}
 	explicit charptr(const std::string &str) : charptr(str.c_str(), str.length()) {}
 	operator char*() { return data.get(); }
 	std::string to_string() const { return data.get(); }

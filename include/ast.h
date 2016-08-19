@@ -124,7 +124,7 @@ namespace ICM
 			List list;
 		};
 	};
-	using ASTNodePtr = autoptr<ASTNode>;
+	using ASTNodePtr = shared_ptr<ASTNode>;
 	string to_string(const ASTNodePtr &anp);
 
 	// AST

@@ -14,12 +14,15 @@ class lightlist
 public:
 	lightlist() = default;
 
+	lightlist(size_t capacity)
+		: _capacity(capacity), data(Memory::create<T>(_capacity), Memory::free<T>) {}
+
 	lightlist(T* begin, T* end)
-		: _capacity(end - begin), data(Memory::copyOf(begin, _capacity)) {}
+		: _capacity(end - begin), data(Memory::copyOf(begin, _capacity), Memory::free<T>) {}
 
 	template <typename Iter>
 	lightlist(Iter begin, Iter end)
-		: _capacity(end - begin), data(Memory::create<T>(_capacity)) {
+		: _capacity(end - begin), data(Memory::create<T>(_capacity), Memory::free<T>) {
 		T* ptr = data.get();
 		for (Iter p = begin; p != end; ++p)
 			*ptr++ = *p;
@@ -34,6 +37,8 @@ public:
 
 	lightlist(const T &t)
 		: lightlist({ t }) {}
+
+	~lightlist() {}
 
 	T* begin() { return data.get(); }
 	T* end() { return data.get() + _capacity; }
@@ -50,7 +55,6 @@ public:
 	T& back() { return *(data.get() + _capacity - 1); }
 	const T& back() const { return *(data.get() + _capacity - 1); }
 
-	~lightlist() { }
 	size_t size() const { return _capacity; }
 	bool empty() const { return _capacity == 0; }
 

@@ -1,9 +1,6 @@
 #include "deffunc.h"
-#include "objectsdef.h"
-#include "tostring.h"
 #include "keyword.h"
-#include "tostring.h"
-#include "function.h"
+#include "objectsdef.h"
 
 namespace ICM
 {
@@ -21,10 +18,11 @@ namespace ICM
 		//=======================================
 		// * Class *
 		//=======================================
-
-		using F = Function::FuncObject;
-		using FI = Function::FuncInitObject;
-		using S = Function::Signature;
+		
+		using F = ICM::Function::FuncObject;
+		using FI = ICM::Function::FuncInitObject;
+		using S = ICM::Function::Signature;
+		using T = ICM::TypeObject;
 
 		namespace Calc
 		{
@@ -33,7 +31,8 @@ namespace ICM
 			{
 			private:
 				S sign() const {
-					return S({ T::Type }, T::Type, true); // T* -> T
+					DefaultType t = T::Type;
+					return S({ t }, t, true); // T* -> T
 				}
 				ObjectPtr func(const DataList &list) const {
 					T *tmp = getPointer<T>(list.front())->clone();
@@ -105,7 +104,7 @@ namespace ICM
 					return S({ T_Identifier }, T_Identifier); // I -> I
 				}
 				ObjectPtr func(const DataList &list) const {
-					autoptr<Number> tmp(new Number(1));
+					shared_ptr<Number> tmp(new Number(1));
 					getPointer<Number>(adjustObjectPtr(list[0]))->add(tmp.get());
 					return list[0];
 				}
@@ -117,7 +116,7 @@ namespace ICM
 					return S({ T_Identifier }, T_Identifier); // I -> I
 				}
 				ObjectPtr func(const DataList &list) const {
-					autoptr<Number> tmp(new Number(1));
+					shared_ptr<Number> tmp(new Number(1));
 					getPointer<Number>(adjustObjectPtr(list[0]))->sub(tmp.get());
 					return list[0];
 				}
@@ -203,6 +202,9 @@ namespace ICM
 			}
 
 			const DataList& _disp(const List *l) {
+				//const DataList& dl = l->get_data();
+				//println("_DISP", to_string(dl));
+
 				return l->get_data();
 			}
 
@@ -237,8 +239,7 @@ namespace ICM
 				return Lists::list(dl);
 			}
 			ObjectPtr println(const DataList &dl) {
-				for (auto &op : dl)
-					Common::Output::print(op->to_output());
+				print(dl);
 				Common::Output::println();
 				return Lists::list(dl);
 			}
@@ -252,7 +253,12 @@ namespace ICM
 			}
 			ObjectPtr exit(const DataList &dl) {
 				std::exit(0);
-				return nullptr;
+				return ObjectPtr(new Nil());
+			}
+			ObjectPtr exitv(const DataList &dl) {
+				// TODO
+				std::exit((int)getPointer<Number>(dl[0])->get_data().getNum());
+				return ObjectPtr(new Nil());
 			}
 		}
 	}
@@ -312,7 +318,8 @@ namespace ICM
 			F(System::dcall, S({ T_Vary, T_Function, T_Vary }, T_Vary)), // (Var F Var) -> Var
 		});
 		DefFuncTable.add("exit", Lst{
-			F(System::exit, S({}, T_Nil)), // Void -> Nil
+			F(System::exit, S({}, T_Nil)),            // Void -> N
+			F(System::exitv, S({ T_Number }, T_Nil)), // N -> N
 		});
 		DefFuncTable.add("system", Lst{
 			F(System::system, S({ T_String }, T_Number)), // S -> N

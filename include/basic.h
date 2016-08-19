@@ -24,6 +24,7 @@
 using std::string;
 using std::vector;
 using std::map;
+using std::shared_ptr;
 using std::to_string;
 using namespace Common;
 
@@ -49,12 +50,10 @@ namespace ICM
 		T_String,     // S
 		T_Char,       // C
 		T_Function,   // F
+		T_Type,       // T
 		T_Boolean,    // Bool
 		T_Symbol,     // Sym
 	};
-
-	// AutoPtr
-	template <typename T> using autoptr = std::shared_ptr<T>;
 
 	std::string to_string();
 }

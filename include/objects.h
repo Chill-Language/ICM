@@ -19,10 +19,11 @@ namespace ICM
 		class List;
 		class Disperse;
 		class Identifier;
+		class Function;
 	}
 
 	// Types
-	using ObjectPtr = autoptr<Objects::Object>;
+	using ObjectPtr = shared_ptr<Objects::Object>;
 	using DataList = std::vector<ObjectPtr>;
 	using CallFunc = ObjectPtr(const DataList&);
 	using FuncPtr = std::function<CallFunc>;
@@ -31,9 +32,15 @@ namespace ICM
 	T* getPointer(const ObjectPtr &op) {
 		return static_cast<T*>(op.get());
 	}
+	template <typename T, typename... Args>
+	ObjectPtr createObject(Args... args) {
+		return ObjectPtr(new T(args...));
+	}
 	ObjectPtr createError(const string &errinfo);
 	ObjectPtr adjustObjectPtr(const ObjectPtr &ptr);
 	std::string to_string(const Objects::Object &obj);
+	DataList::iterator begin(Objects::Disperse *disp);
+	DataList::iterator end(Objects::Disperse *disp);
 
 	namespace Objects
 	{
@@ -44,18 +51,12 @@ namespace ICM
 		{
 		public:
 			virtual ~Object() {}
-			virtual string to_string() const {
-				return "Object";
-			}
+			virtual string to_string() const = 0;
 			virtual string to_output() const {
 				return to_string();
 			}
-			virtual DefaultType get_type() const {
-				return Type;
-			}
-			virtual Object* clone() const {
-				return new Object(*this);
-			}
+			virtual DefaultType get_type() const = 0;
+			virtual Object* clone() const = 0;
 			// Method
 			virtual Boolean* equ(const ObjectPtr &obj) const;
 			// Const

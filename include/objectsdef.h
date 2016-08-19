@@ -12,49 +12,6 @@ namespace ICM
 	namespace Objects
 	{
 		//=======================================
-		// * Class Error
-		//=======================================
-		class Error : public Object
-		{
-		public:
-			explicit Error(std::string msg = "") : msg(msg) {}
-			string to_string() const {
-				return "Error(" + msg + ")";
-			}
-			DefaultType get_type() const {
-				return Type;
-			}
-			// Const
-			static const DefaultType Type = T_Error;
-
-		private:
-			std::string msg;
-		};
-
-		//=======================================
-		// * Class Nil
-		//=======================================
-		class Nil : public Object
-		{
-		public:
-			Nil() {}
-
-			Boolean* equ(const ObjectPtr &obj) const;
-			string to_string() const {
-				return "Nil";
-			}
-			DefaultType get_type() const {
-				return Type;
-			}
-			Nil* clone() const {
-				return new Nil(*this);
-			}
-			// Const
-			static const DefaultType Type = T_Nil;
-
-		};
-
-		//=======================================
 		// * Class Boolean
 		//=======================================
 		class Boolean : public Object
@@ -63,6 +20,10 @@ namespace ICM
 			Boolean() {}
 			explicit Boolean(bool b) : data(b) {}
 
+			//-----------------------------------
+			// + Inherited
+			//-----------------------------------
+			// Method
 			Boolean* equ(const ObjectPtr &obj) const;
 			string to_string() const {
 				return Convert::to_string(data);
@@ -90,7 +51,6 @@ namespace ICM
 			using NumType = Common::Number::Rational;
 			explicit Number(NumType dat = 0) : data(dat) {}
 
-			Boolean* equ(const ObjectPtr &obj) const;
 			Number* add(const Number *obj);
 			Number* sub(const Number *obj);
 			Number* mul(const Number *obj);
@@ -103,6 +63,11 @@ namespace ICM
 			bool operator>(const Number &obj);
 			bool operator>=(const Number &obj);
 
+			//-----------------------------------
+			// + Inherited
+			//-----------------------------------
+			// Method
+			Boolean* equ(const ObjectPtr &obj) const;
 			string to_string() const {
 				return Common::Number::to_string(data);
 			}
@@ -112,11 +77,15 @@ namespace ICM
 			Number* clone() const {
 				return new Number(*this);
 			}
+			NumType get_data() const {
+				return data;
+			}
 			// Const
 			static const DefaultType Type = T_Number;
 
 		private:
 			NumType data;
+			// TODO
 			NumType& get_data(Object *obj)
 			{
 				return ((Number*)obj)->data;
@@ -134,12 +103,16 @@ namespace ICM
 		{
 		public:
 			explicit String(const std::string &dat = "") : data(dat) {}
-
-			Boolean* equ(const ObjectPtr &obj) const;
 			String* add(const String *obj);
 			std::string to_output() const {
 				return data.to_string();
 			}
+
+			//-----------------------------------
+			// + Inherited
+			//-----------------------------------
+			// Method
+			Boolean* equ(const ObjectPtr &obj) const;
 			std::string to_string() const {
 				return '"' + data.to_string() + '"';
 			}
@@ -168,7 +141,6 @@ namespace ICM
 		public:
 			explicit List(const DataList &dl) : data(dl) {}
 
-			Boolean* equ(const ObjectPtr &obj) const;
 			List* push(const ObjectPtr &objp);
 			List* push(const DataList &dl);
 			List* add(const List *dl);
@@ -182,6 +154,11 @@ namespace ICM
 				return data;
 			}
 
+			//-----------------------------------
+			// + Inherited
+			//-----------------------------------
+			// Method
+			Boolean* equ(const ObjectPtr &obj) const;
 			string to_string() const;
 			string to_output() const;
 			DefaultType get_type() const {
@@ -205,7 +182,6 @@ namespace ICM
 		public:
 			explicit Disperse(const DataList &dl) : data(dl) {}
 
-			Boolean* equ(const ObjectPtr &obj) const;
 			DataList::iterator begin() {
 				return data.begin();
 			}
@@ -216,6 +192,11 @@ namespace ICM
 				return data;
 			}
 
+			//-----------------------------------
+			// + Inherited
+			//-----------------------------------
+			// Method
+			Boolean* equ(const ObjectPtr &obj) const;
 			string to_string() const;
 			string to_output() const;
 			DefaultType get_type() const {
@@ -249,21 +230,125 @@ namespace ICM
 			ASTNode* getDatNode();
 			void setValue(ASTNode *node);
 			DefaultType getValueType() const;
-			std::string to_string() const;
-			string to_output() const;
 
+			//-----------------------------------
+			// + Inherited
+			//-----------------------------------
+			// Method
 			DefaultType get_type() const {
 				return Type;
 			}
 			Identifier* clone() const {
 				return new Identifier(name.to_string());
 			}
+			std::string to_string() const;
+			string to_output() const;
 			// Const
 			static const DefaultType Type = T_Identifier;
 
 		private:
 			Common::charptr name;
 			ASTNode* data;
+		};
+
+		//class TypeObject;
+
+		
+		
+		//=======================================
+		// * Class TypeObject
+		//=======================================
+		/*class TypeObject : public Object
+		{
+		public:
+			explicit TypeObject(const ICM::TypeObject &data)
+				: data(data) {}
+			//-----------------------------------
+			// + Inherited
+			//-----------------------------------
+			// Method
+			DefaultType get_type() const {
+				return Type;
+			}
+			TypeObject* clone() const {
+				return new TypeObject(*this);
+			}
+			string to_string() const {
+				return data.to_string();
+			}
+			// Const
+			static const DefaultType Type = T_Type;
+
+		private:
+			ICM::TypeObject data;
+		};*/
+
+		//=======================================
+		// * Class Function
+		//=======================================
+		/*class FuncObject : public Object
+		{
+		public:
+			Function() : name(0) {}
+
+		private:
+			Common::charptr name;
+			Signature sign;
+		};*/
+
+		//=======================================
+		// * Class Error
+		//=======================================
+		class Error : public Object
+		{
+		public:
+			explicit Error(std::string msg = "") : msg(msg) {}
+
+			//-----------------------------------
+			// + Inherited
+			//-----------------------------------
+			// Method
+			string to_string() const {
+				return "Error(" + msg + ")";
+			}
+			DefaultType get_type() const {
+				return Type;
+			}
+			Object* clone() const {
+				return new Error(*this);
+			}
+			// Const
+			static const DefaultType Type = T_Error;
+
+		private:
+			std::string msg;
+		};
+
+		//=======================================
+		// * Class Nil
+		//=======================================
+		class Nil : public Object
+		{
+		public:
+			Nil() {}
+
+			//-----------------------------------
+			// + Inherited
+			//-----------------------------------
+			// Method
+			Boolean* equ(const ObjectPtr &obj) const;
+			string to_string() const {
+				return "Nil";
+			}
+			DefaultType get_type() const {
+				return Type;
+			}
+			Nil* clone() const {
+				return new Nil(*this);
+			}
+			// Const
+			static const DefaultType Type = T_Nil;
+
 		};
 	}
 }

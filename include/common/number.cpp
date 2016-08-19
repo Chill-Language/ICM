@@ -28,53 +28,53 @@ namespace Number
 		num *= cond ? -1 : 1;
 	}
 	Rational& Rational::operator+=(const Rational &r) {
-		initialize(num * r.den + r.num * den, den * r.den);
+		initialize(num * r.getDen() + r.num * den, den * r.getDen());
 		return *this;
 	}
 	Rational& Rational::operator-=(const Rational &r) {
-		initialize(num * r.den - r.num * den, den * r.den);
+		initialize(num * r.getDen() - r.num * den, den * r.getDen());
 		return *this;
 	}
 	Rational& Rational::operator*=(const Rational &r) {
-		initialize(num * r.num, den * r.den);
+		initialize(num * r.num, den * r.getDen());
 		return *this;
 	}
 	Rational& Rational::operator/=(const Rational &r) {
-		initialize(num * r.den, den * r.num);
+		initialize(num * r.getDen(), den * r.num);
 		return *this;
 	}
 	//--------------------
 	// * Basic
 	//--------------------
 	const Rational operator-(const Rational &sr) {
-		return Rational(-sr.num, sr.den);
+		return Rational(-sr.getNum(), sr.getDen());
 	}
 	const Rational operator~(const Rational &sr) {
-		return Rational(sr.den, sr.num);
+		return Rational(sr.getDen(), sr.getNum());
 	}
 	const Rational operator+(const Rational &sr, const Rational &r) {
-		return Rational(sr.num * r.den + r.num * sr.den, sr.den * r.den);
+		return Rational(sr.getNum() * r.getDen() + r.getNum() * sr.getDen(), sr.getDen() * r.getDen());
 	}
 	const Rational operator-(const Rational &sr, const Rational &r) {
-		return Rational(sr.num * r.den - r.num * sr.den, sr.den * r.den);
+		return Rational(sr.getNum() * r.getDen() - r.getNum() * sr.getDen(), sr.getDen() * r.getDen());
 	}
 	const Rational operator*(const Rational &sr, const Rational &r) {
-		return Rational(sr.num * r.num, sr.den * r.den);
+		return Rational(sr.getNum() * r.getNum(), sr.getDen() * r.getDen());
 	}
 	const Rational operator/(const Rational &sr, const Rational &r) {
-		return Rational(sr.num * r.den, sr.den * r.num);
+		return Rational(sr.getNum() * r.getDen(), sr.getDen() * r.getNum());
 	}
 	Rational::Type ceil(const Rational &sr) {
-		return (Rational::Type)std::ceil((long double)(sr.num) / sr.den);
+		return (Rational::Type)std::ceil((long double)(sr.getNum()) / sr.getDen());
 	}
 	Rational::Type floor(const Rational &sr) {
-		return (Rational::Type)std::floor((long double)(sr.num) / sr.den);
+		return (Rational::Type)std::floor((long double)(sr.getNum()) / sr.getDen());
 	}
 	Rational::Type fix(const Rational &sr) {
-		return (sr.num > 0) ? floor(sr) : ceil(sr);
+		return (sr.getNum() > 0) ? floor(sr) : ceil(sr);
 	}
 	const Rational abs(const Rational &sr) {
-		return Rational(std::abs(sr.num), sr.den);
+		return Rational(std::abs(sr.getNum()), sr.getDen());
 	}
 	const Rational mod(const Rational &sr, const Rational &r) {
 		return sr - r * floor(sr / r);
@@ -86,7 +86,7 @@ namespace Number
 	// * Compare
 	//--------------------
 	Rational::Type compare(const Rational &sr, const Rational &r) {
-		return sr.num * r.den - r.num * sr.den;
+		return sr.getNum() * r.getDen() - r.getNum() * sr.getDen();
 	}
 	bool operator>(const Rational &sr, const Rational &r) {
 		return compare(sr, r) > 0;
@@ -95,7 +95,7 @@ namespace Number
 		return compare(sr, r) >= 0;
 	}
 	bool operator==(const Rational &sr, const Rational &r) {
-		return sr.num == r.num && sr.den == r.den;
+		return sr.getNum() == r.getNum() && sr.getDen() == r.getDen();
 	}
 	bool operator!=(const Rational &sr, const Rational &r) {
 		return !(sr == r);
@@ -111,11 +111,11 @@ namespace Number
 	//--------------------
 	std::string to_string(const Rational &rat)
 	{
-		if (rat.den == 0)
+		if (rat.getDen() == 0)
 			return "NaN";
-		std::string result(std::to_string(rat.num));
-		if (rat.den != 1)
-			result += std::string("/") + std::to_string(rat.den);
+		std::string result(std::to_string(rat.getNum()));
+		if (rat.getDen() != 1)
+			result += std::string("/") + std::to_string(rat.getDen());
 		return result;
 	}
 	Rational get_num(const std::string &str);

@@ -4,6 +4,7 @@
 #include "ast.h"
 #include "objects.h"
 #include "lightlist.h"
+#include "typeobject.h"
 
 namespace ICM
 {
@@ -18,24 +19,23 @@ namespace ICM
 		class Signature
 		{
 		public:
-			using List = lightlist<DefaultType>;
-			using InitList = std::initializer_list<DefaultType>;
+			using List = lightlist<shared_ptr<TypeObject>>;
+			using InitList1 = std::initializer_list<TypeObject>;
 
 			Signature() = default;
-			Signature(const InitList &intype, DefaultType outtype, bool last_is_args = false)
-				: InType(intype), OutType(outtype), last_is_args(last_is_args) {}
-			Signature(const InitList &intype, const InitList &outtype, bool last_is_args = false)
-				: InType(intype), OutType(outtype), last_is_args(last_is_args) {}
+			Signature(const InitList1 &intype, const TypeObject& outtype, bool last_is_args = false);
 
 			const List& getInType() const { return InType; }
-			const List& getOutType() const { return OutType; }
+			const TypeObject& getOutType() const { return *OutType; }
 			bool isLastArgs() const { return last_is_args; }
 
 			bool checkType(const DataList &list, DataList &dlp) const;
 
+			string to_string() const;
+
 		private:
 			List InType;
-			List OutType;
+			shared_ptr<TypeObject> OutType;
 			bool last_is_args;
 
 			bool checkSub(ObjectPtr ptr, DefaultType checktype, DataList &dlp) const;
@@ -109,26 +109,29 @@ namespace ICM
 	class FuncTableUnit
 	{
 	public:
+		using FuncObject = ICM::Function::FuncObject;
+		using FuncInitObject = ICM::Function::FuncInitObject;
+
 		FuncTableUnit() = default;
-		FuncTableUnit(size_t id, const string &name, const std::initializer_list<Function::FuncObject> &func)
+		FuncTableUnit(size_t id, const string &name, const std::initializer_list<FuncObject> &func)
 			: id(id), name(name), is_ref(false), func(func) {}
-		FuncTableUnit(size_t id, const string &name, const std::initializer_list<Function::FuncInitObject*> &func)
+		FuncTableUnit(size_t id, const string &name, const std::initializer_list<FuncInitObject*> &func)
 			: id(id), name(name), is_ref(true) {
 			for (auto *p : func)
-				funcp.push_back(autoptr<Function::FuncInitObject>(p));
+				funcp.push_back(shared_ptr<FuncInitObject>(p));
 		}
 
 		size_t getID() const { return id; }
 		const string& getName() const { return name; }
 		const size_t size() const { return is_ref ? funcp.size() : func.size(); }
-		Function::FuncObject operator[](size_t i) const { return is_ref ? funcp[i]->get_f() : func[i]; }
+		FuncObject operator[](size_t i) const { return is_ref ? funcp[i]->get_f() : func[i]; }
 
 	private:
 		size_t id = 0;
 		string name;
 		bool is_ref = false;
-		vector<Function::FuncObject> func;
-		vector<autoptr<Function::FuncInitObject>> funcp;
+		vector<FuncObject> func;
+		vector<shared_ptr<FuncInitObject>> funcp;
 	};
 
 	//=======================================

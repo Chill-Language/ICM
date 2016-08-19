@@ -15,9 +15,6 @@ namespace ICM
 			Object *object;
 			switch (type)
 			{
-			case ICM::T_Null:
-				object = nullptr;
-				break;
 			case ICM::T_Nil:
 				object = new Nil();
 				break;
@@ -34,7 +31,7 @@ namespace ICM
 				object = new Identifier(str);
 				break;
 			default:
-				object = new Object();
+				object = nullptr;
 				break;
 			}
 			return ObjectPtr(object);
@@ -95,6 +92,10 @@ namespace ICM
 						else if ((i = AddFuncTable.find(mr.getString()))) {
 							// Adden Function
 							ast->setFunc(FUNC_ADD, i);
+						}
+						else {
+							println("Undefined method '" + mr.getString() + "' in line(" + std::to_string(match.getCurLineNum()) + ").");
+							return nullptr;
 						}
 						firstMatchBraket = false;
 					}

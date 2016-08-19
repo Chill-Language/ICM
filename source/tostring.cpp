@@ -29,7 +29,9 @@ namespace ICM
 		case T_Symbol:     return "Symbol";
 		case T_List:       return "List";
 		case T_Vary:       return "Vary";
-		default:           return "";
+		case T_Function:   return "Function";
+		case T_Type:       return "Type";
+		default:           return "UnfoundType";
 		}
 	}
 	string to_string(const ObjectPtr &obj) {
@@ -138,26 +140,6 @@ namespace ICM
 		return Convert::to_string(list.begin(), list.end());
 	}
 	std::string to_string(const Function::Signature &sign) {
-		using Convert::to_string;
-		using ICM::to_string;
-
-		std::string str;
-		const auto &its = sign.getInType();
-		const auto &ots = sign.getOutType();
-		if (!its.empty()) {
-			if (its.size() != 1) str.push_back('(');
-			str.append(to_string(its.begin(), its.end()));
-			if (sign.isLastArgs()) str.push_back('*');
-			if (its.size() != 1) str.push_back(')');
-		}
-		else {
-			str.append("Void");
-		}
-		str.append(" -> ");
-		if (ots.size() == 1)
-			str.append(to_string(ots.front()));
-		else
-			str.append(to_string(ots));
-		return str;
+		return sign.to_string();
 	}
 }

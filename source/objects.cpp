@@ -165,4 +165,23 @@ namespace ICM
 		else
 			return ptr;
 	}
+	// Get TypeObject
+	TypeObject getTypeObject(const ObjectPtr &op)
+	{
+		if (op->get_type() == T_Identifier)
+			return ICM::TypeObject(T_Identifier, getTypeObject(getPointer<Objects::Identifier>(op)->getRefNode()->getdata()));
+		else if (op->get_type() == T_Function)
+			return ICM::TypeObject(op->get_type()); // TODO
+		else
+			return ICM::TypeObject(op->get_type());
+	}
+	// Get Disperse Iterator
+	DataList::iterator begin(Objects::Disperse *disp)
+	{
+		return disp->begin();
+	}
+	DataList::iterator end(Objects::Disperse *disp)
+	{
+		return disp->end();
+	}
 }

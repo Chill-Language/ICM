@@ -43,8 +43,10 @@ namespace Number
 		Rational& operator-=(const Rational &r);
 		Rational& operator*=(const Rational &r);
 		Rational& operator/=(const Rational &r);
+		const Type& getNum() const { return num; }
+		const Type& getDen() const { return den; }
 
-	public:
+	private:
 		Type num; // Numerator
 		Type den; // Denominator
 	};
