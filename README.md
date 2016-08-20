@@ -20,6 +20,10 @@ At first, you should download the source, then, run 'compile.bat' on Windows or 
 If you have **MSVC (Visual Studio)**, you can also create a project to build these files.<br>
 ***You should ensure that your compiler support C++14.***
 
+# How To Run
+You can only use 'main run.chl'(Windows) or './main run.chl'(Linux) after you have built it.
+'run.chl' is a source file to test the program.
+
 # Grammar
 ### ***Call Function*** : *(FunctionName Parameters...)*<br>
 Function is an object in **Chill** Lang.<br>

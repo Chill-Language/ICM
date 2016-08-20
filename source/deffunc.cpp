@@ -184,11 +184,21 @@ namespace ICM
 				}
 				ObjectPtr func(const DataList &list) const {
 					Identifier *data = getPointer<Identifier>(list[0]);
-					data->setValue(new ASTNode(ObjectPtr(list[1]->clone())));
+					data->setValue(new ASTNode(ObjectPtr(adjustObjectPtr(list[1])->clone())));
 					string name = getPointer<Identifier>(list[0])->getName();
 					if (!AddVariableTable.find(name))
 						AddVariableTable.add(name, data);
 					return ObjectPtr(data);
+				}
+			};
+			struct CpyV : public FI
+			{
+			private:
+				S sign() const {
+					return S({ T_Vary }, T_Vary); // Var -> Var
+				}
+				ObjectPtr func(const DataList &list) const {
+					return ObjectPtr(adjustObjectPtr(list[0])->clone());
 				}
 			};
 		}
@@ -293,7 +303,7 @@ namespace ICM
 		DefFuncTable.add("--", "dec");
 
 		DefFuncTable.add("let", LST{ new Assign::Let() });
-		DefFuncTable.add("cpy", LST{ new Assign::Cpy() });
+		DefFuncTable.add("cpy", LST{ new Assign::Cpy(), new Assign::CpyV() });
 
 		DefFuncTable.add("list", Lst{
 			F(Lists::list, S({}, T_List)),               // Void -> L

@@ -1,0 +1,61 @@
+; Test 01
+(println "----------1----------")
+(let a "Hello ")
+(let b "World!")
+(println (+ a b))
+
+; Test 02
+(println "----------2----------")
+(let c [9 8 7 6 5 4 3 2 1 0])
+(println c)
+(sort c)
+(println c)
+
+; Test 03
+(println "----------3----------")
+(let d [9/5 8/8 7/8 67/2 5/10 4/1 3/2 2/5 1/7 0/5])
+(println d)
+(sort d)
+(println d)
+
+; Test 04
+(println "----------4----------")
+(let e [5 1 3])
+(let f e)
+(cpy g e)
+(sort e)
+(println f)
+(println g)
+(let e [5 1 3])
+(println e)
+(println (sort (cpy e)))
+(println e)
+
+; Test 05
+(println "----------5----------")
+(let e (list 1 2 3))
+(println e)
+(println (disp e))
+
+; Test 06
+(println "----------6----------")
+(let a 5)
+(let b 6)
+(let c [a b])
+(println (+ (disp c)))
+(let e [f5 7])
+(let (disp e))
+(println f5)
+
+; Test 07
+(println "----------7----------")
+(let add +)
+(println add)
+(println (add 5 6))
+(let a [9 5 7])
+(println (sort (cpy a)))
+(println (sort (cpy a) <))
+(println (sort (cpy a) >))
+(println (sort (cpy a) +)) ; Error
+(let small <)
+(println (sort (cpy a) small))

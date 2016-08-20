@@ -243,7 +243,7 @@ namespace ICM
 				return Type;
 			}
 			Identifier* clone() const {
-				return new Identifier(name.to_string());
+				return new Identifier(name.to_string(), data);
 			}
 			std::string to_string() const;
 			string to_output() const;
