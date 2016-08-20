@@ -27,6 +27,14 @@ namespace ICM
 				result->setdata(data);
 				return result;
 			}
+			else if (func->getType() == FUNC_ADD){
+				auto id = func->getID();
+				auto &list = node->getPars()->getList();
+				ASTNode* result = new ASTNode(AST_DATA);
+				ObjectPtr data = checkCall(AddFuncTable[id], createList(list));
+				result->setdata(data);
+				return result;
+			}
 		}
 		default:
 			return nullptr;

@@ -29,7 +29,9 @@ namespace ICM
 			const TypeObject& getOutType() const { return *OutType; }
 			bool isLastArgs() const { return last_is_args; }
 
-			bool checkType(const DataList &list, DataList &dlp) const;
+			bool checkType(const DataList &list, DataList *dlp = nullptr) const;
+			bool checkType(const Signature &sign) const;
+			bool checkType(const vector<TypeObject> &argT) const;
 
 			string to_string() const;
 
@@ -52,12 +54,18 @@ namespace ICM
 				: func(func), sign(sign) {}
 
 			template <typename... Args>
-			bool checkType(Args&... args) const {
+			bool checkType(Args... args) const {
 				return sign.checkType(args...);
 			}
 			ObjectPtr call(const DataList &dl) const {
 				// If there was a crash, make sure that the pointer 'func' is effective.
 				return func(dl);
+			}
+			string to_string() const {
+				return sign.to_string();
+			}
+			const Signature& getSign() const {
+				return sign;
 			}
 
 		private:
@@ -161,6 +169,11 @@ namespace ICM
 			data.push_back(Unit(count, name, args...));
 			keymap[name] = count;
 		}
+		void add(const string &name, const Unit &unit) {
+			count++;
+			data.push_back(unit);
+			keymap[name] = count;
+		}
 		const Unit& operator[](size_t id) const {
 			return data[id];
 		}
@@ -175,6 +188,9 @@ namespace ICM
 			if (iter != keymap.end())
 				return iter->second;
 			return 0;
+		}
+		size_t getCurrentID() const {
+			return count;
 		}
 
 	private:

@@ -20,6 +20,7 @@ namespace ICM
 		class Disperse;
 		class Identifier;
 		class Function;
+		class TypeClass;
 	}
 
 	// Types

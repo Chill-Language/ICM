@@ -38,37 +38,52 @@ namespace ICM
 			return str;
 		}
 		vector<TypeObject> getTypeObjectList(const DataList &list);
+		vector<TypeObject> getTypeObjectList(const Signature::List &list);
 		void getAdjustedObjectPtr(ObjectPtr op, const TypeObject &type, DataList &dlp);
-		bool Signature::checkType(const DataList &list, DataList &dlp) const {
-			// Get TypeObject List
-			vector<TypeObject> argT = getTypeObjectList(list);
+		bool Signature::checkType(const vector<TypeObject> &argT) const {
 			// Check Size
 			if (last_is_args) {
-				if (list.size() < InType.size())
+				if (argT.size() < InType.size())
 					return false;
 			}
-			else if (list.size() != InType.size()) {
+			else if (argT.size() != InType.size()) {
 				return false;
 			}
 			// Check Type
 			size_t size = last_is_args ? InType.size() - 1 : InType.size();
-			Range<size_t> r1(0, size - 1);
-			Range<size_t> r2(size, list.size() - 1);
-			for (auto i : r1)
+			for (auto i : Range<size_t>(0, size - 1))
 				if (!InType[i]->checkType(argT[i]))
 					return false;
 			if (last_is_args) {
-				for (auto i : r2)
+				for (auto i : Range<size_t>(size, argT.size() - 1))
 					if (!InType.back()->checkType(argT[i]))
 						return false;
 			}
+			return true;
+		}
+		bool Signature::checkType(const Signature &sign) const {
+			// Get TypeObject List
+			const vector<TypeObject> &argT = getTypeObjectList(sign.InType);
+			// Check
+			return checkType(argT);
+		}
+		bool Signature::checkType(const DataList &list, DataList *dlp) const {
+			// Get TypeObject List
+			const vector<TypeObject> &argT = getTypeObjectList(list);
+			// Check
+			if (!checkType(argT))
+				return false;
 			// Get Adjusted DataList
-			dlp.clear();
-			for (size_t i : r1)
-				getAdjustedObjectPtr(list[i], *InType[i], dlp);
-			if (last_is_args)
-				for (size_t i : r2)
-					getAdjustedObjectPtr(list[i], *InType.back(), dlp);
+			if (dlp) {
+				size_t size = last_is_args ? InType.size() - 1 : InType.size();
+				auto& dl = *dlp;
+				dl.clear();
+				for (size_t i : Range<size_t>(0, size - 1))
+					getAdjustedObjectPtr(list[i], *InType[i], dl);
+				if (last_is_args)
+					for (size_t i : Range<size_t>(size, argT.size() - 1))
+						getAdjustedObjectPtr(list[i], *InType.back(), dl);
+			}
 			return true;
 		}
 		vector<TypeObject> getTypeObjectList(const DataList &list)
@@ -76,6 +91,13 @@ namespace ICM
 			vector<TypeObject> typelist;
 			for (auto &e : list)
 				typelist.push_back(getTypeObject(e));
+			return typelist;
+		}
+		vector<TypeObject> getTypeObjectList(const Signature::List &list)
+		{
+			vector<TypeObject> typelist;
+			for (auto &e : list)
+				typelist.push_back(*e);
 			return typelist;
 		}
 		void getAdjustedObjectPtr(ObjectPtr op, const TypeObject &type, DataList &dlp)
@@ -110,7 +132,7 @@ namespace ICM
 				nlist.push_back(e);
 		}
 		for (size_t i : Range<size_t>(0, ftu.size() - 1)) {
-			if (ftu[i].checkType(nlist, ndl)) {
+			if (ftu[i].checkType(nlist, &ndl)) {
 				id = i;
 				break;
 			}

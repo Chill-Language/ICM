@@ -93,6 +93,20 @@ namespace ICM
 							// Adden Function
 							ast->setFunc(FUNC_ADD, i);
 						}
+						else if ((i = AddVariableTable.find(mr.getString()))) {
+							// Default Variable
+							ASTNode *node = AddVariableTable[i].getData()->getRefNode();
+							auto &op = node->getdata();
+							if (op->get_type() == T_Function) {
+								AddFuncTable.add(mr.getString(), getPointer<Objects::Function>(op)->get_data());
+								size_t id = AddFuncTable.getCurrentID();
+								ast->setFunc(FUNC_ADD, id);
+							}
+							else {
+								println("Undefined method '" + mr.getString() + "' in line(" + std::to_string(match.getCurLineNum()) + ").");
+								return nullptr;
+							}
+						}
 						else {
 							println("Undefined method '" + mr.getString() + "' in line(" + std::to_string(match.getCurLineNum()) + ").");
 							return nullptr;
@@ -102,7 +116,21 @@ namespace ICM
 					else {
 						size_t i;
 
-						if ((i = DefVariableTable.find(mr.getString()))) {
+						if ((i = DefFuncTable.find(mr.getString()))) {
+							// Default Function
+							auto &r = DefFuncTable[i];
+							ASTNode *astnode = new ASTNode(ObjectPtr(new Objects::Function(&r)));
+							ObjectPtr data(new Identifier(mr.getString(), astnode));
+							ast->pushData(data);
+						}
+						else if ((i = AddFuncTable.find(mr.getString()))) {
+							// Adden Function
+							auto &r = AddFuncTable[i];
+							ASTNode *astnode = new ASTNode(ObjectPtr(new Objects::Function(&r)));
+							ObjectPtr data(new Identifier(mr.getString(), astnode));
+							ast->pushData(data);
+						}
+						else if ((i = DefVariableTable.find(mr.getString()))) {
 							// Default Variable
 							ASTNode *node = DefVariableTable[i].getData()->getRefNode();
 							ast->pushNode(node);

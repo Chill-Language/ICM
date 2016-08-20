@@ -37,6 +37,26 @@ namespace ICM
 	}
 	bool checkNonIdentType(const TypeObject &parT, const TypeObject &argT)
 	{
+		if (parT.isFunc()) {
+			if (argT.isFunc()) {
+				auto &ps = parT.getSign();
+				auto &as = argT.getSign();
+				if (&ps) {
+					if (&as)
+						return ps.checkType(as);
+					else {
+						auto &ft = argT.getFuncTableUnit();
+						for (size_t i : Range<size_t>(0, ft.size() - 1))
+							if (ps.checkType(ft[i].getSign()))
+								return true;
+						return false;
+					}
+				}
+				else {
+					return true;
+				}
+			}
+		}
 		if (!argT.isIdent())
 			return parT.getType() == argT.getType();
 		return checkNonIdentType(parT, argT.getValueType());

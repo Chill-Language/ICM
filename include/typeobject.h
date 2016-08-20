@@ -8,6 +8,7 @@
 namespace ICM
 {
 	namespace Function { class Signature; }
+	class FuncTableUnit;
 
 	class TypeObject
 	{
@@ -27,8 +28,14 @@ namespace ICM
 		TypeObject getValueType() const {
 			return valuetype ? *valuetype : type;
 		}
-		const ICM::Function::Signature& getSign() const {
+		const Function::Signature& getSign() const {
 			return *sign;
+		}
+		void setFuncTableUnit(const FuncTableUnit *functableunit) {
+			this->functableunit = functableunit;
+		}
+		const FuncTableUnit& getFuncTableUnit() const {
+			return *functableunit;
 		}
 		bool isIdent() const {
 			return type == T_Identifier;
@@ -53,7 +60,8 @@ namespace ICM
 	private:
 		DefaultType type;
 		shared_ptr<TypeObject> valuetype;
-		shared_ptr<ICM::Function::Signature> sign;
+		shared_ptr<Function::Signature> sign;
+		const FuncTableUnit *functableunit = nullptr;
 	};
 
 	ICM::TypeObject getTypeObject(const ObjectPtr &op);

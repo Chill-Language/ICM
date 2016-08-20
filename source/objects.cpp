@@ -170,8 +170,12 @@ namespace ICM
 	{
 		if (op->get_type() == T_Identifier)
 			return ICM::TypeObject(T_Identifier, getTypeObject(getPointer<Objects::Identifier>(op)->getRefNode()->getdata()));
-		else if (op->get_type() == T_Function)
-			return ICM::TypeObject(op->get_type()); // TODO
+		else if (op->get_type() == T_Function) {
+			TypeObject t =  TypeObject(T_Function);
+			auto &ft = getPointer<Objects::Function>(op)->get_data();
+			t.setFuncTableUnit(&ft);
+			return t;
+		}
 		else
 			return ICM::TypeObject(op->get_type());
 	}

@@ -18,7 +18,7 @@ namespace ICM
 		//=======================================
 		// * Class *
 		//=======================================
-		
+
 		using F = ICM::Function::FuncObject;
 		using FI = ICM::Function::FuncInitObject;
 		using S = ICM::Function::Signature;
@@ -221,11 +221,11 @@ namespace ICM
 			}
 			// TODO
 			ObjectPtr sort_f(const DataList &dl) {
-				string name = getPointer<Identifier>(dl[1])->getName();
+				auto &func = getPointer<Objects::Function>(dl[1])->get_data();
 
 				List *list = getPointer<List>(dl[0]);
 				std::sort(list->begin(), list->end(), [&](const ObjectPtr &a, const ObjectPtr &b) -> bool {
-					return (bool)*getPointer<Boolean>(callDefFunc(name, DataList({ a, b })));
+					return (bool)*getPointer<Boolean>(checkCall(func, DataList({ a, b })));
 				});
 				return ObjectPtr(list);
 			}
@@ -304,7 +304,7 @@ namespace ICM
 		});
 		DefFuncTable.add("sort", Lst{
 			F(Lists::sort, S({ T_List }, T_List)), // L -> L
-			F(Lists::sort_f, S({ T_List, T_Function }, T_List)), // (L F) -> L
+			F(Lists::sort_f, S({ T_List, T(T_Function,S({T_Number,T_Number},T_Number)) }, T_List)), // (L F) -> L
 		});
 		DefFuncTable.add("print", Lst{
 			F(System::print, S({}, T_List)),               // Void -> L

@@ -222,6 +222,10 @@ namespace ICM
 			Identifier(const std::string &name, ASTNode *node) : name(name) {
 				setValue(node);
 			}
+			Identifier(const std::string &name, const ObjectPtr &op) : name(name) {
+				// TODO : new ASTNode will cause memory leak.
+				setValue(new ASTNode(op));
+			}
 
 			std::string getName() const {
 				return name.to_string();
@@ -250,18 +254,14 @@ namespace ICM
 			Common::charptr name;
 			ASTNode* data;
 		};
-
-		//class TypeObject;
-
-		
 		
 		//=======================================
-		// * Class TypeObject
+		// * Class TypeClass
 		//=======================================
-		/*class TypeObject : public Object
+		class TypeClass : public Object
 		{
 		public:
-			explicit TypeObject(const ICM::TypeObject &data)
+			explicit TypeClass(const TypeObject &data)
 				: data(data) {}
 			//-----------------------------------
 			// + Inherited
@@ -270,8 +270,8 @@ namespace ICM
 			DefaultType get_type() const {
 				return Type;
 			}
-			TypeObject* clone() const {
-				return new TypeObject(*this);
+			TypeClass* clone() const {
+				return new TypeClass(*this);
 			}
 			string to_string() const {
 				return data.to_string();
@@ -280,21 +280,40 @@ namespace ICM
 			static const DefaultType Type = T_Type;
 
 		private:
-			ICM::TypeObject data;
-		};*/
+			TypeObject data;
+		};
 
 		//=======================================
 		// * Class Function
 		//=======================================
-		/*class FuncObject : public Object
+		class Function : public Object
 		{
 		public:
-			Function() : name(0) {}
+			Function(const FuncTableUnit *data) : data(data) {}
+			//Function(const string &name, const FuncObject *data) : name(name), data(data) {}
+			const FuncTableUnit& get_data() const {
+				return *data;
+			}
+			//-----------------------------------
+			// + Inherited
+			//-----------------------------------
+			// Method
+			DefaultType get_type() const {
+				return Type;
+			}
+			Function* clone() const {
+				return new Function(*this);
+			}
+			string to_string() const {
+				return "F(" + data->getName() + ")";
+			}
+			// Const
+			static const DefaultType Type = T_Function;
 
 		private:
-			Common::charptr name;
-			Signature sign;
-		};*/
+			//Common::charptr name;
+			shared_ptr<const FuncTableUnit> data;
+		};
 
 		//=======================================
 		// * Class Error

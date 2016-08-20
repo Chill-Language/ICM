@@ -1,9 +1,6 @@
 #include "basic.h"
 #include "tostring.h"
 #include "objects.h"
-using std::string;
-using std::to_string;
-#include <algorithm>
 
 namespace ICM
 {
