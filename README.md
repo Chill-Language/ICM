@@ -122,7 +122,7 @@ e.g. `[1 2 3 5]  ; same as (list 1 2 3 5)`<br>
 (let a 0)
 (print b) ; 6
 
-; test04
+; test03
 ; list
 
 (let a (list 9 7 6 3 1))
@@ -131,7 +131,7 @@ e.g. `[1 2 3 5]  ; same as (list 1 2 3 5)`<br>
 (sort (+ a b) <)  ; Output : 0 1 2 3 4 5 6 7 8 9
 (foreach + a b)   ; Output : 11 11 11 11 1
 
-; test03
+; test04
 ; function & call
 
 (defun p [n]
