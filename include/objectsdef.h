@@ -231,6 +231,25 @@ namespace ICM
 				else
 					data = op;
 			}
+			void setCopy(const ObjectPtr &op) {
+				if (op->get_type() == T_Identifier)
+					setCopy(getPointer<Identifier>(op)->getData());
+				else
+					data = ObjectPtr(op->clone());
+			}
+			void setRefer(const ObjectPtr &op) {
+				if (op->get_type() == T_Identifier) {
+					ObjectPtr sop = getPointer<Identifier>(op)->getData();
+					ObjectPtr refop = (sop->get_type() == T_Identifier) ? sop : op;
+					ObjectPtr refopdata = getPointer<Identifier>(refop)->getData();
+					if (data.get() != refopdata.get())
+						data = refop;
+					else
+						data = refopdata;
+				}
+				else
+					data = op;
+			}
 			DefaultType getValueType() const {
 				return data->get_type();
 			}
@@ -293,7 +312,6 @@ namespace ICM
 		{
 		public:
 			Function(const FuncTableUnit *data) : data(data) {}
-			//Function(const string &name, const FuncObject *data) : name(name), data(data) {}
 			const FuncTableUnit& get_data() const {
 				return *data;
 			}
@@ -314,7 +332,6 @@ namespace ICM
 			static const DefaultType Type = T_Function;
 
 		private:
-			//Common::charptr name;
 			shared_ptr<const FuncTableUnit> data;
 		};
 

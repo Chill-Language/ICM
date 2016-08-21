@@ -161,7 +161,7 @@ namespace ICM
 
 		namespace Assign
 		{
-			struct Let : public FI
+			class Basic : public FI
 			{
 			private:
 				S sign() const {
@@ -169,26 +169,33 @@ namespace ICM
 				}
 				ObjectPtr func(const DataList &list) const {
 					Identifier *data = getPointer<Identifier>(list[0]);
-					data->setData(list[1]);
+					setData(data, list[1]);
 					string name = getPointer<Identifier>(list[0])->getName();
 					if (!AddVariableTable.find(name))
 						AddVariableTable.add(name, data);
 					return ObjectPtr(data);
+				}
+				virtual void setData(Identifier *data, const ObjectPtr &op) const = 0;
+			};
+			struct Let : public Basic
+			{
+			private:
+				void setData(Identifier *data, const ObjectPtr &op) const {
+					data->setData(op);
 				}
 			};
-			struct Cpy : public FI
+			struct Cpy : public Basic
 			{
 			private:
-				S sign() const {
-					return S({ T_Identifier, T_Vary }, T_Identifier); // (I Var) -> I
+				void setData(Identifier *data, const ObjectPtr &op) const {
+					data->setCopy(op);
 				}
-				ObjectPtr func(const DataList &list) const {
-					Identifier *data = getPointer<Identifier>(list[0]);
-					data->setData(ObjectPtr(adjustObjectPtr(list[1])->clone()));
-					string name = getPointer<Identifier>(list[0])->getName();
-					if (!AddVariableTable.find(name))
-						AddVariableTable.add(name, data);
-					return ObjectPtr(data);
+			};
+			struct Ref : public Basic
+			{
+			private:
+				void setData(Identifier *data, const ObjectPtr &op) const {
+					data->setRefer(op);
 				}
 			};
 			struct CpyV : public FI
@@ -198,7 +205,9 @@ namespace ICM
 					return S({ T_Vary }, T_Vary); // Var -> Var
 				}
 				ObjectPtr func(const DataList &list) const {
-					return ObjectPtr(adjustObjectPtr(list[0])->clone());
+					Identifier temp;
+					temp.setCopy(list[0]);
+					return temp.getData();
 				}
 			};
 		}
@@ -245,6 +254,11 @@ namespace ICM
 		{
 			ObjectPtr call(const DataList &dl) {
 				return checkCall(getPointer<Objects::Function>(dl[0])->get_data(), DataList(dl.begin() + 1, dl.end()));
+			}
+			ObjectPtr p(const DataList &dl) {
+				for (auto &op : dl)
+					Common::Output::println(op->to_string());
+				return Lists::list(dl);
 			}
 			ObjectPtr print(const DataList &dl) {
 				for (auto &op : dl)
@@ -307,6 +321,7 @@ namespace ICM
 
 		DefFuncTable.add("let", LST{ new Assign::Let() });
 		DefFuncTable.add("cpy", LST{ new Assign::Cpy(), new Assign::CpyV() });
+		DefFuncTable.add("ref", LST{ new Assign::Ref() });
 
 		DefFuncTable.add("list", Lst{
 			F(Lists::list, S({}, T_List)),               // Void -> L
@@ -330,6 +345,10 @@ namespace ICM
 		DefFuncTable.add("println", Lst{
 			F(System::println, S({}, T_List)),               // Void -> L
 			F(System::println, S({ T_Vary }, T_List, true)), // Var* -> L
+		});
+		DefFuncTable.add("p", Lst{
+			F(System::p, S({}, T_List)),               // Void -> L
+			F(System::p, S({ T_Vary }, T_List, true)), // Var* -> L
 		});
 		DefFuncTable.add("dcall", Lst{
 			F(System::dcall, S({ T_Vary, T_Function, T_Vary }, T_Vary)), // (Var F Var) -> Var
