@@ -164,7 +164,7 @@ namespace ICM
 			}
 		}
 		template <typename... Args>
-		void add(const string &name, const Args&... args) {
+		void add(const string &name, Args... args) {
 			count++;
 			data.push_back(Unit(count, name, args...));
 			keymap[name] = count;

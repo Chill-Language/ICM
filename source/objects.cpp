@@ -125,29 +125,6 @@ namespace ICM
 		//=======================================
 		// * Class Identifier
 		//=======================================
-		ASTNode* Identifier::getRefNode() {
-			return data;
-		}
-		ASTNode* Identifier::getDatNode() {
-			return calcASTNode(getRefNode());
-		}
-
-		void Identifier::setValue(ASTNode *node) {
-			if (node->getNodeType() == AST_DATA && node->getObjtype() == T_Identifier)
-				this->data = getPointer<Identifier>(node->getdata())->data;
-			else
-				this->data = node;
-		}
-		DefaultType Identifier::getValueType() const {
-			return this->data->getObjtype();
-		}
-
-		string Identifier::to_string() const {
-			return name.to_string() + "(" + ICM::to_string(data) + ")";
-		}
-		string Identifier::to_output() const {
-			return data->getdata()->to_output();
-		}
 	}
 
 	//=======================================
@@ -161,7 +138,7 @@ namespace ICM
 	// Adjust ObjectPtr
 	ObjectPtr adjustObjectPtr(const ObjectPtr &ptr) {
 		if (ptr->get_type() == T_Identifier)
-			return getPointer<Objects::Identifier>(ptr)->getRefNode()->getdata();
+			return getPointer<Objects::Identifier>(ptr)->getData();
 		else
 			return ptr;
 	}
@@ -169,7 +146,7 @@ namespace ICM
 	TypeObject getTypeObject(const ObjectPtr &op)
 	{
 		if (op->get_type() == T_Identifier)
-			return ICM::TypeObject(T_Identifier, getTypeObject(getPointer<Objects::Identifier>(op)->getRefNode()->getdata()));
+			return ICM::TypeObject(T_Identifier, getTypeObject(getPointer<Objects::Identifier>(op)->getData()));
 		else if (op->get_type() == T_Function) {
 			TypeObject t =  TypeObject(T_Function);
 			auto &ft = getPointer<Objects::Function>(op)->get_data();

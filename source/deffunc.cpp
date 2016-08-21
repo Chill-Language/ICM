@@ -169,7 +169,7 @@ namespace ICM
 				}
 				ObjectPtr func(const DataList &list) const {
 					Identifier *data = getPointer<Identifier>(list[0]);
-					data->setValue(new ASTNode(list[1]));
+					data->setData(list[1]);
 					string name = getPointer<Identifier>(list[0])->getName();
 					if (!AddVariableTable.find(name))
 						AddVariableTable.add(name, data);
@@ -184,7 +184,7 @@ namespace ICM
 				}
 				ObjectPtr func(const DataList &list) const {
 					Identifier *data = getPointer<Identifier>(list[0]);
-					data->setValue(new ASTNode(ObjectPtr(adjustObjectPtr(list[1])->clone())));
+					data->setData(ObjectPtr(adjustObjectPtr(list[1])->clone()));
 					string name = getPointer<Identifier>(list[0])->getName();
 					if (!AddVariableTable.find(name))
 						AddVariableTable.add(name, data);
@@ -243,6 +243,9 @@ namespace ICM
 
 		namespace System
 		{
+			ObjectPtr call(const DataList &dl) {
+				return checkCall(getPointer<Objects::Function>(dl[0])->get_data(), DataList(dl.begin() + 1, dl.end()));
+			}
 			ObjectPtr print(const DataList &dl) {
 				for (auto &op : dl)
 					Common::Output::print(op->to_output());
@@ -315,6 +318,10 @@ namespace ICM
 		DefFuncTable.add("sort", Lst{
 			F(Lists::sort, S({ T_List }, T_List)), // L -> L
 			F(Lists::sort_f, S({ T_List, T(T_Function,S({T_Number,T_Number},T_Number)) }, T_List)), // (L F) -> L
+		});
+		DefFuncTable.add("call", Lst{
+			F(System::call, S({ T_Function }, T_Vary)),    // F -> V
+			F(System::call, S({ T_Function, T_Vary }, T_Vary, true)),    // (F V*) -> V
 		});
 		DefFuncTable.add("print", Lst{
 			F(System::print, S({}, T_List)),               // Void -> L

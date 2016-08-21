@@ -2,7 +2,6 @@
 #define _ICM_OBJECTSDEF_H_
 
 #include "basic.h"
-#include "ast.h"
 #include "objects.h"
 #include "tostring.h"
 #include "number.h"
@@ -219,22 +218,22 @@ namespace ICM
 		{
 		public:
 			explicit Identifier(const std::string &name = "") : name(name) {}
-			Identifier(const std::string &name, ASTNode *node) : name(name) {
-				setValue(node);
-			}
-			Identifier(const std::string &name, const ObjectPtr &op) : name(name) {
-				// TODO : new ASTNode will cause memory leak.
-				setValue(new ASTNode(op));
-			}
-
+			Identifier(const std::string &name, const ObjectPtr &op) : name(name), data(op) {}
 			std::string getName() const {
 				return name.to_string();
 			}
-			ASTNode* getRefNode();
-			ASTNode* getDatNode();
-			void setValue(ASTNode *node);
-			DefaultType getValueType() const;
-
+			ObjectPtr getData() const {
+				return data;
+			}
+			void setData(const ObjectPtr &op) {
+				if (op->get_type() == T_Identifier)
+					data = getPointer<Identifier>(op)->getData();
+				else
+					data = op;
+			}
+			DefaultType getValueType() const {
+				return data->get_type();
+			}
 			//-----------------------------------
 			// + Inherited
 			//-----------------------------------
@@ -245,14 +244,18 @@ namespace ICM
 			Identifier* clone() const {
 				return new Identifier(name.to_string(), data);
 			}
-			std::string to_string() const;
-			string to_output() const;
+			string to_string() const {
+				return name.to_string() + "(" + ICM::to_string(data) + ")";
+			}
+			string to_output() const {
+				return data->to_output();
+			}
 			// Const
 			static const DefaultType Type = T_Identifier;
 
 		private:
 			Common::charptr name;
-			ASTNode* data;
+			ObjectPtr data;
 		};
 		
 		//=======================================

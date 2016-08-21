@@ -16,11 +16,12 @@ namespace ICM
 	void createDefFuncTable()
 	{
 		addDefFuncs(DefFuncTable);
-		// TODO
-		Objects::Identifier *idp = new Objects::Identifier("Nil", new ASTNode(ObjectPtr(new Objects::Nil())));
-		DefVariableTable.add("Nil", idp);
-		DefVariableTable.add("NIL", idp);
-		Objects::Identifier *nan = new Objects::Identifier("NaN", new ASTNode(ObjectPtr(new Objects::Number(Common::Number::Rational(0, 0)))));
+		// TODO : Memory leak
+		Objects::Identifier *nil = new Objects::Identifier("Nil", ObjectPtr(new Objects::Nil()));
+		DefVariableTable.add("Nil", nil);
+		DefVariableTable.add("NIL", nil);
+		DefVariableTable.add("nil", nil);
+		Objects::Identifier *nan = new Objects::Identifier("NaN", ObjectPtr(new Objects::Number(Common::Number::Rational(0, 0))));
 		DefVariableTable.add("NaN", nan);
 	}
 }

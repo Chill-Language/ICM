@@ -17,8 +17,13 @@ int main(int argc, char *argv[])
 	// Initialize
 	createDefFuncTable();
 	const bool LoopMatch = argc <= 1;
+	const bool DebugMode = !true;
+	const bool PrintAST = DebugMode;
+	const bool PrintFlagWord = DebugMode;
+	const bool PrintResult = true;
 	string init_text;
 
+	// Load File
 	if (!LoopMatch) {
 		File file(argv[1], "rt");
 		init_text = file.get_text();
@@ -28,9 +33,6 @@ int main(int argc, char *argv[])
 	test();
 
 	// Init Text
-	//const char *init_text = "(print (list 5 6 7) \" \" 3)";
-	//const char *init_text = "(print (+ \"Hello \" \"World!\"))";
-
 	charptr text(LoopMatch ? charptr(0xff) : charptr(init_text));
 
 	// Loop
@@ -51,13 +53,21 @@ int main(int argc, char *argv[])
 			AST *ast = Parser::createAST(match);
 			if (ast && ast->getRoot()) {
 				if (LoopMatch) {
-					println("\nAST: \n", ast, "\n");
-					println("Output: ");
+					if (PrintAST)
+						println("\nAST: \n", ast, "\n");
+					if (PrintResult && PrintFlagWord)
+						println("Output: ");
 				}
 				ASTNode *data = runAST(ast);
 				if (LoopMatch) {
-					println();
-					println("\nResult:\n", data, "\n");
+					if (PrintResult) {
+						print(PrintFlagWord ? "\n\nResult:\n" : "=> ");
+						if (data->getNodeType() == AST_DATA)
+							println(to_string(data->getdata()));
+						else
+							println(to_string(data));
+						println();
+					}
 				}
 				delete ast;
 			}

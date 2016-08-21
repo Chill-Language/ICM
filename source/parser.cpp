@@ -36,7 +36,8 @@ namespace ICM
 			}
 			return ObjectPtr(object);
 		}
-
+		bool createIdentFuncASTNode(AST *ast, const MatchResult &mr);
+		bool createIdentDataASTNode(AST *ast, const MatchResult &mr);
 		AST* createAST(Match &match)
 		{
 			AST *ast = new AST();
@@ -66,6 +67,10 @@ namespace ICM
 
 				switch (mr.getType()) {
 				case T_LBracket:
+					if (firstMatchBraket) {
+						println("Unfind Method in Line(", match.getCurLineNum(), ")."); // TODO
+						return nullptr;
+					}
 					ast->pushNode();
 					firstMatchBraket = true;
 					emptybreak = true;
@@ -84,71 +89,15 @@ namespace ICM
 					break;
 				case T_Identifier:
 					if (firstMatchBraket) {
-						size_t i;
-						if ((i = DefFuncTable.find(mr.getString()))) {
-							// Default Function
-							ast->setFunc(FUNC_DEF, i);
-						}
-						else if ((i = AddFuncTable.find(mr.getString()))) {
-							// Adden Function
-							ast->setFunc(FUNC_ADD, i);
-						}
-						else if ((i = AddVariableTable.find(mr.getString()))) {
-							// Default Variable
-							ASTNode *node = AddVariableTable[i].getData()->getRefNode();
-							auto &op = node->getdata();
-							if (op->get_type() == T_Function) {
-								AddFuncTable.add(mr.getString(), getPointer<Objects::Function>(op)->get_data());
-								size_t id = AddFuncTable.getCurrentID();
-								ast->setFunc(FUNC_ADD, id);
-							}
-							else {
-								println("Undefined method '" + mr.getString() + "' in line(" + std::to_string(match.getCurLineNum()) + ").");
-								return nullptr;
-							}
-						}
-						else {
+						bool result = createIdentFuncASTNode(ast, mr);
+						if (!result) {
 							println("Undefined method '" + mr.getString() + "' in line(" + std::to_string(match.getCurLineNum()) + ").");
 							return nullptr;
 						}
 						firstMatchBraket = false;
 					}
 					else {
-						size_t i;
-
-						if ((i = DefFuncTable.find(mr.getString()))) {
-							// Default Function
-							auto &r = DefFuncTable[i];
-							ASTNode *astnode = new ASTNode(ObjectPtr(new Objects::Function(&r)));
-							ObjectPtr data(new Identifier(mr.getString(), astnode));
-							ast->pushData(data);
-						}
-						else if ((i = AddFuncTable.find(mr.getString()))) {
-							// Adden Function
-							auto &r = AddFuncTable[i];
-							ASTNode *astnode = new ASTNode(ObjectPtr(new Objects::Function(&r)));
-							ObjectPtr data(new Identifier(mr.getString(), astnode));
-							ast->pushData(data);
-						}
-						else if ((i = DefVariableTable.find(mr.getString()))) {
-							// Default Variable
-							ASTNode *node = DefVariableTable[i].getData()->getRefNode();
-							ast->pushNode(node);
-						}
-						else if ((i = AddVariableTable.find(mr.getString()))) {
-							// Default Variable
-
-							//ASTNode *node = AddVariableTable[i].getData()->getValue();
-							//ast->pushNode(node);
-
-							ObjectPtr data(AddVariableTable[i].getData());
-							ast->pushData(data);
-						}
-						else {
-							ASTNode *astnode = new ASTNode(ObjectPtr(new Nil()));
-							ObjectPtr data(new Identifier(mr.getString(), astnode));
-							ast->pushData(data);
-						}
+						createIdentDataASTNode(ast, mr);
 					}
 					break;
 				case T_Number: case T_String: case T_Boolean:
@@ -178,6 +127,67 @@ namespace ICM
 				return nullptr;
 			}
 			return ast->reset();
+		}
+		bool createIdentFuncASTNode(AST *ast, const MatchResult &mr)
+		{
+			size_t i;
+			if ((i = DefFuncTable.find(mr.getString()))) {
+				// Default Function
+				ast->setFunc(FUNC_DEF, i);
+			}
+			else if ((i = AddFuncTable.find(mr.getString()))) {
+				// Adden Function
+				ast->setFunc(FUNC_ADD, i);
+			}
+			else if ((i = AddVariableTable.find(mr.getString()))) {
+				// Default Variable
+				ObjectPtr op = AddVariableTable[i].getData()->getData();
+				if (op->get_type() == T_Function) {
+					AddFuncTable.add(mr.getString(), getPointer<Objects::Function>(op)->get_data());
+					size_t id = AddFuncTable.getCurrentID();
+					ast->setFunc(FUNC_ADD, id);
+				}
+				else {
+					return false;
+				}
+			}
+			else {
+				return false;
+			}
+			return true;
+		}
+		void createFuncData(const FuncTableUnit &r, AST *ast, const MatchResult &mr)
+		{
+			ObjectPtr data(new Identifier(mr.getString(), ObjectPtr(new Objects::Function(&r))));
+			ast->pushData(data);
+		}
+		bool createIdentDataASTNode(AST *ast, const MatchResult &mr)
+		{
+			size_t i;
+
+			if ((i = DefFuncTable.find(mr.getString()))) {
+				// Default Function
+				createFuncData(DefFuncTable[i], ast, mr); // Get Func Value
+			}
+			else if ((i = AddFuncTable.find(mr.getString()))) {
+				// Adden Function
+				createFuncData(AddFuncTable[i], ast, mr); // Get Func Value
+			}
+			else if ((i = DefVariableTable.find(mr.getString()))) {
+				// Default Variable
+				ObjectPtr data = DefVariableTable[i].getData()->getData(); // Get Value
+				ast->pushData(data);
+			}
+			else if ((i = AddVariableTable.find(mr.getString()))) {
+				// Adden Variable
+				ObjectPtr data(AddVariableTable[i].getData()); // Get Ident
+				ast->pushData(data);
+			}
+			else {
+				ObjectPtr data(new Identifier(mr.getString(), ObjectPtr(new Nil())));
+				ast->pushData(data);
+			}
+			return true;
 		}
 	}
 }
