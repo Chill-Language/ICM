@@ -39,6 +39,12 @@ If '***a***' is a function, using '***(a ...)***' to call it, use '***a***' to g
 (defun add_func [n] (+ (+ n 1) (- n 2)))
 (add_func n)
 ```
+'***call***' is a function to call function.
+```lisp
+(call + 5 6)     ; Same As (+ 5 6)
+(call (disp [+]) 5 6) ; Same As ((disp [+]) + 5 6), (+ 5 6)
+```
+
 ### ***Get List*** : use '*list*' to get a list object.<br>
 e.g. `(list 1 2 3 5)`<br>
 '**[...]**' is same as '**(list ...)**'.<br>

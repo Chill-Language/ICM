@@ -67,18 +67,22 @@ namespace ICM
 
 				switch (mr.getType()) {
 				case T_LBracket:
-					if (firstMatchBraket) {
-						println("Unfind Method in Line(", match.getCurLineNum(), ")."); // TODO
-						return nullptr;
-					}
+					if (firstMatchBraket)
+						ast->setFunc(FUNC_DEF, DefFuncTable.find("call"));
 					ast->pushNode();
 					firstMatchBraket = true;
 					emptybreak = true;
 					break;
 				case T_RBracket:
+					if (firstMatchBraket) {
+						println("Unfind Method in Line(", match.getCurLineNum(), ").");
+						return nullptr;
+					}
 					ast->retNode();
 					break;
 				case T_LSBracket:
+					if (firstMatchBraket)
+						ast->setFunc(FUNC_DEF, DefFuncTable.find("call"));
 					ast->pushNode();
 					ast->setFunc(FUNC_DEF, DefFuncTable.find("list"));
 					firstMatchBraket = false;

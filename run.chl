@@ -62,5 +62,9 @@
 
 ; Test 08
 (println "----------8----------")
+(println (+ 5 6))     ; 11
+(println ((disp [+]) 5 6)) ; 11
+(println ((disp [+ 5 6]))) ; 11
+(println (call + 5 6))     ; 11
 (println (call (disp [+]) 5 6)) ; 11
 (println (call (disp [+ 5 6]))) ; 11

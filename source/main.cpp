@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
 	// Initialize
 	createDefFuncTable();
 	const bool LoopMatch = argc <= 1;
-	const bool DebugMode = !true;
+	const bool DebugMode = false;
 	const bool PrintAST = DebugMode;
 	const bool PrintFlagWord = DebugMode;
 	const bool PrintResult = true;
@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
 				if (LoopMatch) {
 					if (PrintResult) {
 						print(PrintFlagWord ? "\n\nResult:\n" : "=> ");
-						if (data->getNodeType() == AST_DATA)
+						if (data && data->getNodeType() == AST_DATA)
 							println(to_string(data->getdata()));
 						else
 							println(to_string(data));
