@@ -36,7 +36,7 @@ namespace ICM
 				}
 				ObjectPtr func(const DataList &list) const {
 					T *tmp = getPointer<T>(list.front())->clone();
-					for (auto i : Range<size_t>(1, list.size() - 1))
+					for (auto i : Range<size_t>(1, list.size()))
 						tmp->add(getPointer<T>(list[i]));
 					return ObjectPtr(tmp);
 				}
@@ -66,7 +66,7 @@ namespace ICM
 				}
 				ObjectPtr func(const DataList &list) const {
 					N *tmp = getPointer<N>(list.front())->clone();
-					for (auto i : Range<size_t>(1, list.size() - 1))
+					for (auto i : Range<size_t>(1, list.size()))
 						fp(tmp, getPointer<N>(list[i]));
 					return ObjectPtr(tmp);
 				}
@@ -221,9 +221,6 @@ namespace ICM
 			}
 
 			const DataList& _disp(const List *l) {
-				//const DataList& dl = l->get_data();
-				//println("_DISP", to_string(dl));
-
 				return l->get_data();
 			}
 
@@ -248,6 +245,29 @@ namespace ICM
 				});
 				return ObjectPtr(list);
 			}
+
+			struct Foreach : public FI
+			{
+			private:
+				S sign() const {
+					return S({ T(T_Function,S({T_Vary},T_Vary,true)), T_List }, T_List, true); // (F(V*->V) L*) -> L
+				}
+				ObjectPtr func(const DataList &list) const {
+					auto &ftb = getPointer<Objects::Function>(list[0])->get_data();
+					size_t minsize;
+					size_t size = list.size();
+					for (auto i : range(1, size))
+						minsize = std::min(minsize, getPointer<List>(list[i])->size());
+					List *result = new List(DataList());
+					for (size_t i : range(0, minsize)) {
+						DataList dl;
+						for (auto id : range(1, size))
+							dl.push_back(getPointer<List>(list[id])->get_data()[i]);
+						result->push(checkCall(ftb, dl));
+					}
+					return ObjectPtr(result);
+				}
+			};
 		}
 
 		namespace System
@@ -334,6 +354,7 @@ namespace ICM
 			F(Lists::sort, S({ T_List }, T_List)), // L -> L
 			F(Lists::sort_f, S({ T_List, T(T_Function,S({T_Number,T_Number},T_Number)) }, T_List)), // (L F) -> L
 		});
+		DefFuncTable.add("foreach", LST{ new Lists::Foreach() });
 		DefFuncTable.add("call", Lst{
 			F(System::call, S({ T_Function }, T_Vary)),    // F -> V
 			F(System::call, S({ T_Function, T_Vary }, T_Vary, true)),    // (F V*) -> V

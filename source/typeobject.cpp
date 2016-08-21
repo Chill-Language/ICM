@@ -46,7 +46,7 @@ namespace ICM
 						return ps.checkType(as);
 					else {
 						auto &ft = argT.getFuncTableUnit();
-						for (size_t i : Range<size_t>(0, ft.size() - 1))
+						for (size_t i : Range<size_t>(0, ft.size()))
 							if (ps.checkType(ft[i].getSign()))
 								return true;
 						return false;

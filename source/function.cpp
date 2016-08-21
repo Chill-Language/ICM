@@ -15,7 +15,7 @@ namespace ICM
 		Signature::Signature(const InitList1 &intype, const TypeObject& outtype, bool last_is_args)
 			: InType(intype.size()), OutType(new TypeObject(outtype)), last_is_args(last_is_args) {
 			auto p = intype.begin();
-			for (auto i : Range<size_t>(0, intype.size() - 1))
+			for (auto i : Range<size_t>(0, intype.size()))
 				InType[i] = shared_ptr<TypeObject>(new TypeObject(*p++));
 		}
 		string Signature::to_string() const {
@@ -51,11 +51,11 @@ namespace ICM
 			}
 			// Check Type
 			size_t size = last_is_args ? InType.size() - 1 : InType.size();
-			for (auto i : Range<size_t>(0, size - 1))
+			for (auto i : Range<size_t>(0, size))
 				if (!InType[i]->checkType(argT[i]))
 					return false;
 			if (last_is_args) {
-				for (auto i : Range<size_t>(size, argT.size() - 1))
+				for (auto i : Range<size_t>(size, argT.size()))
 					if (!InType.back()->checkType(argT[i]))
 						return false;
 			}
@@ -78,10 +78,10 @@ namespace ICM
 				size_t size = last_is_args ? InType.size() - 1 : InType.size();
 				auto& dl = *dlp;
 				dl.clear();
-				for (size_t i : Range<size_t>(0, size - 1))
+				for (size_t i : Range<size_t>(0, size))
 					getAdjustedObjectPtr(list[i], *InType[i], dl);
 				if (last_is_args)
-					for (size_t i : Range<size_t>(size, argT.size() - 1))
+					for (size_t i : Range<size_t>(size, argT.size()))
 						getAdjustedObjectPtr(list[i], *InType.back(), dl);
 			}
 			return true;
@@ -131,7 +131,7 @@ namespace ICM
 			else
 				nlist.push_back(e);
 		}
-		for (size_t i : Range<size_t>(0, ftu.size() - 1)) {
+		for (size_t i : Range<size_t>(0, ftu.size())) {
 			if (ftu[i].checkType(nlist, &ndl)) {
 				id = i;
 				break;

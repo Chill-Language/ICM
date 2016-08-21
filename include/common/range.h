@@ -41,7 +41,7 @@ public:
 		return (a > b) ? a + 1 : a;
 	}
 	iterator end() const {
-		return max() + 1;
+		return max();
 	}
 	bool operator==(const Range &r) const {
 		return a == r.a && b == r.b;
@@ -57,24 +57,14 @@ public:
 		return (a > b) ? a : b;
 	}
 	size_t size() const {
-		return max() - min() + 1;
+		return max() - min();
 	}
 
 	bool include(T n) const {
-		return n >= min() && n <= max();
+		return n >= min() && n < max();
 	}
 	bool include(const Range &r) const {
 		return min() <= r.min() && max() >= r.max();
-	}
-
-	Range reverse() const {
-		return Range(b, a);
-	}
-	Range sequence() const {
-		return Range(min(), max());
-	}
-	Range inverse() const {
-		return Range(max(), min());
 	}
 
 private:
@@ -86,6 +76,7 @@ Range<T> range(T a, T b)
 {
 	return Range<T>(a, b);
 }
+Range<size_t> range(int a, size_t b);
 
 template <typename T>
 std::string to_string(const Range<T> &r)

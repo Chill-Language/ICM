@@ -152,6 +152,9 @@ namespace ICM
 			const DataList& get_data() const {
 				return data;
 			}
+			size_t size() const {
+				return data.size();
+			}
 
 			//-----------------------------------
 			// + Inherited
