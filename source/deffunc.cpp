@@ -1,6 +1,7 @@
 #include "deffunc.h"
 #include "keyword.h"
 #include "objectsdef.h"
+#include "config.h"
 
 namespace ICM
 {
@@ -18,12 +19,14 @@ namespace ICM
 		//=======================================
 		// * Class *
 		//=======================================
-
 		using F = ICM::Function::FuncObject;
 		using FI = ICM::Function::FuncInitObject;
 		using S = ICM::Function::Signature;
 		using T = ICM::TypeObject;
 
+		//=======================================
+		// * Calculate
+		//=======================================
 		namespace Calc
 		{
 			template <typename T>
@@ -123,6 +126,9 @@ namespace ICM
 			};
 		}
 
+		//=======================================
+		// * Compare
+		//=======================================
 		namespace Comp
 		{
 			struct NumComp : public FI
@@ -159,6 +165,9 @@ namespace ICM
 			};
 		}
 
+		//=======================================
+		// * Assign
+		//=======================================
 		namespace Assign
 		{
 			class Basic : public FI
@@ -212,6 +221,9 @@ namespace ICM
 			};
 		}
 
+		//=======================================
+		// * Lists
+		//=======================================
 		namespace Lists
 		{
 			using L = List;
@@ -270,6 +282,9 @@ namespace ICM
 			};
 		}
 
+		//=======================================
+		// * System
+		//=======================================
 		namespace System
 		{
 			ObjectPtr call(const DataList &dl) {
@@ -307,6 +322,40 @@ namespace ICM
 				std::exit((int)getPointer<Number>(dl[0])->get_data().getNum());
 				return ObjectPtr(new Nil());
 			}
+		}
+
+		//=======================================
+		// * Config
+		//=======================================
+		namespace Config
+		{
+			struct SetBool : public FI
+			{
+			private:
+				S sign() const {
+					return S({ T_Boolean }, T_Nil); // Bool -> Nil
+				}
+				ObjectPtr func(const DataList &list) const {
+					bool value = getPointer<Boolean>(list[0])->operator bool();
+					setValue(value);
+					return ObjectPtr(new Nil());
+				}
+				virtual void setValue(bool value) const = 0;
+			};
+			struct DebugMode : public SetBool
+			{
+			private:
+				virtual void setValue(bool value) const {
+					GlobalConfig.SetDebugMode(value);
+				}
+			};
+			struct PrintIntervalTime : public SetBool
+			{
+			private:
+				virtual void setValue(bool value) const {
+					GlobalConfig.PrintIntervalTime = value;
+				}
+			};
 		}
 	}
 
@@ -381,5 +430,7 @@ namespace ICM
 		DefFuncTable.add("system", Lst{
 			F(System::system, S({ T_String }, T_Number)), // S -> N
 		});
+		DefFuncTable.add("Config.SetDebugMode", LST{ new DefFunc::Config::DebugMode() });
+		DefFuncTable.add("Config.SetPrintIntervalTime", LST{ new DefFunc::Config::PrintIntervalTime() });
 	}
 }

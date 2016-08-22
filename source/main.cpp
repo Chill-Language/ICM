@@ -5,6 +5,7 @@
 #include "keyword.h"
 #include "function.h"
 #include "file.h"
+#include "config.h"
 
 using namespace ICM;
 
@@ -12,19 +13,46 @@ void test()
 {
 }
 
+#include <ctime>
+
+class Timer
+{
+public:
+	Timer() : time(clock()) {}
+	size_t detTime() {
+		clock_t currTime = clock();
+		size_t det = currTime - time;
+		time = currTime;
+		return det;
+	}
+
+	clock_t time;
+};
+
+ICM::Config GlobalConfig(false, true, false);
+
+void printIntervalTime(Timer &t)
+{
+	println("Current Interval Time : ", t.detTime());
+}
+
 int main(int argc, char *argv[])
 {
+	Timer t;
 	// Initialize
 	createDefFuncTable();
 	const bool LoopMatch = argc <= 1;
-	const bool DebugMode = false;
-	const bool PrintAST = DebugMode;
-	const bool PrintFlagWord = DebugMode;
-	const bool PrintResult = true;
+
+	if (GlobalConfig.PrintIntervalTime)
+		printIntervalTime(t);
+
 	string init_text;
 
 	// Load File
-	if (!LoopMatch) {
+	if (LoopMatch) {
+		println("ICM 0.1");
+	}
+	else {
 		File file(argv[1], "rt");
 		init_text = file.get_text();
 	}
@@ -53,15 +81,15 @@ int main(int argc, char *argv[])
 			AST *ast = Parser::createAST(match);
 			if (ast && ast->getRoot()) {
 				if (LoopMatch) {
-					if (PrintAST)
+					if (GlobalConfig.PrintAST)
 						println("\nAST: \n", ast, "\n");
-					if (PrintResult && PrintFlagWord)
+					if (GlobalConfig.PrintResult && GlobalConfig.PrintFlagWord)
 						println("Output: ");
 				}
 				ASTNode *data = runAST(ast);
 				if (LoopMatch) {
-					if (PrintResult) {
-						print(PrintFlagWord ? "\n\nResult:\n" : "=> ");
+					if (GlobalConfig.PrintResult) {
+						print(GlobalConfig.PrintFlagWord ? "\n\nResult:\n" : "=> ");
 						if (data && data->getNodeType() == AST_DATA)
 							println(to_string(data->getdata()));
 						else
@@ -74,8 +102,13 @@ int main(int argc, char *argv[])
 			else {
 				break;
 			}
+			if (GlobalConfig.PrintIntervalTime)
+				printIntervalTime(t);
 		}
 	} while (LoopMatch);
+
+	if (GlobalConfig.PrintIntervalTime)
+		printIntervalTime(t);
 
 	return 0;
 }
