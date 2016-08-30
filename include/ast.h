@@ -6,158 +6,154 @@
 
 namespace ICM
 {
-	// Types
-	enum FuncType { FUNC_NIL, FUNC_DEF, FUNC_ADD };
-	using FuncID = unsigned;
-	enum ASTNodeType { AST_NIL, AST_DATA, AST_NODE };
-
-	// ASTNode
-	class ASTNode
+	//=======================================
+	// * Namespace ASTNode
+	//=======================================
+	namespace ASTNode
 	{
-	public:
-		// Declare
-		class Function;
-		class Parameters;
-	public:
-		ASTNode() {}
-		// Create a Variables from Type.
-		explicit ASTNode(ASTNodeType type) { initialize(type); }
-		// Create a Reference from Pointer.
-		explicit ASTNode(const ObjectPtr &dat) { initialize(dat); }
-		explicit ASTNode(Function *fun, Parameters *par) { initialize(fun, par); }
-		explicit ASTNode(Function *fun) : ASTNode(fun, nullptr) {}
-		explicit ASTNode(Parameters *par) : ASTNode(nullptr, par) {}
-		~ASTNode() { release(); }
+		enum ASTNodeType { AST_Node, AST_Data, AST_Refer };
 
-		void initialize(ASTNodeType type);
-		void initialize(const ObjectPtr &dat);
-		void initialize(Function *fun = nullptr, Parameters *par = nullptr);
-
-		void release();
-		ASTNode* clone() const; // Shallow Copy
-		ASTNode* deep_clone() const; // Deep Copy
-		ASTNodeType getNodeType() const {
-			return this->type;
-		}
-		// Get
-		const ObjectPtr& getdata() const {
-			return this->objdata;
-		}
-		const Function* getFunc() const {
-			return this->fundata.func;
-		}
-		const Parameters* getPars() const {
-			return this->fundata.pars;
-		}
-		// Set
-		void setdata(const ObjectPtr &pdata) {
-			this->objdata = pdata;
-		}
-		void setfunc(FuncType type, FuncID id) {
-			this->fundata.func->set(type, id);
-		}
-		void pushpars(ASTNode *node) {
-			this->fundata.pars->push(node);
-		}
-		DefaultType getObjtype() const {
-			return objdata->get_type();
-		}
-
-		friend std::string to_string(const ASTNode *astn);
-		friend class AST;
-
-	private:
-		// Members
-		ASTNodeType type;
-		union {
-			struct {
-				Function *func = nullptr;
-				Parameters *pars = nullptr;
-			} fundata;
-			ObjectPtr objdata = nullptr;
-		};
-		bool reference = true;
-
-	public:
-		// Function
-		class Function
+		//=======================================
+		// * Class ASTNodeBase
+		//=======================================
+		class ASTNodeBase
 		{
 		public:
-			Function() {}
-			Function(FuncType type, FuncID id) : type(type), id(id) {}
-			void set(FuncType type, FuncID id) {
-				this->type = type;
-				this->id = id;
-			}
-			FuncType getType() const {
-				return this->type;
-			}
-			FuncID getID() const {
-				return this->id;
-			}
-			friend std::string to_string(const Function* func);
-
-		private:
-			// Members
-			FuncType type = FUNC_NIL;
-			FuncID id = 0;
+			virtual ASTNodeType getType() const = 0;
+			virtual string to_string() const = 0;
+			virtual string to_string_code() const = 0;
 		};
 
-		// Parameters
-		class Parameters
+		//=======================================
+		// * Class ASTNodeNode
+		//=======================================
+		class ASTNodeNode : public ASTNodeBase
+		{
+			using ASTNodePtr = shared_ptr<ASTNodeBase>;
+		public:
+			explicit ASTNodeNode(size_t id) : index(id) {}
+			// List
+			ASTNodeBase* front() const { return data.front().get(); }
+			bool empty() const { return data.empty(); }
+			void pushNode(const ASTNodePtr &node) { data.push_back(node); }
+			auto begin() const { return data.begin(); }
+			auto end() const { return data.end(); }
+			auto begin() { return data.begin(); }
+			auto end() { return data.end(); }
+			auto cbegin() const { return data.cbegin(); }
+			auto cend() const { return data.cend(); }
+			size_t size() const { return data.size(); }
+			const ASTNodePtr& operator[](size_t id) const { return data[id]; }
+
+			// Index
+			void setIndex(size_t id) { this->index = id; }
+			size_t getIndex() const { return this->index; }
+			string to_string_for_order() const;
+
+			//-----------------------------------
+			// + Inherited
+			//-----------------------------------
+			ASTNodeType getType() const { return Type; }
+			string to_string() const;
+			string to_string_code() const;
+			// Const
+			static const ASTNodeType Type = AST_Node;
+
+		private:
+			size_t index;
+			vector<ASTNodePtr> data;
+		};
+
+		//=======================================
+		// * Class ASTNodeData
+		//=======================================
+		class ASTNodeData : public ASTNodeBase
 		{
 		public:
-			Parameters() {}
-			// Declare
-			using List = std::vector<ASTNode*>;
-			// Method
-			void push(ASTNode *node) { list.push_back(node); }
-			const List& getList() const {
-				return list;
-			}
-			friend std::string to_string(const Parameters *pars);
-
-			Parameters* clone() const; // Shallow Copy
-			Parameters* deep_clone() const; // Deep Copy
+			ASTNodeData(const ObjectPtr &op) : data(op) {}
+			const ObjectPtr& getData() const { return data; }
+			ObjectPtr& getData() { return data; }
+			//-----------------------------------
+			// + Inherited
+			//-----------------------------------
+			ASTNodeType getType() const { return Type; }
+			string to_string() const;
+			string to_string_code() const;
+			// Const
+			static const ASTNodeType Type = AST_Data;
 
 		private:
-			List list;
+			ObjectPtr data;
 		};
-	};
-	using ASTNodePtr = shared_ptr<ASTNode>;
-	string to_string(const ASTNodePtr &anp);
 
-	// AST
+		//=======================================
+		// * Class ASTNodeRefer
+		//=======================================
+		class ASTNodeRefer : public ASTNodeBase
+		{
+		public:
+			ASTNodeRefer(size_t index) : data(index) {}
+			size_t getData() const { return data; }
+			void setData(size_t id) { data = id; }
+			//-----------------------------------
+			// + Inherited
+			//-----------------------------------
+			ASTNodeType getType() const { return Type; }
+			string to_string() const;
+			string to_string_code() const;
+			// Const
+			static const ASTNodeType Type = AST_Refer;
+
+		private:
+			size_t data;
+		};
+	}
+
+	//=======================================
+	// * Class AST
+	//=======================================
 	class AST
 	{
 	public:
-		AST() {}
-		void pushNode();
-		void pushNode(ASTNode *node);
-		int retNode();
-		void pushData(const ObjectPtr &op);
-		void setFunc(FuncType type, FuncID id);
+		using Base = ASTNode::ASTNodeBase;
+		using Node = ASTNode::ASTNodeNode;
+		using Data = ASTNode::ASTNodeData;
+		using Refer = ASTNode::ASTNodeRefer;
+		using NodePtr = shared_ptr<Node>;
 
-		const ASTNode* getRoot() const {
-			return this->root;
+		AST() : root(new Node(0)), currindex(1), table({ root }), currptr(root.get()) {}
+
+		void pushData(const ObjectPtr &op);
+		void pushNode();
+		bool retNode();
+		AST* reset() {
+			this->currptr = root.get();
+			return this;
 		}
 		bool empty() const {
-			return root == nullptr;
+			return table.size() == 1;
 		}
 		bool isend() const {
 			return farthptrs.empty();
 		}
-		AST* reset() {
-			this->currptr = root;
-			return this;
+		auto getTableRange() const {
+			return range(table.begin() + 1, table.end());
 		}
-
-		friend std::string to_string(const AST *ast);
+		const vector<NodePtr>& getTable() const {
+			return table;
+		}
+		Node* getRoot() const {
+			return root.get();
+		}
+		string to_string() const;
+		string to_string_code() const;
 
 	private:
-		ASTNode *root = nullptr;
-		ASTNode *currptr = nullptr;
-		std::stack<ASTNode*> farthptrs;
+		NodePtr root;
+		size_t currindex = 0;
+		vector<NodePtr> table;
+		Node *currptr;
+		std::stack<Node*> farthptrs;
 	};
 }
 

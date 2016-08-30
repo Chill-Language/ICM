@@ -35,40 +35,37 @@ public:
 		T value;
 	};
 public:
-	Range(const T &a, const T &b) : a(a), b(b) {}
+	Range(const T &bg, const T &ed) : _begin(bg), _end(ed) {}
 	// Data Method
 	iterator begin() const {
-		return (a > b) ? a + 1 : a;
+		return _begin;
 	}
 	iterator end() const {
-		return max();
+		return _end;
 	}
 	bool operator==(const Range &r) const {
-		return a == r.a && b == r.b;
+		return _begin == r._begin && _end == r._end;
+	}
+	T operator[](size_t i) const {
+		return _begin + i;
 	}
 
 	template <typename R> friend std::string to_string(const Range<R> &r);
 
 	// Calculation
-	const T& min() const {
-		return (a < b) ? a : b;
-	}
-	const T& max() const {
-		return (a > b) ? a : b;
-	}
 	size_t size() const {
-		return max() - min();
+		return _end - _begin;
 	}
 
 	bool include(T n) const {
-		return n >= min() && n < max();
+		return n >= _begin && n < _end;
 	}
 	bool include(const Range &r) const {
-		return min() <= r.min() && max() >= r.max();
+		return _begin <= r._begin && _end >= r._end;
 	}
 
 private:
-	T a, b;
+	T _begin, _end;
 };
 
 template <typename T>

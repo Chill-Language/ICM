@@ -1,5 +1,5 @@
 # ICM (Building)
-The Interpreter of The Chill 0.1 Programming Language
+The Interpreter of The Chill 0.2 Programming Language
 
 **Now the "Hello World!" program can be run!**
 

@@ -1,7 +1,6 @@
 #include "objectsdef.h"
 #include "tostring.h"
 #include "keyword.h"
-#include "runast.h"
 
 namespace ICM
 {
@@ -24,14 +23,14 @@ namespace ICM
 		// * Class Boolean
 		//=======================================
 		Boolean* Boolean::equ(const ObjectPtr &obj) const {
-			return new Boolean(this->data == getPointer<Boolean>(obj)->data);
+			return new Boolean(this->data == obj.get<Boolean>()->data);
 		}
 
 		//=======================================
 		// * Class Number
 		//=======================================
 		Boolean* Number::equ(const ObjectPtr &obj) const {
-			return new Boolean(this->data == getPointer<Number>(obj)->data);
+			return new Boolean(this->data == obj.get<Number>()->data);
 		}
 		Number* Number::add(const Number *obj) {
 			this->data += obj->data;
@@ -74,7 +73,7 @@ namespace ICM
 		// * Class String
 		//=======================================
 		Boolean* String::equ(const ObjectPtr &obj) const {
-			return new Boolean(this->to_string() == getPointer<String>(obj)->to_string());
+			return new Boolean(this->to_string() == obj.get<String>()->to_string());
 		}
 		String* String::add(const String *obj) {
 			data = Common::charptr(self.data.to_string() + obj->data.to_string());
@@ -82,10 +81,17 @@ namespace ICM
 		}
 
 		//=======================================
+		// * Class Symbol
+		//=======================================
+		Boolean* Symbol::equ(const ObjectPtr &obj) const {
+			return new Boolean(this->data == obj.get<Symbol>()->data);
+		}
+
+		//=======================================
 		// * Class List
 		//=======================================
 		Boolean* List::equ(const ObjectPtr &obj) const {
-			return new Boolean(this->data == getPointer<List>(obj)->data);
+			return new Boolean(this->data == obj.get<List>()->data);
 		}
 		List* List::push(const ObjectPtr &op) {
 			data.push_back(op);
@@ -110,7 +116,7 @@ namespace ICM
 		// * Class Disperse
 		//=======================================
 		Boolean* Disperse::equ(const ObjectPtr &obj) const {
-			return new Boolean(this->data == getPointer<Disperse>(obj)->data);
+			return new Boolean(this->data == obj.get<Disperse>()->data);
 		}
 		string Disperse::to_string() const {
 			return Convert::to_string(data.begin(), data.end(), [](const ObjectPtr &op) { return ICM::to_string(op); });
@@ -131,14 +137,13 @@ namespace ICM
 	// * Functions
 	//=======================================
 	// Create Error
-	ObjectPtr createError(const string &errinfo)
-	{
+	ObjectPtr createError(const string &errinfo) {
 		return ObjectPtr(new Objects::Error(errinfo));
 	}
 	// Adjust ObjectPtr
-	ObjectPtr adjustObjectPtr(const ObjectPtr &ptr) {
+	const ObjectPtr& adjustObjectPtr(const ObjectPtr &ptr) {
 		if (ptr->get_type() == T_Identifier)
-			return getPointer<Objects::Identifier>(ptr)->getData();
+			return ptr.get<Objects::Identifier>()->getData();
 		else
 			return ptr;
 	}
@@ -146,10 +151,10 @@ namespace ICM
 	TypeObject getTypeObject(const ObjectPtr &op)
 	{
 		if (op->get_type() == T_Identifier)
-			return ICM::TypeObject(T_Identifier, getTypeObject(getPointer<Objects::Identifier>(op)->getData()));
+			return ICM::TypeObject(T_Identifier, getTypeObject(op.get<Objects::Identifier>()->getData()));
 		else if (op->get_type() == T_Function) {
-			TypeObject t =  TypeObject(T_Function);
-			auto &ft = getPointer<Objects::Function>(op)->get_data();
+			TypeObject t(T_Function);
+			auto &ft = op.get<Objects::Function>()->get_data();
 			t.setFuncTableUnit(&ft);
 			return t;
 		}

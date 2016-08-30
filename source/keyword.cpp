@@ -4,10 +4,6 @@
 #include "objectsdef.h"
 #include "number.h"
 
-ICM::FuncTable DefFuncTable;
-ICM::FuncTable AddFuncTable;
-ICM::VariableTable DefVariableTable;
-ICM::VariableTable AddVariableTable;
 
 namespace ICM
 {
@@ -17,11 +13,23 @@ namespace ICM
 	{
 		addDefFuncs(DefFuncTable);
 		// TODO : Memory leak
-		Objects::Identifier *nil = new Objects::Identifier("Nil", ObjectPtr(new Objects::Nil()));
+		ObjectPtr nil(new Objects::Identifier("Nil", ObjectPtr(new Objects::Nil())));
 		DefVariableTable.add("Nil", nil);
-		DefVariableTable.add("NIL", nil);
-		DefVariableTable.add("nil", nil);
-		Objects::Identifier *nan = new Objects::Identifier("NaN", ObjectPtr(new Objects::Number(Common::Number::Rational(0, 0))));
-		DefVariableTable.add("NaN", nan);
+		//DefVariableTable.add("NIL", nil);
+		//DefVariableTable.add("nil", nil);
+		//ObjectPtr nan(new Objects::Identifier("NaN", ObjectPtr(new Objects::Number(Common::Number::Rational(0, 0)))));
+		//DefVariableTable.add("NaN", nan);
+	}
+	void createDefKeywordTable()
+	{
+		DefKetwordTable.add("if", KeywordID::IF);
+		DefKetwordTable.add("then", KeywordID::THEN);
+		DefKetwordTable.add("else", KeywordID::ELSE);
+		DefKetwordTable.add("elsif", KeywordID::ELSIF);
+		DefKetwordTable.add("while", KeywordID::WHILE);
+		DefKetwordTable.add("break", KeywordID::BREAK);
+		DefKetwordTable.add("for", KeywordID::FOR);
+		DefKetwordTable.add("case", KeywordID::CASE);
+		DefKetwordTable.add("function", KeywordID::FUNCTION);
 	}
 }

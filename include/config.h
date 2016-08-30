@@ -19,7 +19,9 @@ namespace ICM
 		bool PrintAST = DebugMode;
 		bool PrintFlagWord = DebugMode;
 		bool PrintResult = true;
-		bool PrintIntervalTime = true;
+		bool PrintIntervalTime;
+		bool PrintOrder = false;
+		bool PrintObjectAllot = false;
 	};
 }
 

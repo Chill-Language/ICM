@@ -1,6 +1,7 @@
 #include "typeobject.h"
 #include "tostring.h"
 #include "function.h"
+#include "keyword.h"
 
 namespace ICM
 {

@@ -1,138 +1,103 @@
 #include "ast.h"
 
-// The Different of 'NIL' & 'Null' :
-//   'NIL' is a real value for empty list or blank name. It's Allowed.
-//   'Null' is a reference for nullptr. It's Not Allowed.
-//  Example:
-//    println(*(new Parameters()));    // Shows 'NIL'.
-//    println(*(Parameters*)nullptr);  // Shows 'Null'.
-
 namespace ICM
 {
-	// Method
-	// Parameters
-	// Shallow Copy  /* TODO : If it can be deleted. */
-	ASTNode::Parameters* ASTNode::Parameters::clone() const {
-		Parameters *cpy = new Parameters();
-		for (auto &l : this->list)
-			cpy->list.push_back(l->clone());
-		return cpy;
-	}
-	// Deep Copy
-	ASTNode::Parameters* ASTNode::Parameters::deep_clone() const {
-		Parameters *cpy = new Parameters();
-		for (auto &l : this->list)
-			cpy->list.push_back(l->deep_clone());
-		return cpy;
-	}
-	// ASTNode
-	void ASTNode::initialize(ASTNodeType type) {
-		this->reference = false;
-		switch (type) {
-		case AST_DATA:
-			initialize(ObjectPtr());
-			break;
-		case AST_NODE:
-			initialize(new Function(), new Parameters());
-			break;
-		default:
-			this->type = type;
+	//=======================================
+	// * Namespace ASTNode
+	//=======================================
+	namespace ASTNode
+	{
+		//=======================================
+		// * Class ASTNodeNode
+		//=======================================
+		string ASTNodeNode::to_string() const {
+			string str = "<N(" + std::to_string(index) + "):";
+			for (auto p : data)
+				str.append(" " + p->to_string());
+			str.append(">");
+			return str;
 		}
-	}
-	void ASTNode::initialize(const ObjectPtr &dat) {
-		this->type = AST_DATA;
-		this->objdata = dat;
-	}
-	void ASTNode::initialize(Function *fun, Parameters *par) {
-		this->type = AST_NODE;
-		this->fundata.func = fun;
-		this->fundata.pars = par;
-	}
-	void ASTNode::release() {
-		if (reference)
-			return;
-		switch (type) {
-		case AST_DATA:
-			this->objdata.~shared_ptr();
-			break;
-		case AST_NODE:
-			delete this->fundata.func;
-			delete this->fundata.pars;
-			break;
-		default:
-			break;
+		string ASTNodeNode::to_string_code() const {
+			string str("[" + std::to_string(index) + "]: " + "(" + to_string_for_order() + ")");
+			return str;
 		}
-	}
-	// Shallow Copy
-	ASTNode* ASTNode::clone() const {
-		ASTNode *copy = new ASTNode();
-		copy->type = this->type;
-		switch (this->type) {
-		case AST_DATA:
-			copy->objdata = ObjectPtr(this->objdata->clone());
-			break;
-		case AST_NODE:
-			copy->fundata.func = this->fundata.func;
-			copy->fundata.pars = this->fundata.pars; /* Shallow */
-			break;
-		default:
-			break;
+		string ASTNodeNode::to_string_for_order() const {
+			string str;
+			//str.append("(");
+			for (auto p : data)
+				str.append(p->to_string_code() + " ");
+			if (!data.empty())
+				str.pop_back();
+			//str.append(")");
+			return str;
 		}
-		return copy;
-	}
-	// Deep Copy
-	ASTNode* ASTNode::deep_clone() const {
-		ASTNode *copy = new ASTNode();
-		copy->type = this->type;
-		switch (this->type) {
-		case AST_DATA:
-			copy->objdata = ObjectPtr(this->objdata->clone());
-			break;
-		case AST_NODE:
-			copy->fundata.func = this->fundata.func;
-			copy->fundata.pars = this->fundata.pars->deep_clone(); /* Deep */
-			break;
-		default:
-			break;
+
+		//=======================================
+		// * Class ASTNodeData
+		//=======================================
+		string ASTNodeData::to_string() const {
+			return "D(" + data->to_string() + ")";
 		}
-		return copy;
+		string ASTNodeData::to_string_code() const {
+			return data->to_string_code();
+		}
+
+		//=======================================
+		// * Class ASTNodeRefer
+		//=======================================
+		string ASTNodeRefer::to_string() const {
+			return "R[" + std::to_string(data) + "]";
+		}
+		string ASTNodeRefer::to_string_code() const {
+			return "{" + std::to_string(data) + "}";
+		}
 	}
 
-	// AST
+	//=======================================
+	// * Class AST
+	//=======================================
+	void AST::pushData(const ObjectPtr &op) {
+		currptr->pushNode(shared_ptr<Base>(new Data(op)));
+	}
 	void AST::pushNode() {
-		if (root == nullptr) {
-			root = new ASTNode(AST_NODE);
-			currptr = root;
-			farthptrs.push(currptr);
-		}
-		else {
-			ASTNode *tmp = new ASTNode(AST_NODE);
-			currptr->pushpars(tmp);
-			farthptrs.push(currptr);
-			currptr = tmp;
-		}
+		currptr->pushNode(shared_ptr<Base>(new Refer(currindex)));
+		NodePtr tmp(new Node(currindex++));
+		farthptrs.push(currptr);
+		currptr = tmp.get();
+		table.push_back(tmp);
 	}
-	void AST::pushNode(ASTNode *node) {
-		currptr->pushpars(node);
-	}
-	int AST::retNode() {
+	bool AST::retNode() {
 		if (!farthptrs.empty()) {
 			currptr = farthptrs.top();
 			farthptrs.pop();
-			return 0;
+			return true;
 		}
+		return false;
+	}
+	string AST::to_string() const {
+		string str("{AST:");
+		if (root->empty())
+			str.append("NIL");
 		else {
-			return -1; // Error
+			for (const auto &e : getTableRange()) {
+				str.append("\n ");
+				str.append((*e)->to_string());
+			}
 		}
+		str.append("\n}");
+		return str;
 	}
-	void AST::pushData(const ObjectPtr &op) {
-		if (root == nullptr)
-			pushNode();
-		ASTNode *tmp = new ASTNode(AST_DATA);
-		tmp->setdata(op);
-		currptr->pushpars(tmp);
-	}
-	void AST::setFunc(FuncType type, FuncID id) {
-		currptr->setfunc(type, id);
+	string AST::to_string_code() const {
+		string str("{AST:");
+		if (root->empty())
+			str.append("NIL");
+		else {
+			for (const auto &e : getTableRange()) {
+				str.append("\n ");
+				str.append((*e)->to_string_code());
+			}
+		}
+		str.append("\n}");
+		return str;
 	}
 }

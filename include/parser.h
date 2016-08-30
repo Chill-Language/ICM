@@ -9,7 +9,7 @@ namespace ICM
 {
 	namespace Parser
 	{
-		AST* createAST(Match &match);
+		shared_ptr<AST> createAST(Match &match);
 		ObjectPtr createObject(DefaultType type, const string &str);
 	}
 }

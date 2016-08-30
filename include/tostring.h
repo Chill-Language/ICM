@@ -5,18 +5,17 @@
 #include "ast.h"
 #include "match.h"
 #include "function.h"
+#include "keyword.h"
 
 namespace ICM
 {
 	std::string to_string(DefaultType type);
+	std::string to_string(KeywordID key);
 	std::string to_string(const ObjectPtr &obj);
 	std::string to_string(const DataList &obj);
-	std::string to_string(const ASTNode::Function* func);
-	std::string to_string(const ASTNode::Parameters *pars);
-	std::string to_string(const ASTNode *astn);
 	std::string to_string(const AST *ast);
 	std::string to_string(const MatchResult *mr);
-	std::string to_string(const Function::Signature &sign);
+	std::string to_string(const ICM::Function::Signature &sign);
 }
 
 #endif

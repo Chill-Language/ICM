@@ -108,7 +108,7 @@
 (p (foreach list a b)) ; [[9 2] [7 4] [6 5] [3 8] [1 0]]
 
 ; Test 13
-(println "----------12----------")
+(println "----------13----------")
 (let a [9 8 7 6 5 4 3 2 1 0])
 (let b (+ a a a a a a a a a a))
 (Config.SetPrintIntervalTime T)

@@ -1,6 +1,6 @@
 @echo off
 cd source
-set src= main.cpp ast.cpp tostring.cpp match.cpp parser.cpp objects.cpp runast.cpp keyword.cpp function.cpp deffunc.cpp typeobject.cpp
+set src= main.cpp ast.cpp tostring.cpp match.cpp parser.cpp objects.cpp keyword.cpp function.cpp deffunc.cpp typeobject.cpp order.cpp interpreter.cpp objectmanager.cpp
 set incdir= ..\include
 set comdir= %incdir%\common
 set comsrc= %comdir%\number.cpp %comdir%\range.cpp

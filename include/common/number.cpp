@@ -28,19 +28,19 @@ namespace Number
 		num *= cond ? -1 : 1;
 	}
 	Rational& Rational::operator+=(const Rational &r) {
-		initialize(num * r.getDen() + r.num * den, den * r.getDen());
+		initialize(num * r.den + r.num * den, den * r.den);
 		return *this;
 	}
 	Rational& Rational::operator-=(const Rational &r) {
-		initialize(num * r.getDen() - r.num * den, den * r.getDen());
+		initialize(num * r.den - r.num * den, den * r.den);
 		return *this;
 	}
 	Rational& Rational::operator*=(const Rational &r) {
-		initialize(num * r.num, den * r.getDen());
+		initialize(num * r.num, den * r.den);
 		return *this;
 	}
 	Rational& Rational::operator/=(const Rational &r) {
-		initialize(num * r.getDen(), den * r.num);
+		initialize(num * r.den, den * r.num);
 		return *this;
 	}
 	//--------------------
@@ -134,7 +134,7 @@ namespace Number
 					Rational n = get_num(str.substr(0, i2));
 					std::string substr(str.substr(i2 + 1, std::string::npos));
 					Rational r = get_num(substr);
-					Rational::Type m = (Rational::Type)powl(10, substr.size());
+					Rational::Type m = (Rational::Type)powl((long double)10, (long double)substr.size());
 					return r / m + n;
 				}
 			}

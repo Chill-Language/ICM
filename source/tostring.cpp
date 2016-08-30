@@ -1,6 +1,7 @@
 #include "basic.h"
 #include "tostring.h"
 #include "objects.h"
+#include "keyword.h"
 
 namespace ICM
 {
@@ -19,16 +20,36 @@ namespace ICM
 		case T_Nil:        return "Nil";
 
 		case T_Identifier: return "Identifier";
+		case T_Keyword:    return "Keyword";
 		case T_Argument:   return "Argument";
 		case T_Number:     return "Number";
 		case T_Boolean:    return "Boolean";
 		case T_String:     return "String";
 		case T_Symbol:     return "Symbol";
 		case T_List:       return "List";
+		case T_Disperse:   return "Disperse";
 		case T_Vary:       return "Vary";
 		case T_Function:   return "Function";
 		case T_Type:       return "Type";
 		default:           return "UnfoundType";
+		}
+	}
+	string to_string(KeywordID key)
+	{
+		switch (key)
+		{
+		case KeywordID::IF:       return "if";
+		case KeywordID::THEN:     return "then";
+		case KeywordID::ELSE:     return "else";
+		case KeywordID::ELSIF:    return "elsif";
+		case KeywordID::FOR:      return "for";
+		case KeywordID::WHILE:    return "while";
+		case KeywordID::LOOP:     return "loop";
+		case KeywordID::BREAK:    return "break";
+		case KeywordID::CASE:     return "case";
+		case KeywordID::WHEN:     return "when";
+		case KeywordID::FUNCTION: return "function";
+		default:                  return "UnfoundKeyword";
 		}
 	}
 	string to_string(const ObjectPtr &obj) {
@@ -39,84 +60,8 @@ namespace ICM
 	string to_string(const DataList &list) {
 		return Convert::to_string<'[', ']'>(list.begin(), list.end(), [](const ObjectPtr &obj) { return to_string(obj); });
 	}
-	string to_string(const ASTNode::Function* func) {
-		// Judge Null
-		if (func == nullptr)
-			return "Null";
-		// Main
-		string str;
-		str.append("F(");
-		if (func->type != FUNC_NIL) {
-			str.append(std::to_string(func->type));
-			str.append(",");
-			str.append(std::to_string(func->id));
-		}
-		else {
-			str.append("NIL");
-		}
-		str.append(")");
-
-		return str;
-	}
-	string to_string(const ASTNode::Parameters *pars) {
-		// Judge Null
-		if (pars == nullptr)
-			return "Null";
-		// Main
-		string str;
-		str.append("[P:");
-		if (pars->list.empty()) {
-			str.append(" NIL");
-		}
-		else {
-			for (auto &l : pars->list) {
-				str.append(" ");
-				str.append(to_string(l));
-			}
-		}
-		str.append("]");
-		return str;
-	}
-	string to_string(const ASTNode *astn) {
-		// Judge Null
-		if (astn == nullptr)
-			return "Null";
-		// Main
-		string str;
-		if (astn->type == AST_NIL) {
-			str.append("<AST: NIL>");
-		}
-		else if (astn->type == AST_DATA) {
-			str.append("D(");
-			if (astn->objdata)
-				str.append(to_string(astn->objdata));
-			else
-				str.append("NIL");
-			str.append(")");
-		}
-		else if (astn->type == AST_NODE) {
-			str.append("N< ");
-			if (astn->fundata.func)
-				str.append(to_string(astn->fundata.func));
-			else
-				str.append("NIL");
-			str.append(", ");
-			if (astn->fundata.pars)
-				str.append(to_string(astn->fundata.pars));
-			else
-				str.append("NIL");
-			str.append(" >");
-		}
-		else {
-			str.append("ASTNodeTypeError");
-		}
-		return str;
-	}
-	string to_string(const ASTNodePtr &anp) {
-		return to_string(anp.get());
-	}
 	string to_string(const AST *ast) {
-		return string("{AST: ") + to_string(ast->root) + string("}");
+		return ast->to_string();
 	}
 	// MatchResult
 	string to_string(const MatchResult *mr) {

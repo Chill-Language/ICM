@@ -1,16 +1,39 @@
 #include "basic.h"
 #include "parser.h"
-#include "runast.h"
 #include "tostring.h"
 #include "keyword.h"
 #include "function.h"
 #include "file.h"
 #include "config.h"
+#include "order.h"
+#include "interpreter.h"
 
+#include "objectsdef.h"
 using namespace ICM;
+
+void testSub()
+{
+	string str("((disp [+]))");
+
+	//string str("(+ (+ 5 6) (- 7 2))");
+	//string str("(if T then 2 else 3)");
+	//string str("(if (& (= a 2) (< b 3)) then (let a 5) (+ a (- 7 (* 3 8)) (/ 2 5)) else if (let b 7) then (+ b 7))");
+
+	Match match(str.c_str());
+	shared_ptr<AST> ast = Parser::createAST(match);
+	vector<AST::NodePtr> table = ast->getTable();
+	ASTOrder::CreateOrder createorder(table);
+	const auto &e = createorder.createOrderASTs();
+	Interpreter interpreter(e);
+	const auto &op = interpreter.run();
+	println(op);
+
+}
 
 void test()
 {
+	//testSub();
+	//exit(0);
 }
 
 #include <ctime>
@@ -38,27 +61,36 @@ void printIntervalTime(Timer &t)
 
 int main(int argc, char *argv[])
 {
+	//test();
+	//exit(0);
+
 	Timer t;
 	// Initialize
 	createDefFuncTable();
-	const bool LoopMatch = argc <= 1;
+	createDefKeywordTable();
+	const bool LoopMatch = (argc <= 1);
+	//const bool LoopMatch = false;
 
 	if (GlobalConfig.PrintIntervalTime)
 		printIntervalTime(t);
+
+	//GlobalConfig.SetDebugMode(true);
+	//GlobalConfig.PrintAST = true;
+	//GlobalConfig.PrintOrder = true;
+
+	// Test
+	test();
 
 	string init_text;
 
 	// Load File
 	if (LoopMatch) {
-		println("ICM 0.1");
+		println("ICM 0.2");
 	}
 	else {
-		File file(argv[1], "rt");
-		init_text = file.get_text();
+		File file(argv[1], File::Text);
+		init_text = file.getText();
 	}
-
-	// Test
-	test();
 
 	// Init Text
 	charptr text(LoopMatch ? charptr(0xff) : charptr(init_text));
@@ -78,26 +110,26 @@ int main(int argc, char *argv[])
 		// Main
 		Match match(text);
 		while (!match.isend()) {
-			AST *ast = Parser::createAST(match);
+			shared_ptr<AST> ast = Parser::createAST(match);
 			if (ast && ast->getRoot()) {
 				if (LoopMatch) {
 					if (GlobalConfig.PrintAST)
-						println("\nAST: \n", ast, "\n");
+						println("\nAST: \n", ast->to_string_code(), "\n");
 					if (GlobalConfig.PrintResult && GlobalConfig.PrintFlagWord)
 						println("Output: ");
 				}
-				ASTNode *data = runAST(ast);
+				vector<AST::NodePtr> table = ast->getTable();
+				ASTOrder::CreateOrder createorder(table);
+				const auto &e = createorder.createOrderASTs();
+				Interpreter interpreter(e);
+				const auto &op = interpreter.run();
 				if (LoopMatch) {
 					if (GlobalConfig.PrintResult) {
 						print(GlobalConfig.PrintFlagWord ? "\n\nResult:\n" : "=> ");
-						if (data && data->getNodeType() == AST_DATA)
-							println(to_string(data->getdata()));
-						else
-							println(to_string(data));
+						println(op->to_string());
 						println();
 					}
 				}
-				delete ast;
 			}
 			else {
 				break;

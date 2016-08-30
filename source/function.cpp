@@ -1,6 +1,7 @@
 #include "function.h"
 #include "tostring.h"
 #include "typeobject.h"
+#include "keyword.h"
 
 namespace ICM
 {
@@ -116,11 +117,23 @@ namespace ICM
 	//=======================================
 	// * Functions
 	//=======================================
+	// Get Call ID
+	size_t getCallID(const FuncTableUnit &ftu, const DataList &dl)
+	{
+		// TODO
+		DataList ndl;
+		size_t id = ftu.size();
+		for (size_t i : Range<size_t>(0, ftu.size())) {
+			if (ftu[i].checkType(dl, &ndl)) {
+				id = i;
+				break;
+			}
+		}
+		return id;
+	}
 	// Check Call
 	ObjectPtr checkCall(const FuncTableUnit &ftu, const DataList &dl)
 	{
-		DataList ndl;
-		size_t id = ftu.size();
 		// Get Adjust DataList
 		DataList nlist;
 		for (auto &e : dl) {
@@ -131,12 +144,16 @@ namespace ICM
 			else
 				nlist.push_back(e);
 		}
+
+		DataList ndl;
+		size_t id = ftu.size();
 		for (size_t i : Range<size_t>(0, ftu.size())) {
 			if (ftu[i].checkType(nlist, &ndl)) {
 				id = i;
 				break;
 			}
 		}
+
 		if (id != ftu.size()) {
 			return ftu[id].call(ndl);
 		}

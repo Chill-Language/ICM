@@ -1,4 +1,5 @@
 #include "match.h"
+#include "keyword.h"
 
 namespace ICM
 {
@@ -120,6 +121,8 @@ namespace ICM
 				;//mr.setType(T_Nil);
 			else if (mr.getString() == "T" || mr.getString() == "F")
 				mr.setType(T_Boolean);
+			else if (DefKetwordTable.find(mr.getString()))
+				mr.setType(T_Keyword);
 		}
 
 		return mr;

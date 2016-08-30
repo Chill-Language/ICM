@@ -5,6 +5,7 @@
 #include "objects.h"
 #include "tostring.h"
 #include "number.h"
+#include "keyword.h"
 
 namespace ICM
 {
@@ -133,6 +134,41 @@ namespace ICM
 		};
 
 		//=======================================
+		// * Class Symbol
+		//=======================================
+		class Symbol : public Object
+		{
+		public:
+			explicit Symbol(size_t id) : data(id) {}
+			explicit Symbol(const std::string &dat = "") {
+				this->data = GlobalSymbolTable.find(dat);
+			}
+
+			//-----------------------------------
+			// + Inherited
+			//-----------------------------------
+			// Method
+			Boolean* equ(const ObjectPtr &obj) const;
+			std::string to_string() const {
+				return '\'' + to_output() + '\'';
+			}
+			DefaultType get_type() const {
+				return Type;
+			}
+			Symbol* clone() const {
+				return new Symbol(*this);
+			}
+			// Const
+			static const DefaultType Type = T_String;
+
+		private:
+			size_t data;
+			std::string get_data() const {
+				return GlobalSymbolTable.get(data);
+			}
+		};
+
+		//=======================================
 		// * Class List
 		//=======================================
 		class List : public Object
@@ -225,26 +261,26 @@ namespace ICM
 			std::string getName() const {
 				return name.to_string();
 			}
-			ObjectPtr getData() const {
+			const ObjectPtr& getData() const {
 				return data;
 			}
 			void setData(const ObjectPtr &op) {
 				if (op->get_type() == T_Identifier)
-					data = getPointer<Identifier>(op)->getData();
+					data = op.get<Identifier>()->getData();
 				else
 					data = op;
 			}
 			void setCopy(const ObjectPtr &op) {
-				if (op->get_type() == T_Identifier)
-					setCopy(getPointer<Identifier>(op)->getData());
+				if (op.isType<Identifier>())
+					setCopy(op.get<Identifier>()->getData());
 				else
 					data = ObjectPtr(op->clone());
 			}
 			void setRefer(const ObjectPtr &op) {
 				if (op->get_type() == T_Identifier) {
-					ObjectPtr sop = getPointer<Identifier>(op)->getData();
-					ObjectPtr refop = (sop->get_type() == T_Identifier) ? sop : op;
-					ObjectPtr refopdata = getPointer<Identifier>(refop)->getData();
+					const ObjectPtr &sop = op.get<Identifier>()->getData();
+					const ObjectPtr &refop = sop.isType<Identifier>() ? sop : op;
+					const ObjectPtr &refopdata = refop.get<Identifier>()->getData();
 					if (data.get() != refopdata.get())
 						data = refop;
 					else
@@ -272,12 +308,49 @@ namespace ICM
 			string to_output() const {
 				return data->to_output();
 			}
+			string to_string_code() const {
+				if (data)
+					return to_output();
+				else
+					return name.to_string();
+			}
 			// Const
 			static const DefaultType Type = T_Identifier;
 
 		private:
 			Common::charptr name;
 			ObjectPtr data;
+		};
+
+		//=======================================
+		// * Class Keyword
+		//=======================================
+		class Keyword : public Object
+		{
+		public:
+			explicit Keyword(const KeywordID &data)
+				: data(data) {}
+			KeywordID getData() const {
+				return data;
+			}
+			//-----------------------------------
+			// + Inherited
+			//-----------------------------------
+			// Method
+			DefaultType get_type() const {
+				return Type;
+			}
+			Keyword* clone() const {
+				return new Keyword(*this);
+			}
+			string to_string() const {
+				return ICM::to_string(data);
+			}
+			// Const
+			static const DefaultType Type = T_Keyword;
+
+		private:
+			KeywordID data;
 		};
 		
 		//=======================================
@@ -314,9 +387,9 @@ namespace ICM
 		class Function : public Object
 		{
 		public:
-			Function(const FuncTableUnit *data) : data(data) {}
+			Function(size_t id) : data(id) {}
 			const FuncTableUnit& get_data() const {
-				return *data;
+				return DefFuncTable[data];
 			}
 			//-----------------------------------
 			// + Inherited
@@ -329,13 +402,16 @@ namespace ICM
 				return new Function(*this);
 			}
 			string to_string() const {
-				return "F(" + data->getName() + ")";
+				return "F(" + get_data().getName() + ")";
+			}
+			string to_string_code() const {
+				return get_data().getName();
 			}
 			// Const
 			static const DefaultType Type = T_Function;
 
 		private:
-			shared_ptr<const FuncTableUnit> data;
+			size_t data;
 		};
 
 		//=======================================

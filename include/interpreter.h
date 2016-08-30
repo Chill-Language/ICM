@@ -1,0 +1,25 @@
+#ifndef _ICM_INTERPRETER_H_
+#define _ICM_INTERPRETER_H_
+
+#include "basic.h"
+#include "order.h"
+
+namespace ICM
+{
+	class Interpreter
+	{
+		using OrderList = vector<ASTOrder::OrderDataCall*>; // ASTOrder::OrderList;
+	public:
+		Interpreter(const OrderList &ol)
+			: orderlist(ol) {}
+		ObjectPtr run();
+		DataList createList(const Range<vector<shared_ptr<AST::Base>>::iterator> &r);
+
+	private:
+		OrderList orderlist;
+		vector<ObjectPtr> tempresult;
+		void runFunc(const ObjectPtr &op, AST::Node *n);
+	};
+}
+
+#endif
