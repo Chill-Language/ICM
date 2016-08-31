@@ -65,9 +65,6 @@ void printIntervalTime(Timer &t)
 
 int main(int argc, char *argv[])
 {
-	//test();
-	//exit(0);
-
 	Timer t;
 	// Initialize
 	createDefFuncTable();
