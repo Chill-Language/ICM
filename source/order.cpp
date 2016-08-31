@@ -192,7 +192,7 @@ namespace ICM
 					error();
 				}
 			}
-			GlobalOrderDataListReferMap[node.getIndex()] = GlobalOrderDataListReferMap.size();
+			GlobalOrderDataListReferMap[node.getIndex()] = GlobalOrderDataListReferMap.size() - 1;
 			GlobalOrderDataList.push_back(new ASTOrder::OrderDataCall((AST::Node*)&node));
 		}
 		void CreateOrder::createOrderKeyword(AST::Node &node, KeywordID keyword)

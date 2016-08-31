@@ -1,8 +1,6 @@
 #include "basic.h"
 #include "parser.h"
 #include "tostring.h"
-#include "keyword.h"
-#include "function.h"
 #include "file.h"
 #include "config.h"
 #include "order.h"
@@ -13,15 +11,21 @@ using namespace ICM;
 
 void testSub()
 {
-	string str("((disp [+]))");
-
+	//string str("((disp [+]))");
+    string str("((disp [+]) (+ 5 6))");
 	//string str("(+ (+ 5 6) (- 7 2))");
 	//string str("(if T then 2 else 3)");
 	//string str("(if (& (= a 2) (< b 3)) then (let a 5) (+ a (- 7 (* 3 8)) (/ 2 5)) else if (let b 7) then (+ b 7))");
 
 	Match match(str.c_str());
-	shared_ptr<AST> ast = Parser::createAST(match);
-	vector<AST::NodePtr> table = ast->getTable();
+	AST ast;
+	bool result = Parser::createAST(match, ast);
+	//println(result);
+	//return;
+    const auto &n1 = ast.getRoot();
+    auto &n2 = ast.getTable();
+    //oast.to_string();
+	vector<AST::NodePtr> table = ast.getTable();
 	ASTOrder::CreateOrder createorder(table);
 	const auto &e = createorder.createOrderASTs();
 	Interpreter interpreter(e);
@@ -44,7 +48,7 @@ public:
 	Timer() : time(clock()) {}
 	size_t detTime() {
 		clock_t currTime = clock();
-		size_t det = currTime - time;
+		size_t det = (size_t)(currTime - time);
 		time = currTime;
 		return det;
 	}
@@ -110,23 +114,27 @@ int main(int argc, char *argv[])
 		// Main
 		Match match(text);
 		while (!match.isend()) {
-			shared_ptr<AST> ast = Parser::createAST(match);
-			if (ast && ast->getRoot()) {
+			AST ast;
+			bool result = Parser::createAST(match, ast); // TODO
+			if (result && ast.getRoot()) {
 				if (LoopMatch) {
 					if (GlobalConfig.PrintAST)
-						println("\nAST: \n", ast->to_string_code(), "\n");
+						println("\nAST: \n", ast.to_string_code(), "\n");
 					if (GlobalConfig.PrintResult && GlobalConfig.PrintFlagWord)
 						println("Output: ");
 				}
-				vector<AST::NodePtr> table = ast->getTable();
+				vector<AST::NodePtr> table = ast.getTable();
 				ASTOrder::CreateOrder createorder(table);
 				const auto &e = createorder.createOrderASTs();
 				Interpreter interpreter(e);
-				const auto &op = interpreter.run();
+				ObjectPtr op = interpreter.run();
 				if (LoopMatch) {
 					if (GlobalConfig.PrintResult) {
 						print(GlobalConfig.PrintFlagWord ? "\n\nResult:\n" : "=> ");
-						println(op->to_string());
+                        if (op.get())
+						    println(op.to_string());
+                        else
+                            println("Null");
 						println();
 					}
 				}

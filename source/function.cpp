@@ -137,7 +137,7 @@ namespace ICM
 		// Get Adjust DataList
 		DataList nlist;
 		for (auto &e : dl) {
-			if (e->get_type() == T_Disperse) {
+			if (e.isType(T_Disperse)) {
 				auto l = (Objects::Disperse*)(e.get());
 				nlist.insert(nlist.end(), begin(l), end(l));
 			}

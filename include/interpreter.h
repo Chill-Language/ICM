@@ -11,14 +11,15 @@ namespace ICM
 		using OrderList = vector<ASTOrder::OrderDataCall*>; // ASTOrder::OrderList;
 	public:
 		Interpreter(const OrderList &ol)
-			: orderlist(ol) {}
+			: orderlist(ol), tempresult(ol.size(), ObjectPtr()) {}
 		ObjectPtr run();
 		DataList createList(const Range<vector<shared_ptr<AST::Base>>::iterator> &r);
 
 	private:
 		OrderList orderlist;
 		vector<ObjectPtr> tempresult;
-		void runFunc(const ObjectPtr &op, AST::Node *n);
+		void runFunc(const ObjectPtr &op, AST::Node *n, size_t id);
+		void runSub(const ObjectPtr &op, AST::Node *node, size_t i);
 	};
 }
 

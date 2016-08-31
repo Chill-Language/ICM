@@ -53,9 +53,7 @@ namespace ICM
 		}
 	}
 	string to_string(const ObjectPtr &obj) {
-		if (obj == nullptr)
-			return "Null";
-		return obj->to_string();
+		return obj.to_string();
 	}
 	string to_string(const DataList &list) {
 		return Convert::to_string<'[', ']'>(list.begin(), list.end(), [](const ObjectPtr &obj) { return to_string(obj); });

@@ -14,7 +14,10 @@ namespace ICM
 	class ObjectManager
 	{
 	public:
-		ObjectManager() : ObjectTypePool(END_TYPE_ENUM), ObjectTypeCount(END_TYPE_ENUM) {}
+		ObjectManager() : ObjectTypePool(END_TYPE_ENUM), ObjectTypeCount(END_TYPE_ENUM) {
+			ObjectTypePool[T_Null].insert(nullptr);
+			ObjectTypeCount[T_Null].push_back(0);
+		}
 
 		size_t newObjectPtr(Objects::Object *obj);
 		void destroyObjectPtr(DefaultType typeID, size_t id);
@@ -50,7 +53,7 @@ namespace ICM
 		ObjectPtr& operator=(const ObjectPtr &op);
 
 		Objects::Object* get() const {
-			return GlobalObjectManager.getObjectPtr(this->type, this->index);
+			return GlobalObjectManager.getObjectPtr(this->_type, this->_index);
 		}
 		template <typename _OTy>
 		_OTy* get() const {
@@ -61,23 +64,28 @@ namespace ICM
 		}
 
 		bool isType(DefaultType type) const {
-			return this->type == type;
+			return this->type() == type;
 		}
 		template <typename _OTy>
 		bool isType() const {
-			return this->type == _OTy::Type;
+			return this->type() == _OTy::Type;
 		}
 
-		bool operator==(nullptr_t) const {
-			return type == T_Null;
+		bool operator==(std::nullptr_t) const {
+			return type() == T_Null;
 		}
 		operator bool() const {
-			return type != T_Null;
+			return type() != T_Null;
 		}
+        DefaultType type() const {
+            return _type;
+        }
+		string to_string() const;
+		string to_output() const;
 
 	private:
-		DefaultType type;
-		size_t index;
+		DefaultType _type;
+		size_t _index;
 	};
 	// For Testing Speed.
 	//class ObjectPtr

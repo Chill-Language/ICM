@@ -2,7 +2,6 @@
 #include "objectmanager.h"
 #include "tostring.h"
 #include "config.h"
-#include "keyword.h"
 
 namespace ICM
 {
@@ -31,18 +30,15 @@ namespace ICM
 		if (GlobalConfig.PrintObjectAllot)
 			println("Destroy : ", to_string(typeID), ",", id, "; V : ", obj->to_string());
 		ObjectTypePool[typeID].eraseID(id);
-		//ObjectTypeCount[typeID].erase(id);
 		delete obj;
 	}
 
 	void ObjectManager::increaseCount(DefaultType typeID, size_t id) {
-		if (typeID == T_Null) return;
 		auto &count = ObjectTypeCount[typeID][id];
 		//println(" Ic : ", to_string(typeID), ",", id, ",", count, "->", count + 1, " V : ", getObjectPtr(typeID, id)->to_string());
 		count++;
 	}
 	void ObjectManager::decreaseCount(DefaultType typeID, size_t id) {
-		if (typeID == T_Null) return;
 		auto &count = ObjectTypeCount[typeID][id];
 		//println(" Dc : ", to_string(typeID), ",", id, ",", count, "->", count - 1, " V : ", getObjectPtr(typeID, id)->to_string());
 		count--;
@@ -60,29 +56,40 @@ namespace ICM
 	//}
 	ObjectPtr::ObjectPtr(Objects::Object* op) {
 		if (op == nullptr) {
-			this->type = T_Null;
+			this->_type = T_Null;
+			this->_index = 0;
 		}
 		else {
-			this->type = op->get_type();
-			this->index = GlobalObjectManager.newObjectPtr(op);
+			this->_type = op->get_type();
+			this->_index = GlobalObjectManager.newObjectPtr(op);
 		}
-		GlobalObjectManager.increaseCount(this->type, this->index);
+		GlobalObjectManager.increaseCount(this->_type, this->_index);
 	}
 	ObjectPtr::ObjectPtr(const ObjectPtr &op)
-		: type(op.type), index(op.index) {
-		GlobalObjectManager.increaseCount(this->type, this->index);
+			: _type(op._type), _index(op._index) {
+		GlobalObjectManager.increaseCount(this->_type, this->_index);
 	}
 	ObjectPtr::~ObjectPtr() {
-		GlobalObjectManager.decreaseCount(this->type, this->index);
+		GlobalObjectManager.decreaseCount(this->_type, this->_index);
 	}
 	ObjectPtr& ObjectPtr::operator=(const ObjectPtr &op) {
-		if (this->type == op.type && this->index == op.index)
+		if (this->_type == op._type && this->_index == op._index)
 			return *this;
-		GlobalObjectManager.decreaseCount(this->type, this->index);
-		this->type = op.type;
-		this->index = op.index;
-		GlobalObjectManager.increaseCount(this->type, this->index);
+		GlobalObjectManager.decreaseCount(this->_type, this->_index);
+		this->_type = op._type;
+		this->_index = op._index;
+		GlobalObjectManager.increaseCount(this->_type, this->_index);
 		return *this;
+	}
+	string ObjectPtr::to_string() const {
+		if (this->get() == nullptr)
+			return "Null";
+		return this->get()->to_string();
+	}
+	string ObjectPtr::to_output() const {
+		if (this->get() == nullptr)
+			return "Null";
+		return this->get()->to_output();
 	}
 
 	//=======================================

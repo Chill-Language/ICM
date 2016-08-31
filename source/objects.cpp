@@ -109,7 +109,7 @@ namespace ICM
 			return ICM::to_string(data);
 		}
 		string List::to_output() const {
-			return Common::Convert::to_string<'[',']'>(data.begin(), data.end(), [](const ObjectPtr &op) { return op->to_output(); });
+			return Common::Convert::to_string<'[',']'>(data.begin(), data.end(), [](const ObjectPtr &op) { return op.to_output(); });
 		}
 		
 		//=======================================
@@ -124,7 +124,7 @@ namespace ICM
 		string Disperse::to_output() const {
 			string str;
 			for (auto &op : data)
-				str.append(op->to_output());
+				str.append(op.to_output());
 			return str;
 		}
 
@@ -141,25 +141,25 @@ namespace ICM
 		return ObjectPtr(new Objects::Error(errinfo));
 	}
 	// Adjust ObjectPtr
-	const ObjectPtr& adjustObjectPtr(const ObjectPtr &ptr) {
-		if (ptr->get_type() == T_Identifier)
-			return ptr.get<Objects::Identifier>()->getData();
+	const ObjectPtr& adjustObjectPtr(const ObjectPtr &op) {
+		if (op.isType(T_Identifier))
+			return adjustObjectPtr(op.get<Objects::Identifier>()->getData());
 		else
-			return ptr;
+			return op;
 	}
 	// Get TypeObject
 	TypeObject getTypeObject(const ObjectPtr &op)
 	{
-		if (op->get_type() == T_Identifier)
+		if (op.isType(T_Identifier))
 			return ICM::TypeObject(T_Identifier, getTypeObject(op.get<Objects::Identifier>()->getData()));
-		else if (op->get_type() == T_Function) {
+		else if (op.isType(T_Function)) {
 			TypeObject t(T_Function);
 			auto &ft = op.get<Objects::Function>()->get_data();
 			t.setFuncTableUnit(&ft);
 			return t;
 		}
 		else
-			return ICM::TypeObject(op->get_type());
+			return ICM::TypeObject(op.type());
 	}
 	// Get Disperse Iterator
 	DataList::iterator begin(Objects::Disperse *disp)

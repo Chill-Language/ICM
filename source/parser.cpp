@@ -40,9 +40,8 @@ namespace ICM
 			return ObjectPtr(object);
 		}
 
-		shared_ptr<AST> createAST(Match &match)
+		bool createAST(Match &match, AST &ast)
 		{
-			shared_ptr<AST> ast(new AST());
 			MatchResult mr = match.matchNext();
 
 			// Check Unmatch
@@ -50,11 +49,11 @@ namespace ICM
 				if (mr.begin() != mr.end())
 					mr = match.matchNext();
 				else
-					return nullptr;
+					return false;
 			}
 			if (mr.getType() != T_LBracket && mr.getType() != T_LSBracket) {
 				printf("Syntax Error in line(%d).\n", match.getCurLineNum());
-				return nullptr;
+				return false;
 			}
 
 			// Start Match
@@ -69,57 +68,57 @@ namespace ICM
 
 				switch (mr.getType()) {
 				case T_LBracket:
-					ast->pushNode();
+					ast.pushNode();
 					firstMatchBraket = true;
 					emptybreak = true;
 					break;
 				case T_RBracket:
 					if (firstMatchBraket) {
 						println("Unfind Method in Line(", match.getCurLineNum(), ").");
-						return nullptr;
+						return false;
 					}
-					ast->retNode();
+					ast.retNode();
 					break;
 				case T_LSBracket:
-					ast->pushNode();
-					ast->pushData(ICM::createObject<Objects::Function>(DefFuncTable.find("list")));
+					ast.pushNode();
+					ast.pushData(ICM::createObject<Objects::Function>(DefFuncTable.find("list")));
 					firstMatchBraket = false;
 					emptybreak = true;
 					break;
 				case T_RSBracket:
-					ast->retNode();
+					ast.retNode();
 					break;
 				case T_Identifier: case T_Keyword:
-					ast->pushData(Parser::createObject(mr.getType(), mr.getString()));
+					ast.pushData(Parser::createObject(mr.getType(), mr.getString()));
 					firstMatchBraket = false;
 					break;
 				case T_Number: case T_String: case T_Boolean:
 					if (firstMatchBraket) {
 						printf("Error '%s' is not function in line(%d).\n", mr.getString().c_str(), match.getCurLineNum());
-						return nullptr;
+						return false;
 					}
-					ast->pushData(Parser::createObject(mr.getType(), mr.getString())); // TODO
+					ast.pushData(Parser::createObject(mr.getType(), mr.getString())); // TODO
 					firstMatchBraket = false;
 					break;
 				default:
 					break;
 				}
 
-				if (emptybreak && ast->isend()) {
+				if (emptybreak && ast.isend()) {
 					break;
 				}
 				mr = match.matchNext();
 			}
 
-			if (ast->empty())
-				return nullptr;
+			if (ast.empty())
+				return false;
 
-			if (!ast->isend()) {
+			if (!ast.isend()) {
 				printf("Error match ')' in line(%d).\n", match.getCurLineNum());
-				return nullptr;
+				return false;
 			}
-			ast->reset();
-			return ast;
+			ast.reset();
+			return true;
 		}
 	}
 }

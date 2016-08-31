@@ -75,6 +75,8 @@ namespace ICM
 		return false;
 	}
 	string AST::to_string() const {
+		if (root == nullptr)
+			return "Null";
 		string str("{AST:");
 		if (root->empty())
 			str.append("NIL");
