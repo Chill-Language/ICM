@@ -1,6 +1,0 @@
-### 1. Object Class to manage ObjectData. (Done.)
-### 2. Function Object & Call.(Done.)
-### 3. 'if', 'else'... Control Flow, Keyword Type.
-### 4. '\\n'... in 'String' need to indicate different.
-### 5. 'defun', 'range'...
-### 6. ...

@@ -4,15 +4,10 @@ The Interpreter of The Chill 0.2 Programming Language
 **Now the "Hello World!" program can be run!**
 
 ```
-Input:
-(print (+ "Hello " "World!"))
-
-AST:
-{AST: N< F(1,5), [P: N< F(1,1), [P: D("Hello ") D("World!")] >] >}
-
-Output:
+ICM 0.2
+> (println (+ "Hello " "World!"))
 Hello World!
-D("Hello World!")
+=> ["Hello World!"]
 ```
 
 # How To Build
