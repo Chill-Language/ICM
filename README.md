@@ -16,12 +16,19 @@ D("Hello World!")
 ```
 
 # How To Build
-At first, you should download the source, then, run 'compile.bat' on Windows or run 'compile.sh' on Linux. (To use **GCC**.)<br>
-If you have **MSVC (Visual Studio)**, you can also create a project to build these files.<br>
 ***You should ensure that your compiler support C++14.***
+If you have cmake & gcc, you can input these commands:
+```
+cmake .
+make
+```
+If you have **MSVC (Visual Studio)**, you can also create a project to build these files.<br>
 
 # How To Run
-You can only use 'main run.chl'(Windows) or './main run.chl'(Linux) after you have built it.
+## Command Mode:
+Just run the program after you have built it.
+## File Mode:
+Use 'icm run.chl'(Windows) or './icm run.chl'(Linux) after you have built it.
 'run.chl' is a source file to test the program.
 
 # Grammar

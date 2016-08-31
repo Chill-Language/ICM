@@ -192,7 +192,13 @@ namespace ICM
 					error();
 				}
 			}
-			GlobalOrderDataListReferMap[node.getIndex()] = GlobalOrderDataListReferMap.size() - 1;
+			size_t id = GlobalOrderDataListReferMap.size();
+			// TODO : Change Map to Vector.
+#ifdef _WIN32
+			GlobalOrderDataListReferMap[node.getIndex()] = id;
+#else
+			GlobalOrderDataListReferMap[node.getIndex()] = id - 1;
+#endif
 			GlobalOrderDataList.push_back(new ASTOrder::OrderDataCall((AST::Node*)&node));
 		}
 		void CreateOrder::createOrderKeyword(AST::Node &node, KeywordID keyword)

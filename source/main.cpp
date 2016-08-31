@@ -12,7 +12,7 @@ using namespace ICM;
 void testSub()
 {
 	//string str("((disp [+]))");
-    string str("((disp [+]) (+ 5 6))");
+	string str("((disp [+]) (+ 5 6))");
 	//string str("(+ (+ 5 6) (- 7 2))");
 	//string str("(if T then 2 else 3)");
 	//string str("(if (& (= a 2) (< b 3)) then (let a 5) (+ a (- 7 (* 3 8)) (/ 2 5)) else if (let b 7) then (+ b 7))");
@@ -22,9 +22,9 @@ void testSub()
 	bool result = Parser::createAST(match, ast);
 	//println(result);
 	//return;
-    const auto &n1 = ast.getRoot();
-    auto &n2 = ast.getTable();
-    //oast.to_string();
+	const auto &n1 = ast.getRoot();
+	auto &n2 = ast.getTable();
+	//oast.to_string();
 	vector<AST::NodePtr> table = ast.getTable();
 	ASTOrder::CreateOrder createorder(table);
 	const auto &e = createorder.createOrderASTs();
@@ -127,14 +127,11 @@ int main(int argc, char *argv[])
 				ASTOrder::CreateOrder createorder(table);
 				const auto &e = createorder.createOrderASTs();
 				Interpreter interpreter(e);
-				ObjectPtr op = interpreter.run();
+				const ObjectPtr &op = interpreter.run();
 				if (LoopMatch) {
 					if (GlobalConfig.PrintResult) {
 						print(GlobalConfig.PrintFlagWord ? "\n\nResult:\n" : "=> ");
-                        if (op.get())
-						    println(op.to_string());
-                        else
-                            println("Null");
+						println(op.to_string());
 						println();
 					}
 				}
