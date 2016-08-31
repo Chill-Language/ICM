@@ -16,7 +16,7 @@ D("Hello World!")
 ```
 
 # How To Build
-***You should ensure that your compiler support C++14.***
+***You should ensure that your compiler support C++14.***<br>
 If you have cmake & gcc, you can input these commands:
 ```
 cmake .
@@ -25,9 +25,9 @@ make
 If you have **MSVC (Visual Studio)**, you can also create a project to build these files.<br>
 
 # How To Run
-## Command Mode:
+### Command Mode:
 Just run the program after you have built it.
-## File Mode:
+### File Mode:
 Use 'icm run.chl'(Windows) or './icm run.chl'(Linux) after you have built it.
 'run.chl' is a source file to test the program.
 
