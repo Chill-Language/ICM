@@ -309,8 +309,8 @@ namespace ICM
 				return Lists::list(dl);
 			}
 			ObjectPtr dcall(const DataList &dl) {
-				string name = dl[1].get<Identifier>()->getName();
-				return callDefFunc(name, DataList({ dl[0], dl[2] }));
+				auto &ftu = dl[1].get<Objects::Function>()->get_data();
+				return checkCall(ftu, DataList({ dl[0], dl[2] }));
 			}
 			ObjectPtr system(const DataList &dl) {
 				int i = std::system(dl[0].get<Objects::String>()->get_data().c_str());
