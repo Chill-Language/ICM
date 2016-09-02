@@ -88,41 +88,44 @@ namespace ICM
 		size_t _index;
 	};
 	// For Testing Speed.
-	//class ObjectPtr
-	//{
-	//public:
-	//	ObjectPtr() : data(nullptr) {}
-	//	ObjectPtr(nullptr_t) : data(nullptr) {}
-	//	ObjectPtr(Objects::Object*obj) : data(obj) {}
+	/*class ObjectPtr
+	{
+	public:
+		ObjectPtr() : data(nullptr) {}
+		ObjectPtr(nullptr_t) : data(nullptr) {}
+		ObjectPtr(Objects::Object *obj) : data(obj) {}
+		ObjectPtr(const ObjectPtr &op) : data(op.data) {}
 
-	//	Objects::Object* get() const {
-	//		return data;
-	//	}
-	//	template <typename _OTy>
-	//	_OTy* get() const {
-	//		return static_cast<_OTy*>(data);
-	//	}
-	//	DefaultType getType() const;
-	//	bool isType(DefaultType type) const {
-	//		return getType() == type;
-	//	}
-	//	template <typename _OTy>
-	//	bool isType() const {
-	//		return getType() == _OTy::Type;
-	//	}
+		Objects::Object* get() const {
+			return data;
+		}
+		template <typename _OTy>
+		_OTy* get() const {
+			return static_cast<_OTy*>(data);
+		}
+		bool isType(DefaultType type) const {
+			return this->type() == type;
+		}
+		template <typename _OTy>
+		bool isType() const {
+			return type() == _OTy::Type;
+		}
 
-	//	bool operator==(nullptr_t) const {
-	//		return getType() == T_Null;
-	//	}
-	//	operator bool() const {
-	//		return getType() != T_Null;
-	//	}
-	//	Objects::Object* operator->() const {
-	//		return data;
-	//	}
+		bool operator==(nullptr_t) const {
+			return type() == T_Null;
+		}
+		operator bool() const {
+			return type() != T_Null;
+		}
+		Objects::Object* operator->() const {
+			return data;
+		}
+		string to_string() const;
+		string to_output() const;
+		DefaultType type() const;
 
-	//	Objects::Object *data;
-	//};
+		Objects::Object *data;
+	};*/
 
 	//=======================================
 	// * SymbolTable

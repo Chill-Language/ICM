@@ -30,6 +30,8 @@ namespace ICM
 	using DataList = std::vector<ObjectPtr>;
 	using CallFunc = ObjectPtr(const DataList&);
 	using FuncPtr = std::function<CallFunc>;
+	using LDataList = Common::lightlist<Objects::Object*>;
+	using LFuncPtr = std::function<void(Objects::Object &, const LDataList &)>;
 	// Functions
 	template <typename T, typename... Args>
 	inline ObjectPtr createObject(Args... args) {
@@ -50,15 +52,21 @@ namespace ICM
 		{
 		public:
 			virtual ~Object() {}
-			virtual string to_string() const = 0;
+			virtual string to_string() const {
+				return "Object";
+			}
 			virtual string to_output() const {
 				return to_string();
 			}
 			virtual string to_string_code() const {
 				return to_string();
 			}
-			virtual DefaultType get_type() const = 0;
-			virtual Object* clone() const = 0;
+			virtual DefaultType get_type() const {
+				return Type;
+			}
+			virtual Object* clone() const {
+				return new Object(*this);
+			}
 			// Method
 			virtual Boolean* equ(const ObjectPtr &obj) const;
 			// Const

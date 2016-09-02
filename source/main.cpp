@@ -6,13 +6,12 @@
 #include "order.h"
 #include "interpreter.h"
 
-#include "objectsdef.h"
 using namespace ICM;
 
 void testSub()
 {
-	//string str("((disp [+]))");
-	string str("((disp [+]) (+ 5 6))");
+	string str("((disp [+]))");
+	//string str("((disp [+]) (+ 5 6))");
 	//string str("(+ (+ 5 6) (- 7 2))");
 	//string str("(if T then 2 else 3)");
 	//string str("(if (& (= a 2) (< b 3)) then (let a 5) (+ a (- 7 (* 3 8)) (/ 2 5)) else if (let b 7) then (+ b 7))");

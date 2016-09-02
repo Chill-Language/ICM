@@ -119,3 +119,12 @@
 (println "sort >:")
 (sort (cpy b) >)
 (Config.SetPrintIntervalTime F)
+
+; Test 14
+(println "----------14----------")
+(Config.SetPrintIntervalTime T)
+(let a (* [9 8 7 6 5 4 3 2 1 0] 1000))
+(p (size (foreach + a)))
+(p (size (sort a <)))
+(Config.SetPrintIntervalTime F)
+

@@ -32,6 +32,10 @@ public:
 	lightlist(const Container &con)
 		: lightlist(con.begin(), con.end()) {}
 
+	template <size_t N>
+	lightlist(T(&arr)[N])
+		: lightlist(std::begin(arr), std::end(arr)) {}
+
 	lightlist(const std::initializer_list<T> &il)
 		: lightlist(il.begin(), il.end()) {}
 

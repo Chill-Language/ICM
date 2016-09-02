@@ -51,9 +51,9 @@ namespace ICM
 	//=======================================
 
 	// For Testing Speed
-	//DefaultType ObjectPtr::getType() const {
-	//	return data->get_type();
-	//}
+	/*DefaultType ObjectPtr::type() const {
+		return data->get_type();
+	}*/
 	ObjectPtr::ObjectPtr(Objects::Object* op) {
 		if (op == nullptr) {
 			this->_type = T_Null;

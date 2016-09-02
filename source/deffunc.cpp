@@ -24,6 +24,8 @@ namespace ICM
 		using S = ICM::Function::Signature;
 		using T = ICM::TypeObject;
 
+		using ObjectLightList = Common::lightlist<Objects::Object*>;
+
 		//=======================================
 		// * Calculate
 		//=======================================
@@ -42,6 +44,12 @@ namespace ICM
 					for (auto i : Range<size_t>(1, list.size()))
 						tmp->add(list[i].get<T>());
 					return ObjectPtr(tmp);
+				}
+				void funcL(Object &result, const LDataList &list) const {
+					T *tmp = static_cast<T*>(list.front()->clone());
+					for (auto i : Range<size_t>(1, list.size()))
+						tmp->add(static_cast<T*>(list[i]));
+					result = *tmp;
 				}
 			};
 			template <>
@@ -145,6 +153,13 @@ namespace ICM
 				ObjectPtr func(const DataList &list) const {
 					bool result = fp(list[0].get<N>(), list[1].get<N>());
 					return ObjectPtr(new Boolean(result));
+				}
+				void funcL(Object &result, const LDataList &list) const {
+					funcB(result, list[0], list[1]);
+				}
+				void funcB(Object &result, Object *a, Object *b) const {
+					bool r = fp(static_cast<N*>(a), static_cast<N*>(b));
+					result = Boolean(r);
 				}
 				Func fp;
 			};
@@ -255,11 +270,28 @@ namespace ICM
 				const auto &rf = func[id];
 
 				List *list = dl[0].get<List>();
+				Boolean r;
 				std::sort(list->begin(), list->end(), [&](const ObjectPtr &a, const ObjectPtr &b) -> bool {
-					return rf.call(DataList({ a, b })).get<Boolean>()->operator bool();
+					rf.callL(r, { a.get(), b.get() });
+					return r.operator bool();
 				});
 				return ObjectPtr(list);
 			}
+
+			class Mul : public FI
+			{
+				S sign() const {
+					return S({ T_List, T_Number }, T_List); // (L N) -> L
+				}
+				ObjectPtr func(const DataList &list) const {
+					auto &l = list[0].get<List>()->get_data();
+					DataList nl;
+					for (size_t i : Range<size_t>(0, (size_t)list[1].get<Number>()->get_data().getNum())) {
+						nl.insert(nl.end(), l.begin(), l.end());
+					}
+					return ObjectPtr(new List(nl));
+				}
+			};
 
 			struct Foreach : public FI
 			{
@@ -268,19 +300,37 @@ namespace ICM
 					return S({ T(T_Function,S({T_Vary},T_Vary,true)), T_List }, T_List, true); // (F(V*->V) L*) -> L
 				}
 				ObjectPtr func(const DataList &list) const {
-					auto &ftb = list[0].get<Objects::Function>()->get_data();
+					// TODO
+					auto &func = list[0].get<Objects::Function>()->get_data();
+					size_t id = getCallID(func, DataList({ ObjectPtr(new Number(0)) }));
+					const auto &rf = func[id];
+
 					size_t minsize;
 					size_t size = list.size();
 					for (auto i : range(1, size))
 						minsize = std::min(minsize, list[i].get<List>()->size());
-					List *result = new List(DataList());
+					DataList dls;
+					Object obj;
 					for (size_t i : range(0, minsize)) {
-						DataList dl;
+						DataList ldl(size - 1);
 						for (auto id : range(1, size))
-							dl.push_back(list[id].get<List>()->get_data()[i]);
-						result->push(checkCall(ftb, dl));
+							ldl[id - 1] = list[id].get<List>()->get_data()[i];
+						dls.push_back(rf.call(ldl));
 					}
+					List *result = new List(dls);
 					return ObjectPtr(result);
+				}
+			};
+
+			struct Size : public FI
+			{
+			private:
+				S sign() const {
+					return S({ T_List }, T_Number); // L -> N
+				}
+				ObjectPtr func(const DataList &list) const {
+					size_t s = list[0].get<List>()->get_data().size();
+					return ObjectPtr(new Number(s));
 				}
 			};
 		}
@@ -375,7 +425,7 @@ namespace ICM
 			new Calc::Add<List>(),
 		});
 		DefFuncTable.add("-", LST{ new Calc::Sub() });
-		DefFuncTable.add("*", LST{ new Calc::Mul() });
+		DefFuncTable.add("*", LST{ new Calc::Mul(), new Lists::Mul() });
 		DefFuncTable.add("/", LST{ new Calc::Div() });
 		DefFuncTable.add("mod", LST{ new Calc::Mod() });
 		DefFuncTable.add("rem", LST{ new Calc::Rem() });
@@ -407,6 +457,7 @@ namespace ICM
 			F(Lists::sort_f, S({ T_List, T(T_Function,S({T_Number,T_Number},T_Number)) }, T_List)), // (L F) -> L
 		});
 		DefFuncTable.add("foreach", LST{ new Lists::Foreach() });
+		DefFuncTable.add("size", LST{ new Lists::Size() });
 		DefFuncTable.add("call", Lst{
 			F(System::call, S({ T_Function }, T_Vary)),    // F -> V
 			F(System::call, S({ T_Function, T_Vary }, T_Vary, true)),    // (F V*) -> V

@@ -17,6 +17,7 @@
 #include "memory.h"
 #include "charptr.h"
 #include "range.h"
+#include "lightlist.h"
 
 // Declares
 
