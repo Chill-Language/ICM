@@ -84,8 +84,8 @@ namespace ICM
 			using LFP = Objects::Object*(const Common::lightlist<Objects::Object*> &); // TODO
 		public:
 			FuncObject get_f() {
-				auto &f1 = std::bind(&FuncInitObject::func, this, std::placeholders::_1);
-				auto &f2 = std::bind(&FuncInitObject::funcL, this, std::placeholders::_1, std::placeholders::_2);
+				const auto &f1 = std::bind(&FuncInitObject::func, this, std::placeholders::_1);
+				const auto &f2 = std::bind(&FuncInitObject::funcL, this, std::placeholders::_1, std::placeholders::_2);
 				return FuncObject(f1, sign(), f2);
 			}
 

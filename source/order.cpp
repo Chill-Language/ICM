@@ -92,7 +92,7 @@ namespace ICM
 			vector<AST::Base*> doexps;
 			enum { IF, ELSE, ELSEIF } mode = IF;
 			bool startelse = false;
-			size_t begin = (key_is(node[1].get(), KeywordID::THEN)) ? *range.begin() + 2 : *range.begin() + 1;
+			size_t begin = (key_is(node[2].get(), KeywordID::THEN)) ? *range.begin() + 2 : *range.begin() + 1;
 			for (size_t i : Range<size_t>(begin, range.end())) {
 				AST::Base *e = node[i].get();
 				switch (mode)
@@ -138,65 +138,95 @@ namespace ICM
 		//=======================================
 		// * Create Order
 		//=======================================
-		vector<OrderDataCall*> CreateOrder::createOrderASTs()
-		{
-			AST::Node &node = *table[0];
-			createOrderASToneNode(node);
+		AST::Node* CreateOrder::getReferNode(AST::Base *refer) {
+			return Table[static_cast<AST::Refer*>(refer)->getData()].get();
+		}
+		ObjectPtr& CreateOrder::getDataRef(AST::Base *data) {
+			return static_cast<AST::Data*>(data)->getData();
+		}
+
+		// New
+		vector<OrderData*>& CreateOrder::createOrder() {
+			// Create Order
+			createOrderSub(getReferNode(Table[0]->front()));
+			addOrder(Table[0].get(), new OrderDataRet(getReferNode(Table[0]->front())->getIndex()));
+			// Adjust Refer
+			for (auto &e : OrderDataList)
+				e->adjustID(OrderDataListReferMap);
+			// Print Order
 			if (GlobalConfig.PrintOrder) {
 				println();
-				for (size_t i : range(0, GlobalOrderDataList.size()))
-					println(GlobalOrderDataList[i]->to_string());
+				for (size_t i : range(0, OrderDataList.size()))
+					println("[", std::to_string(i), "] ", OrderDataList[i]->to_string());
 				println();
-			}
-			return GlobalOrderDataList;
-		}
-		void CreateOrder::createOrderASToneNode(AST::Node &node)
-		{
-			if (GlobalConfig.PrintOrder)
-				println(node.to_string_code());
-			for (auto &e : node)
-			{
-				if (e->getType() == AST::Data::Type) {
-					ObjectPtr &op = getNodeDataRef(e.get());
 
-					if (op.isType<Objects::Keyword>()) {
-						createOrderKeyword(node, op.get<Objects::Keyword>()->getData());
-					}
-					else if (op.isType<Objects::Identifier>()) {
-						Objects::Identifier *ident = op.get<Objects::Identifier>();
-						size_t i;
-						if ((i = DefFuncTable.find(ident->getName()))) {
-							op = ObjectPtr(new Objects::Function(i));
-						}
-						else if ((i = DefVariableTable.find(ident->getName()))) {
-							op = ObjectPtr(DefVariableTable[i].getData());
-						}
-						else if ((i = AddVariableTable.find(ident->getName()))) {
-							op = ObjectPtr(AddVariableTable[i].getData());
-						}
-						else {
-							ident->setData(ObjectPtr(new Objects::Nil()));
-							AddVariableTable.add(ident->getName(), ObjectPtr(ident));
-							//error("Unfind Identifier(" + ident->getName() + ").");
-						}
-						//createOrderIdentifier(node, getPointer<Objects::Identifier>(op));
-					}
-				}
-				else if (e->getType() == AST::Refer::Type) {
-					AST::Refer *ref = static_cast<AST::Refer*>(e.get());
-					size_t id = ref->getData();
-					createOrderASToneNode(*table[id]);
-					ref->setData(GlobalOrderDataListReferMap[id]);
-				}
-				else {
-					error();
+				for (size_t i : range(0, OrderDataListReferMap.size())) {
+					if (OrderDataListReferMap.find(i) != OrderDataListReferMap.end())
+						println(std::to_string(i), " -> ", std::to_string(OrderDataListReferMap[i]));
 				}
 			}
-			size_t id = GlobalOrderDataListReferMap.size();
-			GlobalOrderDataListReferMap[node.getIndex()] = id;
-			GlobalOrderDataList.push_back(new ASTOrder::OrderDataCall((AST::Node*)&node));
+			return OrderDataList;
 		}
-		void CreateOrder::createOrderKeyword(AST::Node &node, KeywordID keyword)
+		void CreateOrder::createOrderSub(const Single& single) {
+			if (GlobalConfig.PrintOrder)
+				println(single->to_string_code());
+			AST::Base *front = single->front();
+			if (front->getType() == AST::Data::Type) {
+				ObjectPtr &op = getDataRef(front);
+				if (op.isType<Objects::Keyword>()) {
+					createOrderKeyword(single, op.get<Objects::Keyword>()->getData());
+					return;
+				}
+			}
+			for (auto p : *single) {
+				if (p->getType() == AST::Data::Type) {
+					ObjectPtr &op = getDataRef(p.get());
+					if (op.isType<Objects::Identifier>())
+						setObjectIdentifier(op);
+				}
+				else if (p->getType() == AST::Refer::Type) {
+					createOrderSub(getReferNode(p.get()));
+				}
+			}
+			addOrder(single, new ASTOrder::OrderDataCall(single));
+		}
+		void CreateOrder::createOrderKeyword(const Single& single, KeywordID keyword) {
+			switch (keyword) {
+			case KeywordID::IF: {
+				const IfStruct &ifstruct = parserToOrderIf(*single);
+
+
+				break;
+			}
+			case KeywordID::WHILE: {
+				break;
+			}
+			}
+		}
+		void CreateOrder::setObjectIdentifier(ObjectPtr &op) {
+			Objects::Identifier *ident = op.get<Objects::Identifier>();
+			std::string name = ident->getName();
+			size_t i;
+			if ((i = DefFuncTable.find(name))) {
+				op = ObjectPtr(new Objects::Function(i));
+			}
+			else if ((i = DefVariableTable.find(name))) {
+				op = ObjectPtr(DefVariableTable[i].getData());
+			}
+			else if ((i = AddVariableTable.find(name))) {
+				op = ObjectPtr(AddVariableTable[i].getData());
+			}
+			else {
+				ident->setData(ObjectPtr(new Objects::Nil()));
+				AddVariableTable.add(name, op);
+				//error("Unfind Identifier(" + ident->getName() + ").");
+			}
+		}
+
+
+		////////////////////////////////////////////////
+		// Old
+		/*void CreateOrder::createOrderKeyword(AST::Node &node, KeywordID keyword)
 		{
 			switch (keyword)
 			{
@@ -206,26 +236,37 @@ namespace ICM
 				////
 				size_t i = 0;
 				vector<OrderData*> vec;
+
+
 				switch (v[i].judexp->getType()) {
 				case AST::Data::Type: {
-					auto e = v[0].judexp;
+					auto e = v[i].judexp;
 					ObjectPtr &op = getNodeDataRef(e);
-					vec.push_back(new OrderDataJumpIf(op));
+					//vec.push_back(new OrderDataJumpIfV(op,2));
+					GlobalOrderDataList.push_back(new OrderDataJumpNotIfVR(op, GlobalOrderDataList.size()+1));
 					break;
 				}
-				case AST::Refer::Type:;
+				case AST::Refer::Type: {
+					addReferMap(node);
+					size_t id = static_cast<AST::Refer*>(v[i].judexp)->getData();
+					createOrderASToneNode(*Table[id]);
+					//vec.push_back(new OrderDataJumpIf(id, 2));
+					//createOrderASToneNode(static_cast<AST::Node&>(*v[i].doexps.front()));
+					GlobalOrderDataList.push_back(new OrderDataJumpNotIfRR(id, GlobalOrderDataList.size()+1));
+					break;
+				}
 				};
 				//ObjectPtr temp;
 				//auto j1 = const_cast<AST::Node*>(static_cast<const AST::Node*>(v[0].judexp));
 				//vec.push_back(new OrderDataCall(temp, j1));
-				vec.push_back(new OrderDataRet());
-				vec.push_back(new OrderDataEnd());
+				//vec.push_back(new OrderDataRet(5));
+				//vec.push_back(new OrderDataEnd());
 
 				for (auto *e : vec)
 					println(e->to_string());
 				////
-				for (size_t i : range(0, v.size())) {
-				}
+				//for (size_t i : range(0, v.size())) {
+				//}
 				break;
 			}
 			case ICM::KeywordID::FOR:
@@ -241,9 +282,6 @@ namespace ICM
 			default:
 				break;
 			}
-		}
-		void CreateOrder::createOrderIdentifier(AST::Node &node, Objects::Identifier *ident)
-		{
-		}
+		}*/
 	}
 }

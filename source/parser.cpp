@@ -89,7 +89,7 @@ namespace ICM
 					ast.retNode();
 					break;
 				case T_Identifier: case T_Keyword:
-					ast.pushData(Parser::createObject(mr.getType(), mr.getString()));
+					ast.pushData(createObject(mr.getType(), mr.getString()));
 					firstMatchBraket = false;
 					break;
 				case T_Number: case T_String: case T_Boolean:
@@ -97,7 +97,7 @@ namespace ICM
 						printf("Error '%s' is not function in line(%d).\n", mr.getString().c_str(), match.getCurLineNum());
 						return false;
 					}
-					ast.pushData(Parser::createObject(mr.getType(), mr.getString())); // TODO
+					ast.pushData(createObject(mr.getType(), mr.getString())); // TODO
 					firstMatchBraket = false;
 					break;
 				default:

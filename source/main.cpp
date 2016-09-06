@@ -10,11 +10,15 @@ using namespace ICM;
 
 void testSub()
 {
-	string str("((disp [+]))");
+	//string str("(if (- (* 3 2) 4) then (- 2 5) (+ (+ (* 3 2) 6) (- 7 2)) else 5)");
+	//string str("(if T then 7 else 3)");
+	//string str("(if (+ 5 6) then 7 else 3)");
 	//string str("((disp [+]) (+ 5 6))");
-	//string str("(+ (+ 5 6) (- 7 2))");
+	string str("(+ (+ (- 6 4) (* 2 3)) (- 7 2))");
 	//string str("(if T then 2 else 3)");
 	//string str("(if (& (= a 2) (< b 3)) then (let a 5) (+ a (- 7 (* 3 8)) (/ 2 5)) else if (let b 7) then (+ b 7))");
+
+	println(str);
 
 	Match match(str.c_str());
 	AST ast;
@@ -26,10 +30,11 @@ void testSub()
 	//oast.to_string();
 	vector<AST::NodePtr> table = ast.getTable();
 	ASTOrder::CreateOrder createorder(table);
-	const auto &e = createorder.createOrderASTs();
-	Interpreter interpreter(e);
-	const auto &op = interpreter.run();
-	println(op);
+	const auto &e = createorder.createOrder();
+	//const auto &e = createorder.createOrderASTs();
+	//Interpreter interpreter(e);
+	//const auto &op = interpreter.run();
+	//println(op);
 
 }
 
@@ -121,7 +126,7 @@ int main(int argc, char *argv[])
 				}
 				vector<AST::NodePtr> table = ast.getTable();
 				ASTOrder::CreateOrder createorder(table);
-				const auto &e = createorder.createOrderASTs();
+				const auto &e = createorder.createOrder();
 				Interpreter interpreter(e);
 				const ObjectPtr &op = interpreter.run();
 				if (LoopMatch) {

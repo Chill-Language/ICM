@@ -8,7 +8,7 @@ namespace ICM
 {
 	class Interpreter
 	{
-		using OrderList = vector<ASTOrder::OrderDataCall*>; // ASTOrder::OrderList;
+		using OrderList = vector<ASTOrder::OrderData*>; // ASTOrder::OrderList;
 	public:
 		Interpreter(const OrderList &ol)
 			: orderlist(ol), tempresult(ol.size(), ObjectPtr()) {}

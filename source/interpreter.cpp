@@ -43,26 +43,35 @@ namespace ICM
 		}
 	}
 	ObjectPtr Interpreter::run() {
-		ObjectPtr result;
-		for (size_t i : range(0, orderlist.size()-1)) {
+		using namespace ASTOrder;
+		size_t i = 0;
+
+		while (true) {
 			auto &e = orderlist[i];
-			//println(e->to_string());
-			//println(e->getData()->to_string());
-			AST::Node *node = e->getData();
-			AST::Base *f = node->front();
-			if (f->getType() == AST::Data::Type) {
-				AST::Data *nf = static_cast<AST::Data*>(f);
-				const ObjectPtr &op = adjustObjectPtr(nf->getData());
-				runSub(op, node, i);
+			switch (e->order()) {
+			case OrderData::CALL: {
+				AST::Node *node = static_cast<ASTOrder::OrderDataCall*>(e)->getData();
+				AST::Base *f = node->front();
+				if (f->getType() == AST::Data::Type) {
+					AST::Data *nf = static_cast<AST::Data*>(f);
+					const ObjectPtr &op = adjustObjectPtr(nf->getData());
+					runSub(op, node, i);
+				}
+				else if (f->getType() == AST::Refer::Type) {
+					AST::Refer *nf = static_cast<AST::Refer*>(f);
+					const ObjectPtr &op = tempresult[nf->getData()];
+					runSub(op, node, i);
+				}
+				break;
 			}
-			else if (f->getType() == AST::Refer::Type) {
-				AST::Refer *nf = static_cast<AST::Refer*>(f);
-				const ObjectPtr &op = tempresult[nf->getData()];
-				runSub(op, node, i);
+			case OrderData::RET: {
+				const auto &ne = static_cast<OrderDataRet*>(e);
+				return tempresult[ne->getID()];
 			}
+			}
+			i++;
 		}
-		// TODO
-		result = tempresult[tempresult.size()-2];
-		return result;
+
+		return ObjectPtr();
 	}
 }
