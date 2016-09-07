@@ -149,8 +149,9 @@ namespace ICM
 		vector<OrderData*>& CreateOrder::createOrder() {
 			// Create Order
 			createOrderSub(getReferNode(Table[0]->front()));
-			addOrder(Table[0].get(), new OrderDataRet(getReferNode(Table[0]->front())->getIndex()));
+			addOrder(Table[0].get(), new OrderDataRet(OrderDataList.size() - 1/*getReferNode(Table[0]->front())->getIndex()*/));
 			// Adjust Refer
+			//if (false)
 			for (auto &e : OrderDataList)
 				e->adjustID(OrderDataListReferMap);
 			// Print Order
@@ -190,11 +191,62 @@ namespace ICM
 			}
 			addOrder(single, new ASTOrder::OrderDataCall(single));
 		}
+		void CreateOrder::createOrderSub(const Segment &segment) {
+			for (AST::Base* single : segment) {
+				
+				if (single->getType() == AST::Refer::Type)
+					createOrderSub(getReferNode(single));
+				else if (single->getType() == AST::Data::Type) {
+					ObjectPtr &op = getDataRef(single);
+					if (op.isType(T_Identifier))
+						setObjectIdentifier(op);
+					addOrder(new OrderDataSingle(op));
+				}
+			}
+		}
 		void CreateOrder::createOrderKeyword(const Single& single, KeywordID keyword) {
 			switch (keyword) {
 			case KeywordID::IF: {
 				const IfStruct &ifstruct = parserToOrderIf(*single);
+				auto &ifexps = ifstruct.getIfexps();
+				auto &elfexp = ifstruct.getElfexp();
 
+				vector<OrderDataJump*> recJmpToEnd;
+				for (size_t i : range(0, ifexps.size())) {
+					auto &judexp = ifexps[i].judexp;
+					auto &doexps = ifexps[i].doexps;
+					OrderDataJumpNotIf *pjmprr;
+					if (judexp->getType() == AST::Refer::Type) {
+						AST::Node *node = getReferNode(judexp);
+						createOrderSub(node);
+						pjmprr = new OrderDataJumpNotIf(node->getIndex());
+					}
+					else { // AST::Data
+						ObjectPtr &op = getDataRef(judexp);
+						if (op.isType(T_Identifier))
+							setObjectIdentifier(op);
+						addOrder(new OrderDataSingle(op));
+						size_t id = OrderDataList.size() - 1;
+						pjmprr = new OrderDataJumpNotIf(id);
+						pjmprr->setExprefAdjusted();
+					}
+					addOrder(pjmprr);
+					createOrderSub(doexps);
+					OrderDataJump *p = new OrderDataJump();
+					recJmpToEnd.push_back(p);
+					addOrder(p);
+					pjmprr->setJmpID(OrderDataList.size());
+					pjmprr->setJmprefAdjusted();
+					// Create Else
+					if (i == ifexps.size() - 1) {
+						createOrderSub(elfexp);
+					}
+				}
+				addOrder(single, new OrderDataStore());
+				for (auto *p : recJmpToEnd) {
+					p->setJmpID(OrderDataList.size() - 1);
+					p->setJmprefAdjusted();
+				}
 
 				break;
 			}

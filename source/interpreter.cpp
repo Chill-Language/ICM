@@ -33,6 +33,8 @@ namespace ICM
 			ndl.insert(ndl.end(), dl.begin(), dl.end());
 			res = checkCall(ftu, ndl);
 		}
+
+		Result = res;
 	}
 	void Interpreter::runSub(const ObjectPtr &op, AST::Node *node, size_t i) {
 		if (op.isType(T_Disperse) || op.isType(T_Function)) {
@@ -44,10 +46,10 @@ namespace ICM
 	}
 	ObjectPtr Interpreter::run() {
 		using namespace ASTOrder;
-		size_t i = 0;
+		size_t ProgramCounter = 0;
 
 		while (true) {
-			auto &e = orderlist[i];
+			auto &e = orderlist[ProgramCounter];
 			switch (e->order()) {
 			case OrderData::CALL: {
 				AST::Node *node = static_cast<ASTOrder::OrderDataCall*>(e)->getData();
@@ -55,23 +57,66 @@ namespace ICM
 				if (f->getType() == AST::Data::Type) {
 					AST::Data *nf = static_cast<AST::Data*>(f);
 					const ObjectPtr &op = adjustObjectPtr(nf->getData());
-					runSub(op, node, i);
+					runSub(op, node, ProgramCounter);
 				}
 				else if (f->getType() == AST::Refer::Type) {
 					AST::Refer *nf = static_cast<AST::Refer*>(f);
 					const ObjectPtr &op = tempresult[nf->getData()];
-					runSub(op, node, i);
+					runSub(op, node, ProgramCounter);
 				}
 				break;
 			}
+			case OrderData::JUMP: {
+				ASTOrder::OrderDataJump *p = static_cast<ASTOrder::OrderDataJump*>(e);
+				size_t jmpid = p->getJmpid();
+				ProgramCounter = jmpid;
+				continue;
+			}
+			case OrderData::JUMPNOT: {
+				ASTOrder::OrderDataJumpNotIf *p = static_cast<ASTOrder::OrderDataJumpNotIf*>(e);
+				size_t expid = p->getExpid();
+				ObjectPtr op = tempresult[expid];
+				if (op.isType(T_Identifier)) {
+					auto *pp = op.get<Objects::Identifier>();
+					if (pp->getValueType() == T_Boolean) {
+						op = pp->getRealData();
+					}
+					else {
+						println("If exp with non Type Boolean.");
+						break;
+					}
+				}
+				if (op.isType(T_Boolean)) {
+					bool result = op.get<Objects::Boolean>()->operator bool();
+					if (!result) {
+						size_t jmpid = p->getJmpid();
+						ProgramCounter = jmpid;
+						continue;
+					}
+				}
+				else {
+					println("If exp with non Type Boolean.");
+				}
+				break;
+			}
+			case OrderData::SINGLE: {
+				tempresult[ProgramCounter] = static_cast<ASTOrder::OrderDataSingle*>(e)->getData();
+				Result = tempresult[ProgramCounter];
+				break;
+			}
+			case OrderData::STORE: {
+				tempresult[ProgramCounter] = Result;
+				break;
+			}
 			case OrderData::RET: {
-				const auto &ne = static_cast<OrderDataRet*>(e);
-				return tempresult[ne->getID()];
+				//const auto &ne = static_cast<OrderDataRet*>(e);
+				//return tempresult[ne->getID()];
+				return Result;
 			}
 			}
-			i++;
+			ProgramCounter++;
 		}
 
-		return ObjectPtr();
+		return Result;
 	}
 }

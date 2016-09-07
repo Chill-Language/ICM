@@ -12,7 +12,7 @@ namespace ICM
 		class OrderData
 		{
 		public:
-			enum Order { CALL, JUMP, JUMPIFRR, JUMPIFVV, JUMPIFRV, JUMPIFVR, FUNC, CALLS, OVER, RET };
+			enum Order { CALL, SINGLE, STORE, JUMP, JUMPNOT, FUNC, OVER, RET };
 
 			virtual Order order() const = 0;
 
@@ -21,12 +21,10 @@ namespace ICM
 				switch (order())
 				{
 				case CALL:     str.append("CALL"); break;
-				case CALLS:    str.append("CALS"); break;
+				case SINGLE:   str.append("SING"); break;
+				case STORE:    str.append("STOR"); break;
 				case JUMP:     str.append("JUMP"); break;
-				case JUMPIFRR: str.append("JMPN"); break;
-				case JUMPIFVV: str.append("JMPN"); break;
-				case JUMPIFRV: str.append("JMPN"); break;
-				case JUMPIFVR: str.append("JMPN"); break;
+				case JUMPNOT:  str.append("JMPN"); break;
 				case FUNC:     str.append("FUNC"); break;
 				case RET:      str.append("RET "); break;
 				case OVER:     str.append("OVER"); break;
@@ -49,11 +47,11 @@ namespace ICM
 		{
 			using NodePtr = AST::Node*;
 		public:
-			OrderDataCall(NodePtr nodptr) : value(ObjectPtr()), nodptr(nodptr) {}
-			OrderDataCall(ObjectPtr &objptr, NodePtr nodptr) : value(std::move(objptr)), nodptr(nodptr) {}
+			OrderDataCall(NodePtr nodptr) : /*value(ObjectPtr()),*/ nodptr(nodptr) {}
+			//OrderDataCall(ObjectPtr &objptr, NodePtr nodptr) : value(std::move(objptr)), nodptr(nodptr) {}
 			OrderData::Order order() const { return OrderData::CALL; }
-			ObjectPtr getValue() const { return value; }
-			void setValue(const ObjectPtr &obj) { value = obj; }
+			//ObjectPtr getValue() const { return value; }
+			//void setValue(const ObjectPtr &obj) { value = obj; }
 			NodePtr& getData() { return nodptr; }
 			const NodePtr& getData() const { return nodptr; }
 			void adjustID(const map<size_t, size_t> &map) {
@@ -66,11 +64,33 @@ namespace ICM
 			}
 
 		private:
-			ObjectPtr &&value;
+			//ObjectPtr &&value;
 			NodePtr nodptr;
 			string getToString() const {
 				return nodptr->to_string_for_order();
 			}
+		};
+
+		class OrderDataSingle : public OrderData
+		{
+		public:
+			OrderDataSingle(ObjectPtr objptr) : data(objptr) {}
+			OrderData::Order order() const { return OrderData::SINGLE; }
+			const ObjectPtr& getData() const { return data; }
+			void setData(const ObjectPtr &obj) { data = obj; }
+
+		private:
+			ObjectPtr data;
+			string getToString() const {
+				return data->to_string_code();
+			}
+		};
+
+		class OrderDataStore : public OrderData
+		{
+		public:
+			OrderDataStore() {}
+			OrderData::Order order() const { return OrderData::STORE; }
 		};
 
 		class OrderDataFunc : public OrderData
@@ -83,42 +103,54 @@ namespace ICM
 		class OrderDataJump : public OrderData
 		{
 		public:
-			OrderData::Order order() const { return OrderData::JUMP; }
-		private:
-		};
+			virtual OrderData::Order order() const { return OrderData::JUMP; }
+			void setJmpID(size_t jmpid) {
+				this->jmpid = jmpid;
+			}
+			void setJmprefAdjusted() {
+				this->adjusted = true;
+			}
+			virtual void adjustID(const map<size_t, size_t> &map) {
+				if (!adjusted)
+					this->jmpid = map.at(this->jmpid);
+			}
+			size_t getJmpid() const {
+				return jmpid;
+			}
 
-		class OrderDataJumpNotIfRR : public OrderData
+		protected:
+			size_t jmpid;
+			bool adjusted = false;
+			virtual string getToString() const {
+				return "{" + std::to_string(jmpid) + "}";
+			}
+		};
+		class OrderDataJumpNotIf : public OrderDataJump
 		{
 		public:
-			OrderDataJumpNotIfRR(size_t expid, size_t jmpid) : expid(expid), jmpid(jmpid) {}
-			OrderData::Order order() const { return OrderData::JUMPIFRR; }
-		private:
+			OrderDataJumpNotIf(size_t expid)
+				: expid(expid) {}
+			OrderData::Order order() const { return OrderData::JUMPNOT; }
+			void adjustID(const map<size_t, size_t> &map) {
+				if (!exprefadjusted)
+					this->expid = map.at(this->expid);
+				OrderDataJump::adjustID(map);
+			}
+			size_t getExpid() const {
+				return expid;
+			}
+
+			void setExprefAdjusted() {
+				exprefadjusted = true;
+			}
+
+		protected:
 			size_t expid;
-			size_t jmpid;
-			string getToString() const {
-				return "{" + std::to_string(expid) + "}, {" + std::to_string(jmpid) + "}";
-			}
-		};
+			bool exprefadjusted = false;
 
-		class OrderDataJumpNotIfVR : public OrderData
-		{
-		public:
-			OrderDataJumpNotIfVR(ObjectPtr op, size_t jmpid) : opdata(op), jmpid(jmpid) {}
-			OrderData::Order order() const { return OrderData::JUMPIFVR; }
-		private:
-			ObjectPtr opdata;
-			size_t jmpid;
 			string getToString() const {
-				return opdata->to_string_code() + ", {" + std::to_string(jmpid) + "}";
+				return "{" + std::to_string(expid) + "}, " + OrderDataJump::getToString();
 			}
-		};
-
-		class OrderDataCalls : public OrderData
-		{
-		public:
-			OrderData::Order order() const { return OrderData::CALLS; }
-		private:
-			shared_ptr<OrderList> data;
 		};
 
 		class OrderDataEnd : public OrderData
@@ -134,7 +166,7 @@ namespace ICM
 			OrderDataRet(size_t id) : id(id) {}
 			OrderData::Order order() const { return OrderData::RET; }
 			void adjustID(const map<size_t, size_t> &map) {
-				this->id = map.at(this->id);
+				//this->id = map.at(this->id);
 			}
 			size_t getID() const {
 				return this->id;
@@ -179,25 +211,31 @@ namespace ICM
 
 			// New
 			using Single = AST::Node*;      // AST's Root
-			using Segment = vector<Single>; // ASTs
+			using Segment = vector<AST::Base*>; // ASTs
 			AST::Node* getReferNode(AST::Base *refer);
 			ObjectPtr& getDataRef(AST::Base *data);
 			void createOrderSub(const Single &single);
-			void createOrderSub(const Segment &segment) {
-				for (const Single &single : segment)
-					createOrderSub(single);
-			}
+			void createOrderSub(const Segment &segment);
 			void createOrderKeyword(const Single& single, KeywordID keyword);
 			void setObjectIdentifier(ObjectPtr &op);
+			void addRefer(const Single &single) {
+				if (OrderDataListReferMap.find(single->getIndex()) == OrderDataListReferMap.end()) {
+					size_t id = OrderDataList.size();
+					OrderDataListReferMap[single->getIndex()] = id;
+				}
+			}
 			void addOrder(const Single &single, OrderData *order) {
 				size_t id = OrderDataList.size();
 				if (OrderDataListReferMap.find(single->getIndex()) == OrderDataListReferMap.end()) {
 					OrderDataListReferMap[single->getIndex()] = id;
-					OrderDataList.push_back(order);
+					addOrder(order);
 				}
 				else {
 					println("Occur a clash with index {", std::to_string(single->getIndex()), "->", std::to_string(id), "}.");
 				}
+			}
+			void addOrder(OrderData *order) {
+				OrderDataList.push_back(order);
 			}
 		};
 	}

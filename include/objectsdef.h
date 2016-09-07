@@ -264,6 +264,12 @@ namespace ICM
 			const ObjectPtr& getData() const {
 				return data;
 			}
+			const ObjectPtr& getRealData() const {
+				if (data.isType(T_Identifier))
+					return data.get<Objects::Identifier>()->getData();
+				else
+					return data;
+			}
 			void setData(const ObjectPtr &op) {
 				if (op->get_type() == T_Identifier)
 					data = op.get<Identifier>()->getData();
@@ -290,7 +296,7 @@ namespace ICM
 					data = op;
 			}
 			DefaultType getValueType() const {
-				return data->get_type();
+				return data.type();
 			}
 			//-----------------------------------
 			// + Inherited

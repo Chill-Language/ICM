@@ -18,6 +18,7 @@ namespace ICM
 	private:
 		OrderList orderlist;
 		vector<ObjectPtr> tempresult;
+		ObjectPtr Result;
 		void runFunc(const ObjectPtr &op, AST::Node *n, size_t id);
 		void runSub(const ObjectPtr &op, AST::Node *node, size_t i);
 	};

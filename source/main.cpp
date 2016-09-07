@@ -10,11 +10,16 @@ using namespace ICM;
 
 void testSub()
 {
-	//string str("(if (- (* 3 2) 4) then (- 2 5) (+ (+ (* 3 2) 6) (- 7 2)) else 5)");
+	//string str("(if (if (+ 5) then (+ 3) else (+ 2)) then (+ 0) else (+ 1))");
+	string str("(if T then 5 else 2)");
+	//string str("(p (if (= 3 4) then (+ 6 4) else (if (= 3 4) then (+ 2 6) else (+ 0 1))))");
+	//string str("(p (if (= 3 4) then (+ 2 6) else (+ 6 4)))");
+	//string str("(if (= 3 4) then (- 2 5) (+ 2 6) elsif (+ 0 1) then (+ 5 6) else (- 5 2) (+ 6 4))");
+	//string str("(if (- (* 3 2) 4) then (- 2 5) (+ (+ (* 3 2) 6) (- 7 2)) else (- 5 2) (+ 6 4))");
 	//string str("(if T then 7 else 3)");
-	//string str("(if (+ 5 6) then 7 else 3)");
+	//string str("(if (= 5 6) then 7 else 3)");
 	//string str("((disp [+]) (+ 5 6))");
-	string str("(+ (+ (- 6 4) (* 2 3)) (- 7 2))");
+	//string str("(+ (+ (- 6 4) (* 2 3)) (- 7 2))");
 	//string str("(if T then 2 else 3)");
 	//string str("(if (& (= a 2) (< b 3)) then (let a 5) (+ a (- 7 (* 3 8)) (/ 2 5)) else if (let b 7) then (+ b 7))");
 
@@ -31,10 +36,9 @@ void testSub()
 	vector<AST::NodePtr> table = ast.getTable();
 	ASTOrder::CreateOrder createorder(table);
 	const auto &e = createorder.createOrder();
-	//const auto &e = createorder.createOrderASTs();
-	//Interpreter interpreter(e);
-	//const auto &op = interpreter.run();
-	//println(op);
+	Interpreter interpreter(e);
+	const auto &op = interpreter.run();
+	println(op);
 
 }
 
