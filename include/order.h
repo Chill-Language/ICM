@@ -206,6 +206,7 @@ namespace ICM
 			// New
 			vector<OrderData*> OrderDataList;
 			map<size_t, size_t> OrderDataListReferMap;
+			stack<size_t> KeywordNodeIDs;
 
 
 
@@ -217,6 +218,7 @@ namespace ICM
 			void createOrderSub(const Single &single);
 			void createOrderSub(const Segment &segment);
 			void createOrderKeyword(const Single& single, KeywordID keyword);
+			void createOrderKeywordSingle(KeywordID keyword);
 			void setObjectIdentifier(ObjectPtr &op);
 			void addRefer(const Single &single) {
 				if (OrderDataListReferMap.find(single->getIndex()) == OrderDataListReferMap.end()) {

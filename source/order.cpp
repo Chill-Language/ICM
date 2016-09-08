@@ -75,19 +75,21 @@ namespace ICM
 			DoExps elexp;
 		};
 
-		void parserToOrderIf(const AST::Node &node, const Range<size_t> &range, IfStruct &ifstruct);
+		void parseToOrderIf(const AST::Node &node, const Range<size_t> &range, IfStruct &ifstruct);
 
-		IfStruct parserToOrderIf(const AST::Node &node)
+		IfStruct parseToOrderIf(const AST::Node &node)
 		{
 			IfStruct ifstruct;
-			parserToOrderIf(node, Range<size_t>(1, node.size()), ifstruct);
+			parseToOrderIf(node, Range<size_t>(1, node.size()), ifstruct);
 			return ifstruct;
 		}
 
-		void parserToOrderIf(const AST::Node &node, const Range<size_t> &range, IfStruct &ifstruct)
+		void parseToOrderIf(const AST::Node &node, const Range<size_t> &range, IfStruct &ifstruct)
 		{
-			if (range.size() < 2)
+			if (range.size() < 2) {
 				error();
+				return;
+			}
 			AST::Base* judexp = node[range.begin()].get();
 			vector<AST::Base*> doexps;
 			enum { IF, ELSE, ELSEIF } mode = IF;
@@ -126,13 +128,46 @@ namespace ICM
 					break;
 				case ELSEIF:
 					ifstruct.add(judexp, doexps);
-					parserToOrderIf(node, Range<size_t>(i, node.size()), ifstruct);
+					parseToOrderIf(node, Range<size_t>(i, node.size()), ifstruct);
 					return;
 				}
 			}
 			if (startelse)
 				error();
 			ifstruct.add(judexp, doexps);
+		}
+
+		//=======================================
+		// * Order Loop
+		//=======================================
+		class LoopStruct
+		{
+			using BasePtr = AST::Base*;
+			using DoExps = vector<BasePtr>;
+		public:
+			LoopStruct() {}
+			void setDoexps(const DoExps &doexps) {
+				this->doexps = doexps;
+			}
+			const DoExps& getDoexps() const {
+				return doexps;
+			}
+
+		private:
+			DoExps doexps;
+		};
+		void parseToOrderLoop(const AST::Node &node, LoopStruct &loopstruct);
+		LoopStruct parseToOrderLoop(const AST::Node &node) {
+			LoopStruct loopstruct;
+			parseToOrderLoop(node, loopstruct);
+			return loopstruct;
+		}
+		void parseToOrderLoop(const AST::Node &node, LoopStruct &loopstruct) {
+			vector<AST::Base*> doexps;
+			for (auto e : range(node.begin()+1,node.end())) {
+				doexps.push_back(e->get());
+			}
+			loopstruct.setDoexps(doexps);
 		}
 
 		//=======================================
@@ -198,16 +233,34 @@ namespace ICM
 					createOrderSub(getReferNode(single));
 				else if (single->getType() == AST::Data::Type) {
 					ObjectPtr &op = getDataRef(single);
+					if (op.isType(T_Keyword)) {
+						createOrderKeywordSingle(op.get<Objects::Keyword>()->getData());
+						continue;
+					}
 					if (op.isType(T_Identifier))
 						setObjectIdentifier(op);
 					addOrder(new OrderDataSingle(op));
 				}
 			}
 		}
+		void CreateOrder::createOrderKeywordSingle(KeywordID keyword) {
+			switch (keyword) {
+			case KeywordID::BREAK: {
+				if (KeywordNodeIDs.empty()) {
+					error("Unmatch 'break'.");
+				}
+				OrderDataJump *p = new OrderDataJump();
+				size_t id = KeywordNodeIDs.top();
+				p->setJmpID(id);
+				addOrder(p);
+				break;
+			}
+			}
+		}
 		void CreateOrder::createOrderKeyword(const Single& single, KeywordID keyword) {
 			switch (keyword) {
 			case KeywordID::IF: {
-				const IfStruct &ifstruct = parserToOrderIf(*single);
+				const IfStruct &ifstruct = parseToOrderIf(*single);
 				auto &ifexps = ifstruct.getIfexps();
 				auto &elfexp = ifstruct.getElfexp();
 
@@ -239,7 +292,10 @@ namespace ICM
 					pjmprr->setJmprefAdjusted();
 					// Create Else
 					if (i == ifexps.size() - 1) {
-						createOrderSub(elfexp);
+						if (elfexp.empty())
+							addOrder(new OrderDataSingle(ObjectPtr(new Objects::Nil())));
+						else
+							createOrderSub(elfexp);
 					}
 				}
 				addOrder(single, new OrderDataStore());
@@ -250,7 +306,23 @@ namespace ICM
 
 				break;
 			}
+			case KeywordID::LOOP: {
+				KeywordNodeIDs.push(single->getIndex());
+				const LoopStruct &loopstruct = parseToOrderLoop(*single);
+				auto &doexps = loopstruct.getDoexps();
+				size_t fid = OrderDataList.size();
+				createOrderSub(doexps);
+				OrderDataJump *p = new OrderDataJump();
+				p->setJmpID(fid);
+				p->setJmprefAdjusted();
+				addOrder(p);
+				addOrder(single, new OrderDataSingle(ObjectPtr(new Objects::Nil())));
+				KeywordNodeIDs.pop();
+				break;
+			}
 			case KeywordID::WHILE: {
+				KeywordNodeIDs.push(single->getIndex());
+				KeywordNodeIDs.pop();
 				break;
 			}
 			}
@@ -274,66 +346,5 @@ namespace ICM
 				//error("Unfind Identifier(" + ident->getName() + ").");
 			}
 		}
-
-
-		////////////////////////////////////////////////
-		// Old
-		/*void CreateOrder::createOrderKeyword(AST::Node &node, KeywordID keyword)
-		{
-			switch (keyword)
-			{
-			case ICM::KeywordID::IF: {
-				const IfStruct &ifstruct = parserToOrderIf(node);
-				auto &v = ifstruct.getIfexps();
-				////
-				size_t i = 0;
-				vector<OrderData*> vec;
-
-
-				switch (v[i].judexp->getType()) {
-				case AST::Data::Type: {
-					auto e = v[i].judexp;
-					ObjectPtr &op = getNodeDataRef(e);
-					//vec.push_back(new OrderDataJumpIfV(op,2));
-					GlobalOrderDataList.push_back(new OrderDataJumpNotIfVR(op, GlobalOrderDataList.size()+1));
-					break;
-				}
-				case AST::Refer::Type: {
-					addReferMap(node);
-					size_t id = static_cast<AST::Refer*>(v[i].judexp)->getData();
-					createOrderASToneNode(*Table[id]);
-					//vec.push_back(new OrderDataJumpIf(id, 2));
-					//createOrderASToneNode(static_cast<AST::Node&>(*v[i].doexps.front()));
-					GlobalOrderDataList.push_back(new OrderDataJumpNotIfRR(id, GlobalOrderDataList.size()+1));
-					break;
-				}
-				};
-				//ObjectPtr temp;
-				//auto j1 = const_cast<AST::Node*>(static_cast<const AST::Node*>(v[0].judexp));
-				//vec.push_back(new OrderDataCall(temp, j1));
-				//vec.push_back(new OrderDataRet(5));
-				//vec.push_back(new OrderDataEnd());
-
-				for (auto *e : vec)
-					println(e->to_string());
-				////
-				//for (size_t i : range(0, v.size())) {
-				//}
-				break;
-			}
-			case ICM::KeywordID::FOR:
-				break;
-			case ICM::KeywordID::WHILE:
-				break;
-			case ICM::KeywordID::LOOP:
-				break;
-			case ICM::KeywordID::CASE:
-				break;
-			case ICM::KeywordID::FUNCTION:
-				break;
-			default:
-				break;
-			}
-		}*/
 	}
 }

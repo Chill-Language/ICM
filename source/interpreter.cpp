@@ -9,7 +9,10 @@ namespace ICM
 		for (const auto &l : r) {
 			if ((*l)->getType() == AST::Data::Type) {
 				auto &op = static_cast<AST::Data*>(l->get())->getData();
-				listnum.push_back(op);
+				if (op.isType(T_Identifier))
+					listnum.push_back(op);
+				else
+					listnum.push_back(ObjectPtr(op->clone())); // TODO
 			}
 			else if ((*l)->getType() == AST::Refer::Type) {
 				size_t id = static_cast<AST::Refer*>(l->get())->getData();

@@ -315,10 +315,7 @@ namespace ICM
 				return data->to_output();
 			}
 			string to_string_code() const {
-				if (data)
-					return to_output();
-				else
-					return name.to_string();
+				return name.to_string();
 			}
 			// Const
 			static const DefaultType Type = T_Identifier;

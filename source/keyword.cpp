@@ -26,6 +26,7 @@ namespace ICM
 		DefKetwordTable.add("then", KeywordID::THEN);
 		DefKetwordTable.add("else", KeywordID::ELSE);
 		DefKetwordTable.add("elsif", KeywordID::ELSIF);
+		DefKetwordTable.add("loop", KeywordID::LOOP);
 		DefKetwordTable.add("while", KeywordID::WHILE);
 		DefKetwordTable.add("break", KeywordID::BREAK);
 		DefKetwordTable.add("for", KeywordID::FOR);

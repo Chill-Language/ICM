@@ -25,6 +25,7 @@
 using std::string;
 using std::vector;
 using std::map;
+using std::stack;
 using std::shared_ptr;
 using std::to_string;
 using namespace Common;

@@ -141,3 +141,23 @@ else
 (p ((if T + else -) 5 6)) ; 11
 (p ((if F + else -) 5 6)) ; -1
 
+(let x 5)
+(if (= x 5) then
+	(let x 6)
+)
+(p x)                     ; x(6)
+
+; Test 15
+(println "----------16----------")
+(let j 1)
+(loop
+	(let i 1)
+	(loop
+		(print i "*" j "=" (* i j) " ")
+		(if (= i j) break)
+		(inc i)
+	)
+	(println)
+	(if (= j 9) break)
+	(inc j)
+)

@@ -11,7 +11,7 @@ using namespace ICM;
 void testSub()
 {
 	//string str("(if (if (+ 5) then (+ 3) else (+ 2)) then (+ 0) else (+ 1))");
-	string str("(if T then 5 else 2)");
+	string str("(loop 4 (loop 5) 6)");
 	//string str("(p (if (= 3 4) then (+ 6 4) else (if (= 3 4) then (+ 2 6) else (+ 0 1))))");
 	//string str("(p (if (= 3 4) then (+ 2 6) else (+ 6 4)))");
 	//string str("(if (= 3 4) then (- 2 5) (+ 2 6) elsif (+ 0 1) then (+ 5 6) else (- 5 2) (+ 6 4))");
@@ -36,9 +36,12 @@ void testSub()
 	vector<AST::NodePtr> table = ast.getTable();
 	ASTOrder::CreateOrder createorder(table);
 	const auto &e = createorder.createOrder();
-	Interpreter interpreter(e);
-	const auto &op = interpreter.run();
-	println(op);
+	if (false)
+	{
+		Interpreter interpreter(e);
+		const auto &op = interpreter.run();
+		println(op);
+	}
 
 }
 
@@ -86,7 +89,6 @@ int main(int argc, char *argv[])
 	//GlobalConfig.SetDebugMode(true);
 	//GlobalConfig.PrintAST = true;
 	//GlobalConfig.PrintOrder = true;
-
 	// Test
 	test();
 
