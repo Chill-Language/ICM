@@ -10,8 +10,9 @@ using namespace ICM;
 
 void testSub()
 {
+	string str("(while (not (not F)) F F F)");
 	//string str("(if (if (+ 5) then (+ 3) else (+ 2)) then (+ 0) else (+ 1))");
-	string str("(loop 4 (loop 5) 6)");
+	//string str("(loop 4 (loop 5) 6)");
 	//string str("(p (if (= 3 4) then (+ 6 4) else (if (= 3 4) then (+ 2 6) else (+ 0 1))))");
 	//string str("(p (if (= 3 4) then (+ 2 6) else (+ 6 4)))");
 	//string str("(if (= 3 4) then (- 2 5) (+ 2 6) elsif (+ 0 1) then (+ 5 6) else (- 5 2) (+ 6 4))");
@@ -47,6 +48,7 @@ void testSub()
 
 void test()
 {
+	//ICM::OrderFile::TEST();
 	//testSub();
 	//exit(0);
 }

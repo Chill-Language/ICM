@@ -30,7 +30,9 @@ namespace ICM
 		DefKetwordTable.add("while", KeywordID::WHILE);
 		DefKetwordTable.add("break", KeywordID::BREAK);
 		DefKetwordTable.add("for", KeywordID::FOR);
+		DefKetwordTable.add("in", KeywordID::IN);
 		DefKetwordTable.add("case", KeywordID::CASE);
+		DefKetwordTable.add("when", KeywordID::WHEN);
 		DefKetwordTable.add("function", KeywordID::FUNCTION);
 	}
 }

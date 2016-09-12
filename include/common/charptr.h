@@ -18,6 +18,9 @@ public:
 	explicit charptr(const char *ptr, size_t len) : _capacity(len + 1), data(Memory::copyOf(ptr, _capacity), Memory::free<char>) {}
 	explicit charptr(const std::string &str) : charptr(str.c_str(), str.length()) {}
 	operator char*() { return data.get(); }
+	operator const char*() const { return data.get(); }
+	char& operator[](size_t id) { return data.get()[id]; }
+	const char& operator[](size_t id) const { return data.get()[id]; }
 	std::string to_string() const { return data.get(); }
 	charptr* clone() const { return new charptr(data.get(), _capacity); }
 	size_t capacity() const { return _capacity; }

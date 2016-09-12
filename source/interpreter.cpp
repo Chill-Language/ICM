@@ -32,7 +32,7 @@ namespace ICM
 		}
 		else if (op.isType(T_Disperse)) {
 			const auto &ftu = DefFuncTable["call"];
-			DataList ndl = op.get<Objects::Disperse>()->get_data();
+			DataList ndl = op.get<Objects::Disperse>()->getData();
 			ndl.insert(ndl.end(), dl.begin(), dl.end());
 			res = checkCall(ftu, ndl);
 		}
@@ -111,9 +111,37 @@ namespace ICM
 				tempresult[ProgramCounter] = Result;
 				break;
 			}
-			case OrderData::RET: {
-				//const auto &ne = static_cast<OrderDataRet*>(e);
-				//return tempresult[ne->getID()];
+			case OrderData::AT: {
+				ASTOrder::OrderDataAt *p = static_cast<ASTOrder::OrderDataAt*>(e);
+				Objects::List *l = tempresult[p->getRefid()].get<Objects::List>();
+				ObjectPtr op = l->getData()[p->getIndex()];
+				if (op.isType(T_Identifier))
+					op = ObjectPtr(op.get<Objects::Identifier>()->getRealData());
+				tempresult[ProgramCounter] = op;
+				Result = tempresult[ProgramCounter];
+				break;
+			}
+			case OrderData::LET: {
+				ASTOrder::OrderDataLet *p = static_cast<ASTOrder::OrderDataLet*>(e);
+				Objects::Identifier *ident = p->getData().get<Objects::Identifier>();
+				ident->setData(tempresult[p->getRefid()]);
+				break;
+			}
+			case OrderData::EQU: {
+				ASTOrder::OrderDataEqu *p = static_cast<ASTOrder::OrderDataEqu*>(e);
+				Objects::Identifier *ident = p->getData().get<Objects::Identifier>();
+				Objects::Boolean *r = ident->getRealData()->equ(tempresult[p->getRefid()]);
+				tempresult[ProgramCounter] = ObjectPtr(r);
+				Result = tempresult[ProgramCounter];
+				break;
+			}
+			case OrderData::INC: {
+				ASTOrder::OrderDataInc *p = static_cast<ASTOrder::OrderDataInc*>(e);
+				tempresult[ProgramCounter] = checkCall(DefFuncTable["inc"], DataList({ p->getData() }));
+				Result = tempresult[ProgramCounter];
+				break;
+			}
+			case OrderData::OVER: {
 				return Result;
 			}
 			}

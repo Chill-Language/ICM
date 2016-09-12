@@ -128,6 +128,55 @@ namespace ICM
 	};*/
 
 	//=======================================
+	// * Class ObjectPool
+	//=======================================
+	class ObjectPool
+	{
+		using Object = Objects::Object;
+	public:
+		struct ObjectPoolPtr
+		{
+			ObjectPoolPtr(DefaultType type, size_t index)
+				: _type(type), _index(index) {}
+			Object* get(const ObjectPool &objpool) const {
+				return objpool.get(*this);
+			}
+			template <typename T>
+			T* get(const ObjectPool &objpool) const {
+				return static_cast<T*>(objpool.get(*this));
+			}
+			bool isType(DefaultType type) const {
+				return this->type() == type;
+			}
+			template <typename _OTy>
+			bool isType() const {
+				return this->type() == _OTy::Type;
+			}
+			DefaultType type() const {
+				return _type;
+			}
+			size_t index() const {
+				return _index;
+			}
+
+		private:
+			DefaultType _type;
+			size_t _index;
+		};
+	public:
+		ObjectPool() : data(END_TYPE_ENUM) {}
+		~ObjectPool();
+		ObjectPoolPtr set(Object *op);
+		Object* get(const ObjectPoolPtr &op) const;
+		void del(const ObjectPoolPtr &op);
+		void write(File &file) const;
+		void read(File &file);
+
+	private:
+		vector<vector<Object*>> data;
+	};
+
+	//=======================================
 	// * SymbolTable
 	//=======================================
 	class SymbolTable

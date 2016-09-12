@@ -73,7 +73,7 @@ namespace ICM
 	//=======================================
 	// * Class Keyword
 	//=======================================
-	enum class KeywordID { IF, THEN, ELSE, ELSIF, FOR, WHILE, LOOP, BREAK, CASE, WHEN, FUNCTION };
+	enum class KeywordID { IF, THEN, ELSE, ELSIF, FOR, IN, WHILE, LOOP, BREAK, CASE, WHEN, FUNCTION };
 
 	//=======================================
 	// * Class KeywordTableUnit

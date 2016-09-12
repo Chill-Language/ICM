@@ -43,6 +43,7 @@ namespace ICM
 		case KeywordID::ELSE:     return "else";
 		case KeywordID::ELSIF:    return "elsif";
 		case KeywordID::FOR:      return "for";
+		case KeywordID::IN:       return "in";
 		case KeywordID::WHILE:    return "while";
 		case KeywordID::LOOP:     return "loop";
 		case KeywordID::BREAK:    return "break";

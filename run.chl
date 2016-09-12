@@ -147,7 +147,7 @@ else
 )
 (p x)                     ; x(6)
 
-; Test 15
+; Test 16
 (println "----------16----------")
 (let j 1)
 (loop
@@ -161,3 +161,26 @@ else
 	(if (= j 9) break)
 	(inc j)
 )
+
+; Test 17
+(println "----------17----------")
+(let j 1)
+(while (<= j 9)
+	(let i 1)
+	(while (<= i j)
+		(print i "*" j "=" (* i j) " ")
+		(inc i)
+	)
+	(println)
+	(inc j)
+)
+
+; Test 18
+(println "----------18----------")
+(for j in [1 9]
+	(for i in [1 j]
+		(print i "*" j "=" (* i j) " ")
+	)
+	(println)
+)
+(exit)

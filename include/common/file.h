@@ -13,7 +13,7 @@
 SYSTEM BEGIN
 class File
 {
-	using FilePtr = shared_ptr<FILE>;
+	using FilePtr = std::shared_ptr<FILE>;
 public:
 	enum TBMode {
 		Text,      // t
@@ -31,11 +31,11 @@ public:
 public:
 	File(TBMode tbmode = Text, RWMode rwmode = ReadWrite)
 		: tbmode(tbmode), rwmode(rwmode) {}
-	File(const string &filename, TBMode tbmode = Text, RWMode rwmode = ReadWrite)
+	File(const std::string &filename, TBMode tbmode = Text, RWMode rwmode = ReadWrite)
 		: filename(filename), tbmode(tbmode), rwmode(rwmode) {
 		priOpen();
 	}
-	File& open(const string &filename) {
+	File& open(const std::string &filename) {
 		this->filename = filename;
 		priOpen();
 		return *this;
@@ -44,6 +44,40 @@ public:
 		file = nullptr;
 		return *this;
 	}
+	File& reopen() {
+		close();
+		priOpen();
+		return *this;
+	}
+	File& reopen(RWMode rwmode) {
+		close();
+		this->rwmode = rwmode;
+		priOpen();
+		return *this;
+	}
+	void write(const void *buffer, size_t elsize, size_t elcount) {
+		fwrite(buffer, elsize, elcount, file.get());
+	}
+	template <typename T>
+	void write(const T *buffer, size_t elcount) {
+		write(buffer, sizeof(T), elcount);
+	}
+	template <typename T>
+	void write(const T &element) {
+		write(&element, 1);
+	}
+	void read(void *buffer, size_t elsize, size_t elcount) {
+		fread(buffer, elsize, elcount, file.get());
+	}
+	template <typename T>
+	void read(T *buffer, size_t elcount) {
+		read(buffer, sizeof(T), elcount);
+	}
+	template <typename T>
+	void read(T &element) {
+		read(&element, 1);
+	}
+
 	operator FILE*() const {
 		return file.get();
 	}
@@ -53,7 +87,7 @@ public:
 	size_t size() const {
 		return _size;
 	}
-	string getText() const {
+	std::string getText() const {
 		if (bad()) return "";
 		FileRecordPost frecpost(file);
 		charptr tmp(size());
@@ -64,13 +98,13 @@ public:
 
 private:
 	FilePtr file;
-	string filename;
+	std::string filename;
 	TBMode tbmode;
 	RWMode rwmode;
 	size_t _size;
 
 	void priOpen() {
-		const string &mode = getMode(tbmode, rwmode);
+		const std::string &mode = getMode(tbmode, rwmode);
 		file = FilePtr(fopen(filename.c_str(), mode.c_str()), fclose);
 		setSize();
 	}
@@ -107,8 +141,8 @@ private:
 		const FilePtr &file;
 	};
 
-	static string getMode(TBMode tbmode, RWMode rwmode) {
-		string str;
+	static std::string getMode(TBMode tbmode, RWMode rwmode) {
+		std::string str;
 		char tbchar = tbmode == Text ? 't' : 'b';
 		char rwchar;
 		bool appchar = false;

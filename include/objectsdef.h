@@ -31,10 +31,16 @@ namespace ICM
 			Boolean* clone() const {
 				return new Boolean(*this);
 			}
-			DefaultType get_type() const {
+			DefaultType getType() const {
 				return Type;
 			}
 			operator bool() const { return data; }
+			virtual void write(File &file) const {
+				file.write(data);
+			}
+			virtual void read(File &file) {
+				file.read(data);
+			}
 			// Const
 			static const DefaultType Type = T_Boolean;
 
@@ -63,6 +69,9 @@ namespace ICM
 			bool operator>(const Number &obj);
 			bool operator>=(const Number &obj);
 
+			NumType get_data() const {
+				return data;
+			}
 			//-----------------------------------
 			// + Inherited
 			//-----------------------------------
@@ -71,14 +80,17 @@ namespace ICM
 			string to_string() const {
 				return Common::Number::to_string(data);
 			}
-			DefaultType get_type() const {
+			DefaultType getType() const {
 				return Type;
 			}
 			Number* clone() const {
 				return new Number(*this);
 			}
-			NumType get_data() const {
-				return data;
+			virtual void write(File &file) const {
+				file.write(data);
+			}
+			virtual void read(File &file) {
+				file.read(data);
 			}
 			// Const
 			static const DefaultType Type = T_Number;
@@ -86,11 +98,11 @@ namespace ICM
 		private:
 			NumType data;
 			// TODO
-			NumType& get_data(Object *obj)
+			static NumType& get_data(Object *obj)
 			{
 				return ((Number*)obj)->data;
 			}
-			const NumType& get_data(const Object *obj) const
+			static const NumType& get_data(const Object *obj)
 			{
 				return ((Number*)obj)->data;
 			}
@@ -119,11 +131,22 @@ namespace ICM
 			std::string get_data() const {
 				return data.to_string();
 			}
-			DefaultType get_type() const {
+			DefaultType getType() const {
 				return Type;
 			}
 			String* clone() const {
 				return new String(*(this->data.clone()));
+			}
+			virtual void write(File &file) const {
+				size_t length = data.length();
+				file.write(length);
+				file.write((const char*)data, length);
+			}
+			virtual void read(File &file) {
+				size_t length;
+				file.read(length);
+				data = charptr(length);
+				file.read((char*)data, length);
 			}
 			// Const
 			static const DefaultType Type = T_String;
@@ -152,11 +175,17 @@ namespace ICM
 			std::string to_string() const {
 				return '\'' + to_output() + '\'';
 			}
-			DefaultType get_type() const {
+			DefaultType getType() const {
 				return Type;
 			}
 			Symbol* clone() const {
 				return new Symbol(*this);
+			}
+			virtual void write(File &file) const {
+				file.write(data);
+			}
+			virtual void read(File &file) {
+				file.read(data);
 			}
 			// Const
 			static const DefaultType Type = T_String;
@@ -174,6 +203,7 @@ namespace ICM
 		class List : public Object
 		{
 		public:
+			List() {}
 			explicit List(const DataList &dl) : data(dl) {}
 
 			List* push(const ObjectPtr &objp);
@@ -185,7 +215,7 @@ namespace ICM
 			DataList::iterator end() {
 				return data.end();
 			}
-			const DataList& get_data() const {
+			const DataList& getData() const {
 				return data;
 			}
 			size_t size() const {
@@ -199,7 +229,7 @@ namespace ICM
 			Boolean* equ(const ObjectPtr &obj) const;
 			string to_string() const;
 			string to_output() const;
-			DefaultType get_type() const {
+			DefaultType getType() const {
 				return Type;
 			}
 			List* clone() const {
@@ -226,7 +256,7 @@ namespace ICM
 			DataList::iterator end() {
 				return data.end();
 			}
-			const DataList& get_data() const {
+			const DataList& getData() const {
 				return data;
 			}
 
@@ -237,7 +267,7 @@ namespace ICM
 			Boolean* equ(const ObjectPtr &obj) const;
 			string to_string() const;
 			string to_output() const;
-			DefaultType get_type() const {
+			DefaultType getType() const {
 				return Type;
 			}
 			Disperse* clone() const {
@@ -271,7 +301,7 @@ namespace ICM
 					return data;
 			}
 			void setData(const ObjectPtr &op) {
-				if (op->get_type() == T_Identifier)
+				if (op->getType() == T_Identifier)
 					data = op.get<Identifier>()->getData();
 				else
 					data = op;
@@ -283,7 +313,7 @@ namespace ICM
 					data = ObjectPtr(op->clone());
 			}
 			void setRefer(const ObjectPtr &op) {
-				if (op->get_type() == T_Identifier) {
+				if (op->getType() == T_Identifier) {
 					const ObjectPtr &sop = op.get<Identifier>()->getData();
 					const ObjectPtr &refop = sop.isType<Identifier>() ? sop : op;
 					const ObjectPtr &refopdata = refop.get<Identifier>()->getData();
@@ -302,7 +332,7 @@ namespace ICM
 			// + Inherited
 			//-----------------------------------
 			// Method
-			DefaultType get_type() const {
+			DefaultType getType() const {
 				return Type;
 			}
 			Identifier* clone() const {
@@ -316,6 +346,12 @@ namespace ICM
 			}
 			string to_string_code() const {
 				return name.to_string();
+			}
+			virtual void write(File &file) const {
+				file.write(data);
+			}
+			virtual void read(File &file) {
+				file.read(data);
 			}
 			// Const
 			static const DefaultType Type = T_Identifier;
@@ -331,6 +367,7 @@ namespace ICM
 		class Keyword : public Object
 		{
 		public:
+			Keyword() {}
 			explicit Keyword(const KeywordID &data)
 				: data(data) {}
 			KeywordID getData() const {
@@ -340,7 +377,7 @@ namespace ICM
 			// + Inherited
 			//-----------------------------------
 			// Method
-			DefaultType get_type() const {
+			DefaultType getType() const {
 				return Type;
 			}
 			Keyword* clone() const {
@@ -348,6 +385,12 @@ namespace ICM
 			}
 			string to_string() const {
 				return ICM::to_string(data);
+			}
+			virtual void write(File &file) const {
+				file.write(data);
+			}
+			virtual void read(File &file) {
+				file.read(data);
 			}
 			// Const
 			static const DefaultType Type = T_Keyword;
@@ -368,7 +411,7 @@ namespace ICM
 			// + Inherited
 			//-----------------------------------
 			// Method
-			DefaultType get_type() const {
+			DefaultType getType() const {
 				return Type;
 			}
 			TypeClass* clone() const {
@@ -376,6 +419,12 @@ namespace ICM
 			}
 			string to_string() const {
 				return data.to_string();
+			}
+			virtual void write(File &file) const {
+				file.write(data);
+			}
+			virtual void read(File &file) {
+				file.read(data);
 			}
 			// Const
 			static const DefaultType Type = T_Type;
@@ -390,6 +439,7 @@ namespace ICM
 		class Function : public Object
 		{
 		public:
+			Function() {}
 			Function(size_t id) : data(id) {}
 			const FuncTableUnit& get_data() const {
 				return DefFuncTable[data];
@@ -398,7 +448,7 @@ namespace ICM
 			// + Inherited
 			//-----------------------------------
 			// Method
-			DefaultType get_type() const {
+			DefaultType getType() const {
 				return Type;
 			}
 			Function* clone() const {
@@ -409,6 +459,12 @@ namespace ICM
 			}
 			string to_string_code() const {
 				return get_data().getName();
+			}
+			virtual void write(File &file) const {
+				file.write(data);
+			}
+			virtual void read(File &file) {
+				file.read(data);
 			}
 			// Const
 			static const DefaultType Type = T_Function;
@@ -432,7 +488,7 @@ namespace ICM
 			string to_string() const {
 				return "Error(" + msg + ")";
 			}
-			DefaultType get_type() const {
+			DefaultType getType() const {
 				return Type;
 			}
 			Object* clone() const {
@@ -461,7 +517,7 @@ namespace ICM
 			string to_string() const {
 				return "Nil";
 			}
-			DefaultType get_type() const {
+			DefaultType getType() const {
 				return Type;
 			}
 			Nil* clone() const {

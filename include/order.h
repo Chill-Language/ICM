@@ -12,7 +12,7 @@ namespace ICM
 		class OrderData
 		{
 		public:
-			enum Order { CALL, SINGLE, STORE, JUMP, JUMPNOT, FUNC, OVER, RET };
+			enum Order { START, CALL, SINGLE, STORE, JUMP, JUMPNOT, FUNC, AT, LET, EQU, INC, OVER };
 
 			virtual Order order() const = 0;
 
@@ -20,14 +20,18 @@ namespace ICM
 				string str;
 				switch (order())
 				{
+				case START:    str.append("BEG "); break;
 				case CALL:     str.append("CALL"); break;
 				case SINGLE:   str.append("SING"); break;
 				case STORE:    str.append("STOR"); break;
 				case JUMP:     str.append("JUMP"); break;
 				case JUMPNOT:  str.append("JMPN"); break;
 				case FUNC:     str.append("FUNC"); break;
-				case RET:      str.append("RET "); break;
-				case OVER:     str.append("OVER"); break;
+				case AT:       str.append("AT  "); break;
+				case LET:      str.append("LET "); break;
+				case EQU:      str.append("EQU "); break;
+				case INC:      str.append("INC "); break;
+				case OVER:     str.append("END "); break;
 				}
 				str.append(" | ");
 				str.append(getToString());
@@ -41,17 +45,12 @@ namespace ICM
 			}
 		};
 
-		class OrderList;
-
 		class OrderDataCall : public OrderData
 		{
 			using NodePtr = AST::Node*;
 		public:
-			OrderDataCall(NodePtr nodptr) : /*value(ObjectPtr()),*/ nodptr(nodptr) {}
-			//OrderDataCall(ObjectPtr &objptr, NodePtr nodptr) : value(std::move(objptr)), nodptr(nodptr) {}
+			OrderDataCall(const NodePtr &nodptr) : nodptr(nodptr) {}
 			OrderData::Order order() const { return OrderData::CALL; }
-			//ObjectPtr getValue() const { return value; }
-			//void setValue(const ObjectPtr &obj) { value = obj; }
 			NodePtr& getData() { return nodptr; }
 			const NodePtr& getData() const { return nodptr; }
 			void adjustID(const map<size_t, size_t> &map) {
@@ -64,7 +63,6 @@ namespace ICM
 			}
 
 		private:
-			//ObjectPtr &&value;
 			NodePtr nodptr;
 			string getToString() const {
 				return nodptr->to_string_for_order();
@@ -153,30 +151,81 @@ namespace ICM
 			}
 		};
 
+		class OrderDataAt : public OrderData
+		{
+		public:
+			OrderDataAt(size_t ref, size_t id) : ref(ref), id(id) {}
+			OrderData::Order order() const { return OrderData::AT; }
+			size_t getRefid() const { return ref; }
+			size_t getIndex() const { return id; }
+
+		private:
+			size_t ref;
+			size_t id;
+			string getToString() const {
+				return "{" + std::to_string(ref) + "}, " + std::to_string(id);
+			}
+		};
+		
+		class OrderDataLet : public OrderData
+		{
+		public:
+			OrderDataLet(ObjectPtr objptr, size_t id) : data(objptr), id(id) {}
+			OrderData::Order order() const { return OrderData::LET; }
+			const ObjectPtr& getData() const { return data; }
+			void setData(const ObjectPtr &obj) { data = obj; }
+			size_t getRefid() const { return id; }
+
+		private:
+			ObjectPtr data;
+			size_t id;
+			string getToString() const {
+				return data->to_string_code() + ", {" + std::to_string(id) + "}";
+			}
+		};
+		
+		class OrderDataEqu : public OrderData
+		{
+		public:
+			OrderDataEqu(ObjectPtr objptr, size_t id) : data(objptr), id(id) {}
+			OrderData::Order order() const { return OrderData::EQU; }
+			const ObjectPtr& getData() const { return data; }
+			void setData(const ObjectPtr &obj) { data = obj; }
+			size_t getRefid() const { return id; }
+
+		private:
+			ObjectPtr data;
+			size_t id;
+			string getToString() const {
+				return data->to_string_code() + ", {" + std::to_string(id) + "}";
+			}
+		};
+		
+		class OrderDataInc : public OrderData
+		{
+		public:
+			OrderDataInc(ObjectPtr objptr) : data(objptr) {}
+			OrderData::Order order() const { return OrderData::INC; }
+			const ObjectPtr& getData() const { return data; }
+			void setData(const ObjectPtr &obj) { data = obj; }
+
+		private:
+			ObjectPtr data;
+			string getToString() const {
+				return data->to_string_code();
+			}
+		};
+
+		class OrderDataBegin : public OrderData
+		{
+		public:
+			OrderData::Order order() const { return OrderData::START; }
+		};
+
 		class OrderDataEnd : public OrderData
 		{
 		public:
 			OrderData::Order order() const { return OrderData::OVER; }
-		private:
-		};
-
-		class OrderDataRet : public OrderData
-		{
-		public:
-			OrderDataRet(size_t id) : id(id) {}
-			OrderData::Order order() const { return OrderData::RET; }
-			void adjustID(const map<size_t, size_t> &map) {
-				//this->id = map.at(this->id);
-			}
-			size_t getID() const {
-				return this->id;
-			}
-
-		private:
-			size_t id;
-			string getToString() const {
-				return "{" + std::to_string(id) + "}";
-			}
 		};
 
 		class OrderList
@@ -215,6 +264,7 @@ namespace ICM
 			using Segment = vector<AST::Base*>; // ASTs
 			AST::Node* getReferNode(AST::Base *refer);
 			ObjectPtr& getDataRef(AST::Base *data);
+			void createSingle(AST::Base *bp);
 			void createOrderSub(const Single &single);
 			void createOrderSub(const Segment &segment);
 			void createOrderKeyword(const Single& single, KeywordID keyword);

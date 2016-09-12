@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <initializer_list>
 //  common
+#include "file.h"
 #include "prints.h"
 #include "memory.h"
 #include "charptr.h"

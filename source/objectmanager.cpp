@@ -9,7 +9,7 @@ namespace ICM
 	// * Class ObjectManager
 	//=======================================
 	size_t ObjectManager::newObjectPtr(Objects::Object *obj) {
-		DefaultType typeID = obj->get_type();
+		DefaultType typeID = obj->getType();
 		auto &table = ObjectTypePool[typeID];
 		size_t id = table.currentIndex();
 		bool res = table.insert(obj);
@@ -60,13 +60,13 @@ namespace ICM
 			this->_index = 0;
 		}
 		else {
-			this->_type = op->get_type();
+			this->_type = op->getType();
 			this->_index = GlobalObjectManager.newObjectPtr(op);
 		}
 		GlobalObjectManager.increaseCount(this->_type, this->_index);
 	}
 	ObjectPtr::ObjectPtr(const ObjectPtr &op)
-			: _type(op._type), _index(op._index) {
+		: _type(op._type), _index(op._index) {
 		GlobalObjectManager.increaseCount(this->_type, this->_index);
 	}
 	ObjectPtr::~ObjectPtr() {
@@ -90,6 +90,48 @@ namespace ICM
 		if (this->get() == nullptr)
 			return "Null";
 		return this->get()->to_output();
+	}
+
+	//=======================================
+	// * Class ObjectPool
+	//=======================================
+	ObjectPool::~ObjectPool() {
+		for (auto &v : data)
+			for (auto *p : v)
+				delete p;
+	}
+	ObjectPool::ObjectPoolPtr ObjectPool::set(Object *op) {
+		DefaultType type = op->getType();
+		size_t index = data[type].size();
+		data[type].push_back(op);
+		return ObjectPoolPtr(type, index);
+	}
+	ObjectPool::Object* ObjectPool::get(const ObjectPoolPtr &op) const {
+		return data[op.type()][op.index()]->clone();
+	}
+	void ObjectPool::del(const ObjectPoolPtr &op) {
+
+	}
+	void ObjectPool::write(File &file) const {
+		for (auto i : Range<size_t>(BEGIN_TYPE_ENUM, END_TYPE_ENUM)) {
+			file.write<int32_t>(i);
+			file.write<int32_t>(data[i].size());
+			for (auto *op : data[i])
+				op->write(file);
+		}
+	}
+	void ObjectPool::read(File &file) {
+		int32_t type;
+		int32_t size;
+		for (auto i : Range<size_t>(BEGIN_TYPE_ENUM, END_TYPE_ENUM)) {
+			file.read(type);
+			file.read(size);
+			data[i].resize(size);
+			for (auto &op : data[i]) {
+				op = createObject((DefaultType)type);
+				op->read(file);
+			}
+		}
 	}
 
 	//=======================================

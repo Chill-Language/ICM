@@ -3,6 +3,7 @@
 
 #include "basic.h"
 #include "objectmanager.h"
+#include "file.h"
 
 namespace ICM
 {
@@ -37,6 +38,7 @@ namespace ICM
 	inline ObjectPtr createObject(Args... args) {
 		return ObjectPtr(new T(args...));
 	}
+	Objects::Object* createObject(DefaultType type);
 	ObjectPtr createError(const string &errinfo);
 	const ObjectPtr& adjustObjectPtr(const ObjectPtr &ptr);
 	std::string to_string(const Objects::Object &obj);
@@ -61,7 +63,7 @@ namespace ICM
 			virtual string to_string_code() const {
 				return to_string();
 			}
-			virtual DefaultType get_type() const {
+			virtual DefaultType getType() const {
 				return Type;
 			}
 			virtual Object* clone() const {
@@ -69,12 +71,14 @@ namespace ICM
 			}
 			// Method
 			virtual Boolean* equ(const ObjectPtr &obj) const;
+			virtual void write(File &file) const {}
+			virtual void read(File &file) {}
 			// Const
 			static const DefaultType Type = T_Object;
 
 		protected:
 			bool type_equal(const ObjectPtr &obj) const {
-				return this->get_type() == obj->get_type();
+				return this->getType() == obj->getType();
 			}
 		};
 	}

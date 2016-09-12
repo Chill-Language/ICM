@@ -248,7 +248,7 @@ namespace ICM
 			}
 
 			const DataList& _disp(const List *l) {
-				return l->get_data();
+				return l->getData();
 			}
 
 			ObjectPtr disp(const DataList &dl) {
@@ -284,7 +284,7 @@ namespace ICM
 					return S({ T_List, T_Number }, T_List); // (L N) -> L
 				}
 				ObjectPtr func(const DataList &list) const {
-					auto &l = list[0].get<List>()->get_data();
+					auto &l = list[0].get<List>()->getData();
 					DataList nl;
 					for (size_t i : Range<size_t>(0, (size_t)list[1].get<Number>()->get_data().getNum())) {
 						nl.insert(nl.end(), l.begin(), l.end());
@@ -314,7 +314,7 @@ namespace ICM
 					for (size_t i : range(0, minsize)) {
 						DataList ldl(size - 1);
 						for (auto id : range(1, size))
-							ldl[id - 1] = list[id].get<List>()->get_data()[i];
+							ldl[id - 1] = list[id].get<List>()->getData()[i];
 						dls.push_back(rf.call(ldl));
 					}
 					List *result = new List(dls);
@@ -329,8 +329,20 @@ namespace ICM
 					return S({ T_List }, T_Number); // L -> N
 				}
 				ObjectPtr func(const DataList &list) const {
-					size_t s = list[0].get<List>()->get_data().size();
+					size_t s = list[0].get<List>()->getData().size();
 					return ObjectPtr(new Number(s));
+				}
+			};
+
+			struct At : public FI
+			{
+			private:
+				S sign() const {
+					return S({ T_List, T_Number }, T_Vary); // L -> V
+				}
+				ObjectPtr func(const DataList &list) const {
+					const ObjectPtr &op = list[0].get<List>()->getData()[(size_t)list[1].get<Number>()->get_data().getNum()];
+					return op;
 				}
 			};
 		}
@@ -458,6 +470,7 @@ namespace ICM
 		});
 		DefFuncTable.add("foreach", LST{ new Lists::Foreach() });
 		DefFuncTable.add("size", LST{ new Lists::Size() });
+		DefFuncTable.add("at", LST{ new Lists::At() });
 		DefFuncTable.add("call", Lst{
 			F(System::call, S({ T_Function }, T_Vary)),    // F -> V
 			F(System::call, S({ T_Function, T_Vary }, T_Vary, true)),    // (F V*) -> V
