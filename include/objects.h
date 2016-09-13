@@ -32,7 +32,7 @@ namespace ICM
 	using CallFunc = ObjectPtr(const DataList&);
 	using FuncPtr = std::function<CallFunc>;
 	using LDataList = Common::lightlist<Objects::Object*>;
-	using LFuncPtr = std::function<void(Objects::Object &, const LDataList &)>;
+	using LFuncPtr = std::function<void(Objects::Object*&, const LDataList &)>;
 	// Functions
 	template <typename T, typename... Args>
 	inline ObjectPtr createObject(Args... args) {

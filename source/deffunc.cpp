@@ -154,12 +154,12 @@ namespace ICM
 					bool result = fp(list[0].get<N>(), list[1].get<N>());
 					return ObjectPtr(new Boolean(result));
 				}
-				void funcL(Object &result, const LDataList &list) const {
+				void funcL(Object* &result, const LDataList &list) const {
 					funcB(result, list[0], list[1]);
 				}
-				void funcB(Object &result, Object *a, Object *b) const {
+				void funcB(Object* &result, Object *a, Object *b) const {
 					bool r = fp(static_cast<N*>(a), static_cast<N*>(b));
-					result = Boolean(r);
+					result = new Boolean(r);
 				}
 				Func fp;
 			};
@@ -270,10 +270,12 @@ namespace ICM
 				const auto &rf = func[id];
 
 				List *list = dl[0].get<List>();
-				Boolean r;
+				Object *r;
 				std::sort(list->begin(), list->end(), [&](const ObjectPtr &a, const ObjectPtr &b) -> bool {
 					rf.callL(r, { a.get(), b.get() });
-					return r.operator bool();
+					bool rr = static_cast<Boolean*>(r)->operator bool();
+					delete r;
+					return rr;
 				});
 				return ObjectPtr(list);
 			}

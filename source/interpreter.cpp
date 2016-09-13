@@ -113,7 +113,10 @@ namespace ICM
 			}
 			case OrderData::AT: {
 				ASTOrder::OrderDataAt *p = static_cast<ASTOrder::OrderDataAt*>(e);
-				Objects::List *l = tempresult[p->getRefid()].get<Objects::List>();
+				ObjectPtr top = tempresult[p->getRefid()];
+				if (top.isType(T_Identifier))
+					top = top.get<Objects::Identifier>()->getRealData();
+				Objects::List *l = top.get<Objects::List>();
 				ObjectPtr op = l->getData()[p->getIndex()];
 				if (op.isType(T_Identifier))
 					op = ObjectPtr(op.get<Objects::Identifier>()->getRealData());
