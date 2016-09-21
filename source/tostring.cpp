@@ -10,18 +10,10 @@ namespace ICM
 	{
 		switch (type) {
 		case T_Null:       return "Null";
-		case T_LBracket:   return "LBracket";
-		case T_RBracket:   return "RBracket";
-		case T_LSBracket:  return "LSBracket";
-		case T_RSBracket:  return "RSBracket";
-		case T_Comment:    return "Comment";
-
 		case T_Object:     return "Object";
 		case T_Nil:        return "Nil";
-
 		case T_Identifier: return "Identifier";
 		case T_Keyword:    return "Keyword";
-		case T_Argument:   return "Argument";
 		case T_Number:     return "Number";
 		case T_Boolean:    return "Boolean";
 		case T_String:     return "String";

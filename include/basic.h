@@ -35,20 +35,13 @@ namespace ICM
 {
 	// Type
 	enum DefaultType {
-		BEGIN_TYPE_ENUM, // Begin Enum Mark
-		T_Null,
-		T_LBracket,
-		T_RBracket,
-		T_LSBracket,
-		T_RSBracket,
-		T_Comment,
+		T_Null,       // Null
 		T_Object,     // Obj
 		T_Nil,        // Nil
 		T_Vary,       // Var
 		T_Error,      // Err
 		T_Identifier, // Idt
 		T_Keyword,    // Key
-		T_Argument,   // Arg *
 		T_List,       // L
 		T_Disperse,   // D   *
 		T_Number,     // N
@@ -59,7 +52,7 @@ namespace ICM
 		T_Boolean,    // Bool
 		T_Symbol,     // Sym
 		END_TYPE_ENUM, // End Enum Mark
-	};
+	}; // Interval : [ T_Null, END_TYPE_ENUM )
 
 	std::string to_string();
 }

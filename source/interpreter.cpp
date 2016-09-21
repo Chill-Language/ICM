@@ -50,8 +50,9 @@ namespace ICM
 	ObjectPtr Interpreter::run() {
 		using namespace ASTOrder;
 		size_t ProgramCounter = 0;
-
+		//vector<size_t> VecPC;
 		while (true) {
+			//VecPC.push_back(ProgramCounter);
 			auto &e = orderlist[ProgramCounter];
 			switch (e->order()) {
 			case OrderData::CALL: {
@@ -90,7 +91,7 @@ namespace ICM
 					}
 				}
 				if (op.isType(T_Boolean)) {
-					bool result = op.get<Objects::Boolean>()->operator bool();
+					bool result = op.get<Objects::Boolean>()->getData();
 					if (!result) {
 						size_t jmpid = p->getJmpid();
 						ProgramCounter = jmpid;
@@ -133,8 +134,8 @@ namespace ICM
 			case OrderData::EQU: {
 				ASTOrder::OrderDataEqu *p = static_cast<ASTOrder::OrderDataEqu*>(e);
 				Objects::Identifier *ident = p->getData().get<Objects::Identifier>();
-				Objects::Boolean *r = ident->getRealData()->equ(tempresult[p->getRefid()]);
-				tempresult[ProgramCounter] = ObjectPtr(r);
+				bool r = ident->getRealData()->equ(tempresult[p->getRefid()]);
+				tempresult[ProgramCounter] = ObjectPtr(new Objects::Boolean(r));
 				Result = tempresult[ProgramCounter];
 				break;
 			}
@@ -145,6 +146,8 @@ namespace ICM
 				break;
 			}
 			case OrderData::OVER: {
+				//for (auto &e : VecPC)
+				//	print(e, "->");
 				return Result;
 			}
 			}

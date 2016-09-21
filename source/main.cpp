@@ -48,6 +48,10 @@ void testSub()
 
 void test()
 {
+	//auto &n1 = Objects::Number(Number::Rational(5));
+	//auto &n2 = Objects::Number(Number::Rational(5));
+
+	//println(n1.equ(&n2));
 	//ICM::OrderFile::TEST();
 	//testSub();
 	//exit(0);

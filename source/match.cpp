@@ -6,7 +6,7 @@ namespace ICM
 	MatchResult Match::matchNext()
 	{
 		MatchResult mr;
-		DefaultType type = T_Null;
+		MatchType type = MT_Null;
 		const char *begin = currptr;
 		int mode = 0;
 		vector<char> findchars;
@@ -25,54 +25,54 @@ namespace ICM
 				{
 				case '(':  /* Left Bracket */
 					++currptr;
-					mr = MatchResult(T_LBracket, currptr - 1, currptr);
+					mr = MatchResult(MT_LBracket, currptr - 1, currptr);
 					goto EndMatch;
 				case ')':  /* Right Bracket */
 					++currptr;
-					mr = MatchResult(T_RBracket, currptr - 1, currptr);
+					mr = MatchResult(MT_RBracket, currptr - 1, currptr);
 					goto EndMatch;
 				case '[':  /* Left Square Bracket */
 					++currptr;
-					mr = MatchResult(T_LSBracket, currptr - 1, currptr);
+					mr = MatchResult(MT_LSBracket, currptr - 1, currptr);
 					goto EndMatch;
 				case ']':  /* Right Square Bracket */
 					++currptr;
-					mr = MatchResult(T_RSBracket, currptr - 1, currptr);
+					mr = MatchResult(MT_RSBracket, currptr - 1, currptr);
 					goto EndMatch;
 				case ';':  /* Comment */
 					findchars = { '\n', '\0' };
 					//ignorechars = { '\\' };
-					type = T_Comment;
+					type = MT_Comment;
 					begin = currptr;
 					mode = 1;
 					break;
 				case '"':  /* String */
 					findchars = { '"', '\0' };
 					//ignorechars = { '\\' };
-					type = T_String;
+					type = MT_String;
 					begin = currptr + 1;
 					mode = 1;
 					break;
 				case '\'':  /* Symbol */ 
 					findchars = { '\'', '\0' };
-					type = T_Symbol;
+					type = MT_Symbol;
 					begin = currptr + 1;
 					mode = 1;
 					break;
 				case '-': /* (Maybe) Number */
-					type = T_Number;
+					type = MT_Number;
 					begin = currptr;
 					mode = 3;
 					firstfind = false;
 					break;
 				default:
 					if (isdigit(c)) /* Number */ {
-						type = T_Number;
+						type = MT_Number;
 						begin = currptr;
 						mode = 2;
 					}
 					else if (isalpha(c) || ispunct(c)) /* Idenit */ {
-						type = T_Identifier;
+						type = MT_Identifier;
 						begin = currptr;
 						mode = 2;
 					}
@@ -103,7 +103,7 @@ namespace ICM
 					}
 					else {
 						currptr -= 2;
-						type = T_Identifier;
+						type = MT_Identifier;
 						mode = 2;
 					}
 				}
@@ -116,15 +116,34 @@ namespace ICM
 			++currptr;
 		}
 		EndMatch:
-		if (mr.getType() == T_Identifier) {
+		if (mr.getType() == MT_Identifier) {
 			if (mr.getString() == "Nil")
-				;//mr.setType(T_Nil);
+				;//mr.setType(MT_Nil);
 			else if (mr.getString() == "T" || mr.getString() == "F")
-				mr.setType(T_Boolean);
+				mr.setType(MT_Boolean);
 			else if (DefKetwordTable.find(mr.getString()))
-				mr.setType(T_Keyword);
+				mr.setType(MT_Keyword);
 		}
 
 		return mr;
+	}
+
+	string to_string(MatchType type)
+	{
+		switch (type) {
+		case MT_Null:       return "Null";
+		case MT_LBracket:   return "LBracket";
+		case MT_RBracket:   return "RBracket";
+		case MT_LSBracket:  return "LSBracket";
+		case MT_RSBracket:  return "RSBracket";
+		case MT_Comment:    return "Comment";
+		case MT_Identifier: return "Identifier";
+		case MT_Keyword:    return "Keyword";
+		case MT_Number:     return "Number";
+		case MT_Boolean:    return "Boolean";
+		case MT_String:     return "String";
+		case MT_Symbol:     return "Symbol";
+		default:            return "UnfoundType";
+		}
 	}
 }

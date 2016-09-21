@@ -52,7 +52,7 @@ namespace ICM
 
 	// For Testing Speed
 	/*DefaultType ObjectPtr::type() const {
-		return data->get_type();
+		return data->getType();
 	}*/
 	ObjectPtr::ObjectPtr(Objects::Object* op) {
 		if (op == nullptr) {
@@ -113,7 +113,7 @@ namespace ICM
 
 	}
 	void ObjectPool::write(File &file) const {
-		for (auto i : Range<size_t>(BEGIN_TYPE_ENUM, END_TYPE_ENUM)) {
+		for (auto i : Range<size_t>(T_Null, END_TYPE_ENUM)) {
 			file.write<int32_t>(i);
 			file.write<int32_t>(data[i].size());
 			for (auto *op : data[i])
@@ -123,7 +123,7 @@ namespace ICM
 	void ObjectPool::read(File &file) {
 		int32_t type;
 		int32_t size;
-		for (auto i : Range<size_t>(BEGIN_TYPE_ENUM, END_TYPE_ENUM)) {
+		for (auto i : Range<size_t>(T_Null, END_TYPE_ENUM)) {
 			file.read(type);
 			file.read(size);
 			data[i].resize(size);

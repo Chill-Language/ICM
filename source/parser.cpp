@@ -8,29 +8,29 @@ namespace ICM
 	{
 		using namespace Objects;
 
-		ObjectPtr createObject(DefaultType type, const string &str)
+		ObjectPtr createObject(MatchType type, const string &str)
 		{
 			using namespace Objects;
 
 			Object *object;
 			switch (type)
 			{
-			case ICM::T_Nil:
-				object = new Nil();
-				break;
-			case ICM::T_Number:
+			//case ICM::MT_Nil:
+			//	object = new Nil();
+			//	break;
+			case ICM::MT_Number:
 				object = new Number(Common::Number::to_rational(str.c_str()));
 				break;
-			case ICM::T_Boolean:
+			case ICM::MT_Boolean:
 				object = new Boolean(str == "T");
 				break;
-			case ICM::T_String:
+			case ICM::MT_String:
 				object = new String(str);
 				break;
-			case ICM::T_Identifier:
+			case ICM::MT_Identifier:
 				object = new Identifier(str);
 				break;
-			case ICM::T_Keyword:
+			case ICM::MT_Keyword:
 				object = new Keyword(DefKetwordTable[str].getData());
 				break;
 			default:
@@ -45,13 +45,13 @@ namespace ICM
 			MatchResult mr = match.matchNext();
 
 			// Check Unmatch
-			while (mr.getType() == T_Null || mr.getType() == T_Comment) {
+			while (mr.getType() == MT_Null || mr.getType() == MT_Comment) {
 				if (mr.begin() != mr.end())
 					mr = match.matchNext();
 				else
 					return false;
 			}
-			if (mr.getType() != T_LBracket && mr.getType() != T_LSBracket) {
+			if (mr.getType() != MT_LBracket && mr.getType() != MT_LSBracket) {
 				printf("Syntax Error in line(%d).\n", match.getCurLineNum());
 				return false;
 			}
@@ -67,32 +67,32 @@ namespace ICM
 				}
 
 				switch (mr.getType()) {
-				case T_LBracket:
+				case MT_LBracket:
 					ast.pushNode();
 					firstMatchBraket = true;
 					emptybreak = true;
 					break;
-				case T_RBracket:
+				case MT_RBracket:
 					if (firstMatchBraket) {
 						println("Unfind Method in Line(", match.getCurLineNum(), ").");
 						return false;
 					}
 					ast.retNode();
 					break;
-				case T_LSBracket:
+				case MT_LSBracket:
 					ast.pushNode();
 					ast.pushData(ICM::createObject<Objects::Function>(DefFuncTable.find("list")));
 					firstMatchBraket = false;
 					emptybreak = true;
 					break;
-				case T_RSBracket:
+				case MT_RSBracket:
 					ast.retNode();
 					break;
-				case T_Identifier: case T_Keyword:
+				case MT_Identifier: case MT_Keyword:
 					ast.pushData(createObject(mr.getType(), mr.getString()));
 					firstMatchBraket = false;
 					break;
-				case T_Number: case T_String: case T_Boolean:
+				case MT_Number: case MT_String: case MT_Boolean:
 					if (firstMatchBraket) {
 						printf("Error '%s' is not function in line(%d).\n", mr.getString().c_str(), match.getCurLineNum());
 						return false;

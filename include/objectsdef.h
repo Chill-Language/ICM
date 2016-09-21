@@ -12,103 +12,6 @@ namespace ICM
 	namespace Objects
 	{
 		//=======================================
-		// * Class Boolean
-		//=======================================
-		class Boolean : public Object
-		{
-		public:
-			Boolean() {}
-			explicit Boolean(bool b) : data(b) {}
-
-			//-----------------------------------
-			// + Inherited
-			//-----------------------------------
-			// Method
-			Boolean* equ(const ObjectPtr &obj) const;
-			string to_string() const {
-				return Convert::to_string(data);
-			}
-			Boolean* clone() const {
-				return new Boolean(*this);
-			}
-			DefaultType getType() const {
-				return Type;
-			}
-			operator bool() const { return data; }
-			virtual void write(File &file) const {
-				file.write(data);
-			}
-			virtual void read(File &file) {
-				file.read(data);
-			}
-			// Const
-			static const DefaultType Type = T_Boolean;
-
-		private:
-			bool data = false;
-		};
-
-		//=======================================
-		// * Class Number
-		//=======================================
-		class Number : public Object
-		{
-		public:
-			using NumType = Common::Number::Rational;
-			explicit Number(NumType dat = 0) : data(dat) {}
-
-			Number* add(const Number *obj);
-			Number* sub(const Number *obj);
-			Number* mul(const Number *obj);
-			Number* div(const Number *obj);
-			Number* mod(const Number *obj);
-			Number* rem(const Number *obj);
-
-			bool operator<(const Number &obj);
-			bool operator<=(const Number &obj);
-			bool operator>(const Number &obj);
-			bool operator>=(const Number &obj);
-
-			NumType get_data() const {
-				return data;
-			}
-			//-----------------------------------
-			// + Inherited
-			//-----------------------------------
-			// Method
-			Boolean* equ(const ObjectPtr &obj) const;
-			string to_string() const {
-				return Common::Number::to_string(data);
-			}
-			DefaultType getType() const {
-				return Type;
-			}
-			Number* clone() const {
-				return new Number(*this);
-			}
-			virtual void write(File &file) const {
-				file.write(data);
-			}
-			virtual void read(File &file) {
-				file.read(data);
-			}
-			// Const
-			static const DefaultType Type = T_Number;
-
-		private:
-			NumType data;
-			// TODO
-			static NumType& get_data(Object *obj)
-			{
-				return ((Number*)obj)->data;
-			}
-			static const NumType& get_data(const Object *obj)
-			{
-				return ((Number*)obj)->data;
-			}
-		};
-
-		//=======================================
 		// * Class String
 		//=======================================
 		class String : public Object
@@ -124,7 +27,9 @@ namespace ICM
 			// + Inherited
 			//-----------------------------------
 			// Method
-			Boolean* equ(const ObjectPtr &obj) const;
+			bool equ(const ObjectPtr &obj) const {
+				return this->to_string() == obj.get<String>()->to_string();
+			}
 			std::string to_string() const {
 				return '"' + data.to_string() + '"';
 			}
@@ -171,7 +76,9 @@ namespace ICM
 			// + Inherited
 			//-----------------------------------
 			// Method
-			Boolean* equ(const ObjectPtr &obj) const;
+			bool equ(const ObjectPtr &obj) const {
+				return this->data == obj.get<Symbol>()->data;
+			}
 			std::string to_string() const {
 				return '\'' + to_output() + '\'';
 			}
@@ -226,7 +133,9 @@ namespace ICM
 			// + Inherited
 			//-----------------------------------
 			// Method
-			Boolean* equ(const ObjectPtr &obj) const;
+			bool equ(const ObjectPtr &obj) const {
+				return this->data == obj.get<List>()->data;
+			}
 			string to_string() const;
 			string to_output() const;
 			DefaultType getType() const {
@@ -264,7 +173,9 @@ namespace ICM
 			// + Inherited
 			//-----------------------------------
 			// Method
-			Boolean* equ(const ObjectPtr &obj) const;
+			bool equ(const ObjectPtr &obj) const {
+				return this->data == obj.get<Disperse>()->data;
+			}
 			string to_string() const;
 			string to_output() const;
 			DefaultType getType() const {
@@ -513,7 +424,9 @@ namespace ICM
 			// + Inherited
 			//-----------------------------------
 			// Method
-			Boolean* equ(const ObjectPtr &obj) const;
+			bool equ(const ObjectPtr &obj) const {
+				return true;
+			}
 			string to_string() const {
 				return "Nil";
 			}

@@ -60,7 +60,29 @@ namespace ICM
 					return S({}, T_Number); // Void -> N
 				}
 				ObjectPtr func(const DataList &list) const {
-					return ObjectPtr(new Number(0));
+					return ObjectPtr(new Number(Number::VType(0)));
+				}
+			};
+			template <>
+			struct Add<Number> : public FI
+			{
+				using T = Number;
+			private:
+				S sign() const {
+					DefaultType t = Number::Type;
+					return S({ t }, t, true); // T* -> T
+				}
+				ObjectPtr func(const DataList &list) const {
+					T *tmp = list.front().get<T>()->clone();
+					for (auto i : Range<size_t>(1, list.size()))
+						tmp->getData().getData().operator+=(list[i].get<T>()->getData().getData());
+					return ObjectPtr(tmp);
+				}
+				void funcL(Object &result, const LDataList &list) const {
+					T *tmp = static_cast<T*>(list.front()->clone());
+					for (auto i : Range<size_t>(1, list.size()))
+						tmp->getData().getData().operator+=(static_cast<T*>(list[i])->getData().getData());
+					result = *tmp;
 				}
 			};
 
@@ -83,9 +105,9 @@ namespace ICM
 				}
 				Func fp;
 			};
-			struct Sub : public NumCall { Sub() : NumCall([](N *num, N *obj) { num->sub(obj); }) {} };
-			struct Mul : public NumCall { Mul() : NumCall([](N *num, N *obj) { num->mul(obj); }) {} };
-			struct Div : public NumCall { Div() : NumCall([](N *num, N *obj) { num->div(obj); }) {} };
+			struct Sub : public NumCall { Sub() : NumCall([](N *num, N *obj) { num->getData().getData() -= obj->getData().getData(); }) {} };
+			struct Mul : public NumCall { Mul() : NumCall([](N *num, N *obj) { num->getData().getData() *= obj->getData().getData(); }) {} };
+			struct Div : public NumCall { Div() : NumCall([](N *num, N *obj) { num->getData().getData() /= obj->getData().getData(); }) {} };
 
 			struct Mod : public FI
 			{
@@ -94,7 +116,10 @@ namespace ICM
 					return S({ T_Number, T_Number }, T_Number); // (N N) -> N
 				}
 				ObjectPtr func(const DataList &list) const {
-					return ObjectPtr(list[0].get<Number>()->mod(list[1].get<Number>()));
+					auto &r1 = list[0].get<Number>()->getData().getData();
+					auto &r2 = list[1].get<Number>()->getData().getData();
+					auto &rr = Common::Number::mod(r1, r2);
+					return ObjectPtr(new Number(rr));
 				}
 			};
 			struct Rem : public FI
@@ -104,7 +129,10 @@ namespace ICM
 					return S({ T_Number, T_Number }, T_Number); // (N N) -> N
 				}
 				ObjectPtr func(const DataList &list) const {
-					return ObjectPtr(list[0].get<Number>()->rem(list[1].get<Number>()));
+					auto &r1 = list[0].get<Number>()->getData().getData();
+					auto &r2 = list[1].get<Number>()->getData().getData();
+					auto &rr = Common::Number::rem(r1, r2);
+					return ObjectPtr(new Number(rr));
 				}
 			};
 
@@ -115,8 +143,8 @@ namespace ICM
 					return S({ T_Identifier }, T_Identifier); // I -> I
 				}
 				ObjectPtr func(const DataList &list) const {
-					shared_ptr<Number> tmp(new Number(1));
-					adjustObjectPtr(list[0]).get<Number>()->add(tmp.get());
+					auto &r1 = adjustObjectPtr(list[0]).get<Number>()->getData().getData();
+					r1.operator+=(1);
 					return list[0];
 				}
 			};
@@ -127,8 +155,8 @@ namespace ICM
 					return S({ T_Identifier }, T_Identifier); // I -> I
 				}
 				ObjectPtr func(const DataList &list) const {
-					shared_ptr<Number> tmp(new Number(1));
-					adjustObjectPtr(list[0]).get<Number>()->sub(tmp.get());
+					auto &r1 = adjustObjectPtr(list[0]).get<Number>()->getData().getData();
+					r1.operator-=(1);
 					return list[0];
 				}
 			};
@@ -143,7 +171,7 @@ namespace ICM
 			{
 			public:
 				using N = Number;
-				using Func = std::function<bool(N*, N*)>;
+				using Func = std::function<bool(const N::VType&, const N::VType&)>;
 				NumComp(const Func &fp) : fp(fp) {}
 
 			private:
@@ -151,22 +179,22 @@ namespace ICM
 					return S({ T_Number, T_Number }, T_Boolean); // (N N) -> Bool
 				}
 				ObjectPtr func(const DataList &list) const {
-					bool result = fp(list[0].get<N>(), list[1].get<N>());
+					bool result = fp(list[0].get<N>()->getData().getData(), list[1].get<N>()->getData().getData());
 					return ObjectPtr(new Boolean(result));
 				}
 				void funcL(Object* &result, const LDataList &list) const {
 					funcB(result, list[0], list[1]);
 				}
 				void funcB(Object* &result, Object *a, Object *b) const {
-					bool r = fp(static_cast<N*>(a), static_cast<N*>(b));
+					bool r = fp(static_cast<N*>(a)->getData().getData(), static_cast<N*>(b)->getData().getData());
 					result = new Boolean(r);
 				}
 				Func fp;
 			};
-			struct NumSmallS : public NumComp { NumSmallS() : NumComp([](N *n1, N *n2) { return *n1 < *n2; }) {} };
-			struct NumSmallE : public NumComp { NumSmallE() : NumComp([](N *n1, N *n2) { return *n1 <= *n2; }) {} };
-			struct NumLargeL : public NumComp { NumLargeL() : NumComp([](N *n1, N *n2) { return *n1 > *n2; }) {} };
-			struct NumLargeE : public NumComp { NumLargeE() : NumComp([](N *n1, N *n2) { return *n1 >= *n2; }) {} };
+			struct NumSmallS : public NumComp { NumSmallS() : NumComp([](const N::VType &n1, const N::VType &n2) { return n1 < n2; }) {} };
+			struct NumSmallE : public NumComp { NumSmallE() : NumComp([](const N::VType &n1, const N::VType &n2) { return n1 <= n2; }) {} };
+			struct NumLargeL : public NumComp { NumLargeL() : NumComp([](const N::VType &n1, const N::VType &n2) { return n1 > n2; }) {} };
+			struct NumLargeE : public NumComp { NumLargeE() : NumComp([](const N::VType &n1, const N::VType &n2) { return n1 >= n2; }) {} };
 
 			struct Equ : public FI
 			{
@@ -175,7 +203,9 @@ namespace ICM
 					return S({ T_Vary, T_Vary }, T_Boolean); // (Var Var) -> Boolean
 				}
 				ObjectPtr func(const DataList &list) const {
-					return ObjectPtr(adjustObjectPtr(list[0])->equ(adjustObjectPtr(list[1])));
+					auto &nn1 = adjustObjectPtr(list[0]);
+					auto &nn2 = adjustObjectPtr(list[1]);
+					return ObjectPtr(new Boolean(nn1->equ(nn2)));
 				}
 			};
 		}
@@ -258,7 +288,7 @@ namespace ICM
 			ObjectPtr sort(const DataList &dl) {
 				List *list = dl[0].get<List>();
 				std::sort(list->begin(), list->end(), [](const ObjectPtr &a, const ObjectPtr &b) {
-					return a.get<Number>()->operator<(*b.get<Number>());
+					return a.get<Number>()->getData().getData() < b.get<Number>()->getData().getData();
 				});
 				return ObjectPtr(list);
 			}
@@ -266,14 +296,14 @@ namespace ICM
 			ObjectPtr sort_f(const DataList &dl) {
 				auto &func = dl[1].get<Objects::Function>()->get_data();
 				// TODO
-				size_t id = getCallID(func, DataList({ ObjectPtr(new Number(0)), ObjectPtr(new Number(0)) }));
+				size_t id = getCallID(func, DataList({ ObjectPtr(new Number(Number::VType(0))), ObjectPtr(new Number(Number::VType(0))) }));
 				const auto &rf = func[id];
 
 				List *list = dl[0].get<List>();
 				Object *r;
 				std::sort(list->begin(), list->end(), [&](const ObjectPtr &a, const ObjectPtr &b) -> bool {
 					rf.callL(r, { a.get(), b.get() });
-					bool rr = static_cast<Boolean*>(r)->operator bool();
+					bool rr = static_cast<Boolean*>(r)->getData();
 					delete r;
 					return rr;
 				});
@@ -288,7 +318,7 @@ namespace ICM
 				ObjectPtr func(const DataList &list) const {
 					auto &l = list[0].get<List>()->getData();
 					DataList nl;
-					for (size_t i : Range<size_t>(0, (size_t)list[1].get<Number>()->get_data().getNum())) {
+					for (size_t i : Range<size_t>(0, (size_t)list[1].get<Number>()->getData().getData().getNum())) {
 						nl.insert(nl.end(), l.begin(), l.end());
 					}
 					return ObjectPtr(new List(nl));
@@ -304,7 +334,7 @@ namespace ICM
 				ObjectPtr func(const DataList &list) const {
 					// TODO
 					auto &func = list[0].get<Objects::Function>()->get_data();
-					size_t id = getCallID(func, DataList({ ObjectPtr(new Number(0)) }));
+					size_t id = getCallID(func, DataList({ ObjectPtr(new Number(Number::VType(0))) }));
 					const auto &rf = func[id];
 
 					size_t minsize;
@@ -332,7 +362,7 @@ namespace ICM
 				}
 				ObjectPtr func(const DataList &list) const {
 					size_t s = list[0].get<List>()->getData().size();
-					return ObjectPtr(new Number(s));
+					return ObjectPtr(new Number(Number::VType(s)));
 				}
 			};
 
@@ -340,11 +370,25 @@ namespace ICM
 			{
 			private:
 				S sign() const {
-					return S({ T_List, T_Number }, T_Vary); // L -> V
+					return S({ T_List, T_Number }, T_Vary); // (L N) -> V
 				}
 				ObjectPtr func(const DataList &list) const {
-					const ObjectPtr &op = list[0].get<List>()->getData()[(size_t)list[1].get<Number>()->get_data().getNum()];
+					const ObjectPtr &op = list[0].get<List>()->getData()[(size_t)list[1].get<Number>()->getData().getData().getNum()];
 					return op;
+				}
+			};
+
+			struct Set : public FI
+			{
+			private:
+				S sign() const {
+					return S({ T_List, T_Number, T_Vary }, T_Vary); // (L N V) -> V
+				}
+				ObjectPtr func(const DataList &list) const {
+					const ObjectPtr &op = list[0].get<List>()->getData()[(size_t)list[1].get<Number>()->getData().getData().getNum()];
+					ObjectPtr &rop = const_cast<ObjectPtr&>(op);
+					rop = list[2];
+					return rop;
 				}
 			};
 		}
@@ -378,7 +422,7 @@ namespace ICM
 			}
 			ObjectPtr system(const DataList &dl) {
 				int i = std::system(dl[0].get<Objects::String>()->get_data().c_str());
-				return ObjectPtr(new Number(i));
+				return ObjectPtr(new Number(Number::VType(i)));
 			}
 			ObjectPtr exit(const DataList &dl) {
 				std::exit(0);
@@ -386,7 +430,7 @@ namespace ICM
 			}
 			ObjectPtr exitv(const DataList &dl) {
 				// TODO
-				std::exit((int)dl[0].get<Number>()->get_data().getNum());
+				std::exit((int)dl[0].get<Number>()->getData().getData().getNum());
 				return ObjectPtr(new Nil());
 			}
 		}
@@ -403,7 +447,7 @@ namespace ICM
 					return S({ T_Boolean }, T_Nil); // Bool -> Nil
 				}
 				ObjectPtr func(const DataList &list) const {
-					bool value = list[0].get<Boolean>()->operator bool();
+					bool value = list[0].get<Boolean>()->getData();
 					setValue(value);
 					return ObjectPtr(new Nil());
 				}
@@ -473,6 +517,7 @@ namespace ICM
 		DefFuncTable.add("foreach", LST{ new Lists::Foreach() });
 		DefFuncTable.add("size", LST{ new Lists::Size() });
 		DefFuncTable.add("at", LST{ new Lists::At() });
+		DefFuncTable.add("set", LST{ new Lists::Set() });
 		DefFuncTable.add("call", Lst{
 			F(System::call, S({ T_Function }, T_Vary)),    // F -> V
 			F(System::call, S({ T_Function, T_Vary }, T_Vary, true)),    // (F V*) -> V

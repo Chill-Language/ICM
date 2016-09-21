@@ -7,74 +7,8 @@ namespace ICM
 	namespace Objects
 	{
 		//=======================================
-		// * Class Object
-		//=======================================
-		Boolean* Object::equ(const ObjectPtr &obj) const {
-			return new Boolean(type_equal(obj));
-		}
-
-		//=======================================
-		// * Class Nil
-		//=======================================
-		Boolean* Nil::equ(const ObjectPtr &obj) const {
-			return new Boolean(true);
-		}
-		//=======================================
-		// * Class Boolean
-		//=======================================
-		Boolean* Boolean::equ(const ObjectPtr &obj) const {
-			return new Boolean(this->data == obj.get<Boolean>()->data);
-		}
-
-		//=======================================
-		// * Class Number
-		//=======================================
-		Boolean* Number::equ(const ObjectPtr &obj) const {
-			return new Boolean(this->data == obj.get<Number>()->data);
-		}
-		Number* Number::add(const Number *obj) {
-			this->data += obj->data;
-			return this;
-		}
-		Number* Number::sub(const Number *obj) {
-			this->data -= obj->data;
-			return this;
-		}
-		Number* Number::mul(const Number *obj) {
-			this->data *= obj->data;
-			return this;
-		}
-		Number* Number::div(const Number *obj) {
-			this->data /= obj->data;
-			return this;
-		}
-		Number* Number::mod(const Number *obj) {
-			this->data = Common::Number::mod(this->data, obj->data);
-			return this;
-		}
-		Number* Number::rem(const Number *obj) {
-			this->data = Common::Number::rem(this->data, obj->data);
-			return this;
-		}
-		bool Number::operator<(const Number &obj) {
-			return self.data < obj.data;
-		}
-		bool Number::operator<=(const Number &obj) {
-			return self.data <= obj.data;
-		}
-		bool Number::operator>(const Number &obj) {
-			return self.data > obj.data;
-		}
-		bool Number::operator>=(const Number &obj) {
-			return self.data >= obj.data;
-		}
-
-		//=======================================
 		// * Class String
 		//=======================================
-		Boolean* String::equ(const ObjectPtr &obj) const {
-			return new Boolean(this->to_string() == obj.get<String>()->to_string());
-		}
 		String* String::add(const String *obj) {
 			data = Common::charptr(self.data.to_string() + obj->data.to_string());
 			return this;
@@ -83,16 +17,10 @@ namespace ICM
 		//=======================================
 		// * Class Symbol
 		//=======================================
-		Boolean* Symbol::equ(const ObjectPtr &obj) const {
-			return new Boolean(this->data == obj.get<Symbol>()->data);
-		}
 
 		//=======================================
 		// * Class List
 		//=======================================
-		Boolean* List::equ(const ObjectPtr &obj) const {
-			return new Boolean(this->data == obj.get<List>()->data);
-		}
 		List* List::push(const ObjectPtr &op) {
 			data.push_back(op);
 			return this;
@@ -115,9 +43,6 @@ namespace ICM
 		//=======================================
 		// * Class Disperse
 		//=======================================
-		Boolean* Disperse::equ(const ObjectPtr &obj) const {
-			return new Boolean(this->data == obj.get<Disperse>()->data);
-		}
 		string Disperse::to_string() const {
 			return Convert::to_string(data.begin(), data.end(), [](const ObjectPtr &op) { return ICM::to_string(op); });
 		}
@@ -147,7 +72,6 @@ namespace ICM
 		case ICM::T_Error:      return new Error;
 		case ICM::T_Identifier: return new Identifier;
 		case ICM::T_Keyword:    return new Keyword;
-		case ICM::T_Argument:   return nullptr; // TODO
 		case ICM::T_List:       return new List;
 		case ICM::T_Disperse:   return nullptr; // TODO
 		case ICM::T_Number:     return new Objects::Number;

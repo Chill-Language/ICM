@@ -8,6 +8,7 @@
 #include <map>
 #include <vector>
 #include <deque>
+#include <initializer_list>
 
 SYSTEM BEGIN
 template <typename _KTy, typename _VTy>
@@ -21,6 +22,10 @@ public:
 	using value_type = _CPTy;
 public:
 	BijectionMap() {}
+	BijectionMap(const std::initializer_list<value_type> &il) {
+		for (const value_type &e : il)
+			insert(e.first, e.second);
+	}
 	bool insert(const _KTy &key, const _VTy &val) {
 		if (findKey(key) != size() || findValue(val) != size())
 			return false;
@@ -102,6 +107,57 @@ private:
 		destroyable.push_back(id);
 	}
 };
+
+template <typename _KTy, typename _VTy>
+class BijectionKVMap
+{
+	using _PTy = std::pair<_KTy, _VTy>;
+	using _CPTy = std::pair<const _KTy, const _VTy>;
+public:
+	using key_type = _KTy;
+	using mapped_type = _VTy;
+	using value_type = _CPTy;
+public:
+	BijectionKVMap() {}
+	BijectionKVMap(const std::initializer_list<value_type> &il) {
+		for (const value_type &e : il)
+			data.insert(e.first, e.second);
+	}
+	bool insert(const _KTy &key, const _VTy &val) {
+		return data.insert(key, val);
+	}
+	bool eraseKey(const _KTy &key) {
+		return data.erase(key);
+	}
+	bool eraseValue(const _VTy &val) {
+		return data.eraseID(data.findValue(val));
+	}
+	size_t findKey(const _KTy &key) const {
+		return data.findKey(key);
+	}
+	size_t findValue(const _VTy &val) const {
+		return data.findValue(val);
+	}
+	const _PTy& getData(size_t id) const {
+		return data.getData(id);
+	}
+	const _KTy& getKey(const _VTy &val) const {
+		return  data.getKey(data.findValue(val));
+	}
+	const _VTy& getValue(const _KTy &key) const {
+		return  data.getValue(data.findKey(key));
+	}
+	size_t size() const {
+		return data.size();
+	}
+	bool empty() const {
+		return data.empty();
+	}
+
+private:
+	BijectionMap<_KTy, _VTy> data;
+};
+
 template <typename _KTy>
 class SerialBijectionMap
 {
