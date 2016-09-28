@@ -484,6 +484,68 @@ namespace ICM
 				KeywordNodeIDs.pop();
 				break;
 			}
+			case KeywordID::LET:
+			case KeywordID::CPY:
+			case KeywordID::REF: {
+				if (single->size() < 2) {
+					error();
+					break;
+				}
+
+				if (single->size() == 2) {
+					if (keyword == KeywordID::CPY) {
+						createSingle((*single)[1].get());
+						addOrder(single, new OrderDataCpySingle(OrderDataList.size() - 1));
+					}
+					else if (keyword == KeywordID::REF) {
+						createSingle((*single)[1].get());
+						addOrder(single, new OrderDataRefSingle(OrderDataList.size() - 1));
+					}
+					break;
+				}
+
+				if (single->size() != 3) {
+					error();
+					break;
+				}
+
+
+				if ((*single)[1]->getType() != AST::Data::Type) {
+					error();
+					break;
+				}
+				ObjectPtr &op = getDataRef((*single)[1].get());
+				if (!op.isType(T_Identifier)) {
+					error();
+					break;
+				}
+
+				Objects::Identifier *ident = op.get<Objects::Identifier>();
+				string name = ident->getName();
+				size_t id;
+				if (id = AddVariableTable.find(name)) {
+					ident = AddVariableTable[id].getData();
+				}
+				else {
+					AddVariableTable.add(name, op);
+				}
+
+				op = ObjectPtr(ident);
+
+				createSingle((*single)[2].get());
+				switch (keyword) {
+				case KeywordID::LET:
+					addOrder(single, new OrderDataLet(op, OrderDataList.size() - 1));
+					break;
+				case KeywordID::CPY:
+					addOrder(single, new OrderDataCpy(op, OrderDataList.size() - 1));
+					break;
+				case KeywordID::REF:
+					addOrder(single, new OrderDataRef(op, OrderDataList.size() - 1));
+					break;
+				}
+				break;
+			}
 			}
 		}
 		void CreateOrder::setObjectIdentifier(ObjectPtr &op) {

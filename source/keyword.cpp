@@ -20,19 +20,22 @@ namespace ICM
 		//ObjectPtr nan(new Objects::Identifier("NaN", ObjectPtr(new Objects::Number(Common::Number::Rational(0, 0)))));
 		//DefVariableTable.add("NaN", nan);
 	}
-	void createDefKeywordTable()
-	{
-		DefKetwordTable.add("if", KeywordID::IF);
-		DefKetwordTable.add("then", KeywordID::THEN);
-		DefKetwordTable.add("else", KeywordID::ELSE);
-		DefKetwordTable.add("elsif", KeywordID::ELSIF);
-		DefKetwordTable.add("loop", KeywordID::LOOP);
-		DefKetwordTable.add("while", KeywordID::WHILE);
-		DefKetwordTable.add("break", KeywordID::BREAK);
-		DefKetwordTable.add("for", KeywordID::FOR);
-		DefKetwordTable.add("in", KeywordID::IN);
-		DefKetwordTable.add("case", KeywordID::CASE);
-		DefKetwordTable.add("when", KeywordID::WHEN);
-		DefKetwordTable.add("function", KeywordID::FUNCTION);
-	}
+
+	BijectionKVMap<string, KeywordID> DefKeywordTable = {
+		{ "let",      KeywordID::LET      },
+		{ "cpy",      KeywordID::CPY      },
+		{ "ref",      KeywordID::REF      },
+		{ "if",       KeywordID::IF       },
+		{ "then",     KeywordID::THEN     },
+		{ "else",     KeywordID::ELSE     },
+		{ "elsif",    KeywordID::ELSIF    },
+		{ "loop",     KeywordID::LOOP     },
+		{ "while",    KeywordID::WHILE    },
+		{ "break",    KeywordID::BREAK    },
+		{ "for",      KeywordID::FOR      },
+		{ "in",       KeywordID::IN       },
+		{ "case",     KeywordID::CASE     },
+		{ "when",     KeywordID::WHEN     },
+		{ "function", KeywordID::FUNCTION },
+	};
 }

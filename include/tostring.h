@@ -15,6 +15,8 @@ namespace ICM
 	std::string to_string(const DataList &obj);
 	std::string to_string(const AST *ast);
 	std::string to_string(const MatchResult *mr);
+	std::string to_string(const TypeObject &to);
+	std::string to_string(const shared_ptr<TypeObject> &top);
 	std::string to_string(const ICM::Function::Signature &sign);
 }
 

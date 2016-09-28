@@ -31,7 +31,7 @@ namespace ICM
 				object = new Identifier(str);
 				break;
 			case ICM::MT_Keyword:
-				object = new Keyword(DefKetwordTable[str].getData());
+				object = new Keyword(DefKeywordTable.getValue(str));
 				break;
 			default:
 				object = nullptr;

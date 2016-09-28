@@ -5,7 +5,7 @@ namespace ICM
 {
 	DataList Interpreter::createList(const Range<vector<shared_ptr<AST::Base>>::iterator> &r)
 	{
-		DataList listnum;
+		lightlist_creater<ObjectPtr> listnum(r.size());
 		for (const auto &l : r) {
 			if ((*l)->getType() == AST::Data::Type) {
 				auto &op = static_cast<AST::Data*>(l->get())->getData();
@@ -19,7 +19,7 @@ namespace ICM
 				listnum.push_back(tempresult[id]);
 			}
 		}
-		return listnum;
+		return listnum.data();
 	}
 	void Interpreter::runFunc(const ObjectPtr &op, AST::Node *n, size_t id) {
 		const auto &r = range(n->begin() + 1, n->end());
@@ -32,9 +32,9 @@ namespace ICM
 		}
 		else if (op.isType(T_Disperse)) {
 			const auto &ftu = DefFuncTable["call"];
-			DataList ndl = op.get<Objects::Disperse>()->getData();
+			auto ndl = op.get<Objects::Disperse>()->getData();
 			ndl.insert(ndl.end(), dl.begin(), dl.end());
-			res = checkCall(ftu, ndl);
+			res = checkCall(ftu, DataList(ndl));
 		}
 
 		Result = res;
@@ -54,6 +54,7 @@ namespace ICM
 		while (true) {
 			//VecPC.push_back(ProgramCounter);
 			auto &e = orderlist[ProgramCounter];
+			//println("[", ProgramCounter, "] ", e->to_string());
 			switch (e->order()) {
 			case OrderData::CALL: {
 				AST::Node *node = static_cast<ASTOrder::OrderDataCall*>(e)->getData();
@@ -104,7 +105,7 @@ namespace ICM
 				break;
 			}
 			case OrderData::SINGLE: {
-				tempresult[ProgramCounter] = static_cast<ASTOrder::OrderDataSingle*>(e)->getData();
+				tempresult[ProgramCounter] = ObjectPtr(static_cast<ASTOrder::OrderDataSingle*>(e)->getData()->clone());
 				Result = tempresult[ProgramCounter];
 				break;
 			}
@@ -128,7 +129,47 @@ namespace ICM
 			case OrderData::LET: {
 				ASTOrder::OrderDataLet *p = static_cast<ASTOrder::OrderDataLet*>(e);
 				Objects::Identifier *ident = p->getData().get<Objects::Identifier>();
+
 				ident->setData(tempresult[p->getRefid()]);
+				
+				tempresult[ProgramCounter] = p->getData();
+				Result = tempresult[ProgramCounter];
+				break;
+			}
+			case OrderData::CPY: {
+				ASTOrder::OrderDataCpy *p = static_cast<ASTOrder::OrderDataCpy*>(e);
+				Objects::Identifier *ident = p->getData().get<Objects::Identifier>();
+				ident->setCopy(tempresult[p->getRefid()]);
+
+				tempresult[ProgramCounter] = p->getData();
+				Result = tempresult[ProgramCounter];
+				break;
+			}
+			case OrderData::REF: {
+				ASTOrder::OrderDataRef *p = static_cast<ASTOrder::OrderDataRef*>(e);
+				Objects::Identifier *ident = p->getData().get<Objects::Identifier>();
+				ident->setRefer(tempresult[p->getRefid()]);
+
+				tempresult[ProgramCounter] = p->getData();
+				Result = tempresult[ProgramCounter];
+				break;
+			}
+			case OrderData::CPYS: {
+				ASTOrder::OrderDataCpySingle *p = static_cast<ASTOrder::OrderDataCpySingle*>(e);
+				size_t id = p->getRefid();
+				Objects::Identifier temp;
+				temp.setCopy(tempresult[id]);
+
+				tempresult[ProgramCounter] = temp.getData();
+				Result = tempresult[ProgramCounter];
+				break;
+			}
+			case OrderData::REFS: {
+				ASTOrder::OrderDataCpySingle *p = static_cast<ASTOrder::OrderDataCpySingle*>(e);
+				size_t id = p->getRefid();
+				// TODO
+				tempresult[ProgramCounter] = ObjectPtr(tempresult[id]);
+				Result = tempresult[ProgramCounter];
 				break;
 			}
 			case OrderData::EQU: {

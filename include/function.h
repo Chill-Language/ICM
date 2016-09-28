@@ -29,7 +29,7 @@ namespace ICM
 			const TypeObject& getOutType() const { return *OutType; }
 			bool isLastArgs() const { return last_is_args; }
 
-			bool checkType(const DataList &list, DataList *dlp = nullptr) const;
+			bool checkType(const DataList &list, lightlist_creater<ObjectPtr> *dlp = nullptr) const;
 			bool checkType(const Signature &sign) const;
 			bool checkType(const vector<TypeObject> &argT) const;
 

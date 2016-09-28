@@ -85,7 +85,6 @@ int main(int argc, char *argv[])
 	Timer t;
 	// Initialize
 	createDefFuncTable();
-	createDefKeywordTable();
 	const bool LoopMatch = (argc <= 1);
 	//const bool LoopMatch = false;
 
@@ -93,8 +92,11 @@ int main(int argc, char *argv[])
 		printIntervalTime(t);
 
 	//GlobalConfig.SetDebugMode(true);
-	//GlobalConfig.PrintAST = true;
-	//GlobalConfig.PrintOrder = true;
+	if (false)
+	{
+		GlobalConfig.PrintAST = true;
+		GlobalConfig.PrintOrder = true;
+	}
 	// Test
 	test();
 

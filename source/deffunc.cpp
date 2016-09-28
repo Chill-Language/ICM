@@ -140,10 +140,10 @@ namespace ICM
 			{
 			private:
 				S sign() const {
-					return S({ T_Identifier }, T_Identifier); // I -> I
+					return S({ T_Number }, T_Number); // N -> N
 				}
 				ObjectPtr func(const DataList &list) const {
-					auto &r1 = adjustObjectPtr(list[0]).get<Number>()->getData().getData();
+					auto &r1 = list[0].get<Number>()->getData().getData();
 					r1.operator+=(1);
 					return list[0];
 				}
@@ -152,10 +152,10 @@ namespace ICM
 			{
 			private:
 				S sign() const {
-					return S({ T_Identifier }, T_Identifier); // I -> I
+					return S({ T_Number }, T_Number); // N -> N
 				}
 				ObjectPtr func(const DataList &list) const {
-					auto &r1 = adjustObjectPtr(list[0]).get<Number>()->getData().getData();
+					auto &r1 = list[0].get<Number>()->getData().getData();
 					r1.operator-=(1);
 					return list[0];
 				}
@@ -209,7 +209,7 @@ namespace ICM
 				}
 			};
 		}
-
+		/*
 		//=======================================
 		// * Assign
 		//=======================================
@@ -265,7 +265,7 @@ namespace ICM
 				}
 			};
 		}
-
+		*/
 		//=======================================
 		// * Lists
 		//=======================================
@@ -277,7 +277,7 @@ namespace ICM
 				return ObjectPtr(new List(dl));
 			}
 
-			const DataList& _disp(const List *l) {
+			const vector<ObjectPtr>& _disp(const List *l) {
 				return l->getData();
 			}
 
@@ -317,7 +317,7 @@ namespace ICM
 				}
 				ObjectPtr func(const DataList &list) const {
 					auto &l = list[0].get<List>()->getData();
-					DataList nl;
+					vector<ObjectPtr> nl;
 					for (size_t i : Range<size_t>(0, (size_t)list[1].get<Number>()->getData().getData().getNum())) {
 						nl.insert(nl.end(), l.begin(), l.end());
 					}
@@ -341,7 +341,7 @@ namespace ICM
 					size_t size = list.size();
 					for (auto i : range(1, size))
 						minsize = std::min(minsize, list[i].get<List>()->size());
-					DataList dls;
+					vector<ObjectPtr> dls;
 					Object obj;
 					for (size_t i : range(0, minsize)) {
 						DataList ldl(size - 1);
@@ -499,9 +499,9 @@ namespace ICM
 		DefFuncTable.add("++", "inc");
 		DefFuncTable.add("--", "dec");
 
-		DefFuncTable.add("let", LST{ new Assign::Let() });
-		DefFuncTable.add("cpy", LST{ new Assign::Cpy(), new Assign::CpyV() });
-		DefFuncTable.add("ref", LST{ new Assign::Ref() });
+		//DefFuncTable.add("let", LST{ new Assign::Let() });
+		//DefFuncTable.add("cpy", LST{ new Assign::Cpy(), new Assign::CpyV() });
+		//DefFuncTable.add("ref", LST{ new Assign::Ref() });
 
 		DefFuncTable.add("list", Lst{
 			F(Lists::list, S({}, T_List)),               // Void -> L

@@ -153,7 +153,8 @@ namespace ICM
 	}
 
 	// Types
-	using DataList = std::vector<ObjectPtr>;
+	using DataList = lightlist<ObjectPtr>;
+	//using DataList = std::vector<ObjectPtr>;
 	using CallFunc = ObjectPtr(const DataList&);
 	using FuncPtr = std::function<CallFunc>;
 	using LDataList = Common::lightlist<Objects::Object*>;
@@ -167,8 +168,8 @@ namespace ICM
 	ObjectPtr createError(const string &errinfo);
 	const ObjectPtr& adjustObjectPtr(const ObjectPtr &ptr);
 	std::string to_string(const Objects::Object &obj);
-	DataList::iterator begin(Objects::Disperse *disp);
-	DataList::iterator end(Objects::Disperse *disp);
+	vector<ObjectPtr>::iterator begin(Objects::Disperse *disp);
+	vector<ObjectPtr>::iterator end(Objects::Disperse *disp);
 
 }
 

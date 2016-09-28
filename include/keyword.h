@@ -73,22 +73,7 @@ namespace ICM
 	//=======================================
 	// * Class Keyword
 	//=======================================
-	enum class KeywordID { IF, THEN, ELSE, ELSIF, FOR, IN, WHILE, LOOP, BREAK, CASE, WHEN, FUNCTION };
-
-	//=======================================
-	// * Class KeywordTableUnit
-	//=======================================
-	class KeywordTableUnit : public BaseTableUnit
-	{
-	public:
-		KeywordTableUnit() = default;
-		KeywordTableUnit(size_t id, const string &name, KeywordID keyword)
-			: BaseTableUnit(id, name), keyword(keyword) {}
-		KeywordID getData() const { return keyword; }
-
-	private:
-		KeywordID keyword;
-	};
+	enum class KeywordID { LET, CPY, REF, IF, THEN, ELSE, ELSIF, FOR, IN, WHILE, LOOP, BREAK, CASE, WHEN, FUNCTION };
 
 	//=======================================
 	// * Class Table<Unit>
@@ -149,16 +134,14 @@ namespace ICM
 
 	using VariableTable = Table<VariableTableUnit>;
 	using FuncTable = Table<FuncTableUnit>;
-	using KeywordTable = Table<KeywordTableUnit>;
 
 	void createDefFuncTable();
-	void createDefKeywordTable();
 
 	extern FuncTable DefFuncTable;
 	extern FuncTable AddFuncTable;
 	extern VariableTable DefVariableTable;
 	extern VariableTable AddVariableTable;
-	extern KeywordTable DefKetwordTable;
+	extern BijectionKVMap<string, KeywordID> DefKeywordTable;
 
 }
 #endif

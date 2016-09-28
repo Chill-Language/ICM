@@ -28,22 +28,11 @@ namespace ICM
 	}
 	string to_string(KeywordID key)
 	{
-		switch (key)
-		{
-		case KeywordID::IF:       return "if";
-		case KeywordID::THEN:     return "then";
-		case KeywordID::ELSE:     return "else";
-		case KeywordID::ELSIF:    return "elsif";
-		case KeywordID::FOR:      return "for";
-		case KeywordID::IN:       return "in";
-		case KeywordID::WHILE:    return "while";
-		case KeywordID::LOOP:     return "loop";
-		case KeywordID::BREAK:    return "break";
-		case KeywordID::CASE:     return "case";
-		case KeywordID::WHEN:     return "when";
-		case KeywordID::FUNCTION: return "function";
-		default:                  return "UnfoundKeyword";
-		}
+		size_t id = DefKeywordTable.findValue(key);
+		if (id != DefKeywordTable.size())
+			return DefKeywordTable.getData(id).first;
+		else
+			return "UnfoundKeyword";
 	}
 	string to_string(const ObjectPtr &obj) {
 		return obj.to_string();
@@ -74,5 +63,12 @@ namespace ICM
 	}
 	std::string to_string(const Function::Signature &sign) {
 		return sign.to_string();
+	}
+
+	std::string to_string(const TypeObject &to) {
+		return to.to_string();
+	}
+	std::string to_string(const shared_ptr<TypeObject> &top) {
+		return top->to_string();
 	}
 }

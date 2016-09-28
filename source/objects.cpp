@@ -112,11 +112,11 @@ namespace ICM
 			return ICM::TypeObject(op.type());
 	}
 	// Get Disperse Iterator
-	DataList::iterator begin(Objects::Disperse *disp)
+	vector<ObjectPtr>::iterator begin(Objects::Disperse *disp)
 	{
 		return disp->begin();
 	}
-	DataList::iterator end(Objects::Disperse *disp)
+	vector<ObjectPtr>::iterator end(Objects::Disperse *disp)
 	{
 		return disp->end();
 	}

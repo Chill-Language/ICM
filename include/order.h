@@ -12,7 +12,18 @@ namespace ICM
 		class OrderData
 		{
 		public:
-			enum Order { START, CALL, SINGLE, STORE, JUMP, JUMPNOT, FUNC, AT, LET, EQU, INC, OVER };
+			enum Order {
+				START,
+				CALL, SINGLE, STORE,
+				JUMP, JUMPNOT,
+				FUNC,
+				AT,
+				LET, CPY, REF,
+				CPYS, REFS,
+				EQU,
+				INC,
+				OVER
+			};
 
 			virtual Order order() const = 0;
 
@@ -29,6 +40,10 @@ namespace ICM
 				case FUNC:     str.append("FUNC"); break;
 				case AT:       str.append("AT  "); break;
 				case LET:      str.append("LET "); break;
+				case CPY:      str.append("CPY "); break;
+				case REF:      str.append("REF "); break;
+				case CPYS:     str.append("CPYS"); break;
+				case REFS:     str.append("REFS"); break;
 				case EQU:      str.append("EQU "); break;
 				case INC:      str.append("INC "); break;
 				case OVER:     str.append("END "); break;
@@ -167,11 +182,10 @@ namespace ICM
 			}
 		};
 		
-		class OrderDataLet : public OrderData
+		class OrderDataLetBase : public OrderData
 		{
 		public:
-			OrderDataLet(ObjectPtr objptr, size_t id) : data(objptr), id(id) {}
-			OrderData::Order order() const { return OrderData::LET; }
+			OrderDataLetBase(ObjectPtr objptr, size_t id) : data(objptr), id(id) {}
 			const ObjectPtr& getData() const { return data; }
 			void setData(const ObjectPtr &obj) { data = obj; }
 			size_t getRefid() const { return id; }
@@ -182,6 +196,49 @@ namespace ICM
 			string getToString() const {
 				return data->to_string_code() + ", {" + std::to_string(id) + "}";
 			}
+		};
+		class OrderDataLet : public OrderDataLetBase
+		{
+		public:
+			OrderDataLet(ObjectPtr objptr, size_t id) : OrderDataLetBase(objptr, id) {}
+			OrderData::Order order() const { return OrderData::LET; }
+		};
+		class OrderDataCpy : public OrderDataLetBase
+		{
+		public:
+			OrderDataCpy(ObjectPtr objptr, size_t id) : OrderDataLetBase(objptr, id) {}
+			OrderData::Order order() const { return OrderData::CPY; }
+		};
+		class OrderDataRef : public OrderDataLetBase
+		{
+		public:
+			OrderDataRef(ObjectPtr objptr, size_t id) : OrderDataLetBase(objptr, id) {}
+			OrderData::Order order() const { return OrderData::REF; }
+		};
+		
+		class OrderDataCpySBase : public OrderData
+		{
+		public:
+			OrderDataCpySBase(size_t id) : id(id) {}
+			size_t getRefid() const { return id; }
+
+		private:
+			size_t id;
+			string getToString() const {
+				return "{" + std::to_string(id) + "}";
+			}
+		};
+		class OrderDataCpySingle : public OrderDataCpySBase
+		{
+		public:
+			OrderDataCpySingle(size_t id) : OrderDataCpySBase(id) {}
+			OrderData::Order order() const { return OrderData::CPYS; }
+		};
+		class OrderDataRefSingle : public OrderDataCpySBase
+		{
+		public:
+			OrderDataRefSingle(size_t id) : OrderDataCpySBase(id) {}
+			OrderData::Order order() const { return OrderData::REFS; }
 		};
 		
 		class OrderDataEqu : public OrderData

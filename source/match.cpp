@@ -121,7 +121,7 @@ namespace ICM
 				;//mr.setType(MT_Nil);
 			else if (mr.getString() == "T" || mr.getString() == "F")
 				mr.setType(MT_Boolean);
-			else if (DefKetwordTable.find(mr.getString()))
+			else if (DefKeywordTable.findKey(mr.getString()) != DefKeywordTable.size())
 				mr.setType(MT_Keyword);
 		}
 

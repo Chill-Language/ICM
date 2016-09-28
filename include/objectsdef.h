@@ -109,8 +109,10 @@ namespace ICM
 		//=======================================
 		class List : public Object
 		{
+			using DataList = vector<ObjectPtr>;
 		public:
 			List() {}
+			explicit List(const lightlist<ObjectPtr> &dl) : data(dl.begin(), dl.end()) {}
 			explicit List(const DataList &dl) : data(dl) {}
 
 			List* push(const ObjectPtr &objp);
@@ -156,7 +158,9 @@ namespace ICM
 		//=======================================
 		class Disperse : public Object
 		{
+			using DataList = vector<ObjectPtr>;
 		public:
+			explicit Disperse(const lightlist<ObjectPtr> &dl) : data(dl.begin(), dl.end()) {}
 			explicit Disperse(const DataList &dl) : data(dl) {}
 
 			DataList::iterator begin() {
@@ -174,7 +178,7 @@ namespace ICM
 			//-----------------------------------
 			// Method
 			bool equ(const ObjectPtr &obj) const {
-				return this->data == obj.get<Disperse>()->data;
+				return this == obj.get<Disperse>();
 			}
 			string to_string() const;
 			string to_output() const;

@@ -40,7 +40,7 @@ namespace ICM
 		}
 		vector<TypeObject> getTypeObjectList(const DataList &list);
 		vector<TypeObject> getTypeObjectList(const Signature::List &list);
-		void getAdjustedObjectPtr(ObjectPtr op, const TypeObject &type, DataList &dlp);
+		void getAdjustedObjectPtr(ObjectPtr op, const TypeObject &type, lightlist_creater<ObjectPtr> &dlp);
 		bool Signature::checkType(const vector<TypeObject> &argT) const {
 			// Check Size
 			if (last_is_args) {
@@ -68,7 +68,7 @@ namespace ICM
 			// Check
 			return checkType(argT);
 		}
-		bool Signature::checkType(const DataList &list, DataList *dlp) const {
+		bool Signature::checkType(const DataList &list, lightlist_creater<ObjectPtr> *dlp) const {
 			// Get TypeObject List
 			const vector<TypeObject> &argT = getTypeObjectList(list);
 			// Check
@@ -101,7 +101,7 @@ namespace ICM
 				typelist.push_back(*e);
 			return typelist;
 		}
-		void getAdjustedObjectPtr(ObjectPtr op, const TypeObject &type, DataList &dlp)
+		void getAdjustedObjectPtr(ObjectPtr op, const TypeObject &type, lightlist_creater<ObjectPtr> &dlp)
 		{
 			if (type.isIdent() && type.getValueType().isVary()) {
 				dlp.push_back(op);
@@ -120,8 +120,18 @@ namespace ICM
 	// Get Call ID
 	size_t getCallID(const FuncTableUnit &ftu, const DataList &dl)
 	{
-		// TODO
-		DataList ndl;
+		// Get Adjust DataList
+		vector<ObjectPtr> nlist;
+		for (auto &e : dl) {
+			if (e.isType(T_Disperse)) {
+				auto l = (Objects::Disperse*)(e.get());
+				nlist.insert(nlist.end(), begin(l), end(l));
+			}
+			else
+				nlist.push_back(e);
+		}
+
+		lightlist_creater<ObjectPtr> ndl(nlist.size());
 		size_t id = ftu.size();
 		for (size_t i : Range<size_t>(0, ftu.size())) {
 			if (ftu[i].checkType(dl, &ndl)) {
@@ -135,7 +145,7 @@ namespace ICM
 	ObjectPtr checkCall(const FuncTableUnit &ftu, const DataList &dl)
 	{
 		// Get Adjust DataList
-		DataList nlist;
+		vector<ObjectPtr> nlist;
 		for (auto &e : dl) {
 			if (e.isType(T_Disperse)) {
 				auto l = (Objects::Disperse*)(e.get());
@@ -145,7 +155,7 @@ namespace ICM
 				nlist.push_back(e);
 		}
 
-		DataList ndl;
+		lightlist_creater<ObjectPtr> ndl(nlist.size());
 		size_t id = ftu.size();
 		for (size_t i : Range<size_t>(0, ftu.size())) {
 			if (ftu[i].checkType(nlist, &ndl)) {
@@ -155,7 +165,7 @@ namespace ICM
 		}
 
 		if (id != ftu.size()) {
-			return ftu[id].call(ndl);
+			return ftu[id].call(ndl.data());
 		}
 		else {
 			std::string errinfo = "Matching Types in function '" + ftu.getName() + "'.";

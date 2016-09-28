@@ -147,5 +147,4 @@ namespace ICM
 	FuncTable AddFuncTable;
 	VariableTable DefVariableTable;
 	VariableTable AddVariableTable;
-	KeywordTable DefKetwordTable;
 }

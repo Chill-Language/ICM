@@ -12,6 +12,8 @@ template <typename T>
 class lightlist
 {
 public:
+	using iterator = T*;
+public:
 	lightlist() = default;
 
 	lightlist(size_t capacity)
@@ -65,6 +67,35 @@ public:
 private:
 	size_t _capacity = 0;
 	std::shared_ptr<T> data = nullptr;
+};
+
+template <typename T>
+class lightlist_creater
+{
+public:
+	lightlist_creater(size_t n) : _count(0), _data(n) {}
+
+	void push_back(const T &e) {
+		_data[_count++] = e;
+	}
+	void clear() {
+		for (size_t i : range(0, _data.size()))
+			_data[i].~T();
+		_count = 0;
+	}
+	lightlist<T> data() const {
+		return _data;
+	}
+	size_t size() const {
+		return _count;
+	}
+	size_t capacity() const {
+		return _data.size();
+	}
+
+private:
+	size_t _count;
+	lightlist<T> _data;
 };
 END
 
