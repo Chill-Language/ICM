@@ -2,6 +2,8 @@
 #include "tostring.h"
 #include "typeobject.h"
 #include "keyword.h"
+#include <ctime>
+size_t CheckCallCount = 0;
 
 namespace ICM
 {
@@ -163,6 +165,7 @@ namespace ICM
 				break;
 			}
 		}
+		CheckCallCount++;
 
 		if (id != ftu.size()) {
 			return ftu[id].call(ndl.data());

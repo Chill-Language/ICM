@@ -177,8 +177,8 @@ else
 
 ; Test 18
 (println "----------18----------")
-(for j in [1 9]
-	(for i in [1 j]
+(for j in 1 to 9
+	(for i in 1 to j
 		(print i "*" j "=" (* i j) " ")
 	)
 	(println)
@@ -189,12 +189,11 @@ else
 (let array [9 8 7 6 5 4 3 2 1])
 (let n (- (size array) 1))
 
-(for j in [0 (- n 1)]
-	(for i in [0 (- n 1 j)]
-		(if (> (at array i) (at array (+ i 1)))
-			(let tmp (at array i))
-			(set array i (at array (+ i 1)))
-			(set array (+ i 1) (cpy tmp))
+(for j in 0 to (- n 1)
+	(for i in 0 to (- n 1 j)
+		(let t (+ i 1))
+		(if (> (at array i) (at array t))
+			(swap array i t)
 		)
 	)
 )

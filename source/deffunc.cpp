@@ -366,6 +366,23 @@ namespace ICM
 				}
 			};
 
+			struct Swap : public FI
+			{
+			private:
+				S sign() const {
+					return S({ T_List, T_Number, T_Number }, T_List); // (L N N) -> L
+				}
+				ObjectPtr func(const DataList &list) const {
+					auto &v = const_cast<vector<ObjectPtr>&>(list[0].get<List>()->getData());
+					size_t i1 = (size_t)list[1].get<Number>()->getData().getData().getNum();
+					size_t i2 = (size_t)list[2].get<Number>()->getData().getData().getNum();
+					ObjectPtr top = v[i1];
+					v[i1] = v[i2];
+					v[i2] = top;
+					return list[0];
+				}
+			};
+
 			struct At : public FI
 			{
 			private:
@@ -516,6 +533,7 @@ namespace ICM
 		});
 		DefFuncTable.add("foreach", LST{ new Lists::Foreach() });
 		DefFuncTable.add("size", LST{ new Lists::Size() });
+		DefFuncTable.add("swap", LST{ new Lists::Swap() });
 		DefFuncTable.add("at", LST{ new Lists::At() });
 		DefFuncTable.add("set", LST{ new Lists::Set() });
 		DefFuncTable.add("call", Lst{

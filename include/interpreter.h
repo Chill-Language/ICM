@@ -21,6 +21,8 @@ namespace ICM
 		ObjectPtr Result;
 		void runFunc(const ObjectPtr &op, AST::Node *n, size_t id);
 		void runSub(const ObjectPtr &op, AST::Node *node, size_t i);
+		DataList getDataList(const vector<AST::Base*> &vb);
+		ObjectPtr getObjectPtr(AST::Base *e);
 	};
 }
 

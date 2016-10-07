@@ -6,10 +6,68 @@
 #include "order.h"
 #include "interpreter.h"
 
+#include "objectsdef.h"
+extern size_t CheckCallCount;
 using namespace ICM;
+
+namespace ICM
+{
+	namespace ASTOrder
+	{
+		class Optimization
+		{
+		public:
+			Optimization(const vector<OrderData*> &List)
+				: List(List) {}
+
+			void start() {
+				size_t Count = 0;
+				vector<DefaultType> Types(List.size());
+				while (Count < List.size()) {
+					auto *o = List[Count];
+					println("Doing: ", o->to_string());
+					switch (o->order())
+					{
+					case OrderData::CCAL: {
+						Types[Count] = T_Vary;
+						OrderDataCheckCall* p = static_cast<OrderDataCheckCall*>(o);
+						AST::Node *node = p->getData();
+						AST::Base *front = node->front();
+						if (front->getType() == AST::Data::Type) {
+							ObjectPtr op = static_cast<AST::Data*>(front)->getData();
+							if (op.isType(T_Function)) {
+								Objects::Function *of = op.get<Objects::Function>();
+								//getCallID(of->get_data(), );
+							}
+						}
+						else {
+
+						}
+							break;
+					}
+					default:
+						NewList.push_back(o);
+						println(o->to_string());
+						break;
+					}
+					Count++;
+				}
+			}
+			const vector<OrderData*>& getNewList() const {
+				return NewList;
+			}
+
+		private:
+			const vector<OrderData*>& List;
+			vector<OrderData*> NewList;
+			map<size_t, size_t> ReferMap;
+		};
+	}
+}
 
 void testSub()
 {
+	//string str("(+ 5 6)");
 	string str("(while (not (not F)) F F F)");
 	//string str("(if (if (+ 5) then (+ 3) else (+ 2)) then (+ 0) else (+ 1))");
 	//string str("(loop 4 (loop 5) 6)");
@@ -36,10 +94,15 @@ void testSub()
 	//oast.to_string();
 	vector<AST::NodePtr> table = ast.getTable();
 	ASTOrder::CreateOrder createorder(table);
-	const auto &e = createorder.createOrder();
-	if (false)
+	const auto *p = &createorder.createOrder();
+	//ASTOrder::Optimization opt(*p);
+	//opt.start();
+	//p = &opt.getNewList();
+
+
+	//if (false)
 	{
-		Interpreter interpreter(e);
+		Interpreter interpreter(*p);
 		const auto &op = interpreter.run();
 		println(op);
 	}
@@ -48,11 +111,6 @@ void testSub()
 
 void test()
 {
-	//auto &n1 = Objects::Number(Number::Rational(5));
-	//auto &n2 = Objects::Number(Number::Rational(5));
-
-	//println(n1.equ(&n2));
-	//ICM::OrderFile::TEST();
 	//testSub();
 	//exit(0);
 }
@@ -150,6 +208,7 @@ int main(int argc, char *argv[])
 						println();
 					}
 				}
+				//println(CheckCallCount);
 			}
 			else {
 				break;
@@ -161,6 +220,5 @@ int main(int argc, char *argv[])
 
 	if (GlobalConfig.PrintIntervalTime)
 		printIntervalTime(t);
-
 	return 0;
 }

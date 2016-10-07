@@ -231,11 +231,17 @@ namespace ICM
 			const ObjectPtr& getObjVar() const {
 				return objvar;
 			}
-			void setRanexp(const BasePtr &rangexp) {
-				this->rangexp = rangexp;
+			void setRanexpBegin(const BasePtr &rangexp) {
+				this->rangexpb = rangexp;
 			}
-			const BasePtr& getRanexp() const {
-				return rangexp;
+			const BasePtr& getRanexpBegin() const {
+				return rangexpb;
+			}
+			void setRanexpEnd(const BasePtr &rangexp) {
+				this->rangexpe = rangexp;
+			}
+			const BasePtr& getRanexpEnd() const {
+				return rangexpe;
 			}
 			void setDoexps(const DoExps &doexps) {
 				this->doexps = doexps;
@@ -246,7 +252,8 @@ namespace ICM
 
 		private:
 			ObjectPtr objvar;
-			BasePtr rangexp;
+			BasePtr rangexpb;
+			BasePtr rangexpe;
 			DoExps doexps;
 		};
 		void parseToOrderFor(const AST::Node &node, ForStruct &forstruct);
@@ -270,9 +277,14 @@ namespace ICM
 				error();
 				return;
 			}
-			forstruct.setRanexp(node[3].get());
+			forstruct.setRanexpBegin(node[3].get());
+			if (!key_is(node[4].get(), KeywordID::TO)) {
+				error();
+				return;
+			}
+			forstruct.setRanexpEnd(node[5].get());
 			vector<AST::Base*> doexps;
-			for (auto e : range(node.begin() + 4, node.end())) {
+			for (auto e : range(node.begin() + 6, node.end())) {
 				doexps.push_back(e->get());
 			}
 			forstruct.setDoexps(doexps);
@@ -334,6 +346,7 @@ namespace ICM
 					return;
 				}
 			}
+
 			for (auto p : *single) {
 				if (p->getType() == AST::Data::Type) {
 					ObjectPtr &op = getDataRef(p.get());
@@ -344,7 +357,7 @@ namespace ICM
 					createOrderSub(getReferNode(p.get()));
 				}
 			}
-			addOrder(single, new ASTOrder::OrderDataCall(single));
+			addOrder(single, new ASTOrder::OrderDataCheckCall(single));
 		}
 		void CreateOrder::createOrderSub(const Segment &segment) {
 			for (AST::Base* single : segment) {
@@ -466,16 +479,16 @@ namespace ICM
 					setObjectIdentifier(opvar);
 				else
 					error();
-				createSingle(forstruct.getRanexp());
-				size_t atid = OrderDataList.size();
-				addOrder(new OrderDataAt(atid - 1, 0));
-				addOrder(new OrderDataAt(atid - 1, 1));
-				addOrder(new OrderDataLet(opvar, atid));
+				createSingle(forstruct.getRanexpBegin());
+				size_t bid = OrderDataList.size() - 1;
+				createSingle(forstruct.getRanexpEnd());
+				size_t eid = OrderDataList.size() - 1;
+				addOrder(new OrderDataLet(opvar, bid));
 				createOrderSub(forstruct.getDoexps());
-				addOrder(new OrderDataEqu(opvar, atid + 1));
+				addOrder(new OrderDataLargeEqual(opvar, eid));
 				OrderDataJumpNotIf *odjni = new OrderDataJumpNotIf(OrderDataList.size() - 1);
 				odjni->setExprefAdjusted();
-				odjni->setJmpID(atid + 2);
+				odjni->setJmpID(eid + 2);
 				odjni->setJmprefAdjusted();
 				addOrder(new OrderDataInc(opvar));
 				addOrder(odjni);

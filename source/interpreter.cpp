@@ -47,6 +47,18 @@ namespace ICM
 			println("Error Type.");
 		}
 	}
+	ObjectPtr Interpreter::getObjectPtr(AST::Base *e) {
+		if (e->getType() == AST::Data::Type)
+			return static_cast<AST::Data*>(e)->getData();
+		else
+			return tempresult[static_cast<AST::Refer*>(e)->getData()];
+	}
+	DataList Interpreter::getDataList(const vector<AST::Base*> &vb) {
+		lightlist_creater<ObjectPtr> ndl(vb.size());
+		for (auto &e : vb)
+			ndl.push_back(getObjectPtr(e));
+		return ndl.data();
+	}
 	ObjectPtr Interpreter::run() {
 		using namespace ASTOrder;
 		size_t ProgramCounter = 0;
@@ -56,8 +68,8 @@ namespace ICM
 			auto &e = orderlist[ProgramCounter];
 			//println("[", ProgramCounter, "] ", e->to_string());
 			switch (e->order()) {
-			case OrderData::CALL: {
-				AST::Node *node = static_cast<ASTOrder::OrderDataCall*>(e)->getData();
+			case OrderData::CCAL: {
+				AST::Node *node = static_cast<ASTOrder::OrderDataCheckCall*>(e)->getData();
 				AST::Base *f = node->front();
 				if (f->getType() == AST::Data::Type) {
 					AST::Data *nf = static_cast<AST::Data*>(f);
@@ -68,6 +80,22 @@ namespace ICM
 					AST::Refer *nf = static_cast<AST::Refer*>(f);
 					const ObjectPtr &op = tempresult[nf->getData()];
 					runSub(op, node, ProgramCounter);
+				}
+				break;
+			}
+			case OrderData::CALL: {
+				ASTOrder::OrderDataCall *p = static_cast<ASTOrder::OrderDataCall*>(e);
+				DataList dl = getDataList(p->getData());
+				
+				tempresult[ProgramCounter] = p->call(dl);
+				Result = tempresult[ProgramCounter];
+				break;
+			}
+			case OrderData::CHKT: {
+				ASTOrder::OrderDataCheckType *p = static_cast<ASTOrder::OrderDataCheckType*>(e);
+				if (!adjustObjectPtr(getObjectPtr(p->getData())).isType(p->getType())) {
+					println("Error in Check Type.", p->to_string());
+					return ObjectPtr();
 				}
 				break;
 			}
@@ -105,6 +133,7 @@ namespace ICM
 				break;
 			}
 			case OrderData::SINGLE: {
+				//tempresult[ProgramCounter] = static_cast<ASTOrder::OrderDataSingle*>(e)->getData();
 				tempresult[ProgramCounter] = ObjectPtr(static_cast<ASTOrder::OrderDataSingle*>(e)->getData()->clone());
 				Result = tempresult[ProgramCounter];
 				break;
@@ -177,6 +206,36 @@ namespace ICM
 				Objects::Identifier *ident = p->getData().get<Objects::Identifier>();
 				bool r = ident->getRealData()->equ(tempresult[p->getRefid()]);
 				tempresult[ProgramCounter] = ObjectPtr(new Objects::Boolean(r));
+				Result = tempresult[ProgramCounter];
+				break;
+			}
+			case OrderData::SML: {
+				ASTOrder::OrderDataSmall *p = static_cast<ASTOrder::OrderDataSmall*>(e);
+				Objects::Identifier *ident = p->getData().get<Objects::Identifier>();
+				tempresult[ProgramCounter] = checkCall(DefFuncTable["<"], DataList({ ident->getRealData(), tempresult[p->getRefid()] }));
+				Result = tempresult[ProgramCounter];
+				break;
+			}
+			case OrderData::SME: {
+				ASTOrder::OrderDataSmallEqual *p = static_cast<ASTOrder::OrderDataSmallEqual*>(e);
+				Objects::Identifier *ident = p->getData().get<Objects::Identifier>();
+				ObjectPtr &op = checkCall(DefFuncTable["<="], DataList({ ident->getRealData(), tempresult[p->getRefid()] }));
+				tempresult[ProgramCounter] = op;
+				Result = tempresult[ProgramCounter];
+				break;
+			}
+			case OrderData::LAR: {
+				ASTOrder::OrderDataSmall *p = static_cast<ASTOrder::OrderDataSmall*>(e);
+				Objects::Identifier *ident = p->getData().get<Objects::Identifier>();
+				tempresult[ProgramCounter] = checkCall(DefFuncTable[">"], DataList({ ident->getRealData(), tempresult[p->getRefid()] }));
+				Result = tempresult[ProgramCounter];
+				break;
+			}
+			case OrderData::LAE: {
+				ASTOrder::OrderDataSmallEqual *p = static_cast<ASTOrder::OrderDataSmallEqual*>(e);
+				Objects::Identifier *ident = p->getData().get<Objects::Identifier>();
+				ObjectPtr &op = checkCall(DefFuncTable[">="], DataList({ ident->getRealData(), tempresult[p->getRefid()] }));
+				tempresult[ProgramCounter] = op;
 				Result = tempresult[ProgramCounter];
 				break;
 			}

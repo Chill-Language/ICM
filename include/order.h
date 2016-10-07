@@ -4,6 +4,7 @@
 #include "basic.h"
 #include "ast.h"
 #include "keyword.h"
+#include "tostring.h"
 
 namespace ICM
 {
@@ -14,13 +15,14 @@ namespace ICM
 		public:
 			enum Order {
 				START,
-				CALL, SINGLE, STORE,
+				SINGLE, STORE,
 				JUMP, JUMPNOT,
 				FUNC,
 				AT,
 				LET, CPY, REF,
+				CALL, CCAL, CHKT,
 				CPYS, REFS,
-				EQU,
+				EQU, SML, SME, LAR, LAE,
 				INC,
 				OVER
 			};
@@ -33,6 +35,8 @@ namespace ICM
 				{
 				case START:    str.append("BEG "); break;
 				case CALL:     str.append("CALL"); break;
+				case CHKT:     str.append("CHKT"); break;
+				case CCAL:     str.append("CCAL"); break;
 				case SINGLE:   str.append("SING"); break;
 				case STORE:    str.append("STOR"); break;
 				case JUMP:     str.append("JUMP"); break;
@@ -45,6 +49,10 @@ namespace ICM
 				case CPYS:     str.append("CPYS"); break;
 				case REFS:     str.append("REFS"); break;
 				case EQU:      str.append("EQU "); break;
+				case SML:      str.append("SML "); break;
+				case SME:      str.append("SME "); break;
+				case LAR:      str.append("LAR "); break;
+				case LAE:      str.append("LAE "); break;
 				case INC:      str.append("INC "); break;
 				case OVER:     str.append("END "); break;
 				}
@@ -60,12 +68,12 @@ namespace ICM
 			}
 		};
 
-		class OrderDataCall : public OrderData
+		class OrderDataCheckCall : public OrderData
 		{
 			using NodePtr = AST::Node*;
 		public:
-			OrderDataCall(const NodePtr &nodptr) : nodptr(nodptr) {}
-			OrderData::Order order() const { return OrderData::CALL; }
+			OrderDataCheckCall(const NodePtr &nodptr) : nodptr(nodptr) {}
+			OrderData::Order order() const { return OrderData::CCAL; }
 			NodePtr& getData() { return nodptr; }
 			const NodePtr& getData() const { return nodptr; }
 			void adjustID(const map<size_t, size_t> &map) {
@@ -81,6 +89,54 @@ namespace ICM
 			NodePtr nodptr;
 			string getToString() const {
 				return nodptr->to_string_for_order();
+			}
+		};
+
+		class OrderDataCall : public OrderData
+		{
+		public:
+			OrderDataCall(const FuncTableUnit &ftu, size_t id, const vector<AST::Base*> &args)
+				: ftu(ftu), id(id), args(args) {}
+			OrderData::Order order() const { return OrderData::CALL; }
+			vector<AST::Base*>& getData() { return args; }
+			const vector<AST::Base*>& getData() const { return args; }
+			ObjectPtr call(const DataList &dl) {
+				return ftu[id].call(dl);
+			}
+			void adjustID(const map<size_t, size_t> &map) {
+				for (auto &e : args) {
+					if (e->getType() == AST::Refer::Type) {
+						AST::Refer &r = static_cast<AST::Refer&>(*e);
+						r.setData(map.at(r.getData()));
+					}
+				}
+			}
+
+		private:
+			const FuncTableUnit &ftu;
+			size_t id;
+			vector<AST::Base*> args;
+			string getToString() const {
+				string str(ftu.getName());
+				for (auto &e : args)
+					str.append(e->to_string_code() + ", ");
+				return str;
+			}
+		};
+
+		class OrderDataCheckType : public OrderData
+		{
+		public:
+			OrderDataCheckType(AST::Base* bp, DefaultType type) : bp(bp) {}
+			OrderData::Order order() const { return OrderData::CHKT; }
+			AST::Base* getData() const { return bp; }
+			DefaultType getType() const { return type; }
+
+		private:
+			AST::Base *bp;
+			DefaultType type;
+			string getToString() const {
+				return bp->to_string_code() + ", " + ICM::to_string(type);
 			}
 		};
 
@@ -181,7 +237,7 @@ namespace ICM
 				return "{" + std::to_string(ref) + "}, " + std::to_string(id);
 			}
 		};
-		
+
 		class OrderDataLetBase : public OrderData
 		{
 		public:
@@ -215,7 +271,7 @@ namespace ICM
 			OrderDataRef(ObjectPtr objptr, size_t id) : OrderDataLetBase(objptr, id) {}
 			OrderData::Order order() const { return OrderData::REF; }
 		};
-		
+
 		class OrderDataCpySBase : public OrderData
 		{
 		public:
@@ -240,12 +296,10 @@ namespace ICM
 			OrderDataRefSingle(size_t id) : OrderDataCpySBase(id) {}
 			OrderData::Order order() const { return OrderData::REFS; }
 		};
-		
-		class OrderDataEqu : public OrderData
+		class OrderDataCompare : public OrderData
 		{
 		public:
-			OrderDataEqu(ObjectPtr objptr, size_t id) : data(objptr), id(id) {}
-			OrderData::Order order() const { return OrderData::EQU; }
+			OrderDataCompare(ObjectPtr objptr, size_t id) : data(objptr), id(id) {}
 			const ObjectPtr& getData() const { return data; }
 			void setData(const ObjectPtr &obj) { data = obj; }
 			size_t getRefid() const { return id; }
@@ -256,6 +310,36 @@ namespace ICM
 			string getToString() const {
 				return data->to_string_code() + ", {" + std::to_string(id) + "}";
 			}
+		};
+		class OrderDataEqu : public OrderDataCompare
+		{
+		public:
+			OrderDataEqu(ObjectPtr objptr, size_t id) : OrderDataCompare(objptr, id) {}
+			OrderData::Order order() const { return OrderData::EQU; }
+		};
+		class OrderDataSmall : public OrderDataCompare
+		{
+		public:
+			OrderDataSmall(ObjectPtr objptr, size_t id) : OrderDataCompare(objptr, id) {}
+			OrderData::Order order() const { return OrderData::SML; }
+		};
+		class OrderDataSmallEqual : public OrderDataCompare
+		{
+		public:
+			OrderDataSmallEqual(ObjectPtr objptr, size_t id) : OrderDataCompare(objptr, id) {}
+			OrderData::Order order() const { return OrderData::SME; }
+		};
+		class OrderDataLarge : public OrderDataCompare
+		{
+		public:
+			OrderDataLarge(ObjectPtr objptr, size_t id) : OrderDataCompare(objptr, id) {}
+			OrderData::Order order() const { return OrderData::LAR; }
+		};
+		class OrderDataLargeEqual : public OrderDataCompare
+		{
+		public:
+			OrderDataLargeEqual(ObjectPtr objptr, size_t id) : OrderDataCompare(objptr, id) {}
+			OrderData::Order order() const { return OrderData::LAE; }
 		};
 		
 		class OrderDataInc : public OrderData

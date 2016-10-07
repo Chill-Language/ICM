@@ -34,6 +34,7 @@ namespace ICM
 		{ "break",    KeywordID::BREAK    },
 		{ "for",      KeywordID::FOR      },
 		{ "in",       KeywordID::IN       },
+		{ "to",       KeywordID::TO       },
 		{ "case",     KeywordID::CASE     },
 		{ "when",     KeywordID::WHEN     },
 		{ "function", KeywordID::FUNCTION },
