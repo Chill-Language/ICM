@@ -2,6 +2,7 @@
 #include "tostring.h"
 #include "typeobject.h"
 #include "keyword.h"
+#include "objectsdef.h"
 #include <ctime>
 size_t CheckCallCount = 0;
 

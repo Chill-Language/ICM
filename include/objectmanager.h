@@ -3,6 +3,7 @@
 
 #include "basic.h"
 #include "bijectionmap.h"
+#include "objectenum.h"
 
 namespace ICM
 {

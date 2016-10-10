@@ -7,6 +7,7 @@
 
 namespace ICM
 {
+	namespace Objects { class Identifier; }
 	//=======================================
 	// * Class BaseTableUnit
 	//=======================================
