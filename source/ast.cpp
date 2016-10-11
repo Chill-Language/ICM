@@ -44,10 +44,10 @@ namespace ICM
 	// * Class AST
 	//=======================================
 	void AST::pushData(const ObjectPtr &op) {
-		currptr->pushNode(Element::Data(op));
+		currptr->push_back(Element::Data(op));
 	}
 	void AST::pushNode() {
-		currptr->pushNode(Element::Refer(currindex));
+		currptr->push_back(Element::Refer(currindex));
 		NodePtr tmp(new Node(currindex++));
 		farthptrs.push(currptr);
 		currptr = tmp.get();

@@ -9,24 +9,12 @@ namespace ICM
 		//=======================================
 		// * Functions
 		//=======================================
-		ObjectPtr& getNodeDataRef(AST::Element *node)
-		{
-			return static_cast<AST::Element*>(node)->getData();
-		}
-		const ObjectPtr& getNodeDataValue(const AST::Element *node)
-		{
-			return static_cast<const AST::Element*>(node)->getData();
-		}
-		size_t getNodeRefer(const AST::Element *node)
-		{
-			return static_cast<const AST::Element*>(node)->getRefer();
-		}
-		bool key_is(const AST::Element *node, KeywordID key)
+		bool key_is(const AST::Element &node, KeywordID key)
 		{
 			using Key = Objects::Keyword;
-			if (node->getType() != AST::Element::E_Data)
+			if (!node.isData())
 				return false;
-			ObjectPtr op = getNodeDataValue(node);
+			ObjectPtr op = node.getData();
 			return op.isType<Key>() && op.get<Key>()->getData() == key;
 		}
 		void error(const string &msg = "")
@@ -94,16 +82,16 @@ namespace ICM
 			vector<AST::Element*> doexps;
 			enum { IF, ELSE, ELSEIF } mode = IF;
 			bool startelse = false;
-			size_t begin = (key_is((AST::Element*)&node[2], KeywordID::THEN)) ? *range.begin() + 2 : *range.begin() + 1;
+			size_t begin = (key_is(node[2], KeywordID::THEN)) ? *range.begin() + 2 : *range.begin() + 1;
 			for (size_t i : Range<size_t>(begin, range.end())) {
-				AST::Element *e = (AST::Element*)&node[i];
+				AST::Element &e = (AST::Element&)node[i];
 				switch (mode)
 				{
 				case IF:
-					if (e->getType() == AST::Element::E_Refer) {
-						doexps.push_back(e);
+					if (e.isRefer()) {
+						doexps.push_back(&e);
 					}
-					else  if (key_is(e, KeywordID::ELSE)) {
+					else if (key_is(e, KeywordID::ELSE)) {
 						mode = ELSE;
 						startelse = true;
 					}
@@ -111,18 +99,18 @@ namespace ICM
 						mode = ELSEIF;
 					}
 					else {
-						doexps.push_back(e);
+						doexps.push_back(&e);
 					}
 					break;
 				case ELSE:
-					if (e->getType() == AST::Element::E_Refer) {
-						ifstruct.add_elexp(e);
+					if (e.isRefer()) {
+						ifstruct.add_elexp(&e);
 					}
 					else if (key_is(e, KeywordID::IF)) {
 						mode = ELSEIF;
 					}
 					else {
-						ifstruct.add_elexp(e);
+						ifstruct.add_elexp(&e);
 					}
 					startelse = false;
 					break;
@@ -268,17 +256,17 @@ namespace ICM
 				return;
 			}
 			AST::Element *v = (AST::Element*)&node[1];
-			if (v->getType() != AST::Element::E_Data) {
+			if (!v->isData()) {
 				error();
 				return;
 			}
-			forstruct.setObjVar(getNodeDataValue(v));
-			if (!key_is((AST::Element*)&node[2], KeywordID::IN)) {
+			forstruct.setObjVar(v->getData());
+			if (!key_is(node[2], KeywordID::IN)) {
 				error();
 				return;
 			}
 			forstruct.setRanexpBegin((AST::Element*)&node[3]);
-			if (!key_is((AST::Element*)&node[4], KeywordID::TO)) {
+			if (!key_is(node[4], KeywordID::TO)) {
 				error();
 				return;
 			}
@@ -294,14 +282,14 @@ namespace ICM
 		//=======================================
 		// * Create Order
 		//=======================================
-		AST::Node* CreateOrder::getReferNode(AST::Element *refer) {
-			return Table[static_cast<AST::Element*>(refer)->getRefer()].get();
+		AST::Node* CreateOrder::getReferNode(AST::Element &refer) {
+			return Table[refer.getRefer()].get();
 		}
-		ObjectPtr& CreateOrder::getDataRef(AST::Element *data) {
-			return static_cast<AST::Element*>(data)->getData();
+		ObjectPtr& CreateOrder::getDataRef(AST::Element &data) {
+			return data.getData();
 		}
-		void CreateOrder::createSingle(AST::Element *bp) {
-			if (bp->getType() == AST::Element::E_Refer)
+		void CreateOrder::createSingle(AST::Element &bp) {
+			if (bp.isRefer())
 				createOrderSub(getReferNode(bp));
 			else {
 				ObjectPtr &op = getDataRef(bp);
@@ -315,7 +303,7 @@ namespace ICM
 		vector<OrderData*>& CreateOrder::createOrder() {
 			// Create Order
 			addOrder(new OrderDataBegin());
-			createOrderSub(getReferNode((AST::Element*)&(Table[0]->front())));
+			createOrderSub(getReferNode(Table[0]->front()));
 			addOrder(Table[0].get(), new OrderDataEnd());
 			// Adjust Refer
 			//if (false)
@@ -339,8 +327,8 @@ namespace ICM
 			if (GlobalConfig.PrintOrder)
 				println(to_string_code(*single));
 			AST::Element *front = (AST::Element*)&(single->front());
-			if (front->getType() == AST::Element::E_Data) {
-				ObjectPtr &op = getDataRef(front);
+			if (front->isData()) {
+				ObjectPtr &op = getDataRef(*front);
 				if (op.isType<Objects::Keyword>()) {
 					createOrderKeyword(single, op.get<Objects::Keyword>()->getData());
 					return;
@@ -348,13 +336,13 @@ namespace ICM
 			}
 
 			for (auto &p : *single) {
-				if (p.getType() == AST::Element::E_Data) {
-					ObjectPtr &op = getDataRef((AST::Element*)&p);
+				if (p.isData()) {
+					ObjectPtr &op = getDataRef(p);
 					if (op.isType<Objects::Identifier>())
 						setObjectIdentifier(op);
 				}
-				else if (p.getType() == AST::Element::E_Refer) {
-					createOrderSub(getReferNode((AST::Element*)&p));
+				else {
+					createOrderSub(getReferNode(p));
 				}
 			}
 			addOrder(single, new ASTOrder::OrderDataCheckCall(single));
@@ -362,10 +350,8 @@ namespace ICM
 		void CreateOrder::createOrderSub(const Segment &segment) {
 			for (AST::Element* single : segment) {
 
-				if (single->getType() == AST::Element::E_Refer)
-					createOrderSub(getReferNode(single));
-				else if (single->getType() == AST::Element::E_Data) {
-					ObjectPtr &op = getDataRef(single);
+				if (single->isData()) {
+					ObjectPtr &op = getDataRef(*single);
 					if (op.isType(T_Keyword)) {
 						createOrderKeywordSingle(op.get<Objects::Keyword>()->getData());
 						continue;
@@ -373,6 +359,9 @@ namespace ICM
 					if (op.isType(T_Identifier))
 						setObjectIdentifier(op);
 					addOrder(new OrderDataSingle(op));
+				}
+				else {
+					createOrderSub(getReferNode(*single));
 				}
 			}
 		}
@@ -402,13 +391,13 @@ namespace ICM
 					auto &judexp = ifexps[i].judexp;
 					auto &doexps = ifexps[i].doexps;
 					OrderDataJumpNotIf *pjmprr;
-					if (judexp->getType() == AST::Element::E_Refer) {
-						createSingle(judexp);
-						AST::Node *node = getReferNode(judexp);
+					if (judexp->isRefer()) {
+						createSingle(*judexp);
+						AST::Node *node = getReferNode(*judexp);
 						pjmprr = new OrderDataJumpNotIf(node->getIndex());
 					}
-					else { // AST::Element
-						createSingle(judexp);
+					else {
+						createSingle(*judexp);
 						size_t id = OrderDataList.size() - 1;
 						pjmprr = new OrderDataJumpNotIf(id);
 						pjmprr->setExprefAdjusted();
@@ -455,7 +444,7 @@ namespace ICM
 				const WhileStruct &whilestruct = parseToOrderWhile(*single);
 				auto &judexp = whilestruct.getJudExp();
 				auto &doexps = whilestruct.getDoexps();
-				createSingle(judexp);
+				createSingle(*judexp);
 				size_t id = OrderDataList.size() - 1;
 				OrderDataJumpNotIf *pjmprr = new OrderDataJumpNotIf(id);
 				pjmprr->setExprefAdjusted();
@@ -479,9 +468,9 @@ namespace ICM
 					setObjectIdentifier(opvar);
 				else
 					error();
-				createSingle(forstruct.getRanexpBegin());
+				createSingle(*forstruct.getRanexpBegin());
 				size_t bid = OrderDataList.size() - 1;
-				createSingle(forstruct.getRanexpEnd());
+				createSingle(*forstruct.getRanexpEnd());
 				size_t eid = OrderDataList.size() - 1;
 				addOrder(new OrderDataLet(opvar, bid));
 				createOrderSub(forstruct.getDoexps());
@@ -507,11 +496,11 @@ namespace ICM
 
 				if (single->size() == 2) {
 					if (keyword == KeywordID::CPY) {
-						createSingle((AST::Element*)&(*single)[1]);
+						createSingle((*single)[1]);
 						addOrder(single, new OrderDataCpySingle(OrderDataList.size() - 1));
 					}
 					else if (keyword == KeywordID::REF) {
-						createSingle((AST::Element*)&(*single)[1]);
+						createSingle((*single)[1]);
 						addOrder(single, new OrderDataRefSingle(OrderDataList.size() - 1));
 					}
 					break;
@@ -523,11 +512,11 @@ namespace ICM
 				}
 
 
-				if ((*single)[1].getType() != AST::Element::E_Data) {
+				if (!(*single)[1].isData()) {
 					error();
 					break;
 				}
-				ObjectPtr &op = getDataRef((AST::Element*)&(*single)[1]);
+				ObjectPtr &op = getDataRef((*single)[1]);
 				if (!op.isType(T_Identifier)) {
 					error();
 					break;
@@ -545,7 +534,7 @@ namespace ICM
 
 				op = ObjectPtr(ident);
 
-				createSingle((AST::Element*)&(*single)[2]);
+				createSingle((*single)[2]);
 				switch (keyword) {
 				case KeywordID::LET:
 					addOrder(single, new OrderDataLet(op, OrderDataList.size() - 1));

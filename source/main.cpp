@@ -33,8 +33,8 @@ namespace ICM
 						OrderDataCheckCall* p = static_cast<OrderDataCheckCall*>(o);
 						AST::Node *node = p->getData();
 						AST::Element *front = (AST::Element*)&(node->front());
-						if (front->getType() == AST::Element::E_Data) {
-							ObjectPtr op = static_cast<AST::Element*>(front)->getData();
+						if (front->isData()) {
+							ObjectPtr op = front->getData();
 							if (op.isType(T_Function)) {
 								Objects::Function *of = op.get<Objects::Function>();
 								//getCallID(of->get_data(), );

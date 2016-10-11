@@ -55,8 +55,6 @@ namespace ICM
 		public:
 			explicit Node(size_t id) : index(id) {}
 
-			void pushNode(const Element &node) { push_back(node); }
-
 			// Index
 			void setIndex(size_t id) { this->index = id; }
 			size_t getIndex() const { return this->index; }

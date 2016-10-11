@@ -78,7 +78,7 @@ namespace ICM
 			const NodePtr& getData() const { return nodptr; }
 			void adjustID(const map<size_t, size_t> &map) {
 				for (auto &e : *nodptr) {
-					if (e.getType() == AST::Element::E_Refer) {
+					if (e.isRefer()) {
 						AST::Element &r = static_cast<AST::Element&>(e);
 						r.setRefer(map.at(r.getRefer()));
 					}
@@ -105,7 +105,7 @@ namespace ICM
 			}
 			void adjustID(const map<size_t, size_t> &map) {
 				for (auto &e : args) {
-					if (e->getType() == AST::Element::E_Refer) {
+					if (e->isRefer()) {
 						AST::Element &r = static_cast<AST::Element&>(*e);
 						r.setRefer(map.at(r.getRefer()));
 					}
@@ -403,9 +403,9 @@ namespace ICM
 			// New
 			using Single = AST::Node*;      // AST's Root
 			using Segment = vector<AST::Element*>; // ASTs
-			AST::Node* getReferNode(AST::Element *refer);
-			ObjectPtr& getDataRef(AST::Element *data);
-			void createSingle(AST::Element *bp);
+			AST::Node* getReferNode(AST::Element &refer);
+			ObjectPtr& getDataRef(AST::Element &data);
+			void createSingle(AST::Element &bp);
 			void createOrderSub(const Single &single);
 			void createOrderSub(const Segment &segment);
 			void createOrderKeyword(const Single& single, KeywordID keyword);

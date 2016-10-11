@@ -7,7 +7,7 @@ namespace ICM
 	{
 		lightlist_creater<ObjectPtr> listnum(r.size());
 		for (const auto &l : r) {
-			if (l.getType() == AST::Element::E_Data) {
+			if (l.isData()) {
 				auto &op = l.getData();
 				if (op.isType(T_Identifier))
 					listnum.push_back(op);
@@ -48,10 +48,10 @@ namespace ICM
 		}
 	}
 	ObjectPtr Interpreter::getObjectPtr(AST::Element *e) {
-		if (e->getType() == AST::Element::E_Data)
-			return static_cast<AST::Element*>(e)->getData();
+		if (e->isData())
+			return e->getData();
 		else
-			return tempresult[static_cast<AST::Element*>(e)->getRefer()];
+			return tempresult[e->getRefer()];
 	}
 	DataList Interpreter::getDataList(const vector<AST::Element*> &vb) {
 		lightlist_creater<ObjectPtr> ndl(vb.size());
@@ -70,15 +70,13 @@ namespace ICM
 			switch (e->order()) {
 			case OrderData::CCAL: {
 				AST::Node *node = static_cast<ASTOrder::OrderDataCheckCall*>(e)->getData();
-				AST::Element *f = (AST::Element*)&(node->front());
-				if (f->getType() == AST::Element::E_Data) {
-					AST::Element *nf = static_cast<AST::Element*>(f);
-					const ObjectPtr &op = adjustObjectPtr(nf->getData());
+				AST::Element *f = &node->front();
+				if (f->isData()) {
+					const ObjectPtr &op = adjustObjectPtr(f->getData());
 					runSub(op, node, ProgramCounter);
 				}
-				else if (f->getType() == AST::Element::E_Refer) {
-					AST::Element *nf = static_cast<AST::Element*>(f);
-					const ObjectPtr &op = tempresult[nf->getRefer()];
+				else {
+					const ObjectPtr &op = tempresult[f->getRefer()];
 					runSub(op, node, ProgramCounter);
 				}
 				break;
