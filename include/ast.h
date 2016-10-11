@@ -6,106 +6,63 @@
 
 namespace ICM
 {
-	//=======================================
-	// * Namespace ASTNode
-	//=======================================
-	namespace ASTNode
+	namespace ASTBase
 	{
-		enum ASTNodeType { AST_Node, AST_Data, AST_Refer };
-
 		//=======================================
-		// * Class ASTNodeBase
+		// * Class Element
 		//=======================================
-		class ASTNodeBase
+		class Element
 		{
 		public:
-			virtual ASTNodeType getType() const = 0;
-			virtual string to_string() const = 0;
-			virtual string to_string_code() const = 0;
+			enum EleType { E_Data, E_Refer };
+			Element(EleType type) : type(type) {}
+
+			static Element Data(const ObjectPtr &op) {
+				Element r(E_Data);
+				r.data.op = new ObjectPtr(op);
+				return r;
+			}
+			static Element Refer(size_t index) {
+				Element r(E_Refer);
+				r.data.id = index;
+				return r;
+			}
+
+			EleType getType() const { return type; }
+
+			bool isData() const { return type == E_Data; }
+			bool isRefer() const { return type == E_Refer; }
+
+			// Get/Set
+			const ObjectPtr& getData() const { return *(data.op); }
+			ObjectPtr& getData() { return *(data.op); }
+			size_t getRefer() const { return data.id; }
+			void setRefer(size_t id) { data.id = id; }
+
+		protected:
+			EleType type;
+			union {
+				ObjectPtr* op;
+				size_t id;
+			} data;
 		};
 
 		//=======================================
-		// * Class ASTNodeNode
+		// * Class Node
 		//=======================================
-		class ASTNodeNode : public ASTNodeBase
+		class Node : public vector<Element>
 		{
-			using ASTNodePtr = shared_ptr<ASTNodeBase>;
 		public:
-			explicit ASTNodeNode(size_t id) : index(id) {}
-			// List
-			ASTNodeBase* front() const { return data.front().get(); }
-			bool empty() const { return data.empty(); }
-			void pushNode(const ASTNodePtr &node) { data.push_back(node); }
-			auto begin() const { return data.begin(); }
-			auto end() const { return data.end(); }
-			auto begin() { return data.begin(); }
-			auto end() { return data.end(); }
-			auto cbegin() const { return data.cbegin(); }
-			auto cend() const { return data.cend(); }
-			size_t size() const { return data.size(); }
-			const ASTNodePtr& operator[](size_t id) const { return data[id]; }
+			explicit Node(size_t id) : index(id) {}
+
+			void pushNode(const Element &node) { push_back(node); }
 
 			// Index
 			void setIndex(size_t id) { this->index = id; }
 			size_t getIndex() const { return this->index; }
-			string to_string_for_order() const;
-
-			//-----------------------------------
-			// + Inherited
-			//-----------------------------------
-			ASTNodeType getType() const { return Type; }
-			string to_string() const;
-			string to_string_code() const;
-			// Const
-			static const ASTNodeType Type = AST_Node;
 
 		private:
 			size_t index;
-			vector<ASTNodePtr> data;
-		};
-
-		//=======================================
-		// * Class ASTNodeData
-		//=======================================
-		class ASTNodeData : public ASTNodeBase
-		{
-		public:
-			ASTNodeData(const ObjectPtr &op) : data(op) {}
-			const ObjectPtr& getData() const { return data; }
-			ObjectPtr& getData() { return data; }
-			//-----------------------------------
-			// + Inherited
-			//-----------------------------------
-			ASTNodeType getType() const { return Type; }
-			string to_string() const;
-			string to_string_code() const;
-			// Const
-			static const ASTNodeType Type = AST_Data;
-
-		private:
-			ObjectPtr data;
-		};
-
-		//=======================================
-		// * Class ASTNodeRefer
-		//=======================================
-		class ASTNodeRefer : public ASTNodeBase
-		{
-		public:
-			ASTNodeRefer(size_t index) : data(index) {}
-			size_t getData() const { return data; }
-			void setData(size_t id) { data = id; }
-			//-----------------------------------
-			// + Inherited
-			//-----------------------------------
-			ASTNodeType getType() const { return Type; }
-			string to_string() const;
-			string to_string_code() const;
-			// Const
-			static const ASTNodeType Type = AST_Refer;
-
-		private:
-			size_t data;
 		};
 	}
 
@@ -115,10 +72,8 @@ namespace ICM
 	class AST
 	{
 	public:
-		using Base = ASTNode::ASTNodeBase;
-		using Node = ASTNode::ASTNodeNode;
-		using Data = ASTNode::ASTNodeData;
-		using Refer = ASTNode::ASTNodeRefer;
+		using Element = ASTBase::Element;
+		using Node = ASTBase::Node;
 		using NodePtr = shared_ptr<Node>;
 
 		AST() : root(new Node(0)), currindex(1), table({ root }), currptr(root.get()) {}
@@ -155,6 +110,12 @@ namespace ICM
 		Node *currptr;
 		std::stack<Node*> farthptrs;
 	};
+
+	string to_string(const AST::Element &element);
+	string to_string_code(const AST::Element &element);
+	string to_string(const AST::Node &node);
+	string to_string_code(const AST::Node &node);
+	string to_string_for_order(const AST::Node &node);
 }
 
 #endif

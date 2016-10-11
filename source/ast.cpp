@@ -3,64 +3,51 @@
 namespace ICM
 {
 	//=======================================
-	// * Namespace ASTNode
+	// * Struct Element
 	//=======================================
-	namespace ASTNode
-	{
-		//=======================================
-		// * Class ASTNodeNode
-		//=======================================
-		string ASTNodeNode::to_string() const {
-			string str = "<N(" + std::to_string(index) + "):";
-			for (auto p : data)
-				str.append(" " + p->to_string());
-			str.append(">");
-			return str;
-		}
-		string ASTNodeNode::to_string_code() const {
-			string str("[" + std::to_string(index) + "]: " + "(" + to_string_for_order() + ")");
-			return str;
-		}
-		string ASTNodeNode::to_string_for_order() const {
-			string str;
-			//str.append("(");
-			for (auto p : data)
-				str.append(p->to_string_code() + " ");
-			if (!data.empty())
-				str.pop_back();
-			//str.append(")");
-			return str;
-		}
-
-		//=======================================
-		// * Class ASTNodeData
-		//=======================================
-		string ASTNodeData::to_string() const {
-			return "D(" + data->to_string() + ")";
-		}
-		string ASTNodeData::to_string_code() const {
-			return data->to_string_code();
-		}
-
-		//=======================================
-		// * Class ASTNodeRefer
-		//=======================================
-		string ASTNodeRefer::to_string() const {
-			return "R[" + std::to_string(data) + "]";
-		}
-		string ASTNodeRefer::to_string_code() const {
-			return "{" + std::to_string(data) + "}";
-		}
+	string to_string(const AST::Element &element) {
+		if (element.isData())
+			return "D(" + element.getData()->to_string() + ")";
+		else
+			return "R[" + std::to_string(element.getRefer()) + "]";
+	}
+	string to_string_code(const AST::Element &element) {
+		if (element.isData())
+			return element.getData()->to_string_code();
+		else
+			return "{" + std::to_string(element.getRefer()) + "}";
+	}
+	//=======================================
+	// * Class Node
+	//=======================================
+	string to_string(const AST::Node &node) {
+		string str = "<N(" + std::to_string(node.getIndex()) + "):";
+		for (auto &e : node)
+			str.append(" " + to_string(e));
+		str.append(">");
+		return str;
+	}
+	string to_string_code(const AST::Node &node) {
+		string str("[" + std::to_string(node.getIndex()) + "]: " + "(" + to_string_for_order(node) + ")");
+		return str;
+	}
+	string to_string_for_order(const AST::Node &node) {
+		string str;
+		for (auto &e : node)
+			str.append(to_string_code(e) + " ");
+		if (!node.empty())
+			str.pop_back();
+		return str;
 	}
 
 	//=======================================
 	// * Class AST
 	//=======================================
 	void AST::pushData(const ObjectPtr &op) {
-		currptr->pushNode(shared_ptr<Base>(new Data(op)));
+		currptr->pushNode(Element::Data(op));
 	}
 	void AST::pushNode() {
-		currptr->pushNode(shared_ptr<Base>(new Refer(currindex)));
+		currptr->pushNode(Element::Refer(currindex));
 		NodePtr tmp(new Node(currindex++));
 		farthptrs.push(currptr);
 		currptr = tmp.get();
@@ -83,7 +70,7 @@ namespace ICM
 		else {
 			for (const auto &e : getTableRange()) {
 				str.append("\n ");
-				str.append((*e)->to_string());
+				str.append(ICM::to_string(**e));
 			}
 		}
 		str.append("\n}");
@@ -96,7 +83,7 @@ namespace ICM
 		else {
 			for (const auto &e : getTableRange()) {
 				str.append("\n ");
-				str.append((*e)->to_string_code());
+				str.append(ICM::to_string_code(**e));
 			}
 		}
 		str.append("\n}");

@@ -32,9 +32,9 @@ namespace ICM
 						Types[Count] = T_Vary;
 						OrderDataCheckCall* p = static_cast<OrderDataCheckCall*>(o);
 						AST::Node *node = p->getData();
-						AST::Base *front = node->front();
-						if (front->getType() == AST::Data::Type) {
-							ObjectPtr op = static_cast<AST::Data*>(front)->getData();
+						AST::Element *front = (AST::Element*)&(node->front());
+						if (front->getType() == AST::Element::E_Data) {
+							ObjectPtr op = static_cast<AST::Element*>(front)->getData();
 							if (op.isType(T_Function)) {
 								Objects::Function *of = op.get<Objects::Function>();
 								//getCallID(of->get_data(), );

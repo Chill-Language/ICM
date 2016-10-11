@@ -13,7 +13,7 @@ namespace ICM
 		Interpreter(const OrderList &ol)
 			: orderlist(ol), tempresult(ol.size(), ObjectPtr()) {}
 		ObjectPtr run();
-		DataList createList(const Range<vector<shared_ptr<AST::Base>>::iterator> &r);
+		DataList createList(const RangeIterator<vector<AST::Element>::iterator> &r);
 
 	private:
 		OrderList orderlist;
@@ -21,8 +21,8 @@ namespace ICM
 		ObjectPtr Result;
 		void runFunc(const ObjectPtr &op, AST::Node *n, size_t id);
 		void runSub(const ObjectPtr &op, AST::Node *node, size_t i);
-		DataList getDataList(const vector<AST::Base*> &vb);
-		ObjectPtr getObjectPtr(AST::Base *e);
+		DataList getDataList(const vector<AST::Element*> &vb);
+		ObjectPtr getObjectPtr(AST::Element *e);
 	};
 }
 

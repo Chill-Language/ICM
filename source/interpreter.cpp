@@ -3,26 +3,26 @@
 
 namespace ICM
 {
-	DataList Interpreter::createList(const Range<vector<shared_ptr<AST::Base>>::iterator> &r)
+	DataList Interpreter::createList(const RangeIterator<vector<AST::Element>::iterator> &r)
 	{
 		lightlist_creater<ObjectPtr> listnum(r.size());
 		for (const auto &l : r) {
-			if ((*l)->getType() == AST::Data::Type) {
-				auto &op = static_cast<AST::Data*>(l->get())->getData();
+			if (l.getType() == AST::Element::E_Data) {
+				auto &op = l.getData();
 				if (op.isType(T_Identifier))
 					listnum.push_back(op);
 				else
 					listnum.push_back(ObjectPtr(op->clone())); // TODO
 			}
-			else if ((*l)->getType() == AST::Refer::Type) {
-				size_t id = static_cast<AST::Refer*>(l->get())->getData();
+			else {
+				size_t id = l.getRefer();
 				listnum.push_back(tempresult[id]);
 			}
 		}
 		return listnum.data();
 	}
 	void Interpreter::runFunc(const ObjectPtr &op, AST::Node *n, size_t id) {
-		const auto &r = range(n->begin() + 1, n->end());
+		const auto &r = rangei(n->begin() + 1, n->end());
 		const DataList &dl = createList(r);
 		ObjectPtr &res = tempresult[id];
 
@@ -47,13 +47,13 @@ namespace ICM
 			println("Error Type.");
 		}
 	}
-	ObjectPtr Interpreter::getObjectPtr(AST::Base *e) {
-		if (e->getType() == AST::Data::Type)
-			return static_cast<AST::Data*>(e)->getData();
+	ObjectPtr Interpreter::getObjectPtr(AST::Element *e) {
+		if (e->getType() == AST::Element::E_Data)
+			return static_cast<AST::Element*>(e)->getData();
 		else
-			return tempresult[static_cast<AST::Refer*>(e)->getData()];
+			return tempresult[static_cast<AST::Element*>(e)->getRefer()];
 	}
-	DataList Interpreter::getDataList(const vector<AST::Base*> &vb) {
+	DataList Interpreter::getDataList(const vector<AST::Element*> &vb) {
 		lightlist_creater<ObjectPtr> ndl(vb.size());
 		for (auto &e : vb)
 			ndl.push_back(getObjectPtr(e));
@@ -70,15 +70,15 @@ namespace ICM
 			switch (e->order()) {
 			case OrderData::CCAL: {
 				AST::Node *node = static_cast<ASTOrder::OrderDataCheckCall*>(e)->getData();
-				AST::Base *f = node->front();
-				if (f->getType() == AST::Data::Type) {
-					AST::Data *nf = static_cast<AST::Data*>(f);
+				AST::Element *f = (AST::Element*)&(node->front());
+				if (f->getType() == AST::Element::E_Data) {
+					AST::Element *nf = static_cast<AST::Element*>(f);
 					const ObjectPtr &op = adjustObjectPtr(nf->getData());
 					runSub(op, node, ProgramCounter);
 				}
-				else if (f->getType() == AST::Refer::Type) {
-					AST::Refer *nf = static_cast<AST::Refer*>(f);
-					const ObjectPtr &op = tempresult[nf->getData()];
+				else if (f->getType() == AST::Element::E_Refer) {
+					AST::Element *nf = static_cast<AST::Element*>(f);
+					const ObjectPtr &op = tempresult[nf->getRefer()];
 					runSub(op, node, ProgramCounter);
 				}
 				break;

@@ -78,9 +78,9 @@ namespace ICM
 			const NodePtr& getData() const { return nodptr; }
 			void adjustID(const map<size_t, size_t> &map) {
 				for (auto &e : *nodptr) {
-					if (e->getType() == AST::Refer::Type) {
-						AST::Refer &r = static_cast<AST::Refer&>(*e);
-						r.setData(map.at(r.getData()));
+					if (e.getType() == AST::Element::E_Refer) {
+						AST::Element &r = static_cast<AST::Element&>(e);
+						r.setRefer(map.at(r.getRefer()));
 					}
 				}
 			}
@@ -88,26 +88,26 @@ namespace ICM
 		private:
 			NodePtr nodptr;
 			string getToString() const {
-				return nodptr->to_string_for_order();
+				return to_string_for_order(*nodptr);
 			}
 		};
 
 		class OrderDataCall : public OrderData
 		{
 		public:
-			OrderDataCall(const FuncTableUnit &ftu, size_t id, const vector<AST::Base*> &args)
+			OrderDataCall(const FuncTableUnit &ftu, size_t id, const vector<AST::Element*> &args)
 				: ftu(ftu), id(id), args(args) {}
 			OrderData::Order order() const { return OrderData::CALL; }
-			vector<AST::Base*>& getData() { return args; }
-			const vector<AST::Base*>& getData() const { return args; }
+			vector<AST::Element*>& getData() { return args; }
+			const vector<AST::Element*>& getData() const { return args; }
 			ObjectPtr call(const DataList &dl) {
 				return ftu[id].call(dl);
 			}
 			void adjustID(const map<size_t, size_t> &map) {
 				for (auto &e : args) {
-					if (e->getType() == AST::Refer::Type) {
-						AST::Refer &r = static_cast<AST::Refer&>(*e);
-						r.setData(map.at(r.getData()));
+					if (e->getType() == AST::Element::E_Refer) {
+						AST::Element &r = static_cast<AST::Element&>(*e);
+						r.setRefer(map.at(r.getRefer()));
 					}
 				}
 			}
@@ -115,11 +115,11 @@ namespace ICM
 		private:
 			const FuncTableUnit &ftu;
 			size_t id;
-			vector<AST::Base*> args;
+			vector<AST::Element*> args;
 			string getToString() const {
 				string str(ftu.getName());
 				for (auto &e : args)
-					str.append(e->to_string_code() + ", ");
+					str.append(to_string_code(*e) + ", ");
 				return str;
 			}
 		};
@@ -127,16 +127,16 @@ namespace ICM
 		class OrderDataCheckType : public OrderData
 		{
 		public:
-			OrderDataCheckType(AST::Base* bp, DefaultType type) : bp(bp) {}
+			OrderDataCheckType(AST::Element* bp, DefaultType type) : bp(bp) {}
 			OrderData::Order order() const { return OrderData::CHKT; }
-			AST::Base* getData() const { return bp; }
+			AST::Element* getData() const { return bp; }
 			DefaultType getType() const { return type; }
 
 		private:
-			AST::Base *bp;
+			AST::Element *bp;
 			DefaultType type;
 			string getToString() const {
-				return bp->to_string_code() + ", " + ICM::to_string(type);
+				return to_string_code(*bp) + ", " + ICM::to_string(type);
 			}
 		};
 
@@ -402,10 +402,10 @@ namespace ICM
 
 			// New
 			using Single = AST::Node*;      // AST's Root
-			using Segment = vector<AST::Base*>; // ASTs
-			AST::Node* getReferNode(AST::Base *refer);
-			ObjectPtr& getDataRef(AST::Base *data);
-			void createSingle(AST::Base *bp);
+			using Segment = vector<AST::Element*>; // ASTs
+			AST::Node* getReferNode(AST::Element *refer);
+			ObjectPtr& getDataRef(AST::Element *data);
+			void createSingle(AST::Element *bp);
 			void createOrderSub(const Single &single);
 			void createOrderSub(const Segment &segment);
 			void createOrderKeyword(const Single& single, KeywordID keyword);
