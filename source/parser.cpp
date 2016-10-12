@@ -8,11 +8,11 @@ namespace ICM
 	{
 		using namespace Objects;
 
-		ObjectPtr createObject(MatchType type, const string &str)
+		Objects::Object* createObject(MatchType type, const string &str)
 		{
 			using namespace Objects;
 
-			Object *object;
+			Objects::Object *object;
 			switch (type)
 			{
 			//case ICM::MT_Nil:
@@ -37,7 +37,7 @@ namespace ICM
 				object = nullptr;
 				break;
 			}
-			return ObjectPtr(object);
+			return object;
 		}
 
 		bool createAST(Match &match, AST &ast)
@@ -81,7 +81,7 @@ namespace ICM
 					break;
 				case MT_LSBracket:
 					ast.pushNode();
-					ast.pushData(ICM::createObject<Objects::Function>(DefFuncTable.find("list")));
+					ast.pushData(new Objects::Function(DefFuncTable.find("list")));
 					firstMatchBraket = false;
 					emptybreak = true;
 					break;

@@ -67,7 +67,7 @@ namespace ICM
 		using namespace Objects;
 		switch (type)
 		{
-		case ICM::T_Object:     return new Object;
+		case ICM::T_Object:     return new Objects::Object;
 		case ICM::T_Nil:        return new Nil;
 		case ICM::T_Error:      return new Error;
 		case ICM::T_Identifier: return new Identifier;

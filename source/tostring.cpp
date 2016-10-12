@@ -41,7 +41,7 @@ namespace ICM
 		return Convert::to_string<'[', ']'>(list.begin(), list.end(), [](const ObjectPtr &obj) { return to_string(obj); });
 	}
 	string to_string(const AST *ast) {
-		return ast->to_string();
+		return to_string(*ast);
 	}
 	// MatchResult
 	string to_string(const MatchResult *mr) {
@@ -70,5 +70,66 @@ namespace ICM
 	}
 	std::string to_string(const shared_ptr<TypeObject> &top) {
 		return top->to_string();
+	}
+
+	//=======================================
+	// * AST
+	//=======================================
+	string to_string(const AST::Element &element) {
+		if (element.isData())
+			return "D(" + element.getData()->to_string() + ")";
+		else
+			return "R[" + std::to_string(element.getRefer()) + "]";
+	}
+	string to_string_code(const AST::Element &element) {
+		if (element.isData())
+			return element.getData()->to_string_code();
+		else
+			return "{" + std::to_string(element.getRefer()) + "}";
+	}
+	string to_string(const AST::Node &node) {
+		string str = "<N(" + std::to_string(node.getIndex()) + "):";
+		for (auto &e : node)
+			str.append(" " + to_string(e));
+		str.append(">");
+		return str;
+	}
+	string to_string_code(const AST::Node &node) {
+		string str("[" + std::to_string(node.getIndex()) + "]: " + "(" + to_string_for_order(node) + ")");
+		return str;
+	}
+	string to_string_for_order(const AST::Node &node) {
+		string str;
+		for (auto &e : node)
+			str.append(to_string_code(e) + " ");
+		if (!node.empty())
+			str.pop_back();
+		return str;
+	}
+	string to_string(const AST &ast) {
+		string str("{AST:");
+		if (ast.empty())
+			str.append("NIL");
+		else {
+			for (const auto &e : ast.getTableRange()) {
+				str.append("\n ");
+				str.append(ICM::to_string(**e));
+			}
+		}
+		str.append("\n}");
+		return str;
+	}
+	string to_string_code(const AST &ast) {
+		string str("{AST:");
+		if (ast.empty())
+			str.append("NIL");
+		else {
+			for (const auto &e : ast.getTableRange()) {
+				str.append("\n ");
+				str.append(ICM::to_string_code(**e));
+			}
+		}
+		str.append("\n}");
+		return str;
 	}
 }

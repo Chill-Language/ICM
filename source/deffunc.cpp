@@ -45,7 +45,7 @@ namespace ICM
 						tmp->add(list[i].get<T>());
 					return ObjectPtr(tmp);
 				}
-				void funcL(Object &result, const LDataList &list) const {
+				void funcL(Objects::Object &result, const LDataList &list) const {
 					T *tmp = static_cast<T*>(list.front()->clone());
 					for (auto i : Range<size_t>(1, list.size()))
 						tmp->add(static_cast<T*>(list[i]));
@@ -78,7 +78,7 @@ namespace ICM
 						tmp->getData().getData().operator+=(list[i].get<T>()->getData().getData());
 					return ObjectPtr(tmp);
 				}
-				void funcL(Object &result, const LDataList &list) const {
+				void funcL(Objects::Object &result, const LDataList &list) const {
 					T *tmp = static_cast<T*>(list.front()->clone());
 					for (auto i : Range<size_t>(1, list.size()))
 						tmp->getData().getData().operator+=(static_cast<T*>(list[i])->getData().getData());
@@ -182,10 +182,10 @@ namespace ICM
 					bool result = fp(list[0].get<N>()->getData().getData(), list[1].get<N>()->getData().getData());
 					return ObjectPtr(new Boolean(result));
 				}
-				void funcL(Object* &result, const LDataList &list) const {
+				void funcL(Objects::Object* &result, const LDataList &list) const {
 					funcB(result, list[0], list[1]);
 				}
-				void funcB(Object* &result, Object *a, Object *b) const {
+				void funcB(Objects::Object* &result, Objects::Object *a, Objects::Object *b) const {
 					bool r = fp(static_cast<N*>(a)->getData().getData(), static_cast<N*>(b)->getData().getData());
 					result = new Boolean(r);
 				}
@@ -300,7 +300,7 @@ namespace ICM
 				const auto &rf = func[id];
 
 				List *list = dl[0].get<List>();
-				Object *r;
+				Objects::Object *r;
 				std::sort(list->begin(), list->end(), [&](const ObjectPtr &a, const ObjectPtr &b) -> bool {
 					rf.callL(r, { a.get(), b.get() });
 					bool rr = static_cast<Boolean*>(r)->getData();
@@ -342,7 +342,7 @@ namespace ICM
 					for (auto i : range(1, size))
 						minsize = std::min(minsize, list[i].get<List>()->size());
 					vector<ObjectPtr> dls;
-					Object obj;
+					Objects::Object obj;
 					for (size_t i : range(0, minsize)) {
 						DataList ldl(size - 1);
 						for (auto id : range(1, size))

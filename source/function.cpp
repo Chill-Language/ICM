@@ -117,6 +117,77 @@ namespace ICM
 		}
 	}
 
+	const Function::FuncObject* FuncTableUnit::checkType(const DataList &list, lightlist_creater<ObjectPtr> *dlp) const {
+		Function::SignTreeMatch STM(ST);
+		vector<TypeObject> typelist = Function::getTypeObjectList(list);
+		const Function::FuncObject *ptr = STM.match(typelist);
+
+		// Get Adjusted DataList
+		if (ptr) {
+			for (auto &v : list) {
+				dlp->push_back(adjustObjectPtr(v));
+			}
+		}
+		return ptr;
+	}
+
+	//=======================================
+
+	const Function::SignTreeMatch::Node* Function::SignTreeMatch::checkSingle(const Node *data, const TypeObject &type, size_t &index) {
+		auto &vec = data->getChildren();
+		if (index == 0) {
+			for (size_t i : range(0, vec.size())) {
+				bool change = false;
+				auto *p = checkSingle(data, vec[i].get(), type, change);
+				if (p != nullptr) {
+					if (change) {
+						index = i + 1;
+					}
+					return p;
+				}
+			}
+		}
+		else {
+			return checkSingle2(data, vec[index - 1].get(), type);
+		}
+		return nullptr;
+	}
+	const Function::SignTreeMatch::Node* Function::SignTreeMatch::checkSingle(const Node *data, const Node *p, const TypeObject &type, bool &change) {
+		if (!p->isNull()) {
+			bool r;
+			if (p->isFunc())
+				r = (p->getSign().checkType(type.getSign()));
+			else
+				r = (p->checkType(type));
+			if (r) {
+				if (p->isArgs()) {
+					change = true;
+					return data;
+				}
+				else
+					return p;
+			}
+		}
+		return nullptr;
+	}
+	const Function::FuncObject* Function::SignTreeMatch::match(const vector<TypeObject> &argT) {
+		const Node* currptr = ST.getRoot();
+		size_t index = 0;
+		for (auto &t : argT) {
+			currptr = checkSingle(currptr, t, index);
+			if (currptr == nullptr)
+				return nullptr;
+		}
+		if (index)
+			currptr = currptr->getChildren()[index - 1].get();
+		size_t callindex;
+		bool r = currptr->canEnd(callindex);
+		if (r)
+			return ST.getFunc(callindex);
+		else
+			return nullptr;
+	}
+
 	//=======================================
 	// * Functions
 	//=======================================
@@ -166,8 +237,12 @@ namespace ICM
 				break;
 			}
 		}
+		//const Function::FuncObject *p = ftu.checkType(nlist, &ndl);
 		CheckCallCount++;
 
+		/*if (p != nullptr) {
+			return p->call(ndl.data());
+		}*/
 		if (id != ftu.size()) {
 			return ftu[id].call(ndl.data());
 		}

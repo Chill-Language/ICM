@@ -15,9 +15,10 @@ namespace ICM
 		{
 		public:
 			enum EleType { E_Data, E_Refer };
+		public:
 			Element(EleType type) : type(type) {}
 
-			static Element Data(const ObjectPtr &op) {
+			static Element Data(Objects::Object *op) {
 				Element r(E_Data);
 				r.data.op = new ObjectPtr(op);
 				return r;
@@ -34,8 +35,10 @@ namespace ICM
 			bool isRefer() const { return type == E_Refer; }
 
 			// Get/Set
-			const ObjectPtr& getData() const { return *(data.op); }
-			ObjectPtr& getData() { return *(data.op); }
+			const ObjectPtr& getData() const { return *data.op; }
+			ObjectPtr& getData() { return *data.op; }
+			void setData(Objects::Object* op) { data.op = new ObjectPtr(op); }
+
 			size_t getRefer() const { return data.id; }
 			void setRefer(size_t id) { data.id = id; }
 
@@ -73,10 +76,10 @@ namespace ICM
 		using Element = ASTBase::Element;
 		using Node = ASTBase::Node;
 		using NodePtr = shared_ptr<Node>;
-
+	public:
 		AST() : root(new Node(0)), currindex(1), table({ root }), currptr(root.get()) {}
 
-		void pushData(const ObjectPtr &op);
+		void pushData(Objects::Object *op);
 		void pushNode();
 		bool retNode();
 		AST* reset() {
@@ -98,17 +101,17 @@ namespace ICM
 		Node* getRoot() const {
 			return root.get();
 		}
-		string to_string() const;
-		string to_string_code() const;
 
 	private:
 		NodePtr root;
 		size_t currindex = 0;
 		vector<NodePtr> table;
 		Node *currptr;
-		std::stack<Node*> farthptrs;
+		stack<Node*> farthptrs;
 	};
 
+	string to_string(const AST &ast);
+	string to_string_code(const AST &ast);
 	string to_string(const AST::Element &element);
 	string to_string_code(const AST::Element &element);
 	string to_string(const AST::Node &node);

@@ -34,7 +34,7 @@ namespace ICM
 						AST::Node *node = p->getData();
 						AST::Element *front = (AST::Element*)&(node->front());
 						if (front->isData()) {
-							ObjectPtr op = front->getData();
+							ObjectPtr op(front->getData());
 							if (op.isType(T_Function)) {
 								Objects::Function *of = op.get<Objects::Function>();
 								//getCallID(of->get_data(), );
@@ -43,7 +43,7 @@ namespace ICM
 						else {
 
 						}
-							break;
+						break;
 					}
 					default:
 						NewList.push_back(o);
@@ -67,8 +67,9 @@ namespace ICM
 
 void testSub()
 {
+	string str("(sort [1 2 3] >)");
 	//string str("(+ 5 6)");
-	string str("(while (not (not F)) F F F)");
+	//string str("(while (not (not F)) F F F)");
 	//string str("(if (if (+ 5) then (+ 3) else (+ 2)) then (+ 0) else (+ 1))");
 	//string str("(loop 4 (loop 5) 6)");
 	//string str("(p (if (= 3 4) then (+ 6 4) else (if (= 3 4) then (+ 2 6) else (+ 0 1))))");
@@ -89,8 +90,8 @@ void testSub()
 	bool result = Parser::createAST(match, ast);
 	//println(result);
 	//return;
-	const auto &n1 = ast.getRoot();
-	auto &n2 = ast.getTable();
+	//const auto &n1 = ast.getRoot();
+	//auto &n2 = ast.getTable();
 	//oast.to_string();
 	vector<AST::NodePtr> table = ast.getTable();
 	ASTOrder::CreateOrder createorder(table);
@@ -109,8 +110,22 @@ void testSub()
 
 }
 
+void test2()
+{
+	Function::SignTree Tree;
+	auto &ftu = DefFuncTable["+"];
+	for (auto i : range(0, ftu.size())) {
+		Tree.insert(ftu[i]);
+	}
+	Function::SignTreeMatch STM(Tree);
+	auto r = STM.match({ T_Number, T_Number, T_Number });
+
+	println(r);
+	return;
+}
 void test()
 {
+	//test2();
 	//testSub();
 	//exit(0);
 }
@@ -189,10 +204,10 @@ int main(int argc, char *argv[])
 		while (!match.isend()) {
 			AST ast;
 			bool result = Parser::createAST(match, ast); // TODO
-			if (result && ast.getRoot()) {
+			if (result && !ast.empty()) {
 				if (LoopMatch) {
 					if (GlobalConfig.PrintAST)
-						println("\nAST: \n", ast.to_string_code(), "\n");
+						println("\nAST: \n", to_string_code(ast), "\n");
 					if (GlobalConfig.PrintResult && GlobalConfig.PrintFlagWord)
 						println("Output: ");
 				}

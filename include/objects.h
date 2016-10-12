@@ -48,6 +48,7 @@ namespace ICM
 	}
 
 	// Types
+	using Object = Objects::Object;
 	using DataList = lightlist<ObjectPtr>;
 	//using DataList = std::vector<ObjectPtr>;
 	using CallFunc = ObjectPtr(const DataList&);

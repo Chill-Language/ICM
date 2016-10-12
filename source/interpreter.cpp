@@ -8,7 +8,7 @@ namespace ICM
 		lightlist_creater<ObjectPtr> listnum(r.size());
 		for (const auto &l : r) {
 			if (l.isData()) {
-				auto &op = l.getData();
+				ObjectPtr op(l.getData());
 				if (op.isType(T_Identifier))
 					listnum.push_back(op);
 				else
@@ -49,7 +49,7 @@ namespace ICM
 	}
 	ObjectPtr Interpreter::getObjectPtr(AST::Element *e) {
 		if (e->isData())
-			return e->getData();
+			return ObjectPtr(e->getData());
 		else
 			return tempresult[e->getRefer()];
 	}
@@ -72,7 +72,7 @@ namespace ICM
 				AST::Node *node = static_cast<ASTOrder::OrderDataCheckCall*>(e)->getData();
 				AST::Element *f = &node->front();
 				if (f->isData()) {
-					const ObjectPtr &op = adjustObjectPtr(f->getData());
+					const ObjectPtr &op = adjustObjectPtr(ObjectPtr(f->getData()));
 					runSub(op, node, ProgramCounter);
 				}
 				else {
@@ -131,8 +131,11 @@ namespace ICM
 				break;
 			}
 			case OrderData::SINGLE: {
-				//tempresult[ProgramCounter] = static_cast<ASTOrder::OrderDataSingle*>(e)->getData();
-				tempresult[ProgramCounter] = ObjectPtr(static_cast<ASTOrder::OrderDataSingle*>(e)->getData()->clone());
+				const ObjectPtr &op = static_cast<ASTOrder::OrderDataSingle*>(e)->getData();
+				if (op.isType(T_Identifier))
+					tempresult[ProgramCounter] = static_cast<ASTOrder::OrderDataSingle*>(e)->getData();
+				else
+					tempresult[ProgramCounter] = ObjectPtr(op->clone());
 				Result = tempresult[ProgramCounter];
 				break;
 			}

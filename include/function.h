@@ -96,6 +96,159 @@ namespace ICM
 				println("Error : Not find funcL.");
 			}
 		};
+
+		//=======================================
+		// * Class SignTree
+		//=======================================
+		class SignTree
+		{
+		public:
+			struct Node;
+			using NodePtr = shared_ptr<Node>;
+			using Nodes = vector<NodePtr>;
+			using TypeObjectPtr = shared_ptr<TypeObject>;
+		public:
+			struct Node
+			{
+			public:
+				Node() : data(nullptr), parent(nullptr) {}
+				Node(const TypeObjectPtr &top, Node* parent)
+					: data(top), parent(parent) {}
+
+				NodePtr find(const TypeObject &to) const {
+					for (auto &p : children) {
+						if (*p->data == to)
+							return p;
+					}
+					return nullptr;
+				}
+				NodePtr find(const TypeObjectPtr &to) const {
+					for (auto &p : children) {
+						if (p->data == nullptr && to == nullptr)
+							return p;
+						else if (p->data == to)
+							return p;
+					}
+					return nullptr;
+				}
+				NodePtr& push(const TypeObjectPtr &top) {
+					children.push_back(NodePtr(new Node(top, this)));
+					return children.back();
+				}
+				NodePtr& pushEnd(size_t id) {
+					NodePtr node(new Node(nullptr, this));
+					node->index = id;
+					children.push_back(node);
+					return children.back();
+				}
+				const Nodes& getChildren() const {
+					return children;
+				}
+				bool checkType(const TypeObject &type) const {
+					return data->checkType(type);
+				}
+				bool isNull() const {
+					return data == nullptr;
+				}
+				bool isFunc() const {
+					return data->isFunc();
+				}
+				const Function::Signature& getSign() const {
+					return data->getSign();
+				}
+				size_t getIndex() const {
+					return index;
+				}
+				bool canEnd() const {
+					for (const NodePtr &np : children) {
+						if (np->isNull())
+							return true;
+					}
+					return false;
+				}
+				bool canEnd(size_t &index) const {
+					for (const NodePtr &np : children) {
+						if (np->isNull()) {
+							index = np->index;
+							return true;
+						}
+					}
+					return false;
+				}
+				bool isArgs() const {
+					return isargs;
+				}
+				void setArgs() {
+					isargs = true;
+				}
+
+			private:
+				TypeObjectPtr data;
+				Node* parent;
+				Nodes children;
+				size_t index;
+				bool isargs = false;
+			};
+		public:
+			SignTree() : root(new Node()), level(1) {}
+
+			void insert(const Function::FuncObject &funcO) {
+				NodePtr currptr = root;
+				size_t count = 1;
+				for (const TypeObjectPtr &to : funcO.getSign().getInType()) {
+					NodePtr ptr = currptr->find(to);
+					if (ptr) {
+						currptr = ptr;
+					}
+					else {
+						currptr = currptr->push(to);
+						if (count == level.size())
+							level.push_back(vector<const Nodes*>());
+						level[count].push_back(&currptr->getChildren());
+					}
+					count++;
+				}
+				if (funcO.getSign().isLastArgs()) {
+					currptr->setArgs();
+				}
+				currptr->pushEnd(funcdata.size());
+				funcdata.push_back(&funcO);
+			}
+			const Node* getRoot() const {
+				return root.get();
+			}
+			const Function::FuncObject* getFunc(size_t index) const {
+				return funcdata[index];
+			}
+
+		private:
+			NodePtr root;
+			vector<vector<const Nodes*>> level;
+			vector<const Function::FuncObject*> funcdata;
+		};
+
+		class SignTreeMatch
+		{
+			using Node = SignTree::Node;
+		public:
+			SignTreeMatch(const SignTree &st)
+				: ST(st) {}
+
+			const Node* checkSingle(const Node *data, const Node *p, const TypeObject &type, bool &change);
+			const Node* checkSingle2(const Node *data, const Node *p, const TypeObject &type) {
+				if (!p->isNull()) {
+					if (p->checkType(type)) {
+						return data;
+					}
+				}
+				return nullptr;
+			}
+			const Node* checkSingle(const Node *data, const TypeObject &type, size_t &index);
+			const Function::FuncObject* match(const vector<TypeObject> &argT);
+
+		private:
+			const SignTree& ST;
+		};
 	}
 
 	//=======================================
