@@ -17,10 +17,17 @@ namespace ICM
 			enum EleType { E_Data, E_Refer };
 		public:
 			Element(EleType type) : type(type) {}
-			//~Element() { if (isData()) delete data.op; }
 
-			static Element Data(Objects::Object *op);
-			static Element Refer(size_t index);
+			static Element Data(Objects::Object *op) {
+				Element r(E_Data);
+				r.data.op = new ObjectPtr(op);
+				return r;
+			}
+			static Element Refer(size_t index) {
+				Element r(E_Refer);
+				r.data.id = index;
+				return r;
+			}
 
 			EleType getType() const { return type; }
 
@@ -28,8 +35,9 @@ namespace ICM
 			bool isRefer() const { return type == E_Refer; }
 
 			// Get/Set
-			ObjectPtr& getData() const { return *data.op; }
-			void setData(Objects::Object* op);
+			const ObjectPtr& getData() const { return *data.op; }
+			ObjectPtr& getData() { return *data.op; }
+			void setData(Objects::Object* op) { data.op = new ObjectPtr(op); }
 
 			size_t getRefer() const { return data.id; }
 			void setRefer(size_t id) { data.id = id; }

@@ -27,12 +27,12 @@ namespace ICM
 		ObjectPtr &res = tempresult[id];
 
 		if (op.isType(T_Function)) {
-			const auto &ftu = op.get<Objects::Function>()->getData().get_data();
+			const auto &ftu = op.get<Objects::Function>()->get_data();
 			res = checkCall(ftu, dl);
 		}
 		else if (op.isType(T_Disperse)) {
 			const auto &ftu = DefFuncTable["call"];
-			auto ndl = op.get<Objects::Disperse>()->getData().getData();
+			auto ndl = op.get<Objects::Disperse>()->getData();
 			ndl.insert(ndl.end(), dl.begin(), dl.end());
 			res = checkCall(ftu, DataList(ndl));
 		}
@@ -149,7 +149,7 @@ namespace ICM
 				if (top.isType(T_Identifier))
 					top = top.get<Objects::Identifier>()->getRealData();
 				Objects::List *l = top.get<Objects::List>();
-				ObjectPtr op = l->getData().getData()[p->getIndex()];
+				ObjectPtr op = l->getData()[p->getIndex()];
 				if (op.isType(T_Identifier))
 					op = ObjectPtr(op.get<Objects::Identifier>()->getRealData());
 				tempresult[ProgramCounter] = op;

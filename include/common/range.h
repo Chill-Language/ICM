@@ -46,34 +46,37 @@ protected:
 	T _begin, _end;
 };
 
+//namespace
+//{
+	template <typename T>
+	class Iterator
+	{
+	public:
+		Iterator(T value) : value(value) {}
+		operator T() const {
+			return value;
+		}
+		T operator*() const {
+			return value;
+		}
+		bool operator!=(const Iterator& i) const {
+			return value != i.value;
+		}
+		const Iterator& operator++() {
+			++value;
+			return *this;
+		}
+
+	private:
+		T value;
+	};
+//}
+
 template <typename T>
-class RIterator
+class Range : public RangeBase<T, Iterator<T>>
 {
 public:
-	RIterator(T value) : value(value) {}
-	operator T() const {
-		return value;
-	}
-	T operator*() const {
-		return value;
-	}
-	bool operator!=(const RIterator& i) const {
-		return value != i.value;
-	}
-	const RIterator& operator++() {
-		++value;
-		return *this;
-	}
-
-private:
-	T value;
-};
-
-template <typename T>
-class Range : public RangeBase<T, RIterator<T>>
-{
-public:
-	Range(const T &bg, const T &ed) : RangeBase<T, RIterator<T>>(bg, ed) {}
+	Range(const T &bg, const T &ed) : RangeBase<T, Iterator<T>>(bg, ed) {}
 
 	T operator[](size_t i) const {
 		return this->_begin + i;

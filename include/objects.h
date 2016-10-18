@@ -45,13 +45,6 @@ namespace ICM
 			bool type_equal(const ObjectPtr &obj) const {
 				return this->getType() == obj->getType();
 			}
-
-		// New Change (Building):
-		public:
-			using TypeUnit = size_t;
-
-			TypeUnit type;
-			void *data;
 		};
 	}
 

@@ -42,13 +42,13 @@ namespace ICM
 				ObjectPtr func(const DataList &list) const {
 					T *tmp = list.front().get<T>()->clone();
 					for (auto i : Range<size_t>(1, list.size()))
-						tmp->getData().operator+=(list[i].get<T>()->getData());
+						tmp->add(list[i].get<T>());
 					return ObjectPtr(tmp);
 				}
 				void funcL(Objects::Object &result, const LDataList &list) const {
 					T *tmp = static_cast<T*>(list.front()->clone());
 					for (auto i : Range<size_t>(1, list.size()))
-						tmp->getData().operator+=(static_cast<T*>(list[i])->getData());
+						tmp->add(static_cast<T*>(list[i]));
 					result = *tmp;
 				}
 			};
@@ -61,6 +61,28 @@ namespace ICM
 				}
 				ObjectPtr func(const DataList &list) const {
 					return ObjectPtr(new Number(Number::VType(0)));
+				}
+			};
+			template <>
+			struct Add<Number> : public FI
+			{
+				using T = Number;
+			private:
+				S sign() const {
+					DefaultType t = Number::Type;
+					return S({ t }, t, true); // T* -> T
+				}
+				ObjectPtr func(const DataList &list) const {
+					T *tmp = list.front().get<T>()->clone();
+					for (auto i : Range<size_t>(1, list.size()))
+						tmp->getData().getData().operator+=(list[i].get<T>()->getData().getData());
+					return ObjectPtr(tmp);
+				}
+				void funcL(Objects::Object &result, const LDataList &list) const {
+					T *tmp = static_cast<T*>(list.front()->clone());
+					for (auto i : Range<size_t>(1, list.size()))
+						tmp->getData().getData().operator+=(static_cast<T*>(list[i])->getData().getData());
+					result = *tmp;
 				}
 			};
 
@@ -83,9 +105,9 @@ namespace ICM
 				}
 				Func fp;
 			};
-			struct Sub : public NumCall { Sub() : NumCall([](N *num, N *obj) { num->getData() -= obj->getData(); }) {} };
-			struct Mul : public NumCall { Mul() : NumCall([](N *num, N *obj) { num->getData() *= obj->getData(); }) {} };
-			struct Div : public NumCall { Div() : NumCall([](N *num, N *obj) { num->getData() /= obj->getData(); }) {} };
+			struct Sub : public NumCall { Sub() : NumCall([](N *num, N *obj) { num->getData().getData() -= obj->getData().getData(); }) {} };
+			struct Mul : public NumCall { Mul() : NumCall([](N *num, N *obj) { num->getData().getData() *= obj->getData().getData(); }) {} };
+			struct Div : public NumCall { Div() : NumCall([](N *num, N *obj) { num->getData().getData() /= obj->getData().getData(); }) {} };
 
 			struct Mod : public FI
 			{
@@ -94,8 +116,8 @@ namespace ICM
 					return S({ T_Number, T_Number }, T_Number); // (N N) -> N
 				}
 				ObjectPtr func(const DataList &list) const {
-					auto &r1 = list[0].get<Number>()->getData();
-					auto &r2 = list[1].get<Number>()->getData();
+					auto &r1 = list[0].get<Number>()->getData().getData();
+					auto &r2 = list[1].get<Number>()->getData().getData();
 					auto &rr = Common::Number::mod(r1, r2);
 					return ObjectPtr(new Number(rr));
 				}
@@ -107,8 +129,8 @@ namespace ICM
 					return S({ T_Number, T_Number }, T_Number); // (N N) -> N
 				}
 				ObjectPtr func(const DataList &list) const {
-					auto &r1 = list[0].get<Number>()->getData();
-					auto &r2 = list[1].get<Number>()->getData();
+					auto &r1 = list[0].get<Number>()->getData().getData();
+					auto &r2 = list[1].get<Number>()->getData().getData();
 					auto &rr = Common::Number::rem(r1, r2);
 					return ObjectPtr(new Number(rr));
 				}
@@ -121,7 +143,7 @@ namespace ICM
 					return S({ T_Number }, T_Number); // N -> N
 				}
 				ObjectPtr func(const DataList &list) const {
-					auto &r1 = list[0].get<Number>()->getData();
+					auto &r1 = list[0].get<Number>()->getData().getData();
 					r1.operator+=(1);
 					return list[0];
 				}
@@ -133,7 +155,7 @@ namespace ICM
 					return S({ T_Number }, T_Number); // N -> N
 				}
 				ObjectPtr func(const DataList &list) const {
-					auto &r1 = list[0].get<Number>()->getData();
+					auto &r1 = list[0].get<Number>()->getData().getData();
 					r1.operator-=(1);
 					return list[0];
 				}
@@ -157,14 +179,14 @@ namespace ICM
 					return S({ T_Number, T_Number }, T_Boolean); // (N N) -> Bool
 				}
 				ObjectPtr func(const DataList &list) const {
-					bool result = fp(list[0].get<N>()->getData(), list[1].get<N>()->getData());
+					bool result = fp(list[0].get<N>()->getData().getData(), list[1].get<N>()->getData().getData());
 					return ObjectPtr(new Boolean(result));
 				}
 				void funcL(Objects::Object* &result, const LDataList &list) const {
 					funcB(result, list[0], list[1]);
 				}
 				void funcB(Objects::Object* &result, Objects::Object *a, Objects::Object *b) const {
-					bool r = fp(static_cast<N*>(a)->getData(), static_cast<N*>(b)->getData());
+					bool r = fp(static_cast<N*>(a)->getData().getData(), static_cast<N*>(b)->getData().getData());
 					result = new Boolean(r);
 				}
 				Func fp;
@@ -252,34 +274,34 @@ namespace ICM
 			using L = List;
 
 			ObjectPtr list(const DataList &dl) {
-				return ObjectPtr(new List(ListType(dl)));
+				return ObjectPtr(new List(dl));
 			}
 
 			const vector<ObjectPtr>& _disp(const List *l) {
-				return l->getData().getData();
+				return l->getData();
 			}
 
 			ObjectPtr disp(const DataList &dl) {
-				return ObjectPtr(new Disperse(DisperseType(_disp(dl[0].get<List>()))));
+				return ObjectPtr(new Disperse(_disp(dl[0].get<List>())));
 			}
 
 			ObjectPtr sort(const DataList &dl) {
 				List *list = dl[0].get<List>();
-				std::sort(list->getData().begin(), list->getData().end(), [](const ObjectPtr &a, const ObjectPtr &b) {
-					return a.get<Number>()->getData() < b.get<Number>()->getData();
+				std::sort(list->begin(), list->end(), [](const ObjectPtr &a, const ObjectPtr &b) {
+					return a.get<Number>()->getData().getData() < b.get<Number>()->getData().getData();
 				});
 				return ObjectPtr(list);
 			}
 			// TODO
 			ObjectPtr sort_f(const DataList &dl) {
-				auto &func = dl[1].get<Objects::Function>()->getData().get_data();
+				auto &func = dl[1].get<Objects::Function>()->get_data();
 				// TODO
 				size_t id = getCallID(func, DataList({ ObjectPtr(new Number(Number::VType(0))), ObjectPtr(new Number(Number::VType(0))) }));
 				const auto &rf = func[id];
 
 				List *list = dl[0].get<List>();
 				Objects::Object *r;
-				std::sort(list->getData().begin(), list->getData().end(), [&](const ObjectPtr &a, const ObjectPtr &b) -> bool {
+				std::sort(list->begin(), list->end(), [&](const ObjectPtr &a, const ObjectPtr &b) -> bool {
 					rf.callL(r, { a.get(), b.get() });
 					bool rr = static_cast<Boolean*>(r)->getData();
 					delete r;
@@ -296,10 +318,10 @@ namespace ICM
 				ObjectPtr func(const DataList &list) const {
 					auto &l = list[0].get<List>()->getData();
 					vector<ObjectPtr> nl;
-					for (size_t i : Range<size_t>(0, (size_t)list[1].get<Number>()->getData().getNum())) {
+					for (size_t i : Range<size_t>(0, (size_t)list[1].get<Number>()->getData().getData().getNum())) {
 						nl.insert(nl.end(), l.begin(), l.end());
 					}
-					return ObjectPtr(new List(ListType(nl)));
+					return ObjectPtr(new List(nl));
 				}
 			};
 
@@ -311,23 +333,23 @@ namespace ICM
 				}
 				ObjectPtr func(const DataList &list) const {
 					// TODO
-					auto &func = list[0].get<Objects::Function>()->getData().get_data();
+					auto &func = list[0].get<Objects::Function>()->get_data();
 					size_t id = getCallID(func, DataList({ ObjectPtr(new Number(Number::VType(0))) }));
 					const auto &rf = func[id];
 
 					size_t minsize;
 					size_t size = list.size();
 					for (auto i : range(1, size))
-						minsize = std::min(minsize, list[i].get<List>()->getData().size());
+						minsize = std::min(minsize, list[i].get<List>()->size());
 					vector<ObjectPtr> dls;
 					Objects::Object obj;
 					for (size_t i : range(0, minsize)) {
 						DataList ldl(size - 1);
 						for (auto id : range(1, size))
-							ldl[id - 1] = list[id].get<List>()->getData().getData()[i];
+							ldl[id - 1] = list[id].get<List>()->getData()[i];
 						dls.push_back(rf.call(ldl));
 					}
-					List *result = new List(ListType(dls));
+					List *result = new List(dls);
 					return ObjectPtr(result);
 				}
 			};
@@ -339,7 +361,7 @@ namespace ICM
 					return S({ T_List }, T_Number); // L -> N
 				}
 				ObjectPtr func(const DataList &list) const {
-					size_t s = list[0].get<List>()->getData().getData().size();
+					size_t s = list[0].get<List>()->getData().size();
 					return ObjectPtr(new Number(Number::VType(s)));
 				}
 			};
@@ -351,9 +373,9 @@ namespace ICM
 					return S({ T_List, T_Number, T_Number }, T_List); // (L N N) -> L
 				}
 				ObjectPtr func(const DataList &list) const {
-					auto &v = const_cast<vector<ObjectPtr>&>(list[0].get<List>()->getData().getData());
-					size_t i1 = (size_t)list[1].get<Number>()->getData().getNum();
-					size_t i2 = (size_t)list[2].get<Number>()->getData().getNum();
+					auto &v = const_cast<vector<ObjectPtr>&>(list[0].get<List>()->getData());
+					size_t i1 = (size_t)list[1].get<Number>()->getData().getData().getNum();
+					size_t i2 = (size_t)list[2].get<Number>()->getData().getData().getNum();
 					ObjectPtr top = v[i1];
 					v[i1] = v[i2];
 					v[i2] = top;
@@ -368,7 +390,7 @@ namespace ICM
 					return S({ T_List, T_Number }, T_Vary); // (L N) -> V
 				}
 				ObjectPtr func(const DataList &list) const {
-					const ObjectPtr &op = list[0].get<List>()->getData().getData()[(size_t)list[1].get<Number>()->getData().getNum()];
+					const ObjectPtr &op = list[0].get<List>()->getData()[(size_t)list[1].get<Number>()->getData().getData().getNum()];
 					return op;
 				}
 			};
@@ -380,7 +402,7 @@ namespace ICM
 					return S({ T_List, T_Number, T_Vary }, T_Vary); // (L N V) -> V
 				}
 				ObjectPtr func(const DataList &list) const {
-					const ObjectPtr &op = list[0].get<List>()->getData().getData()[(size_t)list[1].get<Number>()->getData().getNum()];
+					const ObjectPtr &op = list[0].get<List>()->getData()[(size_t)list[1].get<Number>()->getData().getData().getNum()];
 					ObjectPtr &rop = const_cast<ObjectPtr&>(op);
 					rop = list[2];
 					return rop;
@@ -394,7 +416,7 @@ namespace ICM
 		namespace System
 		{
 			ObjectPtr call(const DataList &dl) {
-				return checkCall(dl[0].get<Objects::Function>()->getData().get_data(), DataList(dl.begin() + 1, dl.end()));
+				return checkCall(dl[0].get<Objects::Function>()->get_data(), DataList(dl.begin() + 1, dl.end()));
 			}
 			ObjectPtr p(const DataList &dl) {
 				for (auto &op : dl)
@@ -412,11 +434,11 @@ namespace ICM
 				return Lists::list(dl);
 			}
 			ObjectPtr dcall(const DataList &dl) {
-				auto &ftu = dl[1].get<Objects::Function>()->getData().get_data();
+				auto &ftu = dl[1].get<Objects::Function>()->get_data();
 				return checkCall(ftu, DataList({ dl[0], dl[2] }));
 			}
 			ObjectPtr system(const DataList &dl) {
-				int i = std::system(dl[0].get<Objects::String>()->getData().c_str());
+				int i = std::system(dl[0].get<Objects::String>()->get_data().c_str());
 				return ObjectPtr(new Number(Number::VType(i)));
 			}
 			ObjectPtr exit(const DataList &dl) {
@@ -425,7 +447,7 @@ namespace ICM
 			}
 			ObjectPtr exitv(const DataList &dl) {
 				// TODO
-				std::exit((int)dl[0].get<Number>()->getData().getNum());
+				std::exit((int)dl[0].get<Number>()->getData().getData().getNum());
 				return ObjectPtr(new Nil());
 			}
 		}
