@@ -123,8 +123,128 @@ void test2()
 	println(r);
 	return;
 }
+
+namespace ICM
+{
+	namespace Types
+	{
+		struct TypeObject
+		{
+		public:
+			enum Property {
+				Const,
+				Static,
+				Mult,
+				Repeat,
+				Volatile,
+			};
+		public:
+			bool isconst() const { return getProperty<Const>(); }
+			bool isstatic() const { return getProperty<Static>(); }
+			bool ismult() const { return getProperty<Mult>(); }
+			bool isrepeat() const { return getProperty<Repeat>(); }
+			bool isvolatile() const { return getProperty<Volatile>(); }
+
+			void setconst() { setProperty<Const>(); }
+			void setstatic() { setProperty<Static>(); }
+			void setmult() { setProperty<Mult>(); }
+			void setrepeat() { setProperty<Repeat>(); }
+			void setvolatile() { setProperty<Volatile>(); }
+
+		public:
+			TypeUnit data = T_Null;
+		private:
+			size_t property = 0;
+			union {
+				void* ptr;
+				size_t idx;
+			} extand;
+
+		private:
+			template <Property _P>
+			bool getProperty() const {
+				return (property & (1 << _P)) >> _P != 0;
+			}
+			template <Property _P>
+			void setProperty() {
+				property |= (1 << _P);
+			}
+
+		};
+
+		string to_string(const TypeObject &to) {
+			string str;
+			str.append(to_string((DefaultType)to.data));
+			if (to.isconst() || to.isstatic() || to.isvolatile()) {
+				str.push_back('.');
+				if (to.isconst())
+					str.push_back('c');
+				if (to.isstatic())
+					str.push_back('s');
+				if (to.isvolatile())
+					str.push_back('v');
+			}
+			if (to.ismult()) {
+				str.append("()");
+			}
+			if (to.isrepeat())
+				str.push_back('*');
+
+			return str;
+		}
+	}
+
+	namespace FunctionNew
+	{
+		struct Signature
+		{
+			Signature(const std::initializer_list<Types::TypeObject> &inil, const Types::TypeObject &out)
+				: InTypes(inil), OutType(out) {}
+			lightlist<Types::TypeObject> InTypes;
+			Types::TypeObject OutType;
+		};
+
+		string to_string(const Signature &sign) {
+			string str;
+			auto &InTypes = sign.InTypes;
+			auto &OutType = sign.OutType;
+			if (InTypes.size() > 1) {
+				str.push_back('(');
+				for (auto &t : InTypes) {
+					str.append(to_string(t));
+					str.push_back(' ');
+				}
+				str.pop_back();
+				str.push_back(')');
+			}
+			else if (InTypes.size() == 1) {
+				str.append(to_string(InTypes.front()));
+			}
+			else {
+				str.append("Void");
+			}
+			str.append(" -> ");
+			str.append(to_string(OutType));
+			return str;
+		}
+	}
+}
+
 void test()
 {
+	/*Types::TypeObject to;
+	to.data = T_Number;
+	//to.setmult();
+	//to.setconst();
+	//to.setstatic();
+	//to.setrepeat();
+	to.setvolatile();
+	println(to);
+
+	FunctionNew::Signature sign({ to, to }, to);
+	println(sign);
+	*/
+
 	//test2();
 	//testSub();
 	//exit(0);

@@ -1,3 +1,13 @@
+; Test
+(let Array [1 2 3])
+(let a 5) (p a); a(5)
+(let b a) (p b); b(5)
+(ref c a) (p c); c(a(5))
+(let c 6) (p c); c(6) ; Forbid
+
+
+(exit)
+
 ; Test 01
 (println "----------1----------")
 (let a "Hello ")

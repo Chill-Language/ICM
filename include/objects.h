@@ -31,6 +31,7 @@ namespace ICM
 			virtual Object* clone() const {
 				return new Object(*this);
 			}
+			virtual void set(const Object *) {}
 			// Method
 			virtual bool equ(const ObjectPtr &obj) const {
 				return this == obj.get();
@@ -48,7 +49,7 @@ namespace ICM
 	}
 
 	// Types
-	using Object = Objects::Object;
+	using TypeUnit = size_t;
 	using DataList = lightlist<ObjectPtr>;
 	//using DataList = std::vector<ObjectPtr>;
 	using CallFunc = ObjectPtr(const DataList&);
@@ -64,6 +65,8 @@ namespace ICM
 	ObjectPtr createError(const string &errinfo);
 	const ObjectPtr& adjustObjectPtr(const ObjectPtr &ptr);
 	std::string to_string(const Objects::Object &obj);
+	std::string to_string(const ObjectPtr &obj);
+	std::string to_string(const DataList &obj);
 }
 
 #endif

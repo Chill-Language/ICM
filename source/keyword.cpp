@@ -3,6 +3,7 @@
 #include "deffunc.h"
 #include "objectsdef.h"
 #include "number.h"
+#include "tabledata.h"
 
 
 namespace ICM

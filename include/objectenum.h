@@ -12,6 +12,8 @@ namespace ICM
 		T_Error,      // Err
 		T_Identifier, // Idt
 		T_Keyword,    // Key
+		T_Reference,  // Ref
+		T_Variable,   // Varb
 		T_List,       // L
 		T_Disperse,   // D   *
 		T_Number,     // N
@@ -23,6 +25,8 @@ namespace ICM
 		T_Symbol,     // Sym
 		END_TYPE_ENUM, // End Enum Mark
 	}; // Interval : [ T_Null, END_TYPE_ENUM )
+
+	std::string to_string(DefaultType type);
 }
 
 #endif

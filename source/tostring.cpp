@@ -2,6 +2,8 @@
 #include "tostring.h"
 #include "objects.h"
 #include "keyword.h"
+#include "tabledata.h"
+#include "parser.h"
 
 namespace ICM
 {
@@ -24,6 +26,24 @@ namespace ICM
 		case T_Function:   return "Function";
 		case T_Type:       return "Type";
 		default:           return "UnfoundType";
+		}
+	}
+	string to_string(MatchType type)
+	{
+		switch (type) {
+		case MT_Null:       return "Null";
+		case MT_LBracket:   return "LBracket";
+		case MT_RBracket:   return "RBracket";
+		case MT_LSBracket:  return "LSBracket";
+		case MT_RSBracket:  return "RSBracket";
+		case MT_Comment:    return "Comment";
+		case MT_Identifier: return "Identifier";
+		case MT_Keyword:    return "Keyword";
+		case MT_Number:     return "Number";
+		case MT_Boolean:    return "Boolean";
+		case MT_String:     return "String";
+		case MT_Symbol:     return "Symbol";
+		default:            return "UnfoundType";
 		}
 	}
 	string to_string(KeywordID key)

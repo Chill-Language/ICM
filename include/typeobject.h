@@ -16,7 +16,7 @@ namespace ICM
 		TypeObject(const DefaultType &type)
 			: type(type) {
 			if (type == T_Identifier)
-				valuetype = shared_ptr<TypeObject>(new TypeObject(T_Vary));
+				valuetype = new TypeObject(T_Vary);
 		}
 		TypeObject(const DefaultType &type, const TypeObject &valuetype)
 			: type(type), valuetype(new TypeObject(valuetype)) {}
@@ -59,12 +59,16 @@ namespace ICM
 
 	private:
 		DefaultType type;
-		shared_ptr<TypeObject> valuetype;
-		shared_ptr<Function::Signature> sign;
+		union {
+			TypeObject* valuetype = nullptr;
+			Function::Signature* sign;
+		};
 		const FuncTableUnit *functableunit = nullptr;
 	};
 
 	ICM::TypeObject getTypeObject(const ObjectPtr &op);
+	std::string to_string(const TypeObject &to);
+	std::string to_string(const shared_ptr<TypeObject> &top);
 }
 
 #endif

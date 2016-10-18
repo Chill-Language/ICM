@@ -6,6 +6,7 @@
 #include "tostring.h"
 #include "number.h"
 #include "keyword.h"
+#include "tabledata.h"
 
 namespace ICM
 {
@@ -63,6 +64,9 @@ namespace ICM
 			DataObject* clone() const {
 				return new DataObject(*this);
 			}
+			void set(const Object *op) {
+				this->data = ((const DataObject*)op)->data;
+			}
 			bool equ(const Object* obj) const {
 				return this->data == static_cast<const DataObject*>(obj)->data;
 			}
@@ -92,6 +96,10 @@ namespace ICM
 			}
 			bool operator==(const ObjectStruct &os) const {
 				return data == os.data;
+			}
+			ObjectStruct& operator=(const ObjectStruct &os) {
+				data = os.data;
+				return *this;
 			}
 			string toOutput() const { return toString(); }
 			void write(File &file) const { file.write(data); }
@@ -150,6 +158,9 @@ namespace ICM
 			String* clone() const {
 				return new String(*(this->data.clone()));
 			}
+			void set(const Object *op) {
+				this->data = ((const String*)op)->data;
+			}
 			virtual void write(File &file) const {
 				size_t length = data.length();
 				file.write(length);
@@ -195,6 +206,9 @@ namespace ICM
 			}
 			Symbol* clone() const {
 				return new Symbol(*this);
+			}
+			void set(const Object *op) {
+				this->data = ((const Symbol*)op)->data;
 			}
 			virtual void write(File &file) const {
 				file.write(data);
@@ -254,6 +268,9 @@ namespace ICM
 			List* clone() const {
 				return new List(*this);
 			}
+			void set(const Object *op) {
+				this->data = ((const List*)op)->data;
+			}
 			// Const
 			static const DefaultType Type = T_List;
 
@@ -296,6 +313,9 @@ namespace ICM
 			Disperse* clone() const {
 				return new Disperse(*this);
 			}
+			void set(const Object *op) {
+				this->data = ((const Disperse*)op)->data;
+			}
 			// Const
 			static const DefaultType Type = T_Disperse;
 
@@ -323,19 +343,19 @@ namespace ICM
 				else
 					return data;
 			}
-			void setData(const ObjectPtr &op) {
+			virtual void setData(const ObjectPtr &op) {
 				if (op->getType() == T_Identifier)
 					data = op.get<Identifier>()->getData();
 				else
 					data = op;
 			}
-			void setCopy(const ObjectPtr &op) {
+			virtual void setCopy(const ObjectPtr &op) {
 				if (op.isType<Identifier>())
 					setCopy(op.get<Identifier>()->getData());
 				else
 					data = ObjectPtr(op->clone());
 			}
-			void setRefer(const ObjectPtr &op) {
+			virtual void setRefer(const ObjectPtr &op) {
 				if (op->getType() == T_Identifier) {
 					const ObjectPtr &sop = op.get<Identifier>()->getData();
 					const ObjectPtr &refop = sop.isType<Identifier>() ? sop : op;
@@ -355,11 +375,14 @@ namespace ICM
 			// + Inherited
 			//-----------------------------------
 			// Method
-			DefaultType getType() const {
+			virtual DefaultType getType() const {
 				return Type;
 			}
 			Identifier* clone() const {
 				return new Identifier(name.to_string(), data);
+			}
+			void set(const Object *op) {
+				this->data = ((const Identifier*)op)->data;
 			}
 			string to_string() const {
 				return name.to_string() + "(" + ICM::to_string(data) + ")";
@@ -370,10 +393,10 @@ namespace ICM
 			string to_string_code() const {
 				return name.to_string();
 			}
-			virtual void write(File &file) const {
+			void write(File &file) const {
 				file.write(data);
 			}
-			virtual void read(File &file) {
+			void read(File &file) {
 				file.read(data);
 			}
 			// Const
@@ -384,6 +407,59 @@ namespace ICM
 			ObjectPtr data;
 		};
 
+		ObjectPtr GetElt(const ObjectPtr &op);
+		ObjectPtr GetRef(const ObjectPtr &op);
+		
+		//=======================================
+		// * Class Variable
+		//=======================================
+		class Variable : public Identifier
+		{
+		public:
+			explicit Variable(const std::string &name = "") : Identifier(name) {}
+			Variable(const std::string &name, const ObjectPtr &op) : Identifier(name, op) {}
+
+			void setData(const ObjectPtr &op) {
+
+			}
+
+		private:
+			//-----------------------------------
+			// + Inherited
+			//-----------------------------------
+			// Method
+			DefaultType getType() const {
+				return Type;
+			}
+			// Const
+			static const DefaultType Type = T_Variable;
+		};
+		
+		//=======================================
+		// * Class Reference
+		//=======================================
+		class Reference : public Identifier
+		{
+		public:
+			explicit Reference(const std::string &name = "") : Identifier(name) {}
+			Reference(const std::string &name, const ObjectPtr &op) : Identifier(name, op) {}
+
+			void setRefer(const ObjectPtr &op) {
+
+			}
+
+		private:
+			//-----------------------------------
+			// + Inherited
+			//-----------------------------------
+			// Method
+			DefaultType getType() const {
+				return Type;
+			}
+			// Const
+			static const DefaultType Type = T_Reference;
+		};
+		
 		//=======================================
 		// * Class Keyword
 		//=======================================

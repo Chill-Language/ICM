@@ -110,6 +110,7 @@ namespace ICM
 		stack<Node*> farthptrs;
 	};
 
+	std::string to_string(const AST *ast);
 	string to_string(const AST &ast);
 	string to_string_code(const AST &ast);
 	string to_string(const AST::Element &element);

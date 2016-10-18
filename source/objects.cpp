@@ -26,7 +26,7 @@ namespace ICM
 			return this;
 		}
 		List* List::push(const DataList &dl) {
-			data.insert(data.end(), dl.begin(),dl.end());
+			data.insert(data.end(), dl.begin(), dl.end());
 			return this;
 		}
 		List* List::add(const List *dl) {
@@ -37,9 +37,9 @@ namespace ICM
 			return ICM::to_string(data);
 		}
 		string List::to_output() const {
-			return Common::Convert::to_string<'[',']'>(data.begin(), data.end(), [](const ObjectPtr &op) { return op.to_output(); });
+			return Common::Convert::to_string<'[', ']'>(data.begin(), data.end(), [](const ObjectPtr &op) { return op.to_output(); });
 		}
-		
+
 		//=======================================
 		// * Class Disperse
 		//=======================================
@@ -56,6 +56,25 @@ namespace ICM
 		//=======================================
 		// * Class Identifier
 		//=======================================
+
+
+
+		ObjectPtr GetElt(const ObjectPtr &op) {
+			if (op.isType(T_Variable))
+				return GetElt(op.get<Variable>()->getData());
+			else if (op.isType(T_Reference))
+				return GetElt(op.get<Reference>()->getData());
+			else
+				return op;
+		}
+		ObjectPtr GetRef(const ObjectPtr &op) {
+			if (op.isType(T_Variable))
+				return ObjectPtr(new Reference("R", op));
+			if (op.isType(T_Reference))
+				return op;
+			else
+				return ObjectPtr(new Reference("R", op));
+		}
 	}
 
 	//=======================================
