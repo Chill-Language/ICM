@@ -210,7 +210,7 @@ namespace ICM
 					break;
 				case MT_LSBracket:
 					ast.pushNode();
-					ast.pushData(new Objects::Function(DefFuncTable.find("list")));
+					ast.pushData(new Objects::Function(FunctionType(DefFuncTable.find("list"))));
 					firstMatchBraket = false;
 					emptybreak = true;
 					break;

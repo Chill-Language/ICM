@@ -1,7 +1,21 @@
 #include "ast.h"
+#include "objects.h"
 
 namespace ICM
 {
+	ASTBase::Element ASTBase::Element::Data(Objects::Object *op) {
+		Element r(E_Data);
+		r.setData(op);
+		return r;
+	}
+	ASTBase::Element ASTBase::Element::Refer(size_t index) {
+		Element r(E_Refer);
+		r.data.id = index;
+		return r;
+	}
+	void ASTBase::Element::setData(Objects::Object* op) {
+		data.op = new ObjectPtr(op);
+	}
 	//=======================================
 	// * Class AST
 	//=======================================

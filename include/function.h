@@ -1,9 +1,7 @@
 #ifndef _ICM_FUNCTION_H_
 #define _ICM_FUNCTION_H_
 
-#include "ast.h"
 #include "objects.h"
-#include "lightlist.h"
 #include "typeobject.h"
 
 namespace ICM
@@ -153,7 +151,7 @@ namespace ICM
 				bool isFunc() const {
 					return data->isFunc();
 				}
-				const Function::Signature& getSign() const {
+				const Signature& getSign() const {
 					return data->getSign();
 				}
 				size_t getIndex() const {
@@ -192,7 +190,7 @@ namespace ICM
 		public:
 			SignTree() : root(new Node()), level(1) {}
 
-			void insert(const Function::FuncObject &funcO) {
+			void insert(const FuncObject &funcO) {
 				NodePtr currptr = root;
 				size_t count = 1;
 				for (const TypeObjectPtr &to : funcO.getSign().getInType()) {
@@ -217,14 +215,14 @@ namespace ICM
 			const Node* getRoot() const {
 				return root.get();
 			}
-			const Function::FuncObject* getFunc(size_t index) const {
+			const FuncObject* getFunc(size_t index) const {
 				return funcdata[index];
 			}
 
 		private:
 			NodePtr root;
 			vector<vector<const Nodes*>> level;
-			vector<const Function::FuncObject*> funcdata;
+			vector<const FuncObject*> funcdata;
 		};
 
 		class SignTreeMatch
@@ -244,7 +242,7 @@ namespace ICM
 				return nullptr;
 			}
 			const Node* checkSingle(const Node *data, const TypeObject &type, size_t &index);
-			const Function::FuncObject* match(const vector<TypeObject> &argT);
+			const FuncObject* match(const vector<TypeObject> &argT);
 
 		private:
 			const SignTree& ST;
