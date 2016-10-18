@@ -8,10 +8,6 @@ namespace ICM
 		//=======================================
 		// * Class String
 		//=======================================
-		String* String::add(const String *obj) {
-			data = Common::charptr(self.data.to_string() + obj->data.to_string());
-			return this;
-		}
 
 		//=======================================
 		// * Class Symbol
@@ -20,32 +16,32 @@ namespace ICM
 		//=======================================
 		// * Class List
 		//=======================================
-		List* List::push(const ObjectPtr &op) {
+		ListType* ListType::push(const ObjectPtr &op) {
 			data.push_back(op);
 			return this;
 		}
-		List* List::push(const DataList &dl) {
+		ListType* ListType::push(const DataList &dl) {
 			data.insert(data.end(), dl.begin(), dl.end());
 			return this;
 		}
-		List* List::add(const List *dl) {
-			data.insert(data.end(), dl->data.begin(), dl->data.end());
-			return this;
+		ListType& ListType::operator+=(const ListType &dl) {
+			data.insert(data.end(), dl.data.begin(), dl.data.end());
+			return *this;
 		}
-		string List::to_string() const {
+		string ListType::to_string() const {
 			return ICM::to_string(data);
 		}
-		string List::to_output() const {
+		string ListType::to_output() const {
 			return Common::Convert::to_string<'[', ']'>(data.begin(), data.end(), [](const ObjectPtr &op) { return op.to_output(); });
 		}
 
 		//=======================================
 		// * Class Disperse
 		//=======================================
-		string Disperse::to_string() const {
+		string DisperseType::to_string() const {
 			return Convert::to_string(data.begin(), data.end(), [](const ObjectPtr &op) { return ICM::to_string(op); });
 		}
-		string Disperse::to_output() const {
+		string DisperseType::to_output() const {
 			string str;
 			for (auto &op : data)
 				str.append(op.to_output());
@@ -58,7 +54,7 @@ namespace ICM
 
 
 
-		ObjectPtr GetElt(const ObjectPtr &op) {
+		/*ObjectPtr GetElt(const ObjectPtr &op) {
 			if (op.isType(T_Variable))
 				return GetElt(op.get<Variable>()->getData());
 			else if (op.isType(T_Reference))
@@ -73,6 +69,18 @@ namespace ICM
 				return op;
 			else
 				return ObjectPtr(new Reference("R", op));
+		}*/
+		string to_string(const ListType &lt) {
+			return lt.to_string();
+		}
+		string to_string(const DisperseType &lt) {
+			return lt.to_string();
+		}
+		string to_string(const ErrorType &et) {
+			return et.to_string();
+		}
+		string to_string(const FunctionType &ft) {
+			return ft.to_string();
 		}
 	}
 
@@ -98,7 +106,7 @@ namespace ICM
 		case ICM::T_Function:   return new Objects::Function;
 		case ICM::T_Type:       return nullptr; // TODO
 		case ICM::T_Boolean:    return new Boolean;
-		case ICM::T_Symbol:     return new Symbol;
+		//case ICM::T_Symbol:     return new Symbol;
 		default:
 			println("Unfind Type.");
 			return nullptr;
@@ -106,7 +114,7 @@ namespace ICM
 	}
 	// Create Error
 	ObjectPtr createError(const string &errinfo) {
-		return ObjectPtr(new Objects::Error(errinfo));
+		return ObjectPtr(new Objects::Error(Objects::ErrorType(errinfo)));
 	}
 	// Adjust ObjectPtr
 	const ObjectPtr& adjustObjectPtr(const ObjectPtr &op) {
@@ -122,7 +130,7 @@ namespace ICM
 			return ICM::TypeObject(T_Identifier, getTypeObject(op.get<Objects::Identifier>()->getData()));
 		else if (op.isType(T_Function)) {
 			TypeObject t(T_Function);
-			auto &ft = op.get<Objects::Function>()->get_data();
+			auto &ft = op.get<Objects::Function>()->getData().get_data();
 			t.setFuncTableUnit(&ft);
 			return t;
 		}
@@ -132,10 +140,10 @@ namespace ICM
 	// Get Disperse Iterator
 	vector<ObjectPtr>::iterator begin(Objects::Disperse *disp)
 	{
-		return disp->begin();
+		return disp->getData().begin();
 	}
 	vector<ObjectPtr>::iterator end(Objects::Disperse *disp)
 	{
-		return disp->end();
+		return disp->getData().end();
 	}
 }
