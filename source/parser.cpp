@@ -157,7 +157,7 @@ namespace ICM
 				object = new String(str);
 				break;
 			case ICM::MT_Identifier:
-				object = new Identifier(str);
+				object = new Identifier(IdentifierType(str));
 				break;
 			case ICM::MT_Keyword:
 				object = new Keyword(DefKeywordTable.getValue(str));

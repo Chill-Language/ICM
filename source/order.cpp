@@ -523,7 +523,7 @@ namespace ICM
 				}
 
 				Objects::Identifier *ident = op.get<Objects::Identifier>();
-				string name = ident->getName();
+				string name = ident->getData().getName();
 				size_t id;
 				if (id = AddVariableTable.find(name)) {
 					ident = AddVariableTable[id].getData();
@@ -552,7 +552,7 @@ namespace ICM
 		}
 		void CreateOrder::setObjectIdentifier(ObjectPtr &op) {
 			Objects::Identifier *ident = op.get<Objects::Identifier>();
-			std::string name = ident->getName();
+			std::string name = ident->getData().getName();
 			size_t i;
 			if ((i = DefFuncTable.find(name))) {
 				op = ObjectPtr(new Objects::Function(Objects::FunctionType(i)));
@@ -564,7 +564,7 @@ namespace ICM
 				op = ObjectPtr(AddVariableTable[i].getData());
 			}
 			else {
-				ident->setData(ObjectPtr(new Objects::Nil()));
+				ident->getData().setData(ObjectPtr(new Objects::Nil()));
 				AddVariableTable.add(name, op);
 				//error("Unfind Identifier(" + ident->getName() + ").");
 			}

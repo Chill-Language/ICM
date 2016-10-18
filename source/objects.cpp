@@ -52,7 +52,38 @@ namespace ICM
 		// * Class Identifier
 		//=======================================
 
+		void IdentifierType::setData(const ObjectPtr &op) {
+			if (op->getType() == T_Identifier)
+				data = op.get<Identifier>()->getData().getData();
+			else
+				data = op;
+		}
+		void IdentifierType::setCopy(const ObjectPtr &op) {
+			if (op.isType<Identifier>())
+				setCopy(op.get<Identifier>()->getData().getData());
+			else
+				data = ObjectPtr(op->clone());
+		}
+		void IdentifierType::setRefer(const ObjectPtr &op) {
+			if (op->getType() == T_Identifier) {
+				const ObjectPtr &sop = op.get<Identifier>()->getData().getData();
+				const ObjectPtr &refop = sop.isType<Identifier>() ? sop : op;
+				const ObjectPtr &refopdata = refop.get<Identifier>()->getData().getData();
+				if (data.get() != refopdata.get())
+					data = refop;
+				else
+					data = refopdata;
+			}
+			else
+				data = op;
+		}
 
+		const ObjectPtr& IdentifierType::getRealData() const {
+			if (data.isType(T_Identifier))
+				return data.get<Objects::Identifier>()->getData().getData();
+			else
+				return data;
+		}
 
 		/*ObjectPtr GetElt(const ObjectPtr &op) {
 			if (op.isType(T_Variable))
@@ -81,6 +112,21 @@ namespace ICM
 		}
 		string to_string(const FunctionType &ft) {
 			return ft.to_string();
+		}
+		string to_string(const IdentifierType &ft) {
+			return ft.to_string();
+		}
+		string to_output(const ListType &lt) {
+			return lt.to_output();
+		}
+		string to_output(const DisperseType &lt) {
+			return lt.to_output();
+		}
+		string to_output(const FunctionType &ft) {
+			return ft.to_output();
+		}
+		string to_output(const IdentifierType &it) {
+			return it.to_output();
 		}
 	}
 
@@ -119,7 +165,7 @@ namespace ICM
 	// Adjust ObjectPtr
 	const ObjectPtr& adjustObjectPtr(const ObjectPtr &op) {
 		if (op.isType(T_Identifier))
-			return adjustObjectPtr(op.get<Objects::Identifier>()->getData());
+			return adjustObjectPtr(op.get<Objects::Identifier>()->getData().getData());
 		else
 			return op;
 	}
@@ -127,7 +173,7 @@ namespace ICM
 	TypeObject getTypeObject(const ObjectPtr &op)
 	{
 		if (op.isType(T_Identifier))
-			return ICM::TypeObject(T_Identifier, getTypeObject(op.get<Objects::Identifier>()->getData()));
+			return ICM::TypeObject(T_Identifier, getTypeObject(op.get<Objects::Identifier>()->getData().getData()));
 		else if (op.isType(T_Function)) {
 			TypeObject t(T_Function);
 			auto &ft = op.get<Objects::Function>()->getData().get_data();

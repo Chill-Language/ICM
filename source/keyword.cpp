@@ -14,7 +14,7 @@ namespace ICM
 	{
 		addDefFuncs(DefFuncTable);
 		// TODO : Memory leak
-		ObjectPtr nil(new Objects::Identifier("Nil", ObjectPtr(new Objects::Nil())));
+		ObjectPtr nil(new Objects::Identifier(Objects::IdentifierType("Nil", ObjectPtr(new Objects::Nil()))));
 		DefVariableTable.add("Nil", nil);
 		//DefVariableTable.add("NIL", nil);
 		//DefVariableTable.add("nil", nil);

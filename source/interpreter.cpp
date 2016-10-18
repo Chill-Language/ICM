@@ -109,8 +109,8 @@ namespace ICM
 				ObjectPtr op = tempresult[expid];
 				if (op.isType(T_Identifier)) {
 					auto *pp = op.get<Objects::Identifier>();
-					if (pp->getValueType() == T_Boolean) {
-						op = pp->getRealData();
+					if (pp->getData().getValueType() == T_Boolean) {
+						op = pp->getData().getRealData();
 					}
 					else {
 						println("If exp with non Type Boolean.");
@@ -147,11 +147,11 @@ namespace ICM
 				ASTOrder::OrderDataAt *p = static_cast<ASTOrder::OrderDataAt*>(e);
 				ObjectPtr top = tempresult[p->getRefid()];
 				if (top.isType(T_Identifier))
-					top = top.get<Objects::Identifier>()->getRealData();
+					top = top.get<Objects::Identifier>()->getData().getRealData();
 				Objects::List *l = top.get<Objects::List>();
 				ObjectPtr op = l->getData().getData()[p->getIndex()];
 				if (op.isType(T_Identifier))
-					op = ObjectPtr(op.get<Objects::Identifier>()->getRealData());
+					op = ObjectPtr(op.get<Objects::Identifier>()->getData().getRealData());
 				tempresult[ProgramCounter] = op;
 				Result = tempresult[ProgramCounter];
 				break;
@@ -160,7 +160,7 @@ namespace ICM
 				ASTOrder::OrderDataLet *p = static_cast<ASTOrder::OrderDataLet*>(e);
 				Objects::Identifier *ident = p->getData().get<Objects::Identifier>();
 
-				ident->setData(tempresult[p->getRefid()]);
+				ident->getData().setData(tempresult[p->getRefid()]);
 				
 				tempresult[ProgramCounter] = p->getData();
 				Result = tempresult[ProgramCounter];
@@ -169,7 +169,7 @@ namespace ICM
 			case OrderData::CPY: {
 				ASTOrder::OrderDataCpy *p = static_cast<ASTOrder::OrderDataCpy*>(e);
 				Objects::Identifier *ident = p->getData().get<Objects::Identifier>();
-				ident->setCopy(tempresult[p->getRefid()]);
+				ident->getData().setCopy(tempresult[p->getRefid()]);
 
 				tempresult[ProgramCounter] = p->getData();
 				Result = tempresult[ProgramCounter];
@@ -178,7 +178,7 @@ namespace ICM
 			case OrderData::REF: {
 				ASTOrder::OrderDataRef *p = static_cast<ASTOrder::OrderDataRef*>(e);
 				Objects::Identifier *ident = p->getData().get<Objects::Identifier>();
-				ident->setRefer(tempresult[p->getRefid()]);
+				ident->getData().setRefer(tempresult[p->getRefid()]);
 
 				tempresult[ProgramCounter] = p->getData();
 				Result = tempresult[ProgramCounter];
@@ -188,9 +188,8 @@ namespace ICM
 				ASTOrder::OrderDataCpySingle *p = static_cast<ASTOrder::OrderDataCpySingle*>(e);
 				size_t id = p->getRefid();
 				Objects::Identifier temp;
-				temp.setCopy(tempresult[id]);
-
-				tempresult[ProgramCounter] = temp.getData();
+				temp.getData().setCopy(tempresult[id]);
+				tempresult[ProgramCounter] = temp.getData().getData();
 				Result = tempresult[ProgramCounter];
 				break;
 			}
@@ -205,7 +204,7 @@ namespace ICM
 			case OrderData::EQU: {
 				ASTOrder::OrderDataEqu *p = static_cast<ASTOrder::OrderDataEqu*>(e);
 				Objects::Identifier *ident = p->getData().get<Objects::Identifier>();
-				bool r = ident->getRealData()->equ(tempresult[p->getRefid()]);
+				bool r = ident->getData().getRealData()->equ(tempresult[p->getRefid()]);
 				tempresult[ProgramCounter] = ObjectPtr(new Objects::Boolean(r));
 				Result = tempresult[ProgramCounter];
 				break;
@@ -213,14 +212,14 @@ namespace ICM
 			case OrderData::SML: {
 				ASTOrder::OrderDataSmall *p = static_cast<ASTOrder::OrderDataSmall*>(e);
 				Objects::Identifier *ident = p->getData().get<Objects::Identifier>();
-				tempresult[ProgramCounter] = checkCall(DefFuncTable["<"], DataList({ ident->getRealData(), tempresult[p->getRefid()] }));
+				tempresult[ProgramCounter] = checkCall(DefFuncTable["<"], DataList({ ident->getData().getRealData(), tempresult[p->getRefid()] }));
 				Result = tempresult[ProgramCounter];
 				break;
 			}
 			case OrderData::SME: {
 				ASTOrder::OrderDataSmallEqual *p = static_cast<ASTOrder::OrderDataSmallEqual*>(e);
 				Objects::Identifier *ident = p->getData().get<Objects::Identifier>();
-				const ObjectPtr &op = checkCall(DefFuncTable["<="], DataList({ ident->getRealData(), tempresult[p->getRefid()] }));
+				const ObjectPtr &op = checkCall(DefFuncTable["<="], DataList({ ident->getData().getRealData(), tempresult[p->getRefid()] }));
 				tempresult[ProgramCounter] = op;
 				Result = tempresult[ProgramCounter];
 				break;
@@ -228,14 +227,14 @@ namespace ICM
 			case OrderData::LAR: {
 				ASTOrder::OrderDataSmall *p = static_cast<ASTOrder::OrderDataSmall*>(e);
 				Objects::Identifier *ident = p->getData().get<Objects::Identifier>();
-				tempresult[ProgramCounter] = checkCall(DefFuncTable[">"], DataList({ ident->getRealData(), tempresult[p->getRefid()] }));
+				tempresult[ProgramCounter] = checkCall(DefFuncTable[">"], DataList({ ident->getData().getRealData(), tempresult[p->getRefid()] }));
 				Result = tempresult[ProgramCounter];
 				break;
 			}
 			case OrderData::LAE: {
 				ASTOrder::OrderDataSmallEqual *p = static_cast<ASTOrder::OrderDataSmallEqual*>(e);
 				Objects::Identifier *ident = p->getData().get<Objects::Identifier>();
-				const ObjectPtr &op = checkCall(DefFuncTable[">="], DataList({ ident->getRealData(), tempresult[p->getRefid()] }));
+				const ObjectPtr &op = checkCall(DefFuncTable[">="], DataList({ ident->getData().getRealData(), tempresult[p->getRefid()] }));
 				tempresult[ProgramCounter] = op;
 				Result = tempresult[ProgramCounter];
 				break;

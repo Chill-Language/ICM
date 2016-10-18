@@ -11,6 +11,19 @@ namespace ICM
 {
 	namespace Objects
 	{
+
+		template <typename T>
+		string to_string(const T &t) {
+			using Common::Convert::to_string;
+			using std::to_string;
+			using ICM::to_string;
+			return to_string(t);
+		}
+		template <typename T>
+		string to_output(const T &t) {
+			return to_string<T>(t);
+		}
+
 		//=======================================
 		// * Class DataObject<T, _Type>
 		//=======================================
@@ -21,7 +34,7 @@ namespace ICM
 			using VType = T;
 			static const DefaultType Type = _Type;
 		public:
-			DataObject() {}
+			DataObject() { this->data = new T(); }
 			DataObject(const T &dat) { this->data = new T(dat); }
 			DataObject(const DataObject &dot) {
 				this->data = new T(dot._ref());
@@ -47,13 +60,10 @@ namespace ICM
 				return equ(obj.get());
 			}
 			string toString() const {
-				using Common::Convert::to_string;
-				using std::to_string;
-				using ICM::to_string;
-				return to_string(_ref());
+				return Objects::to_string(_ref());
 			}
 			string toOutput() const {
-				return toString();
+				return Objects::to_output(_ref());
 			}
 			DefaultType getType() const {
 				return _Type;
@@ -113,6 +123,7 @@ namespace ICM
 			DataList data;
 		};
 		string to_string(const ListType &lt);
+		string to_output(const ListType &lt);
 
 		//=======================================
 		// * Class Disperse
@@ -144,6 +155,7 @@ namespace ICM
 			DataList data;
 		};
 		string to_string(const DisperseType &lt);
+		string to_output(const DisperseType &lt);
 
 		//=======================================
 		// * Class Error
@@ -197,86 +209,32 @@ namespace ICM
 			size_t data;
 		};
 		string to_string(const FunctionType &ft);
-
-		class Nil;
-		using Error = DataObject<ErrorType, T_Error>;
-		using Boolean = DataObject<bool, T_Boolean>;
-		using Number = DataObject<Common::Number::Rational, T_Number>;
-		using String = DataObject<string, T_String>;
-
-		using List = DataObject<ListType, T_List>;
-		using Disperse = DataObject<DisperseType, T_Disperse>;
-		class Identifier;
-		using Keyword = DataObject<KeywordID, T_Keyword>;
-		using Function = DataObject<FunctionType, T_Function>;
-	}
-
-	vector<ObjectPtr>::iterator begin(Objects::Disperse *disp);
-	vector<ObjectPtr>::iterator end(Objects::Disperse *disp);
-
-	namespace Objects
-	{
+		string to_output(const FunctionType &lt);
 		//=======================================
 		// * Class Identifier
 		//=======================================
-		class Identifier : public Object
+		class IdentifierType : public Object
 		{
 		public:
-			explicit Identifier(const std::string &name = "") : name(name) {}
-			Identifier(const std::string &name, const ObjectPtr &op) : name(name), data(op) {}
+			explicit IdentifierType(const std::string &name = "") : name(name) {}
+			IdentifierType(const std::string &name, const ObjectPtr &op) : name(name), data(op) {}
 			std::string getName() const {
 				return name.to_string();
 			}
 			const ObjectPtr& getData() const {
 				return data;
 			}
-			const ObjectPtr& getRealData() const {
-				if (data.isType(T_Identifier))
-					return data.get<Objects::Identifier>()->getData();
-				else
-					return data;
-			}
-			virtual void setData(const ObjectPtr &op) {
-				if (op->getType() == T_Identifier)
-					data = op.get<Identifier>()->getData();
-				else
-					data = op;
-			}
-			virtual void setCopy(const ObjectPtr &op) {
-				if (op.isType<Identifier>())
-					setCopy(op.get<Identifier>()->getData());
-				else
-					data = ObjectPtr(op->clone());
-			}
-			virtual void setRefer(const ObjectPtr &op) {
-				if (op->getType() == T_Identifier) {
-					const ObjectPtr &sop = op.get<Identifier>()->getData();
-					const ObjectPtr &refop = sop.isType<Identifier>() ? sop : op;
-					const ObjectPtr &refopdata = refop.get<Identifier>()->getData();
-					if (data.get() != refopdata.get())
-						data = refop;
-					else
-						data = refopdata;
-				}
-				else
-					data = op;
-			}
+			const ObjectPtr& getRealData() const;
+			void setData(const ObjectPtr &op);
+			void setCopy(const ObjectPtr &op);
+			void setRefer(const ObjectPtr &op);
 			DefaultType getValueType() const {
 				return data.type();
 			}
-			//-----------------------------------
-			// + Inherited
-			//-----------------------------------
+			bool operator==(const IdentifierType &it) const {
+				return data == it.data;
+			}
 			// Method
-			virtual DefaultType getType() const {
-				return Type;
-			}
-			Identifier* clone() const {
-				return new Identifier(name.to_string(), data);
-			}
-			void set(const Object *op) {
-				this->data = ((const Identifier*)op)->data;
-			}
 			string to_string() const {
 				return name.to_string() + "(" + ICM::to_string(data) + ")";
 			}
@@ -292,14 +250,36 @@ namespace ICM
 			void read(File &file) {
 				file.read(data);
 			}
-			// Const
-			static const DefaultType Type = T_Identifier;
 
 		private:
 			Common::charptr name;
 			ObjectPtr data;
 		};
+		string to_string(const IdentifierType &ft);
+		string to_output(const IdentifierType &ft);
 
+		class Nil;
+		using Error = DataObject<ErrorType, T_Error>;
+		using Boolean = DataObject<bool, T_Boolean>;
+		using Number = DataObject<Common::Number::Rational, T_Number>;
+		using String = DataObject<string, T_String>;
+
+		using List = DataObject<ListType, T_List>;
+		using Disperse = DataObject<DisperseType, T_Disperse>;
+		using Keyword = DataObject<KeywordID, T_Keyword>;
+		using Function = DataObject<FunctionType, T_Function>;
+		class Identifier : public DataObject<IdentifierType, T_Identifier> {
+		public:
+			Identifier() : DataObject<IdentifierType, T_Identifier>() {}
+			Identifier(const IdentifierType &it) : DataObject<IdentifierType, T_Identifier>(it) {}
+		};
+	}
+
+	vector<ObjectPtr>::iterator begin(Objects::Disperse *disp);
+	vector<ObjectPtr>::iterator end(Objects::Disperse *disp);
+
+	namespace Objects
+	{
 		//=======================================
 		// * Class Nil
 		//=======================================
