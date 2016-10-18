@@ -34,9 +34,9 @@ namespace ICM
 			using VType = T;
 			static const DefaultType Type = _Type;
 		public:
-			DataObject() { this->data = new T(); }
-			DataObject(const T &dat) { this->data = new T(dat); }
-			DataObject(const DataObject &dot) {
+			DataObject() : Object(_Type) { this->data = new T(); }
+			DataObject(const T &dat) : Object(_Type) { this->data = new T(dat); }
+			DataObject(const DataObject &dot) : Object(_Type) {
 				this->data = new T(dot._ref());
 			}
 
@@ -64,9 +64,6 @@ namespace ICM
 			}
 			string toOutput() const {
 				return Objects::to_output(_ref());
-			}
-			DefaultType getType() const {
-				return _Type;
 			}
 			DataObject* clone() const {
 				return new DataObject(*this);
@@ -286,7 +283,7 @@ namespace ICM
 		class Nil : public Object
 		{
 		public:
-			Nil() {}
+			Nil() : Object(T_Nil) {}
 
 			//-----------------------------------
 			// + Inherited
@@ -297,9 +294,6 @@ namespace ICM
 			}
 			string to_string() const {
 				return "Nil";
-			}
-			DefaultType getType() const {
-				return Type;
 			}
 			Nil* clone() const {
 				return new Nil(*this);

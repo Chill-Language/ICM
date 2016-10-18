@@ -14,7 +14,10 @@ namespace ICM
 		//=======================================
 		class Object
 		{
+			using TypeUnit = size_t;
 		public:
+			Object(TypeUnit type = T_Null) : type(type) {}
+
 			virtual ~Object() {}
 			virtual string to_string() const {
 				return "Object";
@@ -26,7 +29,7 @@ namespace ICM
 				return to_string();
 			}
 			virtual DefaultType getType() const {
-				return Type;
+				return (DefaultType)type;
 			}
 			virtual Object* clone() const {
 				return new Object(*this);
@@ -48,7 +51,6 @@ namespace ICM
 
 		// New Change (Building):
 		public:
-			using TypeUnit = size_t;
 
 			TypeUnit type;
 			void *data;
