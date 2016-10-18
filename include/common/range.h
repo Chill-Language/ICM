@@ -46,23 +46,23 @@ protected:
 	T _begin, _end;
 };
 
-namespace
-{
+//namespace
+//{
 	template <typename T>
-	class iterator
+	class Iterator
 	{
 	public:
-		iterator(T value) : value(value) {}
+		Iterator(T value) : value(value) {}
 		operator T() const {
 			return value;
 		}
 		T operator*() const {
 			return value;
 		}
-		bool operator!=(const iterator& i) const {
+		bool operator!=(const Iterator& i) const {
 			return value != i.value;
 		}
-		const iterator& operator++() {
+		const Iterator& operator++() {
 			++value;
 			return *this;
 		}
@@ -70,16 +70,16 @@ namespace
 	private:
 		T value;
 	};
-}
+//}
 
 template <typename T>
-class Range : public RangeBase<T, iterator<T>>
+class Range : public RangeBase<T, Iterator<T>>
 {
 public:
-	Range(const T &bg, const T &ed) : RangeBase(bg, ed) {}
+	Range(const T &bg, const T &ed) : RangeBase<T, Iterator<T>>(bg, ed) {}
 
 	T operator[](size_t i) const {
-		return _begin + i;
+		return this->_begin + i;
 	}
 };
 
@@ -87,10 +87,10 @@ template <typename T>
 class RangeIterator : public RangeBase<T, T>
 {
 public:
-	RangeIterator(const T &bg, const T &ed) : RangeBase(bg, ed) {}
+	RangeIterator(const T &bg, const T &ed) : RangeBase<T, T>(bg, ed) {}
 
 	auto operator[](size_t i) const {
-		return *(_begin + i);
+		return *(this->_begin + i);
 	}
 };
 

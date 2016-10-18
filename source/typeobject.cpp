@@ -1,12 +1,11 @@
 #include "typeobject.h"
-#include "tostring.h"
 #include "keyword.h"
 #include "tabledata.h"
 
 namespace ICM
 {
 	TypeObject::TypeObject(const DefaultType &type, const Function::Signature &valuetype)
-		: type(type), valuetype(new TypeObject(valuetype.getOutType())), sign(new Function::Signature(valuetype)) {}
+		: type(type), sign(new Function::Signature(valuetype)) {}
 	string TypeObject::to_string() const {
 		string str(ICM::to_string(type));
 		if (type == T_Identifier) {

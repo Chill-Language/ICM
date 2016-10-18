@@ -3,7 +3,6 @@
 
 #include "basic.h"
 #include "objects.h"
-#include "tostring.h"
 #include "number.h"
 #include "keyword.h"
 #include "tabledata.h"

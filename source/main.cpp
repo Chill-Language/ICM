@@ -1,6 +1,5 @@
 #include "basic.h"
 #include "parser.h"
-#include "tostring.h"
 #include "file.h"
 #include "config.h"
 #include "order.h"
@@ -230,8 +229,26 @@ namespace ICM
 	}
 }
 
+template <typename T>
+class A
+{
+public:
+	A(int c) : v(c) {}
+protected:
+	int v;
+};
+template <typename T>
+class B : public A<T>
+{
+public:
+	B(int s) : A<T>(s) {}
+
+
+};
+
 void test()
 {
+	B<int> a(6);
 	/*Types::TypeObject to;
 	to.data = T_Number;
 	//to.setmult();

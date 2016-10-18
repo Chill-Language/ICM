@@ -220,7 +220,7 @@ namespace ICM
 			case OrderData::SME: {
 				ASTOrder::OrderDataSmallEqual *p = static_cast<ASTOrder::OrderDataSmallEqual*>(e);
 				Objects::Identifier *ident = p->getData().get<Objects::Identifier>();
-				ObjectPtr &op = checkCall(DefFuncTable["<="], DataList({ ident->getRealData(), tempresult[p->getRefid()] }));
+				const ObjectPtr &op = checkCall(DefFuncTable["<="], DataList({ ident->getRealData(), tempresult[p->getRefid()] }));
 				tempresult[ProgramCounter] = op;
 				Result = tempresult[ProgramCounter];
 				break;
@@ -235,7 +235,7 @@ namespace ICM
 			case OrderData::LAE: {
 				ASTOrder::OrderDataSmallEqual *p = static_cast<ASTOrder::OrderDataSmallEqual*>(e);
 				Objects::Identifier *ident = p->getData().get<Objects::Identifier>();
-				ObjectPtr &op = checkCall(DefFuncTable[">="], DataList({ ident->getRealData(), tempresult[p->getRefid()] }));
+				const ObjectPtr &op = checkCall(DefFuncTable[">="], DataList({ ident->getRealData(), tempresult[p->getRefid()] }));
 				tempresult[ProgramCounter] = op;
 				Result = tempresult[ProgramCounter];
 				break;

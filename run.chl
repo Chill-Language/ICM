@@ -6,7 +6,6 @@
 (let c 6) (p c); c(6) ; Forbid
 
 
-(exit)
 
 ; Test 01
 (println "----------1----------")
