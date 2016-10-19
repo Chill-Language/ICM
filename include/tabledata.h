@@ -56,26 +56,24 @@ namespace ICM
 
 		FuncTableUnit() = default;
 		FuncTableUnit(size_t id, const string &name, const std::initializer_list<FuncObject> &func)
-			: BaseTableUnit(id, name), is_ref(false), func(func) {
+			: BaseTableUnit(id, name), func(func) {
 			//initSignTree();
 		}
 		FuncTableUnit(size_t id, const string &name, const std::initializer_list<FuncInitObject*> &func)
-			: BaseTableUnit(id, name), is_ref(true) {
+			: BaseTableUnit(id, name) {
 			for (auto *p : func)
-				funcp.push_back(shared_ptr<FuncInitObject>(p));
+				this->func.push_back(p->get_f());
 			//initSignTree();
 		}
 
-		const size_t size() const { return is_ref ? funcp.size() : func.size(); }
-		FuncObject operator[](size_t i) const { return is_ref ? funcp[i]->get_f() : func[i]; }
+		size_t size() const { return func.size(); }
+		const FuncObject& operator[](size_t i) const { return func[i]; }
 
 		const FuncObject* checkType(const DataList &list, lightlist_creater<ObjectPtr> *dl) const;
 
 	private:
-		bool is_ref = false;
 		vector<FuncObject> func;
-		vector<shared_ptr<FuncInitObject>> funcp;
-		Function::SignTree ST;
+		ICM::Function::SignTree ST;
 		void initSignTree() {
 			for (auto i : range(0, size())) {
 				ST.insert(*new FuncObject((*this)[i]));

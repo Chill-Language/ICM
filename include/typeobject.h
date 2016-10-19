@@ -49,12 +49,6 @@ namespace ICM
 		bool operator!=(const TypeObject &tobj) const {
 			return !(*this == tobj);
 		}
-		/*TypeObject& operator=(const TypeObject &to) {
-			type = to.type;
-			sign = to.sign;
-			functableunit = to.functableunit;
-			return *this;
-		}*/
 
 		bool checkType(const TypeObject &type) const;
 
