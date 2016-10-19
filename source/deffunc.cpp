@@ -315,7 +315,7 @@ namespace ICM
 					size_t id = getCallID(func, DataList({ ObjectPtr(new Number(Number::VType(0))) }));
 					const auto &rf = func[id];
 
-					size_t minsize;
+					size_t minsize = list[1].get<List>()->getData().size();
 					size_t size = list.size();
 					for (auto i : range(1, size))
 						minsize = std::min(minsize, list[i].get<List>()->getData().size());

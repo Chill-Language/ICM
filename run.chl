@@ -1,4 +1,3 @@
-
 (Config.SetPrintIntervalTime T)
 (Config.PrintAST T)
 (Config.PrintOrder T)

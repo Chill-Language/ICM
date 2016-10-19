@@ -11,16 +11,18 @@ namespace ICM
 				const ObjectPtr &op = l.getData();
 				if (op.isType(T_Identifier))
 					listnum.push_back(adjustObjectPtr(op));
-				else if (op.isType(T_Disperse)) {
-					Objects::Disperse* l = op.get<Objects::Disperse>();
-					listnum.insert(listnum.end(), begin(l), end(l));
-				}
 				else
 					listnum.push_back(op);
 			}
 			else {
 				size_t id = l.getRefer();
-				listnum.push_back(tempresult[id]);
+				const ObjectPtr &op = tempresult[id];
+				if (op.isType(T_Disperse)) {
+					Objects::Disperse* l = op.get<Objects::Disperse>();
+					listnum.insert(listnum.end(), begin(l), end(l));
+				}
+				else
+					listnum.push_back(op);
 			}
 		}
 		return DataList(listnum);
