@@ -101,37 +101,37 @@ namespace ICM
 			else
 				return ObjectPtr(new Reference("R", op));
 		}*/
-		string to_string(const ListType &lt) {
+		template <> string to_string<ListType>(const ListType &lt) {
 			return lt.to_string();
 		}
-		string to_string(const DisperseType &lt) {
+		template <> string to_string<DisperseType>(const DisperseType &lt) {
 			return lt.to_string();
 		}
-		string to_string(const ErrorType &et) {
+		template <> string to_string<ErrorType>(const ErrorType &et) {
 			return et.to_string();
 		}
-		string to_string(const FunctionType &ft) {
+		template <> string to_string<FunctionType>(const FunctionType &ft) {
 			return ft.to_string();
 		}
-		string to_string(const IdentifierType &ft) {
+		template <> string to_string<IdentifierType>(const IdentifierType &ft) {
 			return ft.to_string();
 		}
-		string to_output(const ListType &lt) {
+		template <> string to_output<ListType>(const ListType &lt) {
 			return lt.to_output();
 		}
-		string to_output(const DisperseType &lt) {
+		template <> string to_output<DisperseType>(const DisperseType &lt) {
 			return lt.to_output();
 		}
-		string to_output(const FunctionType &ft) {
+		template <> string to_output<FunctionType>(const FunctionType &ft) {
 			return ft.to_output();
 		}
-		string to_output(const IdentifierType &it) {
+		template <> string to_output<IdentifierType>(const IdentifierType &it) {
 			return it.to_output();
 		}
-		string to_string_code(const FunctionType &ft) {
+		template <> string to_string_code<FunctionType>(const FunctionType &ft) {
 			return ft.to_string_code();
 		}
-		string to_string_code(const IdentifierType &it) {
+		template <> string to_string_code<IdentifierType>(const IdentifierType &it) {
 			return it.to_string_code();
 		}
 	}

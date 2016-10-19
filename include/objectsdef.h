@@ -129,8 +129,8 @@ namespace ICM
 		private:
 			DataList data;
 		};
-		string to_string(const ListType &lt);
-		string to_output(const ListType &lt);
+		template <> string to_string<ListType>(const ListType &lt);
+		template <> string to_output<ListType>(const ListType &lt);
 
 		//=======================================
 		// * Class Disperse
@@ -161,8 +161,8 @@ namespace ICM
 		private:
 			DataList data;
 		};
-		string to_string(const DisperseType &lt);
-		string to_output(const DisperseType &lt);
+		template <> string to_string<DisperseType>(const DisperseType &dt);
+		template <> string to_output<DisperseType>(const DisperseType &dt);
 
 		//=======================================
 		// * Class Error
@@ -182,7 +182,8 @@ namespace ICM
 		private:
 			std::string msg;
 		};
-		string to_string(const ErrorType &et);
+		template <> string to_string<ErrorType>(const ErrorType &et);
+
 		//=======================================
 		// * Class Function
 		//=======================================
@@ -215,9 +216,10 @@ namespace ICM
 		private:
 			size_t data;
 		};
-		string to_string(const FunctionType &ft);
-		string to_output(const FunctionType &ft);
-		string to_string_code(const FunctionType &ft);
+		template <> string to_string<FunctionType>(const FunctionType &ft);
+		template <> string to_output<FunctionType>(const FunctionType &ft);
+		template <> string to_string_code<FunctionType>(const FunctionType &ft);
+
 		//=======================================
 		// * Class Identifier
 		//=======================================
@@ -263,9 +265,9 @@ namespace ICM
 			Common::charptr name;
 			ObjectPtr data;
 		};
-		string to_string(const IdentifierType &ft);
-		string to_output(const IdentifierType &ft);
-		string to_string_code(const IdentifierType &ft);
+		template <> string to_string<IdentifierType>(const IdentifierType &it);
+		template <> string to_output<IdentifierType>(const IdentifierType &it);
+		template <> string to_string_code<IdentifierType>(const IdentifierType &it);
 
 		class Nil;
 		using Error = DataObject<ErrorType, T_Error>;

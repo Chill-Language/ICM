@@ -1,7 +1,7 @@
 (Config.SetPrintIntervalTime T)
 (Config.PrintAST T)
 (Config.PrintOrder T)
-(let array (* [9 8 7 6 5 4 3 2 1] 50))
+(let array (* [9 8 7 6 5 4 3 2 1] 100))
 (let n (- (size array) 1))
 
 (for j in 0 to (- n 1)
