@@ -17,25 +17,6 @@ namespace ICM
 		//=======================================
 		Signature::Signature(const InitList &intype, const TypeObject& outtype, bool last_is_args)
 			: InType(intype), OutType(outtype), last_is_args(last_is_args) {}
-		string Signature::to_string() const {
-			std::string str;
-
-			const auto &its = getInType();
-			const auto &ots = getOutType();
-			if (!its.empty()) {
-				if (its.size() != 1) str.push_back('(');
-				str.append(Convert::to_string(its.begin(), its.end(), [](const auto &e) { return e.to_string(); }));
-				if (isLastArgs()) str.push_back('*');
-				if (its.size() != 1) str.push_back(')');
-			}
-			else {
-				str.append("Void");
-			}
-			str.append(" -> ");
-			str.append(ots.to_string());
-
-			return str;
-		}
 		lightlist<TypeObject> getTypeObjectList(const DataList &list);
 		bool Signature::checkType(const lightlist<TypeObject> &argT) const {
 			// Check Size

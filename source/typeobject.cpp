@@ -6,18 +6,11 @@ namespace ICM
 {
 	TypeObject::TypeObject(const DefaultType &type, const Function::Signature &valuetype)
 		: type(type), sign(new Function::Signature(valuetype)) {}
-	string TypeObject::to_string() const {
-		string str(ICM::to_string(type));
-		if (type == T_Identifier) {
-			str.append("(" + valuetype->to_string() + ")");
-		}
-		else if (type == T_Function) {
-			str.append("(" + sign->to_string() + ")");
-		}
-		return str;
-	}
-	bool checkType(const TypeObject &parT, const TypeObject &argT)
+
+	bool TypeObject::checkType(const TypeObject &argT) const
 	{
+		const TypeObject &parT = *this;
+
 		if (parT.isVary())
 			return true;
 		if (parT.isFunc()) {
@@ -41,9 +34,5 @@ namespace ICM
 			}
 		}
 		return parT.getType() == argT.getType();
-	}
-	bool TypeObject::checkType(const TypeObject &tobj) const
-	{
-		return ICM::checkType(*this, tobj);
 	}
 }

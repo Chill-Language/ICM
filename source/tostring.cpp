@@ -80,15 +80,32 @@ namespace ICM
 	inline std::string to_string(const Function::Signature::List &list) {
 		return Convert::to_string(list.begin(), list.end());
 	}
-	std::string to_string(const Function::Signature &sign) {
-		return sign.to_string();
-	}
 
-	std::string to_string(const TypeObject &to) {
-		return to.to_string();
+	string to_string(const Function::Signature &sign) {
+		std::string str;
+
+		const auto &its = sign.getInType();
+		const auto &ots = sign.getOutType();
+		if (!its.empty()) {
+			if (its.size() != 1) str.push_back('(');
+			str.append(Convert::to_string(its.begin(), its.end()));
+			if (sign.isLastArgs()) str.push_back('*');
+			if (its.size() != 1) str.push_back(')');
+		}
+		else {
+			str.append("Void");
+		}
+		str.append(" -> ");
+		str.append(to_string(ots));
+
+		return str;
 	}
-	std::string to_string(const shared_ptr<TypeObject> &top) {
-		return top->to_string();
+	string to_string(const TypeObject &to) {
+		string str(ICM::to_string(to.getType()));
+		if (to.isFunc()) {
+			str.append("(" + ICM::to_string(to.getSign()) + ")");
+		}
+		return str;
 	}
 
 	//=======================================

@@ -14,20 +14,13 @@ namespace ICM
 	{
 	public:
 		TypeObject() : TypeObject(T_Null) {}
-		TypeObject(const DefaultType &type)
-			: type(type) {
-			if (type == T_Identifier)
-				valuetype = new TypeObject(T_Vary);
-		}
+		TypeObject(const DefaultType &type) : type(type) {}
 		TypeObject(const DefaultType &type, const TypeObject &valuetype)
-			: type(type), valuetype(new TypeObject(valuetype)) {}
+			: type(type) {}
 		TypeObject(const DefaultType &type, const ICM::Function::Signature &valuetype);
 
 		DefaultType getType() const {
 			return type;
-		}
-		TypeObject getValueType() const {
-			return valuetype ? *valuetype : type;
 		}
 		const Function::Signature& getSign() const {
 			return *sign;
@@ -45,7 +38,7 @@ namespace ICM
 			return type == T_Vary;
 		}
 		bool operator==(const TypeObject &tobj) const {
-			return type == tobj.type && (valuetype == nullptr || *valuetype == *tobj.valuetype); // TODO
+			return type == tobj.type; // TODO
 		}
 		bool operator!=(const TypeObject &tobj) const {
 			return !(*this == tobj);
@@ -53,20 +46,14 @@ namespace ICM
 
 		bool checkType(const TypeObject &type) const;
 
-		string to_string() const;
-
 	private:
 		DefaultType type;
-		union {
-			TypeObject* valuetype = nullptr;
-			Function::Signature* sign;
-		};
+		Function::Signature* sign;
 		const FuncTableUnit *functableunit = nullptr;
 	};
 
 	ICM::TypeObject getTypeObject(const ObjectPtr &op);
 	std::string to_string(const TypeObject &to);
-	std::string to_string(const shared_ptr<TypeObject> &top);
 }
 
 #endif

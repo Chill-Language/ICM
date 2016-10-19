@@ -29,14 +29,17 @@ namespace ICM
 			bool checkType(const Signature &sign) const;
 			bool checkType(const lightlist<TypeObject> &argT) const;
 
-			string to_string() const;
-
 		private:
 			List InType;
 			TypeObject OutType;
 			bool last_is_args;
 		};
+	}
 
+	string to_string(const Function::Signature& sign);
+
+	namespace Function
+	{
 		//=======================================
 		// * Class FuncObject
 		//=======================================
@@ -60,7 +63,7 @@ namespace ICM
 			}
 
 			string to_string() const {
-				return sign.to_string();
+				return ICM::to_string(sign);
 			}
 			const Signature& getSign() const {
 				return sign;
