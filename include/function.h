@@ -18,10 +18,10 @@ namespace ICM
 		{
 		public:
 			using List = vector<TypeObject>;
-			using InitList1 = std::initializer_list<TypeObject>;
+			using InitList = std::initializer_list<TypeObject>;
 
 			Signature() = default;
-			Signature(const InitList1 &intype, const TypeObject& outtype, bool last_is_args = false);
+			Signature(const InitList &intype, const TypeObject& outtype, bool last_is_args = false);
 
 			const List& getInType() const { return InType; }
 			const TypeObject& getOutType() const { return OutType; }

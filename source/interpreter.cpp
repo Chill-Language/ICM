@@ -222,37 +222,41 @@ namespace ICM
 			case OrderData::SML: {
 				ASTOrder::OrderDataSmall *p = static_cast<ASTOrder::OrderDataSmall*>(e);
 				Objects::Identifier *ident = p->getData().get<Objects::Identifier>();
-				tempresult[ProgramCounter] = checkCall(DefFuncTable["<"], DataList({ ident->getData().getRealData(), tempresult[p->getRefid()] }));
+				bool r = (ident->getData().getRealData().get<Objects::Number>()->getData() < tempresult[p->getRefid()].get<Objects::Number>()->getData());
+				tempresult[ProgramCounter] = ObjectPtr(new Objects::Boolean(r));
 				Result = tempresult[ProgramCounter];
 				break;
 			}
 			case OrderData::SME: {
 				ASTOrder::OrderDataSmallEqual *p = static_cast<ASTOrder::OrderDataSmallEqual*>(e);
 				Objects::Identifier *ident = p->getData().get<Objects::Identifier>();
-				const ObjectPtr &op = checkCall(DefFuncTable["<="], DataList({ ident->getData().getRealData(), tempresult[p->getRefid()] }));
-				tempresult[ProgramCounter] = op;
+				bool r = (ident->getData().getRealData().get<Objects::Number>()->getData() <= tempresult[p->getRefid()].get<Objects::Number>()->getData());
+				tempresult[ProgramCounter] = ObjectPtr(new Objects::Boolean(r));
 				Result = tempresult[ProgramCounter];
 				break;
 			}
 			case OrderData::LAR: {
 				ASTOrder::OrderDataSmall *p = static_cast<ASTOrder::OrderDataSmall*>(e);
 				Objects::Identifier *ident = p->getData().get<Objects::Identifier>();
-				tempresult[ProgramCounter] = checkCall(DefFuncTable[">"], DataList({ ident->getData().getRealData(), tempresult[p->getRefid()] }));
+				bool r = (ident->getData().getRealData().get<Objects::Number>()->getData() > tempresult[p->getRefid()].get<Objects::Number>()->getData());
+				//tempresult[ProgramCounter] = checkCall(DefFuncTable[">"], DataList({ ident->getData().getRealData(), tempresult[p->getRefid()] }));
+				tempresult[ProgramCounter] = ObjectPtr(new Objects::Boolean(r));
 				Result = tempresult[ProgramCounter];
 				break;
 			}
 			case OrderData::LAE: {
 				ASTOrder::OrderDataSmallEqual *p = static_cast<ASTOrder::OrderDataSmallEqual*>(e);
 				Objects::Identifier *ident = p->getData().get<Objects::Identifier>();
-				const ObjectPtr &op = checkCall(DefFuncTable[">="], DataList({ ident->getData().getRealData(), tempresult[p->getRefid()] }));
-				tempresult[ProgramCounter] = op;
+				bool r = (ident->getData().getRealData().get<Objects::Number>()->getData() >= tempresult[p->getRefid()].get<Objects::Number>()->getData());
+				tempresult[ProgramCounter] = ObjectPtr(new Objects::Boolean(r));
 				Result = tempresult[ProgramCounter];
 				break;
 			}
 			case OrderData::INC: {
 				ASTOrder::OrderDataInc *p = static_cast<ASTOrder::OrderDataInc*>(e);
-				tempresult[ProgramCounter] = checkCall(DefFuncTable["inc"], DataList({ p->getData() }));
-				Result = tempresult[ProgramCounter];
+				p->getData().get<Objects::Identifier>()->getData().getRealData().get<Objects::Number>()->getData().operator+=(1);
+				//tempresult[ProgramCounter] = checkCall(DefFuncTable["inc"], DataList({ p->getData() }));
+				//Result = tempresult[ProgramCounter];
 				break;
 			}
 			case OrderData::OVER: {

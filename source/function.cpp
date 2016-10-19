@@ -15,7 +15,7 @@ namespace ICM
 		//=======================================
 		// * Class Signature
 		//=======================================
-		Signature::Signature(const InitList1 &intype, const TypeObject& outtype, bool last_is_args)
+		Signature::Signature(const InitList &intype, const TypeObject& outtype, bool last_is_args)
 			: InType(intype), OutType(outtype), last_is_args(last_is_args) {}
 		string Signature::to_string() const {
 			std::string str;
@@ -59,10 +59,7 @@ namespace ICM
 			return true;
 		}
 		bool Signature::checkType(const Signature &sign) const {
-			// Get TypeObject List
-			vector<TypeObject> argT(sign.InType.begin(), sign.InType.end());
-			// Check
-			return checkType(argT);
+			return checkType(sign.InType);
 		}
 		vector<TypeObject> getTypeObjectList(const DataList &list)
 		{
