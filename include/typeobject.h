@@ -37,9 +37,6 @@ namespace ICM
 		const FuncTableUnit& getFuncTableUnit() const {
 			return *functableunit;
 		}
-		bool isIdent() const {
-			return type == T_Identifier;
-		}
 		bool isFunc() const {
 			return type == T_Function;
 		}

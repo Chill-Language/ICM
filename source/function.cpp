@@ -105,10 +105,10 @@ namespace ICM
 		}
 		void getAdjustedObjectPtr(ObjectPtr op, const TypeObject &type, lightlist_creater<ObjectPtr> &dlp)
 		{
-			if (type.isIdent() && type.getValueType().isVary()) {
-				dlp.push_back(op);
-				return;
-			}
+			//if (type.isIdent() && type.getValueType().isVary()) {
+			//	dlp.push_back(op);
+			//	return;
+			//}
 			if (!type.isVary())
 				while (getTypeObject(op) != type)
 					op = adjustObjectPtr(op);
@@ -203,6 +203,9 @@ namespace ICM
 			else
 				nlist.push_back(e);
 		}
+		for (auto &e : nlist)
+			if (e.isType(T_Identifier))
+				e = adjustObjectPtr(e);
 
 		lightlist_creater<ObjectPtr> ndl(nlist.size());
 		size_t id = ftu.size();
@@ -227,6 +230,9 @@ namespace ICM
 			else
 				nlist.push_back(e);
 		}
+		for (auto &e : nlist)
+			if (e.isType(T_Identifier))
+				e = adjustObjectPtr(e);
 
 		lightlist_creater<ObjectPtr> ndl(nlist.size());
 		size_t id = ftu.size();

@@ -29,11 +29,11 @@ namespace ICM
 	{
 		if (parT.isVary())
 			return true;
-		if (!parT.isIdent())
+		//if (!parT.isIdent())
 			return checkNonIdentType(parT, argT);
-		if (argT.isIdent())
-			return checkType(parT.getValueType(), argT.getValueType());
-		return false;
+		//if (argT.isIdent())
+		//	return checkType(parT.getValueType(), argT.getValueType());
+		//return false;
 	}
 	bool checkNonIdentType(const TypeObject &parT, const TypeObject &argT)
 	{
@@ -57,9 +57,9 @@ namespace ICM
 				}
 			}
 		}
-		if (!argT.isIdent())
+		//if (!argT.isIdent())
 			return parT.getType() == argT.getType();
-		return checkNonIdentType(parT, argT.getValueType());
+		//return checkNonIdentType(parT, argT.getValueType());
 	}
 	bool TypeObject::checkType(const TypeObject &tobj) const
 	{

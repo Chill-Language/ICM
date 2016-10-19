@@ -1,3 +1,18 @@
+
+(Config.SetPrintIntervalTime T)
+(let array (* [9 8 7 6 5 4 3 2 1] 50))
+(let n (- (size array) 1))
+
+(for j in 0 to (- n 1)
+	(for i in 0 to (- n 1 j)
+		(let t (+ i 1))
+		(if (> (at array i) (at array t))
+			(swap array i t)
+		)
+	)
+)
+
+(println array)(exit)
 ; Test
 (let Array [1 2 3])
 (let a 5) (p a); a(5)
