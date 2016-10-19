@@ -63,6 +63,7 @@ public:
 
 	size_t size() const { return _capacity; }
 	bool empty() const { return _capacity == 0; }
+	void resize(size_t nsize) { _capacity = nsize; }
 
 private:
 	size_t _capacity = 0;
@@ -78,13 +79,21 @@ public:
 	void push_back(const T &e) {
 		_data[_count++] = e;
 	}
+	template <typename Iter>
+	void insert(Iter beg, Iter end) {
+		for (auto &e : rangei(beg, end)) {
+			push_back(e);
+		}
+	}
 	void clear() {
 		for (size_t i : range(0, _data.size()))
 			_data[i].~T();
 		_count = 0;
 	}
 	lightlist<T> data() const {
-		return _data;
+		lightlist<T> ndata(_data);
+		ndata.resize(_count);
+		return ndata;
 	}
 	size_t size() const {
 		return _count;

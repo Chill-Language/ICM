@@ -27,7 +27,7 @@ namespace ICM
 			const TypeObject& getOutType() const { return OutType; }
 			bool isLastArgs() const { return last_is_args; }
 			bool checkType(const Signature &sign) const;
-			bool checkType(const vector<TypeObject> &argT) const;
+			bool checkType(const lightlist<TypeObject> &argT) const;
 
 			string to_string() const;
 
@@ -240,7 +240,7 @@ namespace ICM
 				return nullptr;
 			}
 			const Node* checkSingle(const Node *data, const TypeObject &type, size_t &index);
-			const FuncObject* match(const vector<TypeObject> &argT);
+			const FuncObject* match(const lightlist<TypeObject> &argT);
 
 		private:
 			const SignTree& ST;

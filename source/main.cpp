@@ -117,7 +117,7 @@ void test2()
 		Tree.insert(ftu[i]);
 	}
 	Function::SignTreeMatch STM(Tree);
-	auto r = STM.match({ T_Number, T_Number, T_Number });
+	auto r = STM.match(lightlist<TypeObject>({ T_Number, T_Number, T_Number }));
 
 	println(r);
 	return;

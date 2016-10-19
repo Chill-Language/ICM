@@ -36,8 +36,8 @@ namespace ICM
 
 			return str;
 		}
-		vector<TypeObject> getTypeObjectList(const DataList &list);
-		bool Signature::checkType(const vector<TypeObject> &argT) const {
+		lightlist<TypeObject> getTypeObjectList(const DataList &list);
+		bool Signature::checkType(const lightlist<TypeObject> &argT) const {
 			// Check Size
 			if (last_is_args) {
 				if (argT.size() < InType.size())
@@ -61,18 +61,18 @@ namespace ICM
 		bool Signature::checkType(const Signature &sign) const {
 			return checkType(sign.InType);
 		}
-		vector<TypeObject> getTypeObjectList(const DataList &list)
+		lightlist<TypeObject> getTypeObjectList(const DataList &list)
 		{
-			vector<TypeObject> typelist;
+			lightlist_creater<TypeObject> typelist(list.size());
 			for (auto &e : list)
 				typelist.push_back(getTypeObject(e));
-			return typelist;
+			return typelist.data();
 		}
 	}
 
 	const Function::FuncObject* FuncTableUnit::checkType(const DataList &list, lightlist_creater<ObjectPtr> *dlp) const {
 		Function::SignTreeMatch STM(ST);
-		vector<TypeObject> typelist = Function::getTypeObjectList(list);
+		lightlist<TypeObject> typelist = Function::getTypeObjectList(list);
 		const Function::FuncObject *ptr = STM.match(typelist);
 
 		// Get Adjusted DataList
@@ -123,7 +123,7 @@ namespace ICM
 		}
 		return nullptr;
 	}
-	const Function::FuncObject* Function::SignTreeMatch::match(const vector<TypeObject> &argT) {
+	const Function::FuncObject* Function::SignTreeMatch::match(const lightlist<TypeObject> &argT) {
 		const Node* currptr = ST.getRoot();
 		size_t index = 0;
 		for (auto &t : argT) {
@@ -148,7 +148,7 @@ namespace ICM
 	size_t getCallID(const FuncTableUnit &ftu, const DataList &dl)
 	{
 		size_t id = ftu.size();
-		const vector<TypeObject> &typelist = Function::getTypeObjectList(dl);
+		const lightlist<TypeObject> &typelist = Function::getTypeObjectList(dl);
 		for (size_t i : Range<size_t>(0, ftu.size())) {
 			if (ftu[i].checkType(typelist)) {
 				id = i;
@@ -160,7 +160,7 @@ namespace ICM
 	// Check Call
 	ObjectPtr checkCall(const FuncTableUnit &ftu, const DataList &dl)
 	{
-		const vector<TypeObject> &typelist = Function::getTypeObjectList(dl);
+		const lightlist<TypeObject> &typelist = Function::getTypeObjectList(dl);
 #define USE_SIGNTREE false
 #if USE_SIGNTREE
 		const Function::FuncObject *p = ftu.checkType(nlist, &ndl);

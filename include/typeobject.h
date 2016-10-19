@@ -13,6 +13,7 @@ namespace ICM
 	class TypeObject
 	{
 	public:
+		TypeObject() : TypeObject(T_Null) {}
 		TypeObject(const DefaultType &type)
 			: type(type) {
 			if (type == T_Identifier)
