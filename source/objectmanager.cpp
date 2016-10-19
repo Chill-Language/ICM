@@ -51,9 +51,11 @@ namespace ICM
 	//=======================================
 
 	// For Testing Speed
-	/*DefaultType ObjectPtr::type() const {
+#if USE_RAW_POINTER
+	DefaultType ObjectPtr::type() const {
 		return data->getType();
-	}*/
+	}
+#else
 	ObjectPtr::ObjectPtr(Objects::Object* op) {
 		if (op == nullptr) {
 			this->_type = T_Null;
@@ -81,6 +83,7 @@ namespace ICM
 		GlobalObjectManager.increaseCount(this->_type, this->_index);
 		return *this;
 	}
+#endif
 	string ObjectPtr::to_string() const {
 		if (this->get() == nullptr)
 			return "Null";

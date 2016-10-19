@@ -45,6 +45,8 @@ namespace ICM
 	//=======================================
 	// * Class ObjectPtr
 	//=======================================
+#define USE_RAW_POINTER !true
+#if !USE_RAW_POINTER
 	class ObjectPtr
 	{
 	public:
@@ -88,8 +90,9 @@ namespace ICM
 		DefaultType _type;
 		size_t _index;
 	};
+#else
 	// For Testing Speed.
-	/*class ObjectPtr
+	class ObjectPtr
 	{
 	public:
 		ObjectPtr() : data(nullptr) {}
@@ -126,7 +129,8 @@ namespace ICM
 		DefaultType type() const;
 
 		Objects::Object *data;
-	};*/
+	};
+#endif
 
 	//=======================================
 	// * Class ObjectPool

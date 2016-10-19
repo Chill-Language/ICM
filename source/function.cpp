@@ -147,23 +147,8 @@ namespace ICM
 	// Get Call ID
 	size_t getCallID(const FuncTableUnit &ftu, const DataList &dl)
 	{
-		// Get Adjust DataList
-		vector<ObjectPtr> nlist;
-		for (auto &e : dl) {
-			if (e.isType(T_Disperse)) {
-				auto l = (Objects::Disperse*)(e.get());
-				nlist.insert(nlist.end(), begin(l), end(l));
-			}
-			else
-				nlist.push_back(e);
-		}
-		for (auto &e : nlist)
-			if (e.isType(T_Identifier))
-				e = adjustObjectPtr(e);
-
-		lightlist_creater<ObjectPtr> ndl(nlist.size());
 		size_t id = ftu.size();
-		const vector<TypeObject> &typelist = Function::getTypeObjectList(nlist);
+		const vector<TypeObject> &typelist = Function::getTypeObjectList(dl);
 		for (size_t i : Range<size_t>(0, ftu.size())) {
 			if (ftu[i].checkType(typelist)) {
 				id = i;
@@ -175,23 +160,7 @@ namespace ICM
 	// Check Call
 	ObjectPtr checkCall(const FuncTableUnit &ftu, const DataList &dl)
 	{
-		// Get Adjust DataList
-		vector<ObjectPtr> nlist;
-		for (auto &e : dl) {
-			if (e.isType(T_Disperse)) {
-				auto l = (Objects::Disperse*)(e.get());
-				for (auto &te : rangei(begin(l), end(l))) {
-					nlist.push_back(te);
-				}
-			}
-			else
-				nlist.push_back(e);
-		}
-		for (auto &e : nlist)
-			if (e.isType(T_Identifier))
-				e = adjustObjectPtr(e);
-
-		const vector<TypeObject> &typelist = Function::getTypeObjectList(nlist);
+		const vector<TypeObject> &typelist = Function::getTypeObjectList(dl);
 #define USE_SIGNTREE false
 #if USE_SIGNTREE
 		const Function::FuncObject *p = ftu.checkType(nlist, &ndl);
@@ -211,7 +180,7 @@ namespace ICM
 		}
 #else
 		if (id != ftu.size()) {
-			return ftu[id].call(lightlist<ObjectPtr>(nlist));
+			return ftu[id].call(dl);
 		}
 #endif
 		else {

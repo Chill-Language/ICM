@@ -5,21 +5,25 @@ namespace ICM
 {
 	DataList Interpreter::createList(const RangeIterator<vector<AST::Element>::iterator> &r)
 	{
-		lightlist_creater<ObjectPtr> listnum(r.size());
+		vector<ObjectPtr> listnum;
 		for (const auto &l : r) {
 			if (l.isData()) {
-				ObjectPtr op(l.getData());
+				const ObjectPtr &op = l.getData();
 				if (op.isType(T_Identifier))
-					listnum.push_back(op);
+					listnum.push_back(adjustObjectPtr(op));
+				else if (op.isType(T_Disperse)) {
+					Objects::Disperse* l = op.get<Objects::Disperse>();
+					listnum.insert(listnum.end(), begin(l), end(l));
+				}
 				else
-					listnum.push_back(ObjectPtr(op->clone())); // TODO
+					listnum.push_back(op);
 			}
 			else {
 				size_t id = l.getRefer();
 				listnum.push_back(tempresult[id]);
 			}
 		}
-		return listnum.data();
+		return DataList(listnum);
 	}
 	void Interpreter::runFunc(const ObjectPtr &op, AST::Node *n, size_t id) {
 		const auto &r = rangei(n->begin() + 1, n->end());
@@ -222,7 +226,7 @@ namespace ICM
 			case OrderData::SML: {
 				ASTOrder::OrderDataSmall *p = static_cast<ASTOrder::OrderDataSmall*>(e);
 				Objects::Identifier *ident = p->getData().get<Objects::Identifier>();
-				bool r = (ident->getData().getRealData().get<Objects::Number>()->getData() < tempresult[p->getRefid()].get<Objects::Number>()->getData());
+				bool r = (ident->getData().getRealData().get<Objects::Number>()->getData() < adjustObjectPtr(tempresult[p->getRefid()]).get<Objects::Number>()->getData());
 				tempresult[ProgramCounter] = ObjectPtr(new Objects::Boolean(r));
 				Result = tempresult[ProgramCounter];
 				break;
@@ -230,7 +234,7 @@ namespace ICM
 			case OrderData::SME: {
 				ASTOrder::OrderDataSmallEqual *p = static_cast<ASTOrder::OrderDataSmallEqual*>(e);
 				Objects::Identifier *ident = p->getData().get<Objects::Identifier>();
-				bool r = (ident->getData().getRealData().get<Objects::Number>()->getData() <= tempresult[p->getRefid()].get<Objects::Number>()->getData());
+				bool r = (ident->getData().getRealData().get<Objects::Number>()->getData() <= adjustObjectPtr(tempresult[p->getRefid()]).get<Objects::Number>()->getData());
 				tempresult[ProgramCounter] = ObjectPtr(new Objects::Boolean(r));
 				Result = tempresult[ProgramCounter];
 				break;
@@ -238,7 +242,7 @@ namespace ICM
 			case OrderData::LAR: {
 				ASTOrder::OrderDataSmall *p = static_cast<ASTOrder::OrderDataSmall*>(e);
 				Objects::Identifier *ident = p->getData().get<Objects::Identifier>();
-				bool r = (ident->getData().getRealData().get<Objects::Number>()->getData() > tempresult[p->getRefid()].get<Objects::Number>()->getData());
+				bool r = (ident->getData().getRealData().get<Objects::Number>()->getData() > adjustObjectPtr(tempresult[p->getRefid()]).get<Objects::Number>()->getData());
 				//tempresult[ProgramCounter] = checkCall(DefFuncTable[">"], DataList({ ident->getData().getRealData(), tempresult[p->getRefid()] }));
 				tempresult[ProgramCounter] = ObjectPtr(new Objects::Boolean(r));
 				Result = tempresult[ProgramCounter];
@@ -247,7 +251,8 @@ namespace ICM
 			case OrderData::LAE: {
 				ASTOrder::OrderDataSmallEqual *p = static_cast<ASTOrder::OrderDataSmallEqual*>(e);
 				Objects::Identifier *ident = p->getData().get<Objects::Identifier>();
-				bool r = (ident->getData().getRealData().get<Objects::Number>()->getData() >= tempresult[p->getRefid()].get<Objects::Number>()->getData());
+				
+				bool r = (ident->getData().getRealData().get<Objects::Number>()->getData() >= adjustObjectPtr(tempresult[p->getRefid()]).get<Objects::Number>()->getData());
 				tempresult[ProgramCounter] = ObjectPtr(new Objects::Boolean(r));
 				Result = tempresult[ProgramCounter];
 				break;
@@ -255,8 +260,6 @@ namespace ICM
 			case OrderData::INC: {
 				ASTOrder::OrderDataInc *p = static_cast<ASTOrder::OrderDataInc*>(e);
 				p->getData().get<Objects::Identifier>()->getData().getRealData().get<Objects::Number>()->getData().operator+=(1);
-				//tempresult[ProgramCounter] = checkCall(DefFuncTable["inc"], DataList({ p->getData() }));
-				//Result = tempresult[ProgramCounter];
 				break;
 			}
 			case OrderData::OVER: {
