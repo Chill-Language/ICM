@@ -16,27 +16,10 @@ namespace ICM
 		}
 		return str;
 	}
-	// P :Pars, A : Args
-	// N : Numberr, I : Ident
-	//  P\A    N  I(N) I(I(N))
-	//   N     T   T     T
-	//  I(N)   F   T     T
-	// I(I(N)) F   F     T
-	//  Var    T   T     T
-	// 'parT' is par type, 'argT' is arg type.
-	bool checkNonIdentType(const TypeObject &parT, const TypeObject &argT);
 	bool checkType(const TypeObject &parT, const TypeObject &argT)
 	{
 		if (parT.isVary())
 			return true;
-		//if (!parT.isIdent())
-			return checkNonIdentType(parT, argT);
-		//if (argT.isIdent())
-		//	return checkType(parT.getValueType(), argT.getValueType());
-		//return false;
-	}
-	bool checkNonIdentType(const TypeObject &parT, const TypeObject &argT)
-	{
 		if (parT.isFunc()) {
 			if (argT.isFunc()) {
 				auto &ps = parT.getSign();
@@ -57,9 +40,7 @@ namespace ICM
 				}
 			}
 		}
-		//if (!argT.isIdent())
-			return parT.getType() == argT.getType();
-		//return checkNonIdentType(parT, argT.getValueType());
+		return parT.getType() == argT.getType();
 	}
 	bool TypeObject::checkType(const TypeObject &tobj) const
 	{

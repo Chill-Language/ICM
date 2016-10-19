@@ -128,6 +128,12 @@ namespace ICM
 		string to_output(const IdentifierType &it) {
 			return it.to_output();
 		}
+		string to_string_code(const FunctionType &ft) {
+			return ft.to_string_code();
+		}
+		string to_string_code(const IdentifierType &it) {
+			return it.to_string_code();
+		}
 	}
 
 	//=======================================

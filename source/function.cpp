@@ -16,11 +16,7 @@ namespace ICM
 		// * Class Signature
 		//=======================================
 		Signature::Signature(const InitList1 &intype, const TypeObject& outtype, bool last_is_args)
-			: InType(intype.size()), OutType(new TypeObject(outtype)), last_is_args(last_is_args) {
-			auto p = intype.begin();
-			for (auto i : Range<size_t>(0, intype.size()))
-				InType[i] = shared_ptr<TypeObject>(new TypeObject(*p++));
-		}
+			: InType(intype), OutType(outtype), last_is_args(last_is_args) {}
 		string Signature::to_string() const {
 			std::string str;
 
@@ -28,7 +24,7 @@ namespace ICM
 			const auto &ots = getOutType();
 			if (!its.empty()) {
 				if (its.size() != 1) str.push_back('(');
-				str.append(Convert::to_string(its.begin(), its.end(), [](const auto &e) { return e->to_string(); }));
+				str.append(Convert::to_string(its.begin(), its.end(), [](const auto &e) { return e.to_string(); }));
 				if (isLastArgs()) str.push_back('*');
 				if (its.size() != 1) str.push_back(')');
 			}
@@ -41,8 +37,6 @@ namespace ICM
 			return str;
 		}
 		vector<TypeObject> getTypeObjectList(const DataList &list);
-		vector<TypeObject> getTypeObjectList(const Signature::List &list);
-		void getAdjustedObjectPtr(ObjectPtr op, const TypeObject &type, lightlist_creater<ObjectPtr> &dlp);
 		bool Signature::checkType(const vector<TypeObject> &argT) const {
 			// Check Size
 			if (last_is_args) {
@@ -55,39 +49,20 @@ namespace ICM
 			// Check Type
 			size_t size = last_is_args ? InType.size() - 1 : InType.size();
 			for (auto i : Range<size_t>(0, size))
-				if (!InType[i]->checkType(argT[i]))
+				if (!InType[i].checkType(argT[i]))
 					return false;
 			if (last_is_args) {
 				for (auto i : Range<size_t>(size, argT.size()))
-					if (!InType.back()->checkType(argT[i]))
+					if (!InType.back().checkType(argT[i]))
 						return false;
 			}
 			return true;
 		}
 		bool Signature::checkType(const Signature &sign) const {
 			// Get TypeObject List
-			const vector<TypeObject> &argT = getTypeObjectList(sign.InType);
+			vector<TypeObject> argT(sign.InType.begin(), sign.InType.end());
 			// Check
 			return checkType(argT);
-		}
-		bool Signature::checkType(const DataList &list, lightlist_creater<ObjectPtr> *dlp) const {
-			// Get TypeObject List
-			const vector<TypeObject> &argT = getTypeObjectList(list);
-			// Check
-			if (!checkType(argT))
-				return false;
-			// Get Adjusted DataList
-			if (dlp) {
-				size_t size = last_is_args ? InType.size() - 1 : InType.size();
-				auto& dl = *dlp;
-				dl.clear();
-				for (size_t i : Range<size_t>(0, size))
-					getAdjustedObjectPtr(list[i], *InType[i], dl);
-				if (last_is_args)
-					for (size_t i : Range<size_t>(size, argT.size()))
-						getAdjustedObjectPtr(list[i], *InType.back(), dl);
-			}
-			return true;
 		}
 		vector<TypeObject> getTypeObjectList(const DataList &list)
 		{
@@ -95,24 +70,6 @@ namespace ICM
 			for (auto &e : list)
 				typelist.push_back(getTypeObject(e));
 			return typelist;
-		}
-		vector<TypeObject> getTypeObjectList(const Signature::List &list)
-		{
-			vector<TypeObject> typelist;
-			for (auto &e : list)
-				typelist.push_back(*e);
-			return typelist;
-		}
-		void getAdjustedObjectPtr(ObjectPtr op, const TypeObject &type, lightlist_creater<ObjectPtr> &dlp)
-		{
-			//if (type.isIdent() && type.getValueType().isVary()) {
-			//	dlp.push_back(op);
-			//	return;
-			//}
-			if (!type.isVary())
-				while (getTypeObject(op) != type)
-					op = adjustObjectPtr(op);
-			dlp.push_back(op);
 		}
 	}
 
@@ -209,8 +166,9 @@ namespace ICM
 
 		lightlist_creater<ObjectPtr> ndl(nlist.size());
 		size_t id = ftu.size();
+		const vector<TypeObject> &typelist = Function::getTypeObjectList(nlist);
 		for (size_t i : Range<size_t>(0, ftu.size())) {
-			if (ftu[i].checkType(dl, &ndl)) {
+			if (ftu[i].checkType(typelist)) {
 				id = i;
 				break;
 			}
@@ -225,7 +183,9 @@ namespace ICM
 		for (auto &e : dl) {
 			if (e.isType(T_Disperse)) {
 				auto l = (Objects::Disperse*)(e.get());
-				nlist.insert(nlist.end(), begin(l), end(l));
+				for (auto &te : rangei(begin(l), end(l))) {
+					nlist.push_back(te);
+				}
 			}
 			else
 				nlist.push_back(e);
@@ -234,23 +194,29 @@ namespace ICM
 			if (e.isType(T_Identifier))
 				e = adjustObjectPtr(e);
 
-		lightlist_creater<ObjectPtr> ndl(nlist.size());
+		const vector<TypeObject> &typelist = Function::getTypeObjectList(nlist);
+#define USE_SIGNTREE false
+#if USE_SIGNTREE
+		const Function::FuncObject *p = ftu.checkType(nlist, &ndl);
+#else
 		size_t id = ftu.size();
 		for (size_t i : Range<size_t>(0, ftu.size())) {
-			if (ftu[i].checkType(nlist, &ndl)) {
+			if (ftu[i].checkType(typelist)) {
 				id = i;
 				break;
 			}
 		}
-		//const Function::FuncObject *p = ftu.checkType(nlist, &ndl);
+#endif
 		CheckCallCount++;
-
-		/*if (p != nullptr) {
+#if USE_SIGNTREE
+		if (p != nullptr) {
 			return p->call(ndl.data());
-		}*/
-		if (id != ftu.size()) {
-			return ftu[id].call(ndl.data());
 		}
+#else
+		if (id != ftu.size()) {
+			return ftu[id].call(lightlist<ObjectPtr>(nlist));
+		}
+#endif
 		else {
 			std::string errinfo = "Matching Types in function '" + ftu.getName() + "'.";
 			return createError(errinfo);

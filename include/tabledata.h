@@ -57,13 +57,13 @@ namespace ICM
 		FuncTableUnit() = default;
 		FuncTableUnit(size_t id, const string &name, const std::initializer_list<FuncObject> &func)
 			: BaseTableUnit(id, name), is_ref(false), func(func) {
-			initSignTree();
+			//initSignTree();
 		}
 		FuncTableUnit(size_t id, const string &name, const std::initializer_list<FuncInitObject*> &func)
 			: BaseTableUnit(id, name), is_ref(true) {
 			for (auto *p : func)
 				funcp.push_back(shared_ptr<FuncInitObject>(p));
-			initSignTree();
+			//initSignTree();
 		}
 
 		const size_t size() const { return is_ref ? funcp.size() : func.size(); }

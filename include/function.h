@@ -17,17 +17,15 @@ namespace ICM
 		class Signature
 		{
 		public:
-			using List = lightlist<shared_ptr<TypeObject>>;
+			using List = vector<TypeObject>;
 			using InitList1 = std::initializer_list<TypeObject>;
 
 			Signature() = default;
 			Signature(const InitList1 &intype, const TypeObject& outtype, bool last_is_args = false);
 
 			const List& getInType() const { return InType; }
-			const TypeObject& getOutType() const { return *OutType; }
+			const TypeObject& getOutType() const { return OutType; }
 			bool isLastArgs() const { return last_is_args; }
-
-			bool checkType(const DataList &list, lightlist_creater<ObjectPtr> *dlp = nullptr) const;
 			bool checkType(const Signature &sign) const;
 			bool checkType(const vector<TypeObject> &argT) const;
 
@@ -35,7 +33,7 @@ namespace ICM
 
 		private:
 			List InType;
-			shared_ptr<TypeObject> OutType;
+			TypeObject OutType;
 			bool last_is_args;
 		};
 
@@ -104,7 +102,7 @@ namespace ICM
 			struct Node;
 			using NodePtr = shared_ptr<Node>;
 			using Nodes = vector<NodePtr>;
-			using TypeObjectPtr = shared_ptr<TypeObject>;
+			using TypeObjectPtr = TypeObject*;//shared_ptr<TypeObject>;
 		public:
 			struct Node
 			{
@@ -193,13 +191,13 @@ namespace ICM
 			void insert(const FuncObject &funcO) {
 				NodePtr currptr = root;
 				size_t count = 1;
-				for (const TypeObjectPtr &to : funcO.getSign().getInType()) {
+				for (const TypeObject &to : funcO.getSign().getInType()) {
 					NodePtr ptr = currptr->find(to);
 					if (ptr) {
 						currptr = ptr;
 					}
 					else {
-						currptr = currptr->push(to);
+						currptr = currptr->push(TypeObjectPtr(new TypeObject(to)));
 						if (count == level.size())
 							level.push_back(vector<const Nodes*>());
 						level[count].push_back(&currptr->getChildren());

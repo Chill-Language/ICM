@@ -23,6 +23,10 @@ namespace ICM
 		string to_output(const T &t) {
 			return to_string<T>(t);
 		}
+		template <typename T>
+		string to_string_code(const T &t) {
+			return to_string<T>(t);
+		}
 
 		//=======================================
 		// * Class DataObject<T, _Type>
@@ -56,6 +60,9 @@ namespace ICM
 			string to_output() const { // Delete
 				return toOutput();
 			}
+			string to_string_code() const {
+				return toStringCode();
+			}
 			bool equ(const ObjectPtr &obj) const { // Delete
 				return equ(obj.get());
 			}
@@ -64,6 +71,9 @@ namespace ICM
 			}
 			string toOutput() const {
 				return Objects::to_output(_ref());
+			}
+			string toStringCode() const {
+				return Objects::to_string_code(_ref());
 			}
 			DataObject* clone() const {
 				return new DataObject(*this);
@@ -190,10 +200,10 @@ namespace ICM
 			string to_string_code() const {
 				return get_data().getName();
 			}
-			virtual void write(File &file) const {
+			void write(File &file) const {
 				file.write(data);
 			}
-			virtual void read(File &file) {
+			void read(File &file) {
 				file.read(data);
 			}
 			bool operator==(const FunctionType &ft) const {
@@ -206,7 +216,8 @@ namespace ICM
 			size_t data;
 		};
 		string to_string(const FunctionType &ft);
-		string to_output(const FunctionType &lt);
+		string to_output(const FunctionType &ft);
+		string to_string_code(const FunctionType &ft);
 		//=======================================
 		// * Class Identifier
 		//=======================================
@@ -254,6 +265,7 @@ namespace ICM
 		};
 		string to_string(const IdentifierType &ft);
 		string to_output(const IdentifierType &ft);
+		string to_string_code(const IdentifierType &ft);
 
 		class Nil;
 		using Error = DataObject<ErrorType, T_Error>;

@@ -462,6 +462,20 @@ namespace ICM
 					GlobalConfig.PrintIntervalTime = value;
 				}
 			};
+			struct PrintAST : public SetBool
+			{
+			private:
+				virtual void setValue(bool value) const {
+					GlobalConfig.PrintAST = value;
+				}
+			};
+			struct PrintOrder : public SetBool
+			{
+			private:
+				virtual void setValue(bool value) const {
+					GlobalConfig.PrintOrder = value;
+				}
+			};
 		}
 	}
 
@@ -542,5 +556,7 @@ namespace ICM
 		});
 		DefFuncTable.add("Config.SetDebugMode", LST{ new DefFunc::Config::DebugMode() });
 		DefFuncTable.add("Config.SetPrintIntervalTime", LST{ new DefFunc::Config::PrintIntervalTime() });
+		DefFuncTable.add("Config.PrintAST", LST{ new DefFunc::Config::PrintAST() });
+		DefFuncTable.add("Config.PrintOrder", LST{ new DefFunc::Config::PrintOrder() });
 	}
 }
