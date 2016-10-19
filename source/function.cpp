@@ -70,17 +70,10 @@ namespace ICM
 		}
 	}
 
-	const Function::FuncObject* FuncTableUnit::checkType(const DataList &list, lightlist_creater<ObjectPtr> *dlp) const {
+	const Function::FuncObject* FuncTableUnit::checkType(const lightlist<TypeObject> &typelist) const {
 		Function::SignTreeMatch STM(ST);
-		lightlist<TypeObject> typelist = Function::getTypeObjectList(list);
 		const Function::FuncObject *ptr = STM.match(typelist);
 
-		// Get Adjusted DataList
-		if (ptr) {
-			for (auto &v : list) {
-				dlp->push_back(adjustObjectPtr(v));
-			}
-		}
 		return ptr;
 	}
 
@@ -101,7 +94,13 @@ namespace ICM
 			}
 		}
 		else {
-			return checkSingle2(data, vec[index - 1].get(), type);
+			const Node *p = vec[index - 1].get();
+			if (!p->isNull()) {
+				if (p->checkType(type)) {
+					return data;
+				}
+			}
+			return nullptr;
 		}
 		return nullptr;
 	}
@@ -163,7 +162,7 @@ namespace ICM
 		const lightlist<TypeObject> &typelist = Function::getTypeObjectList(dl);
 #define USE_SIGNTREE false
 #if USE_SIGNTREE
-		const Function::FuncObject *p = ftu.checkType(nlist, &ndl);
+		const Function::FuncObject *p = ftu.checkType(typelist);
 #else
 		size_t id = ftu.size();
 		for (size_t i : Range<size_t>(0, ftu.size())) {
@@ -176,7 +175,7 @@ namespace ICM
 		CheckCallCount++;
 #if USE_SIGNTREE
 		if (p != nullptr) {
-			return p->call(ndl.data());
+			return p->call(dl);
 		}
 #else
 		if (id != ftu.size()) {

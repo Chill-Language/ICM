@@ -113,7 +113,7 @@ namespace ICM
 
 				NodePtr find(const TypeObject &to) const {
 					for (auto &p : children) {
-						if (*p->data == to)
+						if (p->data && *p->data == to)
 							return p;
 					}
 					return nullptr;
@@ -231,14 +231,6 @@ namespace ICM
 				: ST(st) {}
 
 			const Node* checkSingle(const Node *data, const Node *p, const TypeObject &type, bool &change);
-			const Node* checkSingle2(const Node *data, const Node *p, const TypeObject &type) {
-				if (!p->isNull()) {
-					if (p->checkType(type)) {
-						return data;
-					}
-				}
-				return nullptr;
-			}
 			const Node* checkSingle(const Node *data, const TypeObject &type, size_t &index);
 			const FuncObject* match(const lightlist<TypeObject> &argT);
 

@@ -57,26 +57,26 @@ namespace ICM
 		FuncTableUnit() = default;
 		FuncTableUnit(size_t id, const string &name, const std::initializer_list<FuncObject> &func)
 			: BaseTableUnit(id, name), func(func) {
-			//initSignTree();
+			initSignTree();
 		}
 		FuncTableUnit(size_t id, const string &name, const std::initializer_list<FuncInitObject*> &func)
 			: BaseTableUnit(id, name) {
 			for (auto *p : func)
 				this->func.push_back(p->get_f());
-			//initSignTree();
+			initSignTree();
 		}
 
 		size_t size() const { return func.size(); }
 		const FuncObject& operator[](size_t i) const { return func[i]; }
 
-		const FuncObject* checkType(const DataList &list, lightlist_creater<ObjectPtr> *dl) const;
+		const FuncObject* checkType(const lightlist<TypeObject> &typelist) const;
 
 	private:
 		vector<FuncObject> func;
 		ICM::Function::SignTree ST;
 		void initSignTree() {
 			for (auto i : range(0, size())) {
-				ST.insert(*new FuncObject((*this)[i]));
+				ST.insert(func[i]);
 			}
 		}
 	};
