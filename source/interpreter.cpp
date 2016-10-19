@@ -156,6 +156,16 @@ namespace ICM
 				Result = tempresult[ProgramCounter];
 				break;
 			}
+			case OrderData::PTI: {
+				ASTOrder::OrderDataPrintIdent *p = static_cast<ASTOrder::OrderDataPrintIdent*>(e);
+				for (auto &i : p->getData()) {
+					println(tempresult[i]);
+				}
+
+				tempresult[ProgramCounter] = ObjectPtr(new Objects::Nil());
+				Result = tempresult[ProgramCounter];
+				break;
+			}
 			case OrderData::LET: {
 				ASTOrder::OrderDataLet *p = static_cast<ASTOrder::OrderDataLet*>(e);
 				Objects::Identifier *ident = p->getData().get<Objects::Identifier>();

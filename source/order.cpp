@@ -486,6 +486,15 @@ namespace ICM
 				KeywordNodeIDs.pop();
 				break;
 			}
+			case KeywordID::PTI: {
+				vector<size_t> indexs;
+				for (auto &n : rangei(single->begin() + 1, single->end())) {
+					createSingle(n);
+					indexs.push_back(OrderDataList.size() - 1);
+				}
+				addOrder(single, new OrderDataPrintIdent(indexs));
+				break;
+			}
 			case KeywordID::LET:
 			case KeywordID::CPY:
 			case KeywordID::REF: {

@@ -8,7 +8,7 @@ namespace ICM
 	//=======================================
 	// * Class Keyword
 	//=======================================
-	enum class KeywordID { LET, CPY, REF, IF, THEN, ELSE, ELSIF, FOR, IN, TO, WHILE, LOOP, BREAK, CASE, WHEN, FUNCTION };
+	enum class KeywordID { PTI, LET, CPY, REF, IF, THEN, ELSE, ELSIF, FOR, IN, TO, WHILE, LOOP, BREAK, CASE, WHEN, FUNCTION };
 
 	string to_string(KeywordID key);
 }

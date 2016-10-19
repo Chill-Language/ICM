@@ -526,10 +526,10 @@ namespace ICM
 			F(System::println, S({}, T_List)),               // Void -> L
 			F(System::println, S({ T_Vary }, T_List, true)), // Var* -> L
 		});
-		DefFuncTable.add("p", Lst{
-			F(System::p, S({}, T_List)),               // Void -> L
-			F(System::p, S({ T_Vary }, T_List, true)), // Var* -> L
-		});
+		//DefFuncTable.add("p", Lst{
+		//	F(System::p, S({}, T_List)),               // Void -> L
+		//	F(System::p, S({ T_Vary }, T_List, true)), // Var* -> L
+		//});
 		DefFuncTable.add("dcall", Lst{
 			F(System::dcall, S({ T_Vary, T_Function, T_Vary }, T_Vary)), // (Var F Var) -> Var
 		});

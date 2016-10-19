@@ -23,6 +23,7 @@ namespace ICM
 	}
 
 	BijectionKVMap<string, KeywordID> DefKeywordTable = {
+		{ "p",        KeywordID::PTI      },
 		{ "let",      KeywordID::LET      },
 		{ "cpy",      KeywordID::CPY      },
 		{ "ref",      KeywordID::REF      },

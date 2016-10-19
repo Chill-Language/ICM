@@ -19,6 +19,7 @@ namespace ICM
 				JUMP, JUMPNOT,
 				FUNC,
 				AT,
+				PTI, // print ident
 				LET, CPY, REF,
 				CALL, CCAL, CHKT,
 				CPYS, REFS,
@@ -43,6 +44,7 @@ namespace ICM
 				case JUMPNOT:  str.append("JMPN"); break;
 				case FUNC:     str.append("FUNC"); break;
 				case AT:       str.append("AT  "); break;
+				case PTI:      str.append("PTI "); break;
 				case LET:      str.append("LET "); break;
 				case CPY:      str.append("CPY "); break;
 				case REF:      str.append("REF "); break;
@@ -238,6 +240,30 @@ namespace ICM
 			}
 		};
 
+		class OrderDataPrintIdent : public OrderData
+		{
+		public:
+			OrderDataPrintIdent(const vector<size_t> &dat) : data(dat) {}
+			OrderData::Order order() const { return OrderData::PTI; }
+			const vector<size_t>& getData() const { return data; }
+
+		private:
+			vector<size_t> data;
+			string getToString() const {
+				string str;
+				for (auto &i : data) {
+					str.push_back('{');
+					str.append(std::to_string(i));
+					str.append("}, ");
+				}
+				if (!data.empty()) {
+					str.pop_back();
+					str.pop_back();
+				}
+				return str;
+			}
+		};
+
 		class OrderDataLetBase : public OrderData
 		{
 		public:
@@ -341,7 +367,7 @@ namespace ICM
 			OrderDataLargeEqual(ObjectPtr objptr, size_t id) : OrderDataCompare(objptr, id) {}
 			OrderData::Order order() const { return OrderData::LAE; }
 		};
-		
+
 		class OrderDataInc : public OrderData
 		{
 		public:
