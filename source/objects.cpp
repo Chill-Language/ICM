@@ -70,7 +70,7 @@ namespace ICM
 	string to_string(const void *data) {
 		using std::to_string;
 		using Common::Convert::to_string;
-		using Objects::to_string;
+		using TypeBase::to_string;
 		return to_string(*get<_TU>((void*)data));
 	}
 	template <>
@@ -87,11 +87,11 @@ namespace ICM
 	}
 	template <TypeUnit _TU>
 	string to_output(const void *data) {
-		return Objects::to_output<typename TType<_TU>::Type>(*get<_TU>((void*)data));
+		return TypeBase::to_output<typename TType<_TU>::Type>(*get<_TU>((void*)data));
 	}
 	template <TypeUnit _TU>
 	string to_string_code(const void *data) {
-		return Objects::to_string_code<typename TType<_TU>::Type>(*get<_TU>((void*)data));
+		return TypeBase::to_string_code<typename TType<_TU>::Type>(*get<_TU>((void*)data));
 	}
 	template <>
 	string to_output<T_Test>(const void *data) {
@@ -148,6 +148,7 @@ namespace ICM
 	map<TypeUnit, TypeInfo> TypeInfoTable = {
 		TypeInfoPair<T_Number>(),
 		TypeInfoPair<T_Null>(),
+		TypeInfoPair<T_Keyword>(),
 		TypeInfoPair<T_String>(),
 		TypeInfoPair<T_Boolean>(),
 		TypeInfoPair<T_Function>(),
@@ -185,7 +186,7 @@ namespace ICM
 		TypeInfoPair<T_Test>(),
 	};
 
-	namespace Objects
+	namespace TypeBase
 	{
 		//=======================================
 		// * Class List
@@ -228,21 +229,21 @@ namespace ICM
 
 		void IdentifierType::setData(const ObjectPtr &op) {
 			if (op->type == T_Identifier)
-				data = op.get<Identifier>()->getData().getData();
+				data = op.get<Objects::Identifier>()->getData().getData();
 			else
 				data = op;
 		}
 		void IdentifierType::setCopy(const ObjectPtr &op) {
-			if (op.isType<Identifier>())
-				setCopy(op.get<Identifier>()->getData().getData());
+			if (op.isType<Objects::Identifier>())
+				setCopy(op.get<Objects::Identifier>()->getData().getData());
 			else
 				data = ObjectPtr(op->clone());
 		}
 		void IdentifierType::setRefer(const ObjectPtr &op) {
 			if (op->type == T_Identifier) {
-				const ObjectPtr &sop = op.get<Identifier>()->getData().getData();
-				const ObjectPtr &refop = sop.isType<Identifier>() ? sop : op;
-				const ObjectPtr &refopdata = refop.get<Identifier>()->getData().getData();
+				const ObjectPtr &sop = op.get<Objects::Identifier>()->getData().getData();
+				const ObjectPtr &refop = sop.isType<Objects::Identifier>() ? sop : op;
+				const ObjectPtr &refopdata = refop.get<Objects::Identifier>()->getData().getData();
 				if (data.get() != refopdata.get())
 					data = refop;
 				else
@@ -340,7 +341,7 @@ namespace ICM
 	}
 	// Create Error
 	ObjectPtr createError(const string &errinfo) {
-		return ObjectPtr(new Objects::Error(Objects::ErrorType(errinfo)));
+		return ObjectPtr(new Objects::Error(TypeBase::ErrorType(errinfo)));
 	}
 	// Adjust ObjectPtr
 	const ObjectPtr& adjustObjectPtr(const ObjectPtr &op) {

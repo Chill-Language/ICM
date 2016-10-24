@@ -9,7 +9,7 @@
 
 namespace ICM
 {
-	namespace Objects
+	namespace TypeBase
 	{
 		template <typename T>
 		string to_string(const T &t) {
@@ -26,43 +26,6 @@ namespace ICM
 		string to_string_code(const T &t) {
 			return to_string<T>(t);
 		}
-
-		//=======================================
-		// * Class DataObject<T, _Type>
-		//=======================================
-		template <typename T, DefaultType _Type>
-		class DataObject : public Object
-		{
-		public:
-			using VType = T;
-			static const DefaultType Type = _Type;
-		public:
-			DataObject() : Object(_Type) { this->data = new T(); }
-			DataObject(const T &dat) : Object(_Type) { this->data = new T(dat); }
-			DataObject(const DataObject &dot) : Object(_Type) {
-				this->data = new T(dot._ref());
-			}
-
-			T& getData() {
-				return _ref();
-			}
-			const T& getData() const {
-				return _ref();
-			}
-			//-----------------------------------
-			// + Inherited
-			//-----------------------------------
-			// Method
-			DataObject* clone() const {
-				return new DataObject(*this);
-			}
-
-		private:
-			const T* _ptr() const { return Object::_ptr<T>(); }
-			T* _ptr() { return Object::_ptr<T>(); }
-			const T& _ref() const { return Object::_ref<T>(); }
-			T& _ref() { return Object::_ref<T>(); }
-		};
 
 		//=======================================
 		// * Class List
@@ -159,7 +122,7 @@ namespace ICM
 		//=======================================
 		// * Class Function
 		//=======================================
-		class FunctionType : public Object
+		class FunctionType
 		{
 		public:
 			FunctionType() {}
@@ -168,6 +131,9 @@ namespace ICM
 				return DefFuncTable[data];
 			}
 			string to_string() const {
+				return "F(" + get_data().getName() + ")";
+			}
+			string to_output() const {
 				return "F(" + get_data().getName() + ")";
 			}
 			string to_string_code() const {
@@ -195,7 +161,7 @@ namespace ICM
 		//=======================================
 		// * Class Identifier
 		//=======================================
-		class IdentifierType : public Object
+		class IdentifierType
 		{
 		public:
 			explicit IdentifierType(const std::string &name = "") : name(name) {}
@@ -240,21 +206,61 @@ namespace ICM
 		template <> string to_string<IdentifierType>(const IdentifierType &it);
 		template <> string to_output<IdentifierType>(const IdentifierType &it);
 		template <> string to_string_code<IdentifierType>(const IdentifierType &it);
+	}
+
+	namespace Objects
+	{
+		//=======================================
+		// * Class DataObject<T, _Type>
+		//=======================================
+		template <typename T, DefaultType _Type>
+		class DataObject : public Object
+		{
+		public:
+			using VType = T;
+			static const DefaultType Type = _Type;
+		public:
+			DataObject() : Object(_Type) { this->data = new T(); }
+			DataObject(const T &dat) : Object(_Type) { this->data = new T(dat); }
+			DataObject(const DataObject &dot) : Object(_Type) {
+				this->data = new T(dot._ref());
+			}
+
+			T& getData() {
+				return _ref();
+			}
+			const T& getData() const {
+				return _ref();
+			}
+			//-----------------------------------
+			// + Inherited
+			//-----------------------------------
+			// Method
+			DataObject* clone() const {
+				return new DataObject(*this);
+			}
+
+		private:
+			const T* _ptr() const { return Object::_ptr<T>(); }
+			T* _ptr() { return Object::_ptr<T>(); }
+			const T& _ref() const { return Object::_ref<T>(); }
+			T& _ref() { return Object::_ref<T>(); }
+		};
 
 		class Nil;
-		using Error = DataObject<ErrorType, T_Error>;
+		using Error = DataObject<TypeBase::ErrorType, T_Error>;
 		using Boolean = DataObject<bool, T_Boolean>;
 		using Number = DataObject<Common::Number::Rational, T_Number>;
 		using String = DataObject<string, T_String>;
 
-		using List = DataObject<ListType, T_List>;
-		using Disperse = DataObject<DisperseType, T_Disperse>;
+		using List = DataObject<TypeBase::ListType, T_List>;
+		using Disperse = DataObject<TypeBase::DisperseType, T_Disperse>;
 		using Keyword = DataObject<KeywordID, T_Keyword>;
-		using Function = DataObject<FunctionType, T_Function>;
-		class Identifier : public DataObject<IdentifierType, T_Identifier> {
+		using Function = DataObject<TypeBase::FunctionType, T_Function>;
+		class Identifier : public DataObject<TypeBase::IdentifierType, T_Identifier> {
 		public:
-			Identifier() : DataObject<IdentifierType, T_Identifier>() {}
-			Identifier(const IdentifierType &it) : DataObject<IdentifierType, T_Identifier>(it) {}
+			Identifier() : DataObject<TypeBase::IdentifierType, T_Identifier>() {}
+			Identifier(const TypeBase::IdentifierType &it) : DataObject<TypeBase::IdentifierType, T_Identifier>(it) {}
 		};
 	}
 
@@ -294,21 +300,21 @@ namespace ICM
 		DEFTYPE(Nil, VoidType);
 		DEFTYPE(Vary, VoidType);
 		DEFTYPE(Void, VoidType);
-		DEFTYPE(Error, Objects::ErrorType);
-		DEFTYPE(List, Objects::ListType);
-		DEFTYPE(Disperse, Objects::DisperseType);
+		DEFTYPE(Error, TypeBase::ErrorType);
+		DEFTYPE(List, TypeBase::ListType);
+		DEFTYPE(Disperse, TypeBase::DisperseType);
 		// Literal Types
 		DEFTYPE(Boolean, bool);
-		DEFTYPE(Identifier, Objects::IdentifierType);
+		DEFTYPE(Identifier, TypeBase::IdentifierType);
 		DEFTYPE(Number, Common::Number::Rational);
 		DEFTYPE(String, string);
 		DEFTYPE(Symbol, string);
 		// Identifier Types
-		DEFTYPE(Function, Objects::FunctionType);
+		DEFTYPE(Function, TypeBase::FunctionType);
 		DEFTYPE(Keyword, KeywordID);
-		DEFTYPE(Reference, Objects::IdentifierType);
-		DEFTYPE(Type, Objects::IdentifierType);
-		DEFTYPE(Variable, Objects::IdentifierType);
+		DEFTYPE(Reference, TypeBase::IdentifierType);
+		DEFTYPE(Type, TypeBase::IdentifierType);
+		DEFTYPE(Variable, TypeBase::IdentifierType);
 		// Compile Types (Platform Dependent)
 		DEFTYPE(Int, int);
 		DEFTYPE(UInt, unsigned int);

@@ -157,7 +157,7 @@ namespace ICM
 				object = new String(str);
 				break;
 			case ICM::MT_Identifier:
-				object = new Identifier(IdentifierType(str));
+				object = new Identifier(TypeBase::IdentifierType(str));
 				break;
 			case ICM::MT_Keyword:
 				object = new Keyword(DefKeywordTable.getValue(str));
@@ -210,7 +210,7 @@ namespace ICM
 					break;
 				case MT_LSBracket:
 					ast.pushNode();
-					ast.pushData(new Objects::Function(FunctionType(DefFuncTable.find("list"))));
+					ast.pushData(new Objects::Function(TypeBase::FunctionType(DefFuncTable.find("list"))));
 					firstMatchBraket = false;
 					emptybreak = true;
 					break;

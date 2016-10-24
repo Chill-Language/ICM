@@ -6,6 +6,7 @@
 namespace ICM
 {
 	using namespace Objects;
+	using namespace TypeBase;
 
 	namespace DefFunc
 	{

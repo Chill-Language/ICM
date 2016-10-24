@@ -53,7 +53,7 @@ namespace ICM
 	// For Testing Speed
 #if USE_RAW_POINTER
 	DefaultType ObjectPtr::type() const {
-		return data->getType();
+		return (DefaultType)data->type;
 	}
 #else
 	ObjectPtr::ObjectPtr(Objects::Object* op) {

@@ -564,7 +564,7 @@ namespace ICM
 			std::string name = ident->getData().getName();
 			size_t i;
 			if ((i = DefFuncTable.find(name))) {
-				op = ObjectPtr(new Objects::Function(Objects::FunctionType(i)));
+				op = ObjectPtr(new Objects::Function(TypeBase::FunctionType(i)));
 			}
 			else if ((i = DefVariableTable.find(name))) {
 				op = ObjectPtr(DefVariableTable[i].getData());
