@@ -8,7 +8,7 @@ namespace ICM
 	//=======================================
 	// * Class ObjectManager
 	//=======================================
-	size_t ObjectManager::newObjectPtr(Objects::Object *obj) {
+	size_t ObjectManager::newObjectPtr(Object *obj) {
 		TypeUnit typeID = obj->type;
 		auto &table = ObjectTypePool[typeID];
 		size_t id = table.currentIndex();
@@ -26,7 +26,7 @@ namespace ICM
 		return id;
 	}
 	void ObjectManager::destroyObjectPtr(DefaultType typeID, size_t id) {
-		Objects::Object *obj = getObjectPtr(typeID, id);
+		Object *obj = getObjectPtr(typeID, id);
 		if (GlobalConfig.PrintObjectAllot)
 			println("Destroy : ", to_string(typeID), ",", id, "; V : ", obj->to_string());
 		ObjectTypePool[typeID].eraseID(id);
@@ -56,7 +56,7 @@ namespace ICM
 		return (DefaultType)data->type;
 	}
 #else
-	ObjectPtr::ObjectPtr(Objects::Object* op) {
+	ObjectPtr::ObjectPtr(Object* op) {
 		if (op == nullptr) {
 			this->_type = T_Null;
 			this->_index = 0;

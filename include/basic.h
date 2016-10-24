@@ -12,6 +12,7 @@
 #include <functional>
 #include <algorithm>
 #include <initializer_list>
+#include <cassert>
 //  common
 #include "file.h"
 #include "prints.h"

@@ -58,7 +58,7 @@ namespace ICM
 				// If there was a crash, make sure that the pointer 'func' is effective.
 				return func(dl);
 			}
-			void callL(Objects::Object* &ro, const LDataList &l) const {
+			void callL(Object* &ro, const LDataList &l) const {
 				Lfunc(ro, l);
 			}
 
@@ -80,7 +80,7 @@ namespace ICM
 		//=======================================
 		class FuncInitObject
 		{
-			using LFP = Objects::Object*(const Common::lightlist<Objects::Object*> &); // TODO
+			using LFP = Object*(const Common::lightlist<Object*> &); // TODO
 		public:
 			FuncObject get_f() {
 				const auto &f1 = std::bind(&FuncInitObject::func, this, std::placeholders::_1);
@@ -91,7 +91,7 @@ namespace ICM
 		protected:
 			virtual Signature sign() const = 0;
 			virtual ObjectPtr func(const DataList &list) const = 0;
-			virtual void funcL(Objects::Object* &, const LDataList &) const {
+			virtual void funcL(Object* &, const LDataList &) const {
 				println("Error : Not find funcL.");
 			}
 		};

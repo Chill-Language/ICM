@@ -315,12 +315,12 @@ namespace ICM
 	// * Functions
 	//=======================================
 	// Create Object
-	Objects::Object* createObject(DefaultType type)
+	Object* createObject(DefaultType type)
 	{
 		using namespace Objects;
 		switch (type)
 		{
-		case ICM::T_Object:     return new Objects::Object;
+		case ICM::T_Object:     return new Object;
 		case ICM::T_Nil:        return new Nil;
 		case ICM::T_Error:      return new Error;
 		case ICM::T_Identifier: return new Identifier;
@@ -362,13 +362,16 @@ namespace ICM
 		else
 			return ICM::TypeObject(op.type());
 	}
-	// Get Disperse Iterator
-	vector<ObjectPtr>::iterator begin(Objects::Disperse *disp)
+	namespace Objects
 	{
-		return disp->getData().begin();
-	}
-	vector<ObjectPtr>::iterator end(Objects::Disperse *disp)
-	{
-		return disp->getData().end();
+		// Get Disperse Iterator
+		vector<ObjectPtr>::iterator begin(Objects::Disperse *disp)
+		{
+			return disp->getData().begin();
+		}
+		vector<ObjectPtr>::iterator end(Objects::Disperse *disp)
+		{
+			return disp->getData().end();
+		}
 	}
 }

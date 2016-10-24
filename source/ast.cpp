@@ -3,7 +3,7 @@
 
 namespace ICM
 {
-	ASTBase::Element ASTBase::Element::Data(Objects::Object *op) {
+	ASTBase::Element ASTBase::Element::Data(Object *op) {
 		Element r(E_Data);
 		r.setData(op);
 		return r;
@@ -13,13 +13,13 @@ namespace ICM
 		r.data.id = index;
 		return r;
 	}
-	void ASTBase::Element::setData(Objects::Object* op) {
+	void ASTBase::Element::setData(Object* op) {
 		data.op = new ObjectPtr(op);
 	}
 	//=======================================
 	// * Class AST
 	//=======================================
-	void AST::pushData(Objects::Object *op) {
+	void AST::pushData(Object *op) {
 		currptr->push_back(Element::Data(op));
 	}
 	void AST::pushNode() {

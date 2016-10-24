@@ -246,8 +246,13 @@ namespace ICM
 			const T& _ref() const { return Object::_ref<T>(); }
 			T& _ref() { return Object::_ref<T>(); }
 		};
+		
+		class Nil : public Object {
+		public:
+			Nil() : Object(T_Nil) {}
+			static const DefaultType Type = T_Nil;
 
-		class Nil;
+		};
 		using Error = DataObject<TypeBase::ErrorType, T_Error>;
 		using Boolean = DataObject<bool, T_Boolean>;
 		using Number = DataObject<Common::Number::Rational, T_Number>;
@@ -262,25 +267,9 @@ namespace ICM
 			Identifier() : DataObject<TypeBase::IdentifierType, T_Identifier>() {}
 			Identifier(const TypeBase::IdentifierType &it) : DataObject<TypeBase::IdentifierType, T_Identifier>(it) {}
 		};
-	}
 
-	vector<ObjectPtr>::iterator begin(Objects::Disperse *disp);
-	vector<ObjectPtr>::iterator end(Objects::Disperse *disp);
-
-	namespace Objects
-	{
-		//=======================================
-		// * Class Nil
-		//=======================================
-		class Nil : public Object
-		{
-		public:
-			Nil() : Object(T_Nil) {}
-
-			// Const
-			static const DefaultType Type = T_Nil;
-
-		};
+		vector<ObjectPtr>::iterator begin(Objects::Disperse *disp);
+		vector<ObjectPtr>::iterator end(Objects::Disperse *disp);
 	}
 
 	namespace Types

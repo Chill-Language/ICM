@@ -137,11 +137,11 @@ namespace ICM
 	{
 		using namespace Objects;
 
-		Objects::Object* createObject(MatchType type, const string &str)
+		Object* createObject(MatchType type, const string &str)
 		{
 			using namespace Objects;
 
-			Objects::Object *object;
+			Object *object;
 			switch (type)
 			{
 			//case ICM::MT_Nil:

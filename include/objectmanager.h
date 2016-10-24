@@ -7,7 +7,7 @@
 
 namespace ICM
 {
-	namespace Objects { struct Object; }
+	struct Object;
 
 	//=======================================
 	// * Class ObjectManager
@@ -20,10 +20,10 @@ namespace ICM
 			ObjectTypeCount[T_Null].push_back(0);
 		}
 
-		size_t newObjectPtr(Objects::Object *obj);
+		size_t newObjectPtr(Object *obj);
 		void destroyObjectPtr(DefaultType typeID, size_t id);
 
-		template <typename _OTy = Objects::Object>
+		template <typename _OTy = Object>
 		_OTy* getObjectPtr(DefaultType typeID, size_t id) {
 			return ObjectTypePool[typeID].getKey(id);
 		}
@@ -32,7 +32,7 @@ namespace ICM
 		void decreaseCount(DefaultType typeID, size_t id);
 
 	private:
-		using ObjectPool = SerialBijectionMap<Objects::Object*>;
+		using ObjectPool = SerialBijectionMap<Object*>;
 		vector<ObjectPool> ObjectTypePool;
 		vector<vector<size_t>> ObjectTypeCount;
 	};
@@ -50,19 +50,19 @@ namespace ICM
 	class ObjectPtr
 	{
 	public:
-		explicit ObjectPtr(Objects::Object *op = nullptr);
+		explicit ObjectPtr(Object *op = nullptr);
 		ObjectPtr(const ObjectPtr &op);
 		~ObjectPtr();
 		ObjectPtr& operator=(const ObjectPtr &op);
 
-		Objects::Object* get() const {
+		Object* get() const {
 			return GlobalObjectManager.getObjectPtr(this->_type, this->_index);
 		}
 		template <typename _OTy>
 		_OTy* get() const {
 			return static_cast<_OTy*>(this->get());
 		}
-		Objects::Object* operator->() const {
+		Object* operator->() const {
 			return get();
 		}
 
@@ -97,10 +97,10 @@ namespace ICM
 	public:
 		ObjectPtr() : data(nullptr) {}
 		ObjectPtr(nullptr_t) : data(nullptr) {}
-		ObjectPtr(Objects::Object *obj) : data(obj) {}
+		ObjectPtr(Object *obj) : data(obj) {}
 		ObjectPtr(const ObjectPtr &op) : data(op.data) {}
 
-		Objects::Object* get() const {
+		Object* get() const {
 			return data;
 		}
 		template <typename _OTy>
@@ -121,14 +121,14 @@ namespace ICM
 		operator bool() const {
 			return type() != T_Null;
 		}
-		Objects::Object* operator->() const {
+		Object* operator->() const {
 			return data;
 		}
 		string to_string() const;
 		string to_output() const;
 		DefaultType type() const;
 
-		Objects::Object *data;
+		Object *data;
 	};
 #endif
 
@@ -137,7 +137,7 @@ namespace ICM
 	//=======================================
 	class ObjectPool
 	{
-		using Object = Objects::Object;
+		using Object = Object;
 	public:
 		struct ObjectPoolPtr
 		{

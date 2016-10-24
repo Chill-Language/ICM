@@ -19,7 +19,7 @@ namespace ICM
 			Element(EleType type) : type(type) {}
 			//~Element() { if (isData()) delete data.op; }
 
-			static Element Data(Objects::Object *op);
+			static Element Data(Object *op);
 			static Element Refer(size_t index);
 
 			EleType getType() const { return type; }
@@ -29,7 +29,7 @@ namespace ICM
 
 			// Get/Set
 			ObjectPtr& getData() const { return *data.op; }
-			void setData(Objects::Object* op);
+			void setData(Object* op);
 
 			size_t getRefer() const { return data.id; }
 			void setRefer(size_t id) { data.id = id; }
@@ -71,7 +71,7 @@ namespace ICM
 	public:
 		AST() : root(new Node(0)), currindex(1), table({ root }), currptr(root.get()) {}
 
-		void pushData(Objects::Object *op);
+		void pushData(Object *op);
 		void pushNode();
 		bool retNode();
 		AST* reset() {

@@ -25,7 +25,7 @@ namespace ICM
 		using S = ICM::Function::Signature;
 		using T = ICM::TypeObject;
 
-		using ObjectLightList = Common::lightlist<Objects::Object*>;
+		using ObjectLightList = Common::lightlist<Object*>;
 
 		//=======================================
 		// * Calculate
@@ -46,7 +46,7 @@ namespace ICM
 						tmp->getData().operator+=(list[i].get<T>()->getData());
 					return ObjectPtr(tmp);
 				}
-				void funcL(Objects::Object &result, const LDataList &list) const {
+				void funcL(Object &result, const LDataList &list) const {
 					T *tmp = static_cast<T*>(list.front()->clone());
 					for (auto i : Range<size_t>(1, list.size()))
 						tmp->getData().operator+=(static_cast<T*>(list[i])->getData());
@@ -161,10 +161,10 @@ namespace ICM
 					bool result = fp(list[0].get<N>()->getData(), list[1].get<N>()->getData());
 					return ObjectPtr(new Boolean(result));
 				}
-				void funcL(Objects::Object* &result, const LDataList &list) const {
+				void funcL(Object* &result, const LDataList &list) const {
 					funcB(result, list[0], list[1]);
 				}
-				void funcB(Objects::Object* &result, Objects::Object *a, Objects::Object *b) const {
+				void funcB(Object* &result, Object *a, Object *b) const {
 					bool r = fp(static_cast<N*>(a)->getData(), static_cast<N*>(b)->getData());
 					result = new Boolean(r);
 				}
@@ -279,7 +279,7 @@ namespace ICM
 				const auto &rf = func[id];
 
 				List *list = dl[0].get<List>();
-				Objects::Object *r;
+				Object *r;
 				std::sort(list->getData().begin(), list->getData().end(), [&](const ObjectPtr &a, const ObjectPtr &b) -> bool {
 					rf.callL(r, { a.get(), b.get() });
 					bool rr = static_cast<Boolean*>(r)->getData();
@@ -321,7 +321,7 @@ namespace ICM
 					for (auto i : range(1, size))
 						minsize = std::min(minsize, list[i].get<List>()->getData().size());
 					vector<ObjectPtr> dls;
-					Objects::Object obj;
+					Object obj;
 					for (size_t i : range(0, minsize)) {
 						DataList ldl(size - 1);
 						for (auto id : range(1, size))
