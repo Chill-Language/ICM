@@ -9,7 +9,7 @@ namespace ICM
 	// * Class ObjectManager
 	//=======================================
 	size_t ObjectManager::newObjectPtr(Objects::Object *obj) {
-		DefaultType typeID = obj->getType();
+		TypeUnit typeID = obj->type;
 		auto &table = ObjectTypePool[typeID];
 		size_t id = table.currentIndex();
 		bool res = table.insert(obj);
@@ -22,7 +22,7 @@ namespace ICM
 			id = table.findKey(obj);
 		}
 		if (GlobalConfig.PrintObjectAllot)
-			println("New : ", to_string(typeID), ",", id, " V : ", obj->to_string());
+			println("New : ", to_string((DefaultType)typeID), ",", id, " V : ", obj->to_string());
 		return id;
 	}
 	void ObjectManager::destroyObjectPtr(DefaultType typeID, size_t id) {
@@ -62,7 +62,7 @@ namespace ICM
 			this->_index = 0;
 		}
 		else {
-			this->_type = op->getType();
+			this->_type = (DefaultType)op->type;
 			this->_index = GlobalObjectManager.newObjectPtr(op);
 		}
 		GlobalObjectManager.increaseCount(this->_type, this->_index);
@@ -104,7 +104,7 @@ namespace ICM
 				delete p;
 	}
 	ObjectPool::ObjectPoolPtr ObjectPool::set(Object *op) {
-		DefaultType type = op->getType();
+		DefaultType type = (DefaultType)op->type;
 		size_t index = data[type].size();
 		data[type].push_back(op);
 		return ObjectPoolPtr(type, index);
@@ -116,25 +116,25 @@ namespace ICM
 
 	}
 	void ObjectPool::write(File &file) const {
-		for (auto i : Range<size_t>(T_Null, END_TYPE_ENUM)) {
-			file.write<int32_t>(i);
-			file.write<int32_t>(data[i].size());
-			for (auto *op : data[i])
-				op->write(file);
-		}
+		//for (auto i : Range<size_t>(T_Null, END_TYPE_ENUM)) {
+		//	file.write<int32_t>(i);
+		//	file.write<int32_t>(data[i].size());
+		//	for (auto *op : data[i])
+		//		op->write(file);
+		//}
 	}
 	void ObjectPool::read(File &file) {
-		int32_t type;
-		int32_t size;
-		for (auto i : Range<size_t>(T_Null, END_TYPE_ENUM)) {
-			file.read(type);
-			file.read(size);
-			data[i].resize(size);
-			for (auto &op : data[i]) {
-				op = createObject((DefaultType)type);
-				op->read(file);
-			}
-		}
+	//	int32_t type;
+	//	int32_t size;
+	//	for (auto i : Range<size_t>(T_Null, END_TYPE_ENUM)) {
+	//		file.read(type);
+	//		file.read(size);
+	//		data[i].resize(size);
+	//		for (auto &op : data[i]) {
+	//			op = createObject((DefaultType)type);
+	//			op->read(file);
+	//		}
+	//	}
 	}
 
 	//=======================================

@@ -9,22 +9,26 @@ namespace ICM
 	// ToString
 	string to_string(DefaultType type)
 	{
-		switch (type) {
-		case T_Null:       return "Null";
-		case T_Object:     return "Object";
-		case T_Nil:        return "Nil";
-		case T_Identifier: return "Identifier";
-		case T_Keyword:    return "Keyword";
-		case T_Number:     return "Number";
-		case T_Boolean:    return "Boolean";
-		case T_String:     return "String";
-		case T_Symbol:     return "Symbol";
-		case T_List:       return "List";
-		case T_Disperse:   return "Disperse";
-		case T_Vary:       return "Vary";
-		case T_Function:   return "Function";
-		case T_Type:       return "Type";
-		default:           return "UnfoundType";
+		if (TypeInfoTable.find(type) != TypeInfoTable.end())
+			return TypeInfoTable[type].name;
+		else {
+			switch (type) {
+			case T_Null:       return "Null";
+			case T_Object:     return "Object";
+			case T_Nil:        return "Nil";
+			case T_Identifier: return "Identifier";
+			case T_Keyword:    return "Keyword";
+			case T_Number:     return "Number";
+			case T_Boolean:    return "Boolean";
+			case T_String:     return "String";
+			case T_Symbol:     return "Symbol";
+			case T_List:       return "List";
+			case T_Disperse:   return "Disperse";
+			case T_Vary:       return "Vary";
+			case T_Function:   return "Function";
+			case T_Type:       return "Type";
+			default:           return "UnfoundType";
+			}
 		}
 	}
 	string to_string(MatchType type)

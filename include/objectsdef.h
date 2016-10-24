@@ -11,7 +11,6 @@ namespace ICM
 {
 	namespace Objects
 	{
-
 		template <typename T>
 		string to_string(const T &t) {
 			using Common::Convert::to_string;
@@ -54,42 +53,15 @@ namespace ICM
 			// + Inherited
 			//-----------------------------------
 			// Method
-			string to_string() const { // Delete
-				return toString();
-			}
-			string to_output() const { // Delete
-				return toOutput();
-			}
-			string to_string_code() const {
-				return toStringCode();
-			}
-			bool equ(const ObjectPtr &obj) const { // Delete
-				return equ(obj.get());
-			}
-			string toString() const {
-				return Objects::to_string(_ref());
-			}
-			string toOutput() const {
-				return Objects::to_output(_ref());
-			}
-			string toStringCode() const {
-				return Objects::to_string_code(_ref());
-			}
 			DataObject* clone() const {
 				return new DataObject(*this);
 			}
-			void set(const Object *op) {
-				_ref() = ((const DataObject*)op)->_ref();
-			}
-			bool equ(const Object* obj) const {
-				return _ref() == static_cast<const DataObject*>(obj)->_ref();
-			}
 
 		private:
-			const T* _ptr() const { return (const T*)this->data; }
-			T* _ptr() { return (T*)this->data; }
-			const T& _ref() const { return *_ptr(); }
-			T& _ref() { return *_ptr(); }
+			const T* _ptr() const { return Object::_ptr<T>(); }
+			T* _ptr() { return Object::_ptr<T>(); }
+			const T& _ref() const { return Object::_ref<T>(); }
+			T& _ref() { return Object::_ref<T>(); }
 		};
 
 		//=======================================
@@ -299,23 +271,81 @@ namespace ICM
 		public:
 			Nil() : Object(T_Nil) {}
 
-			//-----------------------------------
-			// + Inherited
-			//-----------------------------------
-			// Method
-			bool equ(const ObjectPtr &obj) const {
-				return true;
-			}
-			string to_string() const {
-				return "Nil";
-			}
-			Nil* clone() const {
-				return new Nil(*this);
-			}
 			// Const
 			static const DefaultType Type = T_Nil;
 
 		};
+	}
+
+	namespace Types
+	{
+		class VoidType {
+		public:
+			bool operator==(const VoidType&) const { return true; }
+		};
+	}
+
+	namespace Types
+	{
+#define DEFTYPE(_TE, _T) template <> struct TType<T_##_TE> { using Type = _T;  static TypeName Name; }; using _TE = TType<T_##_TE>::Type;
+
+		DEFTYPE(Null, VoidType);
+		DEFTYPE(Object, VoidType);
+		DEFTYPE(Nil, VoidType);
+		DEFTYPE(Vary, VoidType);
+		DEFTYPE(Void, VoidType);
+		DEFTYPE(Error, Objects::ErrorType);
+		DEFTYPE(List, Objects::ListType);
+		DEFTYPE(Disperse, Objects::DisperseType);
+		// Literal Types
+		DEFTYPE(Boolean, bool);
+		DEFTYPE(Identifier, Objects::IdentifierType);
+		DEFTYPE(Number, Common::Number::Rational);
+		DEFTYPE(String, string);
+		DEFTYPE(Symbol, string);
+		// Identifier Types
+		DEFTYPE(Function, Objects::FunctionType);
+		DEFTYPE(Keyword, KeywordID);
+		DEFTYPE(Reference, Objects::IdentifierType);
+		DEFTYPE(Type, Objects::IdentifierType);
+		DEFTYPE(Variable, Objects::IdentifierType);
+		// Compile Types (Platform Dependent)
+		DEFTYPE(Int, int);
+		DEFTYPE(UInt, unsigned int);
+		DEFTYPE(Short, short);
+		DEFTYPE(UShort, unsigned short);
+		DEFTYPE(Long, long);
+		DEFTYPE(ULong, unsigned long);
+		DEFTYPE(LLong, long long);
+		DEFTYPE(ULLong, unsigned long long);
+		DEFTYPE(Float, float);
+		DEFTYPE(Double, double);
+		DEFTYPE(LDouble, long double);
+		DEFTYPE(CPointer, void*);
+		// Compile Types (Platform Independent)
+		DEFTYPE(Byte, byte);
+		DEFTYPE(Word, word);
+		DEFTYPE(DWord, dword);
+		DEFTYPE(QWord, qword);
+		DEFTYPE(Int8, int8_t);
+		DEFTYPE(Int16, int16_t);
+		DEFTYPE(Int32, int32_t);
+		DEFTYPE(Int64, int64_t);
+		DEFTYPE(UInt8, uint8_t);
+		DEFTYPE(UInt16, uint16_t);
+		DEFTYPE(UInt32, uint32_t);
+		DEFTYPE(UInt64, uint64_t);
+		// Test
+		struct Test
+		{
+			Test() { println("Init Test"); }
+			~Test() { println("Destory Test"); }
+			Test(const Test &) { println("Copy Test"); }
+			bool operator==(const Test&) const { return true; }
+		};
+		DEFTYPE(Test, Test);
+
+#undef DEFTYPE
 	}
 }
 

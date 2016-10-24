@@ -229,21 +229,13 @@ namespace ICM
 	}
 }
 
+namespace ICM
+{
+
+}
+
 void test()
 {
-	/*Types::TypeObject to;
-	to.data = T_Number;
-	//to.setmult();
-	//to.setconst();
-	//to.setstatic();
-	//to.setrepeat();
-	to.setvolatile();
-	println(to);
-
-	FunctionNew::Signature sign({ to, to }, to);
-	println(sign);
-	*/
-
 	//test2();
 	//testSub();
 	//exit(0);

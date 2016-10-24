@@ -220,7 +220,7 @@ namespace ICM
 			case OrderData::EQU: {
 				ASTOrder::OrderDataEqu *p = static_cast<ASTOrder::OrderDataEqu*>(e);
 				Objects::Identifier *ident = p->getData().get<Objects::Identifier>();
-				bool r = ident->getData().getRealData()->equ(tempresult[p->getRefid()]);
+				bool r = ident->getData().getRealData()->equ(tempresult[p->getRefid()].get());
 				tempresult[ProgramCounter] = ObjectPtr(new Objects::Boolean(r));
 				Result = tempresult[ProgramCounter];
 				break;

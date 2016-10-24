@@ -183,7 +183,7 @@ namespace ICM
 				ObjectPtr func(const DataList &list) const {
 					auto &nn1 = adjustObjectPtr(list[0]);
 					auto &nn2 = adjustObjectPtr(list[1]);
-					return ObjectPtr(new Boolean(nn1->equ(nn2)));
+					return ObjectPtr(new Boolean(nn1->equ(nn2.get())));
 				}
 			};
 		}

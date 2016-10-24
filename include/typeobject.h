@@ -48,7 +48,7 @@ namespace ICM
 
 	private:
 		DefaultType type;
-		Function::Signature* sign;
+		Function::Signature* sign = nullptr;
 		const FuncTableUnit *functableunit = nullptr;
 	};
 

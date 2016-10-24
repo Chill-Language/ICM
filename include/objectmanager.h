@@ -7,7 +7,7 @@
 
 namespace ICM
 {
-	namespace Objects { class Object; }
+	namespace Objects { struct Object; }
 
 	//=======================================
 	// * Class ObjectManager

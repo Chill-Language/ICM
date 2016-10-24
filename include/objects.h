@@ -7,58 +7,125 @@
 
 namespace ICM
 {
+	//===========================================================
+	// * Namespace Types
+	//===========================================================
+	namespace Types
+	{
+		//===========================================================
+		// * Template TType
+		//===========================================================
+		using TypeName = const char* const;
+		template <TypeUnit> struct TType { using Type = void; static TypeName Name; };
+	}
+	template <TypeUnit T> using TType = Types::TType<T>;
+
+	struct TypeInfo
+	{
+		using TosFunc = std::string(const void*);
+		using EquFunc = bool(const void*, const void*);
+
+		TypeUnit index;
+		const char* name;
+		size_t size;
+
+		EquFunc* equal;
+
+		TosFunc* to_string;
+		TosFunc* to_output;
+		TosFunc* to_string_code;
+
+		void* alloc() const {
+			//println("Call Alloc.");
+			return std::malloc(size);
+		}
+		void* copy(const void *src) const {
+			//println("Call Copy.");
+			return std::memcpy(alloc(), src, size);
+		}
+	};
+	extern map<TypeUnit, TypeInfo> TypeInfoTable;
+
 	namespace Objects
 	{
-		//=======================================
-		// * Class Object
-		//=======================================
-		class Object
+		//=============================================
+		// * Struct Object
+		//---------------------------------------------
+		//   Object is a struct with a type & a data.
+		//=============================================
+		struct Object
 		{
-			using TypeUnit = size_t;
 		public:
 			Object(TypeUnit type = T_Null) : type(type) {}
 
-			virtual ~Object() {}
-			virtual string to_string() const {
+			string to_string() const {
+				if (TypeInfoTable.find(type) != TypeInfoTable.end())
+					return TypeInfoTable[type].to_string(data);
+				else
+					println("Error info for type(", (DefaultType)type, ").");
+
 				return "Object";
 			}
-			virtual string to_output() const {
-				return to_string();
+			string to_output() const {
+				if (TypeInfoTable.find(type) != TypeInfoTable.end())
+					return TypeInfoTable[type].to_output(data);
+				else
+					println("Error info for type(", (DefaultType)type, ").");
+
+				return "Object";
 			}
-			virtual string to_string_code() const {
-				return to_string();
+			string to_string_code() const {
+				if (TypeInfoTable.find(type) != TypeInfoTable.end())
+					return TypeInfoTable[type].to_string_code(data);
+				else
+					println("Error info for type(", (DefaultType)type, ").");
+
+				return "Object";
 			}
-			virtual DefaultType getType() const {
-				return (DefaultType)type;
+			
+			Object* clone() const {
+				Object *p = new Object(type);
+				if (data == nullptr)
+					return p;
+				if (TypeInfoTable.find(type) != TypeInfoTable.end())
+					p->data = TypeInfoTable[type].copy(data);
+				else
+					println("Error size for type(", (DefaultType)type, ").");
+				return p;
 			}
-			virtual Object* clone() const {
-				return new Object(*this);
+			void set(const Object *op) {
+				if (TypeInfoTable.find(type) != TypeInfoTable.end())
+					this->data = TypeInfoTable[type].copy(op->data);
+				else
+					println("Error size for type(", (DefaultType)type, ").");
 			}
-			virtual void set(const Object *) {}
 			// Method
-			virtual bool equ(const ObjectPtr &obj) const {
-				return this == obj.get();
+			bool equ(const Object *obj) const {
+				if (TypeInfoTable.find(type) == TypeInfoTable.end())
+					println("Error size for type(", (DefaultType)type, ").");
+				return this == obj || (this->type == obj->type && TypeInfoTable[type].equal(this->data,obj->data));
 			}
-			virtual void write(File &file) const {}
-			virtual void read(File &file) {}
 			// Const
 			static const DefaultType Type = T_Object;
 
-		protected:
-			bool type_equal(const ObjectPtr &obj) const {
-				return this->getType() == obj->getType();
-			}
-
 		// New Change (Building):
 		public:
+			//template <typename T> T* get() { return _ptr<T>(); }
+			//template <typename T> const T* get() const { return _ptr<T>(); }
 
-			TypeUnit type;
-			void *data;
+			TypeUnit type = T_Null;
+			void *data = nullptr;
+			// All data should be copyable, have no shared resource.
+
+			// Methods for data
+			template <typename T> T* _ptr() { return static_cast<T*>(data); }
+			template <typename T> const T* _ptr() const { return static_cast<const T*>(data); }
+			template <typename T> T& _ref() { return *_ptr<T>(); }
+			template <typename T> const T& _ref() const { return *_ptr<T>(); }
 		};
 	}
 
 	// Types
-	using TypeUnit = size_t;
 	using DataList = lightlist<ObjectPtr>;
 	//using DataList = std::vector<ObjectPtr>;
 	using CallFunc = ObjectPtr(const DataList&);

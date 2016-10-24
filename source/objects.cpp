@@ -3,16 +3,190 @@
 
 namespace ICM
 {
+	//===========================================================
+	// * Namespace Types
+	//===========================================================
+	namespace Types
+	{
+#define DEFTYPENAME(_TE) TypeName TType<T_##_TE>::Name = #_TE;
+		//
+		DEFTYPENAME(Null);
+		DEFTYPENAME(Object);
+		DEFTYPENAME(Nil);
+		DEFTYPENAME(Vary);
+		DEFTYPENAME(Void);
+		DEFTYPENAME(Error);
+		DEFTYPENAME(List);
+		DEFTYPENAME(Disperse);
+		// Literal Types
+		DEFTYPENAME(Boolean);
+		DEFTYPENAME(Identifier);
+		DEFTYPENAME(Number);
+		DEFTYPENAME(String);
+		DEFTYPENAME(Symbol);
+		// Identifier Types
+		DEFTYPENAME(Function);
+		DEFTYPENAME(Keyword);
+		DEFTYPENAME(Reference);
+		DEFTYPENAME(Type);
+		DEFTYPENAME(Variable);
+		// Compile Types (Platform Dependent)
+		DEFTYPENAME(Int);
+		DEFTYPENAME(UInt);
+		DEFTYPENAME(Short);
+		DEFTYPENAME(UShort);
+		DEFTYPENAME(Long);
+		DEFTYPENAME(ULong);
+		DEFTYPENAME(LLong);
+		DEFTYPENAME(ULLong);
+		DEFTYPENAME(Float);
+		DEFTYPENAME(Double);
+		DEFTYPENAME(LDouble);
+		DEFTYPENAME(CPointer);
+		// Compile Types (Platform Independent)
+		DEFTYPENAME(Byte);
+		DEFTYPENAME(Word);
+		DEFTYPENAME(DWord);
+		DEFTYPENAME(QWord);
+		DEFTYPENAME(Int8);
+		DEFTYPENAME(Int16);
+		DEFTYPENAME(Int32);
+		DEFTYPENAME(Int64);
+		DEFTYPENAME(UInt8);
+		DEFTYPENAME(UInt16);
+		DEFTYPENAME(UInt32);
+		DEFTYPENAME(UInt64);
+		// Test
+		DEFTYPENAME(Test);
+#undef DEFTYPENAME
+	}
+
+	template <TypeUnit _TU>
+	typename TType<_TU>::Type* get(void *data) {
+		return static_cast<TType<_TU>::Type*>(data);
+	}
+
+	template <TypeUnit _TU>
+	string to_string(const void *data) {
+		using std::to_string;
+		using Common::Convert::to_string;
+		using Objects::to_string;
+		return to_string(*get<_TU>((void*)data));
+	}
+	template <>
+	string to_string<T_Test>(const void *data) {
+		return "Test";
+	}
+	template <>
+	string to_string<T_Nil>(const void *data) {
+		return "Nil";
+	}
+	template <>
+	string to_string<T_Null>(const void *data) {
+		return "Null";
+	}
+	template <TypeUnit _TU>
+	string to_output(const void *data) {
+		return Objects::to_output<typename TType<_TU>::Type>(*get<_TU>((void*)data));
+	}
+	template <TypeUnit _TU>
+	string to_string_code(const void *data) {
+		return Objects::to_string_code<typename TType<_TU>::Type>(*get<_TU>((void*)data));
+	}
+	template <>
+	string to_output<T_Test>(const void *data) {
+		return "Test";
+	}
+	template <>
+	string to_output<T_Nil>(const void *data) {
+		return "Nil";
+	}
+	template <>
+	string to_output<T_Null>(const void *data) {
+		return "Null";
+	}
+	template <>
+	string to_string_code<T_Test>(const void *data) {
+		return "Test";
+	}
+	template <>
+	string to_string_code<T_Nil>(const void *data) {
+		return "Nil";
+	}
+	template <>
+	string to_string_code<T_Null>(const void *data) {
+		return "Null";
+	}
+	template <TypeUnit _TU>
+	bool equal(const void *dat1, const void *dat2) {
+		using Type = typename TType<_TU>::Type;
+		return *(Type*)dat1 == *(Type*)dat2;
+	}
+
+	//=======================================
+	//=======================================
+
+	template <TypeUnit _TU>
+	TypeInfo initTypeInfo() {
+		return{
+			_TU,
+			TType<_TU>::Name,
+			sizeof(typename TType<_TU>::Type),
+			equal<_TU>,
+			to_string<_TU>,
+			to_output<_TU>,
+			to_string_code<_TU>,
+		};
+	}
+
+	template <TypeUnit _TU>
+	std::pair<TypeUnit, TypeInfo> TypeInfoPair() {
+		return{ _TU, initTypeInfo<_TU>() };
+	}
+
+	class NilType {};
+	map<TypeUnit, TypeInfo> TypeInfoTable = {
+		TypeInfoPair<T_Number>(),
+		TypeInfoPair<T_Null>(),
+		TypeInfoPair<T_String>(),
+		TypeInfoPair<T_Boolean>(),
+		TypeInfoPair<T_Function>(),
+		TypeInfoPair<T_Identifier>(),
+		TypeInfoPair<T_Error>(),
+		TypeInfoPair<T_Nil>(),
+		TypeInfoPair<T_List>(),
+		TypeInfoPair<T_Disperse>(),
+		//
+		TypeInfoPair<T_Int>(),
+		TypeInfoPair<T_UInt>(),
+		TypeInfoPair<T_Short>(),
+		TypeInfoPair<T_UShort>(),
+		TypeInfoPair<T_Long>(),
+		TypeInfoPair<T_ULong>(),
+		TypeInfoPair<T_LLong>(),
+		TypeInfoPair<T_ULLong>(),
+		TypeInfoPair<T_Float>(),
+		TypeInfoPair<T_Double>(),
+		TypeInfoPair<T_LDouble>(),
+		TypeInfoPair<T_CPointer>(),
+		//
+		TypeInfoPair<T_Byte>(),
+		TypeInfoPair<T_Word>(),
+		TypeInfoPair<T_DWord>(),
+		TypeInfoPair<T_QWord>(),
+		TypeInfoPair<T_Int8>(),
+		TypeInfoPair<T_Int16>(),
+		TypeInfoPair<T_Int32>(),
+		TypeInfoPair<T_Int64>(),
+		TypeInfoPair<T_UInt8>(),
+		TypeInfoPair<T_UInt16>(),
+		TypeInfoPair<T_UInt32>(),
+		TypeInfoPair<T_UInt64>(),
+		TypeInfoPair<T_Test>(),
+	};
+
 	namespace Objects
 	{
-		//=======================================
-		// * Class String
-		//=======================================
-
-		//=======================================
-		// * Class Symbol
-		//=======================================
-
 		//=======================================
 		// * Class List
 		//=======================================
@@ -53,7 +227,7 @@ namespace ICM
 		//=======================================
 
 		void IdentifierType::setData(const ObjectPtr &op) {
-			if (op->getType() == T_Identifier)
+			if (op->type == T_Identifier)
 				data = op.get<Identifier>()->getData().getData();
 			else
 				data = op;
@@ -65,7 +239,7 @@ namespace ICM
 				data = ObjectPtr(op->clone());
 		}
 		void IdentifierType::setRefer(const ObjectPtr &op) {
-			if (op->getType() == T_Identifier) {
+			if (op->type == T_Identifier) {
 				const ObjectPtr &sop = op.get<Identifier>()->getData().getData();
 				const ObjectPtr &refop = sop.isType<Identifier>() ? sop : op;
 				const ObjectPtr &refopdata = refop.get<Identifier>()->getData().getData();
@@ -158,7 +332,7 @@ namespace ICM
 		case ICM::T_Function:   return new Objects::Function;
 		case ICM::T_Type:       return nullptr; // TODO
 		case ICM::T_Boolean:    return new Boolean;
-		//case ICM::T_Symbol:     return new Symbol;
+			//case ICM::T_Symbol:     return new Symbol;
 		default:
 			println("Unfind Type.");
 			return nullptr;
@@ -178,9 +352,7 @@ namespace ICM
 	// Get TypeObject
 	TypeObject getTypeObject(const ObjectPtr &op)
 	{
-		if (op.isType(T_Identifier))
-			return ICM::TypeObject(T_Identifier, getTypeObject(op.get<Objects::Identifier>()->getData().getData()));
-		else if (op.isType(T_Function)) {
+		if (op.isType(T_Function)) {
 			TypeObject t(T_Function);
 			auto &ft = op.get<Objects::Function>()->getData().get_data();
 			t.setFuncTableUnit(&ft);
