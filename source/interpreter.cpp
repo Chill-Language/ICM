@@ -203,9 +203,9 @@ namespace ICM
 			case OrderData::CPYS: {
 				ASTOrder::OrderDataCpySingle *p = static_cast<ASTOrder::OrderDataCpySingle*>(e);
 				size_t id = p->getRefid();
-				Objects::Identifier temp;
-				temp.getData().setCopy(tempresult[id]);
-				tempresult[ProgramCounter] = temp.getData().getData();
+				Types::Identifier temp;
+				temp.setCopy(tempresult[id]);
+				tempresult[ProgramCounter] = temp.getData();
 				Result = tempresult[ProgramCounter];
 				break;
 			}

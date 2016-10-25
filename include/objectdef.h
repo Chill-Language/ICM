@@ -86,9 +86,6 @@ namespace ICM
 		public:
 			DataObject() : Object(_Type) { this->data = new T(); }
 			DataObject(const T &dat) : Object(_Type) { this->data = new T(dat); }
-
-			T& getData() { return Object::_ref<T>(); }
-			const T& getData() const { return Object::_ref<T>(); }
 		};
 		
 		using Nil = DataObject<T_Nil>;
