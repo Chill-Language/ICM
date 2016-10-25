@@ -11,14 +11,9 @@ namespace ICM
 		//=======================================
 		bool key_is(const AST::Element &node, KeywordID key)
 		{
-			using Key = Objects::Keyword;
-			if (!node.isData())
-				return false;
-			//Object *op = node.getData();
-			///return op->type == T_Keyword && op->dat<T_Keyword> == key;
-
-			ObjectPtr op = node.getData();
-			return op.isType(T_Keyword) && op.get<Key>()->getData() == key;
+			if (!node.isData()) return false;
+			Object *op = node.getData().get();
+			return op->type == T_Keyword && op->dat<T_Keyword>() == key;
 		}
 		void error(const string &msg = "")
 		{

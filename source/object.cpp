@@ -276,4 +276,9 @@ namespace ICM
 			return disp->get<T_Disperse>()->end();
 		}
 	}
+
+	bool operator==(TypeUnit t1, DefaultType t2)
+	{
+		return t1 == (TypeUnit)t2;
+	}
 }

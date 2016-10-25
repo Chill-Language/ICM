@@ -108,7 +108,7 @@ namespace ICM
 		template <TypeUnit _TU> const Ty<_TU>* get() const { return _ptr<Ty<_TU>>(); }
 		template <TypeUnit _TU> Ty<_TU>& dat() { return _ref<Ty<_TU>>(); }
 		template <TypeUnit _TU> const Ty<_TU>& dat() const { return _ref<Ty<_TU>>(); }
-
+		bool isType(TypeUnit _TU) const { return type == _TU; }
 		
 		TypeUnit type = T_Null;
 		void *data = nullptr;

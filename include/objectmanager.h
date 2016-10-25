@@ -45,7 +45,7 @@ namespace ICM
 	//=======================================
 	// * Class ObjectPtr
 	//=======================================
-#define USE_RAW_POINTER !true
+#define USE_RAW_POINTER true
 #if !USE_RAW_POINTER
 	class ObjectPtr
 	{

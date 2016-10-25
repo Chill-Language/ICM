@@ -64,6 +64,7 @@ namespace ICM
 
 	using TypeUnit = size_t;
 	std::string to_string(DefaultType type);
+	bool operator==(TypeUnit t1, DefaultType t2);
 }
 
 #endif
