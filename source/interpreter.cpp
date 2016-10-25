@@ -33,7 +33,7 @@ namespace ICM
 		ObjectPtr &res = tempresult[id];
 
 		if (op.isType(T_Function)) {
-			const auto &ftu = op.get<Objects::Function>()->getData().get_data();
+			const auto &ftu = op.get<Objects::Function>()->getData().getData();
 			res = checkCall(ftu, dl);
 		}
 		else if (op.isType(T_Disperse)) {

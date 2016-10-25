@@ -257,7 +257,7 @@ namespace ICM
 	{
 		if (op.isType(T_Function)) {
 			TypeObject t(T_Function);
-			auto &ft = op->get<T_Function>()->get_data();
+			auto &ft = op->get<T_Function>()->getData();
 			t.setFuncTableUnit(&ft);
 			return t;
 		}

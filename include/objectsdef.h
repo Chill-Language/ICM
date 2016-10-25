@@ -7,7 +7,6 @@
 
 namespace ICM
 {
-
 	namespace Types
 	{
 #define DEFTYPE(_TE, _T) template <> struct TType<T_##_TE> { using Type = _T;  static TypeName Name; }; using _TE = TType<T_##_TE>::Type;
@@ -74,14 +73,16 @@ namespace ICM
 
 	namespace Objects
 	{
+		// TODO : Delete this class.
 		//=======================================
-		// * Class DataObject<T, _Type>
+		// * Class DataObject<_Type>
 		//=======================================
-		template <typename T, DefaultType _Type>
+		template <DefaultType _Type>
 		class DataObject : public Object
 		{
+			using T = typename TType<_Type>::Type;
 		public:
-			using VType = T;
+			using VType = typename TType<_Type>::Type;
 			static const DefaultType Type = _Type;
 		public:
 			DataObject() : Object(_Type) { this->data = new T(); }
@@ -117,23 +118,23 @@ namespace ICM
 			static const DefaultType Type = T_Nil;
 
 		};
-		using Error = DataObject<TypeBase::ErrorType, T_Error>;
-		using Boolean = DataObject<bool, T_Boolean>;
-		using Number = DataObject<Common::Number::Rational, T_Number>;
-		using String = DataObject<string, T_String>;
+		using Error = DataObject<T_Error>;
+		using Boolean = DataObject<T_Boolean>;
+		using Number = DataObject<T_Number>;
+		using String = DataObject<T_String>;
 
-		using List = DataObject<TypeBase::ListType, T_List>;
-		using Disperse = DataObject<TypeBase::DisperseType, T_Disperse>;
-		using Keyword = DataObject<KeywordID, T_Keyword>;
-		using Function = DataObject<TypeBase::FunctionType, T_Function>;
-		class Identifier : public DataObject<TypeBase::IdentifierType, T_Identifier> {
+		using List = DataObject<T_List>;
+		using Disperse = DataObject<T_Disperse>;
+		using Keyword = DataObject<T_Keyword>;
+		using Function = DataObject<T_Function>;
+		class Identifier : public DataObject<T_Identifier> {
 		public:
-			Identifier() : DataObject<TypeBase::IdentifierType, T_Identifier>() {}
-			Identifier(const TypeBase::IdentifierType &it) : DataObject<TypeBase::IdentifierType, T_Identifier>(it) {}
+			Identifier() : DataObject<T_Identifier>() {}
+			Identifier(const TypeBase::IdentifierType &it) : DataObject<T_Identifier>(it) {}
 		};
 
-		vector<ObjectPtr>::iterator begin(Objects::Disperse *disp);
-		vector<ObjectPtr>::iterator end(Objects::Disperse *disp);
+		vector<ObjectPtr>::iterator begin(Disperse *disp);
+		vector<ObjectPtr>::iterator end(Disperse *disp);
 	}
 }
 

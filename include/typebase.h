@@ -135,17 +135,17 @@ namespace ICM
 		public:
 			FunctionType() {}
 			FunctionType(size_t id) : data(id) {}
-			const FuncTableUnit& get_data() const {
+			const FuncTableUnit& getData() const {
 				return DefFuncTable[data];
 			}
 			string to_string() const {
-				return "F(" + get_data().getName() + ")";
+				return "F(" + getData().getName() + ")";
 			}
 			string to_output() const {
-				return "F(" + get_data().getName() + ")";
+				return "F(" + getData().getName() + ")";
 			}
 			string to_string_code() const {
-				return get_data().getName();
+				return getData().getName();
 			}
 			void write(File &file) const {
 				file.write(data);

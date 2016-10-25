@@ -104,11 +104,14 @@ namespace ICM
 
 		// New Change (Building):
 	public:
-		template <TypeUnit _TU> typename TType<_TU>::Type* get() { return _ptr<typename TType<_TU>::Type>(); }
-		template <TypeUnit _TU> const typename TType<_TU>::Type* get() const { return _ptr<typename TType<_TU>::Type>(); }
-		template <typename T> T* get() { return _ptr<T>(); }
-		template <typename T> const T* get() const { return _ptr<T>(); }
+		template <TypeUnit _TU> using Ty = typename TType<_TU>::Type;
 
+		template <TypeUnit _TU> Ty<_TU>* get() { return _ptr<Ty<_TU>>(); }
+		template <TypeUnit _TU> const Ty<_TU>* get() const { return _ptr<Ty<_TU>>(); }
+		template <TypeUnit _TU> Ty<_TU>& dat() { return _ref<Ty<_TU>>(); }
+		template <TypeUnit _TU> const Ty<_TU>& dat() const { return _ref<Ty<_TU>>(); }
+
+		
 		TypeUnit type = T_Null;
 		void *data = nullptr;
 		// All data should be copyable, have no shared resource.
