@@ -328,7 +328,7 @@ namespace ICM
 			if (front->isData()) {
 				ObjectPtr &op = getDataRef(*front);
 				if (op.isType(T_Keyword)) {
-					createOrderKeyword(single, op.get<Objects::Keyword>()->getData());
+					createOrderKeyword(single, op->dat<T_Keyword>());
 					return;
 				}
 			}
@@ -351,7 +351,7 @@ namespace ICM
 				if (single->isData()) {
 					ObjectPtr &op = getDataRef(*single);
 					if (op.isType(T_Keyword)) {
-						createOrderKeywordSingle(op.get<Objects::Keyword>()->getData());
+						createOrderKeywordSingle(op->dat<T_Keyword>());
 						continue;
 					}
 					if (op.isType(T_Identifier))
@@ -529,17 +529,15 @@ namespace ICM
 					break;
 				}
 
-				Objects::Identifier *ident = op.get<Objects::Identifier>();
-				string name = ident->getData().getName();
+				Types::Identifier &ident = op->dat<T_Identifier>();
+				string name = ident.getName();
 				size_t id;
 				if (id = AddVariableTable.find(name)) {
-					ident = AddVariableTable[id].getData();
+					op = ObjectPtr(AddVariableTable[id].getData());
 				}
 				else {
 					AddVariableTable.add(name, op);
 				}
-
-				op = ObjectPtr(ident);
 
 				createSingle((*single)[2]);
 				switch (keyword) {
@@ -558,8 +556,8 @@ namespace ICM
 			}
 		}
 		void CreateOrder::setObjectIdentifier(ObjectPtr &op) {
-			Objects::Identifier *ident = op.get<Objects::Identifier>();
-			std::string name = ident->getData().getName();
+			Types::Identifier &ident = op->dat<T_Identifier>();
+			std::string name = ident.getName();
 			size_t i;
 			if ((i = DefFuncTable.find(name))) {
 				op = ObjectPtr(new Objects::Function(TypeBase::FunctionType(i)));
@@ -571,7 +569,7 @@ namespace ICM
 				op = ObjectPtr(AddVariableTable[i].getData());
 			}
 			else {
-				ident->getData().setData(ObjectPtr(new Objects::Nil()));
+				ident.setData(ObjectPtr(new Objects::Nil()));
 				AddVariableTable.add(name, op);
 				//error("Unfind Identifier(" + ident->getName() + ").");
 			}

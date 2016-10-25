@@ -27,6 +27,10 @@ namespace ICM
 			return to_string<T>(t);
 		}
 
+		class VoidType {
+		public:
+			bool operator==(const VoidType&) const { return true; }
+		};
 		using NumberType = Common::Number::Rational;
 		using BooleanType = bool;
 		using StringType = std::string;
@@ -134,9 +138,9 @@ namespace ICM
 		{
 		public:
 			FunctionType() {}
-			FunctionType(size_t id) : data(id) {}
+			FunctionType(size_t id) : index(id) {}
 			const FuncTableUnit& getData() const {
-				return DefFuncTable[data];
+				return DefFuncTable[index];
 			}
 			string to_string() const {
 				return "F(" + getData().getName() + ")";
@@ -147,20 +151,13 @@ namespace ICM
 			string to_string_code() const {
 				return getData().getName();
 			}
-			void write(File &file) const {
-				file.write(data);
-			}
-			void read(File &file) {
-				file.read(data);
-			}
 			bool operator==(const FunctionType &ft) const {
-				return data == ft.data;
+				return index == ft.index && subid == ft.subid;
 			}
-			// Const
-			static const DefaultType Type = T_Function;
 
 		private:
-			size_t data;
+			size_t index;
+			size_t subid = MaxValue<size_t>();
 		};
 		template <> string to_string<FunctionType>(const FunctionType &ft);
 		template <> string to_output<FunctionType>(const FunctionType &ft);
@@ -215,9 +212,16 @@ namespace ICM
 		template <> string to_output<IdentifierType>(const IdentifierType &it);
 		template <> string to_string_code<IdentifierType>(const IdentifierType &it);
 
-		class VoidType {
+		class VariableType
+		{
 		public:
-			bool operator==(const VoidType&) const { return true; }
+			VariableType() {}
+			Object* getData() { return &data; }
+			const Object* getData() const { return &data; }
+
+		private:
+			size_t index = MaxValue<size_t>();
+			Object data;
 		};
 	}
 }

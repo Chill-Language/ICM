@@ -66,7 +66,7 @@ namespace ICM
 	struct Object
 	{
 	public:
-		Object(TypeUnit type = T_Null) : type(type), data(nullptr) {}
+		Object(TypeUnit type = T_Null, void *data = nullptr) : type(type), data(data) {}
 
 #define CheckTypeInfo() assert(TypeInfoTable.find(this->type) != TypeInfoTable.end())
 

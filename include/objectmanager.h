@@ -45,8 +45,12 @@ namespace ICM
 	//=======================================
 	// * Class ObjectPtr
 	//=======================================
-#define USE_RAW_POINTER true
-#if !USE_RAW_POINTER
+#define USE_RAW_POINTER false
+#define USE_DIRECT_POINTER true
+#if USE_RAW_POINTER
+	using ObjectPtr = Object*;
+#else
+#if !USE_DIRECT_POINTER
 	class ObjectPtr
 	{
 	public:
@@ -57,10 +61,6 @@ namespace ICM
 
 		Object* get() const {
 			return GlobalObjectManager.getObjectPtr(this->_type, this->_index);
-		}
-		template <typename _OTy>
-		_OTy* get() const {
-			return static_cast<_OTy*>(this->get());
 		}
 		Object* operator->() const {
 			return get();
@@ -99,10 +99,6 @@ namespace ICM
 		Object* get() const {
 			return data;
 		}
-		template <typename _OTy>
-		_OTy* get() const {
-			return static_cast<_OTy*>(data);
-		}
 		bool isType(DefaultType type) const {
 			return this->type() == type;
 		}
@@ -120,8 +116,9 @@ namespace ICM
 		string to_output() const;
 		DefaultType type() const;
 
-		Object *data;
+		Object *data = nullptr;
 	};
+#endif
 #endif
 
 	//=======================================

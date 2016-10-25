@@ -25,7 +25,7 @@ namespace ICM
 				CPYS, REFS,
 				EQU, SML, SME, LAR, LAE,
 				INC,
-				OVER
+				OVER,
 			};
 
 			virtual Order order() const = 0;

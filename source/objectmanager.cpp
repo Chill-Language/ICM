@@ -51,7 +51,8 @@ namespace ICM
 	//=======================================
 
 	// For Testing Speed
-#if USE_RAW_POINTER
+#if !USE_RAW_POINTER
+#if USE_DIRECT_POINTER
 	DefaultType ObjectPtr::type() const {
 		return (DefaultType)data->type;
 	}
@@ -94,6 +95,7 @@ namespace ICM
 			return "Null";
 		return this->get()->to_output();
 	}
+#endif
 
 	//=======================================
 	// * Class ObjectPool

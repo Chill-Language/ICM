@@ -3,6 +3,7 @@
 #include "keyword.h"
 #include "tabledata.h"
 #include "parser.h"
+#include "instruction.h"
 
 namespace ICM
 {
@@ -56,6 +57,14 @@ namespace ICM
 			return DefKeywordTable.getData(id).first;
 		else
 			return "UnfoundKeyword";
+	}
+	string to_string(Instruction::Instruction inst)
+	{
+		size_t id = Instruction::InstructionName.findKey(inst);
+		if (id != Instruction::InstructionName.size())
+			return Instruction::InstructionName.getValue(id);
+		else
+			return "UnknowInstruction";
 	}
 	string to_string(const ObjectPtr &obj) {
 		return obj.to_string();

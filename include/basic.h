@@ -37,6 +37,8 @@ using word = uint16_t;
 using dword = uint32_t;
 using qword = uint64_t;
 
+template <typename T> constexpr T MaxValue() { return T(-1); }
+
 namespace ICM
 {
 	std::string to_string();

@@ -195,12 +195,12 @@ namespace ICM
 				return ObjectPtr(new List(ListType(dl)));
 			}
 
-			const vector<ObjectPtr>& _disp(const List *l) {
-				return l->get<T_List>()->getData();
+			const vector<ObjectPtr>& _disp(const ListType *l) {
+				return l->getData();
 			}
 
 			ObjectPtr disp(const DataList &dl) {
-				return ObjectPtr(new Disperse(DisperseType(_disp(dl[0].get<List>()))));
+				return ObjectPtr(new Disperse(DisperseType(_disp(dl[0]->get<T_List>()))));
 			}
 
 			ObjectPtr sort(const DataList &dl) {

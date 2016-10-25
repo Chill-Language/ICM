@@ -43,7 +43,6 @@ namespace ICM
 		//=======================================
 		// * Class Identifier
 		//=======================================
-
 		void IdentifierType::setData(const ObjectPtr &op) {
 			if (op->type == T_Identifier)
 				data = op->get<T_Identifier>()->getData();

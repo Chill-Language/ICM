@@ -16,7 +16,8 @@ namespace ICM
 		public:
 			enum EleType { E_Data, E_Refer };
 		public:
-			Element(EleType type) : type(type) {}
+			Element() {}
+			explicit Element(EleType type) : type(type) {}
 			//~Element() { if (isData()) delete data.op; }
 
 			static Element Data(Object *op);
@@ -102,7 +103,7 @@ namespace ICM
 		stack<Node*> farthptrs;
 	};
 
-	std::string to_string(const AST *ast);
+	string to_string(const AST *ast);
 	string to_string(const AST &ast);
 	string to_string_code(const AST &ast);
 	string to_string(const AST::Element &element);

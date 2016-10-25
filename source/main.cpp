@@ -4,6 +4,7 @@
 #include "config.h"
 #include "order.h"
 #include "interpreter.h"
+#include "instruction.h"
 
 #include "objectdef.h"
 extern size_t CheckCallCount;
@@ -35,7 +36,7 @@ namespace ICM
 						if (front->isData()) {
 							ObjectPtr op(front->getData());
 							if (op.isType(T_Function)) {
-								Objects::Function *of = op.get<Objects::Function>();
+								Types::Function *of = op->get<T_Function>();
 								//getCallID(of->get_data(), );
 							}
 						}
@@ -323,6 +324,10 @@ int main(int argc, char *argv[])
 						println("Output: ");
 				}
 				vector<AST::NodePtr> table = ast.getTable();
+#if !true
+				Instruction::InstructionCreater instcreater(table);
+				instcreater.create();
+#else
 				ASTOrder::CreateOrder createorder(table);
 				const auto &e = createorder.createOrder();
 				Interpreter interpreter(e);
@@ -334,6 +339,7 @@ int main(int argc, char *argv[])
 						println();
 					}
 				}
+#endif
 				//println(CheckCallCount);
 			}
 			else {

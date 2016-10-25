@@ -18,8 +18,8 @@ namespace ICM
 				size_t id = l.getRefer();
 				const ObjectPtr &op = tempresult[id];
 				if (op.isType(T_Disperse)) {
-					Objects::Disperse* l = op.get<Objects::Disperse>();
-					listnum.insert(listnum.end(), begin(l), end(l));
+					Types::Disperse &l = op->dat<T_Disperse>();
+					listnum.insert(listnum.end(), l.begin(), l.end());
 				}
 				else
 					listnum.push_back(op);
@@ -33,12 +33,12 @@ namespace ICM
 		ObjectPtr &res = tempresult[id];
 
 		if (op.isType(T_Function)) {
-			const auto &ftu = op.get<Objects::Function>()->getData().getData();
+			const auto &ftu = op->get<T_Function>()->getData();
 			res = checkCall(ftu, dl);
 		}
 		else if (op.isType(T_Disperse)) {
 			const auto &ftu = DefFuncTable["call"];
-			auto ndl = op.get<Objects::Disperse>()->getData().getData();
+			auto ndl = op->get<T_Disperse>()->getData();
 			ndl.insert(ndl.end(), dl.begin(), dl.end());
 			res = checkCall(ftu, DataList(ndl));
 		}
@@ -114,9 +114,9 @@ namespace ICM
 				size_t expid = p->getExpid();
 				ObjectPtr op = tempresult[expid];
 				if (op.isType(T_Identifier)) {
-					auto *pp = op.get<Objects::Identifier>();
-					if (pp->getData().getValueType() == T_Boolean) {
-						op = pp->getData().getRealData();
+					auto *pp = op->get<T_Identifier>();
+					if (pp->getValueType() == T_Boolean) {
+						op = pp->getRealData();
 					}
 					else {
 						println("If exp with non Type Boolean.");
@@ -124,7 +124,7 @@ namespace ICM
 					}
 				}
 				if (op.isType(T_Boolean)) {
-					bool result = op.get<Objects::Boolean>()->getData();
+					bool result = op->dat<T_Boolean>();
 					if (!result) {
 						size_t jmpid = p->getJmpid();
 						ProgramCounter = jmpid;
@@ -153,11 +153,11 @@ namespace ICM
 				ASTOrder::OrderDataAt *p = static_cast<ASTOrder::OrderDataAt*>(e);
 				ObjectPtr top = tempresult[p->getRefid()];
 				if (top.isType(T_Identifier))
-					top = top.get<Objects::Identifier>()->getData().getRealData();
-				Objects::List *l = top.get<Objects::List>();
-				ObjectPtr op = l->getData().getData()[p->getIndex()];
+					top = top->get<T_Identifier>()->getRealData();
+				Types::List &l = top->dat<T_List>();
+				ObjectPtr op = l.getData()[p->getIndex()];
 				if (op.isType(T_Identifier))
-					op = ObjectPtr(op.get<Objects::Identifier>()->getData().getRealData());
+					op = ObjectPtr(op->get<T_Identifier>()->getRealData());
 				tempresult[ProgramCounter] = op;
 				Result = tempresult[ProgramCounter];
 				break;
@@ -174,9 +174,9 @@ namespace ICM
 			}
 			case OrderData::LET: {
 				ASTOrder::OrderDataLet *p = static_cast<ASTOrder::OrderDataLet*>(e);
-				Objects::Identifier *ident = p->getData().get<Objects::Identifier>();
+				Types::Identifier &ident = p->getData()->dat<T_Identifier>();
 
-				ident->getData().setData(tempresult[p->getRefid()]);
+				ident.setData(tempresult[p->getRefid()]);
 				
 				tempresult[ProgramCounter] = p->getData();
 				Result = tempresult[ProgramCounter];
@@ -184,8 +184,8 @@ namespace ICM
 			}
 			case OrderData::CPY: {
 				ASTOrder::OrderDataCpy *p = static_cast<ASTOrder::OrderDataCpy*>(e);
-				Objects::Identifier *ident = p->getData().get<Objects::Identifier>();
-				ident->getData().setCopy(tempresult[p->getRefid()]);
+				Types::Identifier &ident = p->getData()->dat<T_Identifier>();
+				ident.setCopy(tempresult[p->getRefid()]);
 
 				tempresult[ProgramCounter] = p->getData();
 				Result = tempresult[ProgramCounter];
@@ -193,8 +193,8 @@ namespace ICM
 			}
 			case OrderData::REF: {
 				ASTOrder::OrderDataRef *p = static_cast<ASTOrder::OrderDataRef*>(e);
-				Objects::Identifier *ident = p->getData().get<Objects::Identifier>();
-				ident->getData().setRefer(tempresult[p->getRefid()]);
+				Types::Identifier &ident = p->getData()->dat<T_Identifier>();
+				ident.setRefer(tempresult[p->getRefid()]);
 
 				tempresult[ProgramCounter] = p->getData();
 				Result = tempresult[ProgramCounter];
@@ -219,49 +219,47 @@ namespace ICM
 			}
 			case OrderData::EQU: {
 				ASTOrder::OrderDataEqu *p = static_cast<ASTOrder::OrderDataEqu*>(e);
-				Objects::Identifier *ident = p->getData().get<Objects::Identifier>();
-				bool r = ident->getData().getRealData()->equ(tempresult[p->getRefid()].get());
+				Types::Identifier &ident = p->getData()->dat<T_Identifier>();
+				bool r = ident.getRealData()->equ(tempresult[p->getRefid()].get());
 				tempresult[ProgramCounter] = ObjectPtr(new Objects::Boolean(r));
 				Result = tempresult[ProgramCounter];
 				break;
 			}
 			case OrderData::SML: {
 				ASTOrder::OrderDataSmall *p = static_cast<ASTOrder::OrderDataSmall*>(e);
-				Objects::Identifier *ident = p->getData().get<Objects::Identifier>();
-				bool r = (ident->getData().getRealData().get<Objects::Number>()->getData() < adjustObjectPtr(tempresult[p->getRefid()]).get<Objects::Number>()->getData());
+				Types::Identifier &ident = p->getData()->dat<T_Identifier>();
+				bool r = (ident.getRealData()->dat<T_Number>() < adjustObjectPtr(tempresult[p->getRefid()])->dat<T_Number>());
 				tempresult[ProgramCounter] = ObjectPtr(new Objects::Boolean(r));
 				Result = tempresult[ProgramCounter];
 				break;
 			}
 			case OrderData::SME: {
 				ASTOrder::OrderDataSmallEqual *p = static_cast<ASTOrder::OrderDataSmallEqual*>(e);
-				Objects::Identifier *ident = p->getData().get<Objects::Identifier>();
-				bool r = (ident->getData().getRealData().get<Objects::Number>()->getData() <= adjustObjectPtr(tempresult[p->getRefid()]).get<Objects::Number>()->getData());
+				Types::Identifier &ident = p->getData()->dat<T_Identifier>();
+				bool r = (ident.getRealData()->dat<T_Number>() <= adjustObjectPtr(tempresult[p->getRefid()])->dat<T_Number>());
 				tempresult[ProgramCounter] = ObjectPtr(new Objects::Boolean(r));
 				Result = tempresult[ProgramCounter];
 				break;
 			}
 			case OrderData::LAR: {
 				ASTOrder::OrderDataSmall *p = static_cast<ASTOrder::OrderDataSmall*>(e);
-				Objects::Identifier *ident = p->getData().get<Objects::Identifier>();
-				bool r = (ident->getData().getRealData().get<Objects::Number>()->getData() > adjustObjectPtr(tempresult[p->getRefid()]).get<Objects::Number>()->getData());
-				//tempresult[ProgramCounter] = checkCall(DefFuncTable[">"], DataList({ ident->getData().getRealData(), tempresult[p->getRefid()] }));
+				Types::Identifier &ident = p->getData()->dat<T_Identifier>();
+				bool r = (ident.getRealData()->dat<T_Number>() > adjustObjectPtr(tempresult[p->getRefid()])->dat<T_Number>());
 				tempresult[ProgramCounter] = ObjectPtr(new Objects::Boolean(r));
 				Result = tempresult[ProgramCounter];
 				break;
 			}
 			case OrderData::LAE: {
 				ASTOrder::OrderDataSmallEqual *p = static_cast<ASTOrder::OrderDataSmallEqual*>(e);
-				Objects::Identifier *ident = p->getData().get<Objects::Identifier>();
-				
-				bool r = (ident->getData().getRealData().get<Objects::Number>()->getData() >= adjustObjectPtr(tempresult[p->getRefid()]).get<Objects::Number>()->getData());
+				Types::Identifier &ident = p->getData()->dat<T_Identifier>();
+				bool r = (ident.getRealData()->dat<T_Number>() >= adjustObjectPtr(tempresult[p->getRefid()])->dat<T_Number>());
 				tempresult[ProgramCounter] = ObjectPtr(new Objects::Boolean(r));
 				Result = tempresult[ProgramCounter];
 				break;
 			}
 			case OrderData::INC: {
 				ASTOrder::OrderDataInc *p = static_cast<ASTOrder::OrderDataInc*>(e);
-				p->getData().get<Objects::Identifier>()->getData().getRealData().get<Objects::Number>()->getData().operator+=(1);
+				p->getData()->dat<T_Identifier>().getRealData()->dat<T_Number>().operator+=(1);
 				break;
 			}
 			case OrderData::OVER: {
