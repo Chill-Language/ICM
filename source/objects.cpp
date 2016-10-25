@@ -16,8 +16,6 @@ namespace ICM
 		DEFTYPENAME(Vary);
 		DEFTYPENAME(Void);
 		DEFTYPENAME(Error);
-		DEFTYPENAME(List);
-		DEFTYPENAME(Disperse);
 		// Literal Types
 		DEFTYPENAME(Boolean);
 		DEFTYPENAME(Identifier);
@@ -30,6 +28,9 @@ namespace ICM
 		DEFTYPENAME(Reference);
 		DEFTYPENAME(Type);
 		DEFTYPENAME(Variable);
+		// List Types
+		DEFTYPENAME(List);
+		DEFTYPENAME(Disperse);
 		// Compile Types (Platform Dependent)
 		DEFTYPENAME(Int);
 		DEFTYPENAME(UInt);
@@ -63,7 +64,7 @@ namespace ICM
 
 	template <TypeUnit _TU>
 	typename TType<_TU>::Type* get(void *data) {
-		return static_cast<TType<_TU>::Type*>(data);
+		return static_cast<typename TType<_TU>::Type*>(data);
 	}
 
 	template <TypeUnit _TU>
@@ -125,6 +126,22 @@ namespace ICM
 
 	//=======================================
 	//=======================================
+#define TEMPFUNC template <TypeUnit _TU> inline
+	// construct/destruct
+	TEMPFUNC void construct(void *data) {
+		new (data) typename TType<_TU>::Type();
+	}
+	TEMPFUNC void destruct(void *data) {
+		using T = typename TType<_TU>::Type;
+		get<_TU>(data)->~T();
+	}
+	TEMPFUNC void ncopy(void *dst, const void *src) {
+		using T = typename TType<_TU>::Type;
+		new (dst) T(*static_cast<const T*>(src));
+	}
+
+	//=======================================
+	//=======================================
 
 	template <TypeUnit _TU>
 	TypeInfo initTypeInfo() {
@@ -132,6 +149,9 @@ namespace ICM
 			_TU,
 			TType<_TU>::Name,
 			sizeof(typename TType<_TU>::Type),
+			construct<_TU>,
+			destruct<_TU>,
+			ncopy<_TU>,
 			equal<_TU>,
 			to_string<_TU>,
 			to_output<_TU>,
@@ -144,20 +164,27 @@ namespace ICM
 		return{ _TU, initTypeInfo<_TU>() };
 	}
 
-	class NilType {};
 	map<TypeUnit, TypeInfo> TypeInfoTable = {
-		TypeInfoPair<T_Number>(),
 		TypeInfoPair<T_Null>(),
-		TypeInfoPair<T_Keyword>(),
-		TypeInfoPair<T_String>(),
-		TypeInfoPair<T_Boolean>(),
-		TypeInfoPair<T_Function>(),
-		TypeInfoPair<T_Identifier>(),
-		TypeInfoPair<T_Error>(),
 		TypeInfoPair<T_Nil>(),
+		TypeInfoPair<T_Error>(),
+		// Literal Types
+		TypeInfoPair<T_Boolean>(),
+		TypeInfoPair<T_Identifier>(),
+		TypeInfoPair<T_Number>(),
+		TypeInfoPair<T_String>(),
+		TypeInfoPair<T_Symbol>(),
+		// Identifier Types
+		TypeInfoPair<T_Function>(),
+		TypeInfoPair<T_Keyword>(),
+		TypeInfoPair<T_Reference>(),
+		TypeInfoPair<T_Type>(),
+		TypeInfoPair<T_Variable>(),
+		// List Types
+		//TypeInfoPair<T_Array>(),
 		TypeInfoPair<T_List>(),
 		TypeInfoPair<T_Disperse>(),
-		//
+		// Compile Types (Platform Dependent)
 		TypeInfoPair<T_Int>(),
 		TypeInfoPair<T_UInt>(),
 		TypeInfoPair<T_Short>(),
@@ -170,7 +197,7 @@ namespace ICM
 		TypeInfoPair<T_Double>(),
 		TypeInfoPair<T_LDouble>(),
 		TypeInfoPair<T_CPointer>(),
-		//
+		// Compile Types (Platform Independent)
 		TypeInfoPair<T_Byte>(),
 		TypeInfoPair<T_Word>(),
 		TypeInfoPair<T_DWord>(),
@@ -185,131 +212,6 @@ namespace ICM
 		TypeInfoPair<T_UInt64>(),
 		TypeInfoPair<T_Test>(),
 	};
-
-	namespace TypeBase
-	{
-		//=======================================
-		// * Class List
-		//=======================================
-		ListType* ListType::push(const ObjectPtr &op) {
-			data.push_back(op);
-			return this;
-		}
-		ListType* ListType::push(const DataList &dl) {
-			data.insert(data.end(), dl.begin(), dl.end());
-			return this;
-		}
-		ListType& ListType::operator+=(const ListType &dl) {
-			data.insert(data.end(), dl.data.begin(), dl.data.end());
-			return *this;
-		}
-		string ListType::to_string() const {
-			return ICM::to_string(data);
-		}
-		string ListType::to_output() const {
-			return Common::Convert::to_string<'[', ']'>(data.begin(), data.end(), [](const ObjectPtr &op) { return op.to_output(); });
-		}
-
-		//=======================================
-		// * Class Disperse
-		//=======================================
-		string DisperseType::to_string() const {
-			return Convert::to_string(data.begin(), data.end(), [](const ObjectPtr &op) { return ICM::to_string(op); });
-		}
-		string DisperseType::to_output() const {
-			string str;
-			for (auto &op : data)
-				str.append(op.to_output());
-			return str;
-		}
-
-		//=======================================
-		// * Class Identifier
-		//=======================================
-
-		void IdentifierType::setData(const ObjectPtr &op) {
-			if (op->type == T_Identifier)
-				data = op.get<Objects::Identifier>()->getData().getData();
-			else
-				data = op;
-		}
-		void IdentifierType::setCopy(const ObjectPtr &op) {
-			if (op.isType<Objects::Identifier>())
-				setCopy(op.get<Objects::Identifier>()->getData().getData());
-			else
-				data = ObjectPtr(op->clone());
-		}
-		void IdentifierType::setRefer(const ObjectPtr &op) {
-			if (op->type == T_Identifier) {
-				const ObjectPtr &sop = op.get<Objects::Identifier>()->getData().getData();
-				const ObjectPtr &refop = sop.isType<Objects::Identifier>() ? sop : op;
-				const ObjectPtr &refopdata = refop.get<Objects::Identifier>()->getData().getData();
-				if (data.get() != refopdata.get())
-					data = refop;
-				else
-					data = refopdata;
-			}
-			else
-				data = op;
-		}
-
-		const ObjectPtr& IdentifierType::getRealData() const {
-			if (data.isType(T_Identifier))
-				return data.get<Objects::Identifier>()->getData().getData();
-			else
-				return data;
-		}
-
-		/*ObjectPtr GetElt(const ObjectPtr &op) {
-			if (op.isType(T_Variable))
-				return GetElt(op.get<Variable>()->getData());
-			else if (op.isType(T_Reference))
-				return GetElt(op.get<Reference>()->getData());
-			else
-				return op;
-		}
-		ObjectPtr GetRef(const ObjectPtr &op) {
-			if (op.isType(T_Variable))
-				return ObjectPtr(new Reference("R", op));
-			if (op.isType(T_Reference))
-				return op;
-			else
-				return ObjectPtr(new Reference("R", op));
-		}*/
-		template <> string to_string<ListType>(const ListType &lt) {
-			return lt.to_string();
-		}
-		template <> string to_string<DisperseType>(const DisperseType &lt) {
-			return lt.to_string();
-		}
-		template <> string to_string<ErrorType>(const ErrorType &et) {
-			return et.to_string();
-		}
-		template <> string to_string<FunctionType>(const FunctionType &ft) {
-			return ft.to_string();
-		}
-		template <> string to_string<IdentifierType>(const IdentifierType &ft) {
-			return ft.to_string();
-		}
-		template <> string to_output<ListType>(const ListType &lt) {
-			return lt.to_output();
-		}
-		template <> string to_output<DisperseType>(const DisperseType &lt) {
-			return lt.to_output();
-		}
-		template <> string to_output<FunctionType>(const FunctionType &ft) {
-			return ft.to_output();
-		}
-		template <> string to_output<IdentifierType>(const IdentifierType &it) {
-			return it.to_output();
-		}
-		template <> string to_string_code<FunctionType>(const FunctionType &ft) {
-			return ft.to_string_code();
-		}
-		template <> string to_string_code<IdentifierType>(const IdentifierType &it) {
-			return it.to_string_code();
-		}
-	}
 
 	//=======================================
 	// * Functions
@@ -346,7 +248,7 @@ namespace ICM
 	// Adjust ObjectPtr
 	const ObjectPtr& adjustObjectPtr(const ObjectPtr &op) {
 		if (op.isType(T_Identifier))
-			return adjustObjectPtr(op.get<Objects::Identifier>()->getData().getData());
+			return adjustObjectPtr(op->get<T_Identifier>()->getData());
 		else
 			return op;
 	}
@@ -355,7 +257,7 @@ namespace ICM
 	{
 		if (op.isType(T_Function)) {
 			TypeObject t(T_Function);
-			auto &ft = op.get<Objects::Function>()->getData().get_data();
+			auto &ft = op->get<T_Function>()->get_data();
 			t.setFuncTableUnit(&ft);
 			return t;
 		}
@@ -367,11 +269,11 @@ namespace ICM
 		// Get Disperse Iterator
 		vector<ObjectPtr>::iterator begin(Objects::Disperse *disp)
 		{
-			return disp->getData().begin();
+			return disp->get<T_Disperse>()->begin();
 		}
 		vector<ObjectPtr>::iterator end(Objects::Disperse *disp)
 		{
-			return disp->getData().end();
+			return disp->get<T_Disperse>()->end();
 		}
 	}
 }

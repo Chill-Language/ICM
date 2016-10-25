@@ -20,15 +20,24 @@ namespace ICM
 	}
 	template <TypeUnit T> using TType = Types::TType<T>;
 
+	//=============================================
+	// * Struct TypeInfo
+	//=============================================
 	struct TypeInfo
 	{
-		using TosFunc = std::string(const void*);
+		using ConFunc = void(void*);
+		using DesFunc = void(void*);
+		using CpyFunc = void(void*, const void*);
 		using EquFunc = bool(const void*, const void*);
+		using TosFunc = std::string(const void*);
 
 		TypeUnit index;
 		const char* name;
 		size_t size;
 
+		ConFunc* construct;
+		DesFunc* destruct;
+		CpyFunc* ncopy;
 		EquFunc* equal;
 
 		TosFunc* to_string;
@@ -36,12 +45,15 @@ namespace ICM
 		TosFunc* to_string_code;
 
 		void* alloc() const {
-			//println("Call Alloc.");
 			return std::malloc(size);
 		}
-		void* copy(const void *src) const {
-			//println("Call Copy.");
+		void* mcopy(const void *src) const {
 			return std::memcpy(alloc(), src, size);
+		}
+		void* copy(const void *src) const {
+			void *dst = alloc();
+			ncopy(dst, src);
+			return dst;
 		}
 	};
 	extern map<TypeUnit, TypeInfo> TypeInfoTable;
@@ -92,6 +104,8 @@ namespace ICM
 
 		// New Change (Building):
 	public:
+		template <TypeUnit _TU> typename TType<_TU>::Type* get() { return _ptr<typename TType<_TU>::Type>(); }
+		template <TypeUnit _TU> const typename TType<_TU>::Type* get() const { return _ptr<typename TType<_TU>::Type>(); }
 		template <typename T> T* get() { return _ptr<T>(); }
 		template <typename T> const T* get() const { return _ptr<T>(); }
 
