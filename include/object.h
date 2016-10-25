@@ -99,8 +99,6 @@ namespace ICM
 			CheckTypeInfo();
 			return this == obj || (this->type == obj->type && TypeInfoTable[type].equal(this->data, obj->data));
 		}
-		// Const
-		static const DefaultType Type = T_Object;
 
 		// New Change (Building):
 	public:

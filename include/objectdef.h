@@ -83,7 +83,6 @@ namespace ICM
 			using T = typename TType<_Type>::Type;
 		public:
 			using VType = typename TType<_Type>::Type;
-			static const DefaultType Type = _Type;
 		public:
 			DataObject() : Object(_Type) { this->data = new T(); }
 			DataObject(const T &dat) : Object(_Type) { this->data = new T(dat); }
@@ -91,25 +90,8 @@ namespace ICM
 				this->data = new T(dot._ref());
 			}
 
-			T& getData() {
-				return _ref();
-			}
-			const T& getData() const {
-				return _ref();
-			}
-			//-----------------------------------
-			// + Inherited
-			//-----------------------------------
-			// Method
-			DataObject* clone() const {
-				return new DataObject(*this);
-			}
-
-		private:
-			const T* _ptr() const { return Object::_ptr<T>(); }
-			T* _ptr() { return Object::_ptr<T>(); }
-			const T& _ref() const { return Object::_ref<T>(); }
-			T& _ref() { return Object::_ref<T>(); }
+			T& getData() { return Object::_ref<T>(); }
+			const T& getData() const { return Object::_ref<T>(); }
 		};
 		
 		class Nil : public Object {

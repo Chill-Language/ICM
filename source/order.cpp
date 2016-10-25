@@ -15,7 +15,7 @@ namespace ICM
 			if (!node.isData())
 				return false;
 			ObjectPtr op = node.getData();
-			return op.isType<Key>() && op.get<Key>()->getData() == key;
+			return op.isType(T_Keyword) && op.get<Key>()->getData() == key;
 		}
 		void error(const string &msg = "")
 		{
@@ -329,7 +329,7 @@ namespace ICM
 			AST::Element *front = (AST::Element*)&(single->front());
 			if (front->isData()) {
 				ObjectPtr &op = getDataRef(*front);
-				if (op.isType<Objects::Keyword>()) {
+				if (op.isType(T_Keyword)) {
 					createOrderKeyword(single, op.get<Objects::Keyword>()->getData());
 					return;
 				}
@@ -338,7 +338,7 @@ namespace ICM
 			for (auto &p : *single) {
 				if (p.isData()) {
 					ObjectPtr &op = getDataRef(p);
-					if (op.isType<Objects::Identifier>())
+					if (op.isType(T_Identifier))
 						setObjectIdentifier(op);
 				}
 				else {

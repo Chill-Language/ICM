@@ -69,10 +69,6 @@ namespace ICM
 		bool isType(DefaultType type) const {
 			return this->type() == type;
 		}
-		template <typename _OTy>
-		bool isType() const {
-			return this->type() == _OTy::Type;
-		}
 
 		bool operator==(std::nullptr_t) const {
 			return type() == T_Null;
@@ -109,10 +105,6 @@ namespace ICM
 		}
 		bool isType(DefaultType type) const {
 			return this->type() == type;
-		}
-		template <typename _OTy>
-		bool isType() const {
-			return type() == _OTy::Type;
 		}
 
 		bool operator==(nullptr_t) const {

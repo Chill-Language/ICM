@@ -51,7 +51,7 @@ namespace ICM
 				data = op;
 		}
 		void IdentifierType::setCopy(const ObjectPtr &op) {
-			if (op.isType<Objects::Identifier>())
+			if (op.isType(T_Identifier))
 				setCopy(op->get<T_Identifier>()->getData());
 			else
 				data = ObjectPtr(op->clone());
@@ -59,7 +59,7 @@ namespace ICM
 		void IdentifierType::setRefer(const ObjectPtr &op) {
 			if (op->type == T_Identifier) {
 				const ObjectPtr &sop = op->get<T_Identifier>()->getData();
-				const ObjectPtr &refop = sop.isType<Objects::Identifier>() ? sop : op;
+				const ObjectPtr &refop = sop.isType(T_Identifier) ? sop : op;
 				const ObjectPtr &refopdata = refop->get<T_Identifier>()->getData();
 				if (data.get() != refopdata.get())
 					data = refop;
