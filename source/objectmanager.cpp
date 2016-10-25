@@ -1,4 +1,4 @@
-#include "objects.h"
+#include "object.h"
 #include "objectmanager.h"
 #include "config.h"
 #include "tabledata.h"

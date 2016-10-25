@@ -2,7 +2,7 @@
 #define _ICM_TYPEBASE_H_
 
 #include "basic.h"
-#include "objects.h"
+#include "object.h"
 #include "number.h"
 #include "keyword.h"
 #include "tabledata.h"

@@ -1,7 +1,7 @@
 #ifndef _ICM_FUNCTION_H_
 #define _ICM_FUNCTION_H_
 
-#include "objects.h"
+#include "object.h"
 #include "typeobject.h"
 
 namespace ICM

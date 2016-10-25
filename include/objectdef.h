@@ -2,7 +2,7 @@
 #define _ICM_OBJECTSDEF_H_
 
 #include "basic.h"
-#include "objects.h"
+#include "object.h"
 #include "typebase.h"
 
 namespace ICM

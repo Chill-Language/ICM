@@ -1,7 +1,7 @@
 #include "keyword.h"
 #include "function.h"
 #include "deffunc.h"
-#include "objectsdef.h"
+#include "objectdef.h"
 #include "number.h"
 #include "tabledata.h"
 

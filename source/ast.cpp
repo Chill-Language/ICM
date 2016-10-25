@@ -1,5 +1,5 @@
 #include "ast.h"
-#include "objects.h"
+#include "object.h"
 
 namespace ICM
 {

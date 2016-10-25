@@ -1,5 +1,5 @@
 #include "interpreter.h"
-#include "objectsdef.h"
+#include "objectdef.h"
 
 namespace ICM
 {

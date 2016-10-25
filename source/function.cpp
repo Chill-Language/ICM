@@ -1,7 +1,7 @@
 #include "function.h"
 #include "typeobject.h"
 #include "keyword.h"
-#include "objectsdef.h"
+#include "objectdef.h"
 #include <ctime>
 size_t CheckCallCount = 0;
 

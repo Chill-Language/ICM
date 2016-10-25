@@ -1,6 +1,6 @@
 #include "deffunc.h"
 #include "keyword.h"
-#include "objectsdef.h"
+#include "objectdef.h"
 #include "config.h"
 
 namespace ICM

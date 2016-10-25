@@ -2,7 +2,7 @@
 #define _ICM_TYPEOBJECT_H_
 
 #include "basic.h"
-#include "objects.h"
+#include "object.h"
 #include "lightlist.h"
 
 namespace ICM
