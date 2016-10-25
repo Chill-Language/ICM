@@ -86,20 +86,12 @@ namespace ICM
 		public:
 			DataObject() : Object(_Type) { this->data = new T(); }
 			DataObject(const T &dat) : Object(_Type) { this->data = new T(dat); }
-			DataObject(const DataObject &dot) : Object(_Type) {
-				this->data = new T(dot._ref());
-			}
 
 			T& getData() { return Object::_ref<T>(); }
 			const T& getData() const { return Object::_ref<T>(); }
 		};
 		
-		class Nil : public Object {
-		public:
-			Nil() : Object(T_Nil) {}
-			static const DefaultType Type = T_Nil;
-
-		};
+		using Nil = DataObject<T_Nil>;
 		using Error = DataObject<T_Error>;
 		using Boolean = DataObject<T_Boolean>;
 		using Number = DataObject<T_Number>;

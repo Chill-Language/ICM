@@ -14,6 +14,9 @@ namespace ICM
 			using Key = Objects::Keyword;
 			if (!node.isData())
 				return false;
+			//Object *op = node.getData();
+			///return op->type == T_Keyword && op->dat<T_Keyword> == key;
+
 			ObjectPtr op = node.getData();
 			return op.isType(T_Keyword) && op.get<Key>()->getData() == key;
 		}
