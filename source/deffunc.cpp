@@ -61,7 +61,7 @@ namespace ICM
 					return S({}, T_Number); // Void -> N
 				}
 				ObjectPtr func(const DataList &list) const {
-					return ObjectPtr(new Number(Number::VType(0)));
+					return ObjectPtr(new Number(NumberType(0)));
 				}
 			};
 
@@ -214,7 +214,7 @@ namespace ICM
 			ObjectPtr sort_f(const DataList &dl) {
 				auto &func = dl[1]->get<T_Function>()->getData();
 				// TODO
-				size_t id = getCallID(func, DataList({ ObjectPtr(new Number(Number::VType(0))), ObjectPtr(new Number(Number::VType(0))) }));
+				size_t id = getCallID(func, DataList({ ObjectPtr(new Number(NumberType(0))), ObjectPtr(new Number(NumberType(0))) }));
 				const auto &rf = func[id];
 
 				Types::List *list = dl[0]->get<T_List>();
@@ -252,7 +252,7 @@ namespace ICM
 				ObjectPtr func(const DataList &list) const {
 					// TODO
 					auto &func = list[0]->get<T_Function>()->getData();
-					size_t id = getCallID(func, DataList({ ObjectPtr(new Number(Number::VType(0))) }));
+					size_t id = getCallID(func, DataList({ ObjectPtr(new Number(NumberType(0))) }));
 					const auto &rf = func[id];
 
 					size_t minsize = list[1]->get<T_List>()->size();
@@ -280,7 +280,7 @@ namespace ICM
 				}
 				ObjectPtr func(const DataList &list) const {
 					size_t s = list[0]->get<T_List>()->getData().size();
-					return ObjectPtr(new Number(Number::VType(s)));
+					return ObjectPtr(new Number(NumberType(s)));
 				}
 			};
 
@@ -357,7 +357,7 @@ namespace ICM
 			}
 			ObjectPtr system(const DataList &dl) {
 				int i = std::system(dl[0]->get<T_String>()->c_str());
-				return ObjectPtr(new Number(Number::VType(i)));
+				return ObjectPtr(new Number(NumberType(i)));
 			}
 			ObjectPtr exit(const DataList &dl) {
 				std::exit(0);

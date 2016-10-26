@@ -300,9 +300,9 @@ namespace ICM
 		// New
 		vector<OrderData*>& CreateOrder::createOrder() {
 			// Create Order
-			addOrder(new OrderDataBegin());
+			addOrder(new OrderData(OrderData::START));
 			createOrderSub(getReferNode(Table[0]->front()));
-			addOrder(Table[0].get(), new OrderDataEnd());
+			addOrder(Table[0].get(), new OrderData(OrderData::OVER));
 			// Adjust Refer
 			//if (false)
 			for (auto &e : OrderDataList)
@@ -415,7 +415,7 @@ namespace ICM
 							createOrderSub(elfexp);
 					}
 				}
-				addOrder(single, new OrderDataStore());
+				addOrder(single, new OrderData(OrderData::STORE));
 				for (auto *p : recJmpToEnd) {
 					p->setJmpID(OrderDataList.size() - 1);
 					p->setJmprefAdjusted();
@@ -470,9 +470,9 @@ namespace ICM
 				size_t bid = OrderDataList.size() - 1;
 				createSingle(*forstruct.getRanexpEnd());
 				size_t eid = OrderDataList.size() - 1;
-				addOrder(new OrderDataLet(opvar, bid));
+				addOrder(new OrderDataAssign(OrderData::LET, opvar, bid));
 				createOrderSub(forstruct.getDoexps());
-				addOrder(new OrderDataLargeEqual(opvar, eid));
+				addOrder(new OrderDataCompare(OrderData::LAE, opvar, eid));
 				OrderDataJumpNotIf *odjni = new OrderDataJumpNotIf(OrderDataList.size() - 1);
 				odjni->setExprefAdjusted();
 				odjni->setJmpID(eid + 2);
@@ -504,11 +504,11 @@ namespace ICM
 				if (single->size() == 2) {
 					if (keyword == KeywordID::CPY) {
 						createSingle((*single)[1]);
-						addOrder(single, new OrderDataCpySingle(OrderDataList.size() - 1));
+						addOrder(single, new OrderDataCpySingle(OrderData::CPYS, OrderDataList.size() - 1));
 					}
 					else if (keyword == KeywordID::REF) {
 						createSingle((*single)[1]);
-						addOrder(single, new OrderDataRefSingle(OrderDataList.size() - 1));
+						addOrder(single, new OrderDataCpySingle(OrderData::REFS, OrderDataList.size() - 1));
 					}
 					break;
 				}
@@ -540,17 +540,13 @@ namespace ICM
 				}
 
 				createSingle((*single)[2]);
+				OrderData::Order order;
 				switch (keyword) {
-				case KeywordID::LET:
-					addOrder(single, new OrderDataLet(op, OrderDataList.size() - 1));
-					break;
-				case KeywordID::CPY:
-					addOrder(single, new OrderDataCpy(op, OrderDataList.size() - 1));
-					break;
-				case KeywordID::REF:
-					addOrder(single, new OrderDataRef(op, OrderDataList.size() - 1));
-					break;
+				case KeywordID::LET: order = OrderData::LET; break;
+				case KeywordID::CPY: order = OrderData::CPY; break;
+				case KeywordID::REF: order = OrderData::REF; break;
 				}
+				addOrder(single, new OrderDataAssign(order, op, OrderDataList.size() - 1));
 				break;
 			}
 			}

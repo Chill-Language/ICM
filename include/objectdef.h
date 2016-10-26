@@ -82,8 +82,6 @@ namespace ICM
 		{
 			using T = typename TType<_Type>::Type;
 		public:
-			using VType = typename TType<_Type>::Type;
-		public:
 			DataObject() : Object(_Type) { this->data = new T(); }
 			DataObject(const T &dat) : Object(_Type) { this->data = new T(dat); }
 		};

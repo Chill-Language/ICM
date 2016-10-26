@@ -28,7 +28,9 @@ namespace ICM
 				OVER,
 			};
 
-			virtual Order order() const = 0;
+			OrderData(Order order) : _order(order) {}
+
+			Order order() const { return _order; };
 
 			string to_string() const {
 				string str;
@@ -68,14 +70,14 @@ namespace ICM
 			virtual string getToString() const {
 				return "";
 			}
+			Order _order;
 		};
 
 		class OrderDataCheckCall : public OrderData
 		{
 			using NodePtr = AST::Node*;
 		public:
-			OrderDataCheckCall(const NodePtr &nodptr) : nodptr(nodptr) {}
-			OrderData::Order order() const { return OrderData::CCAL; }
+			OrderDataCheckCall(const NodePtr &nodptr) : OrderData(CCAL), nodptr(nodptr) {}
 			NodePtr& getData() { return nodptr; }
 			const NodePtr& getData() const { return nodptr; }
 			void adjustID(const map<size_t, size_t> &map) {
@@ -98,7 +100,7 @@ namespace ICM
 		{
 		public:
 			OrderDataCall(const FuncTableUnit &ftu, size_t id, const vector<AST::Element*> &args)
-				: ftu(ftu), id(id), args(args) {}
+				: OrderData(CALL), ftu(ftu), id(id), args(args) {}
 			OrderData::Order order() const { return OrderData::CALL; }
 			vector<AST::Element*>& getData() { return args; }
 			const vector<AST::Element*>& getData() const { return args; }
@@ -129,8 +131,7 @@ namespace ICM
 		class OrderDataCheckType : public OrderData
 		{
 		public:
-			OrderDataCheckType(AST::Element* bp, DefaultType type) : bp(bp) {}
-			OrderData::Order order() const { return OrderData::CHKT; }
+			OrderDataCheckType(AST::Element* bp, DefaultType type) : OrderData(CHKT), bp(bp) {}
 			AST::Element* getData() const { return bp; }
 			DefaultType getType() const { return type; }
 
@@ -145,8 +146,7 @@ namespace ICM
 		class OrderDataSingle : public OrderData
 		{
 		public:
-			OrderDataSingle(ObjectPtr objptr) : data(objptr) {}
-			OrderData::Order order() const { return OrderData::SINGLE; }
+			OrderDataSingle(ObjectPtr objptr) : OrderData(SINGLE), data(objptr) {}
 			const ObjectPtr& getData() const { return data; }
 			void setData(const ObjectPtr &obj) { data = obj; }
 
@@ -157,24 +157,18 @@ namespace ICM
 			}
 		};
 
-		class OrderDataStore : public OrderData
-		{
-		public:
-			OrderDataStore() {}
-			OrderData::Order order() const { return OrderData::STORE; }
-		};
-
 		class OrderDataFunc : public OrderData
 		{
 		public:
-			OrderData::Order order() const { return OrderData::FUNC; }
+			OrderDataFunc() : OrderData(FUNC) {}
 		private:
 		};
 
 		class OrderDataJump : public OrderData
 		{
 		public:
-			virtual OrderData::Order order() const { return OrderData::JUMP; }
+			OrderDataJump() : OrderData(JUMP) {}
+			OrderDataJump(Order order) : OrderData(order) {}
 			void setJmpID(size_t jmpid) {
 				this->jmpid = jmpid;
 			}
@@ -200,8 +194,7 @@ namespace ICM
 		{
 		public:
 			OrderDataJumpNotIf(size_t expid)
-				: expid(expid) {}
-			OrderData::Order order() const { return OrderData::JUMPNOT; }
+				: OrderDataJump(JUMPNOT), expid(expid) {}
 			void adjustID(const map<size_t, size_t> &map) {
 				if (!exprefadjusted)
 					this->expid = map.at(this->expid);
@@ -227,8 +220,7 @@ namespace ICM
 		class OrderDataAt : public OrderData
 		{
 		public:
-			OrderDataAt(size_t ref, size_t id) : ref(ref), id(id) {}
-			OrderData::Order order() const { return OrderData::AT; }
+			OrderDataAt(size_t ref, size_t id) : OrderData(AT), ref(ref), id(id) {}
 			size_t getRefid() const { return ref; }
 			size_t getIndex() const { return id; }
 
@@ -243,8 +235,7 @@ namespace ICM
 		class OrderDataPrintIdent : public OrderData
 		{
 		public:
-			OrderDataPrintIdent(const vector<size_t> &dat) : data(dat) {}
-			OrderData::Order order() const { return OrderData::PTI; }
+			OrderDataPrintIdent(const vector<size_t> &dat) : OrderData(PTI), data(dat) {}
 			const vector<size_t>& getData() const { return data; }
 
 		private:
@@ -264,10 +255,10 @@ namespace ICM
 			}
 		};
 
-		class OrderDataLetBase : public OrderData
+		class OrderDataAssign : public OrderData
 		{
 		public:
-			OrderDataLetBase(ObjectPtr objptr, size_t id) : data(objptr), id(id) {}
+			OrderDataAssign(Order order, ObjectPtr objptr, size_t id) : OrderData(order), data(objptr), id(id) {}
 			const ObjectPtr& getData() const { return data; }
 			void setData(const ObjectPtr &obj) { data = obj; }
 			size_t getRefid() const { return id; }
@@ -279,29 +270,11 @@ namespace ICM
 				return data->to_string_code() + ", {" + std::to_string(id) + "}";
 			}
 		};
-		class OrderDataLet : public OrderDataLetBase
-		{
-		public:
-			OrderDataLet(ObjectPtr objptr, size_t id) : OrderDataLetBase(objptr, id) {}
-			OrderData::Order order() const { return OrderData::LET; }
-		};
-		class OrderDataCpy : public OrderDataLetBase
-		{
-		public:
-			OrderDataCpy(ObjectPtr objptr, size_t id) : OrderDataLetBase(objptr, id) {}
-			OrderData::Order order() const { return OrderData::CPY; }
-		};
-		class OrderDataRef : public OrderDataLetBase
-		{
-		public:
-			OrderDataRef(ObjectPtr objptr, size_t id) : OrderDataLetBase(objptr, id) {}
-			OrderData::Order order() const { return OrderData::REF; }
-		};
 
-		class OrderDataCpySBase : public OrderData
+		class OrderDataCpySingle : public OrderData
 		{
 		public:
-			OrderDataCpySBase(size_t id) : id(id) {}
+			OrderDataCpySingle(Order order, size_t id) : OrderData(order), id(id) {}
 			size_t getRefid() const { return id; }
 
 		private:
@@ -310,22 +283,11 @@ namespace ICM
 				return "{" + std::to_string(id) + "}";
 			}
 		};
-		class OrderDataCpySingle : public OrderDataCpySBase
-		{
-		public:
-			OrderDataCpySingle(size_t id) : OrderDataCpySBase(id) {}
-			OrderData::Order order() const { return OrderData::CPYS; }
-		};
-		class OrderDataRefSingle : public OrderDataCpySBase
-		{
-		public:
-			OrderDataRefSingle(size_t id) : OrderDataCpySBase(id) {}
-			OrderData::Order order() const { return OrderData::REFS; }
-		};
+
 		class OrderDataCompare : public OrderData
 		{
 		public:
-			OrderDataCompare(ObjectPtr objptr, size_t id) : data(objptr), id(id) {}
+			OrderDataCompare(Order order, ObjectPtr objptr, size_t id) : OrderData(order), data(objptr), id(id) {}
 			const ObjectPtr& getData() const { return data; }
 			void setData(const ObjectPtr &obj) { data = obj; }
 			size_t getRefid() const { return id; }
@@ -337,42 +299,11 @@ namespace ICM
 				return data->to_string_code() + ", {" + std::to_string(id) + "}";
 			}
 		};
-		class OrderDataEqu : public OrderDataCompare
-		{
-		public:
-			OrderDataEqu(ObjectPtr objptr, size_t id) : OrderDataCompare(objptr, id) {}
-			OrderData::Order order() const { return OrderData::EQU; }
-		};
-		class OrderDataSmall : public OrderDataCompare
-		{
-		public:
-			OrderDataSmall(ObjectPtr objptr, size_t id) : OrderDataCompare(objptr, id) {}
-			OrderData::Order order() const { return OrderData::SML; }
-		};
-		class OrderDataSmallEqual : public OrderDataCompare
-		{
-		public:
-			OrderDataSmallEqual(ObjectPtr objptr, size_t id) : OrderDataCompare(objptr, id) {}
-			OrderData::Order order() const { return OrderData::SME; }
-		};
-		class OrderDataLarge : public OrderDataCompare
-		{
-		public:
-			OrderDataLarge(ObjectPtr objptr, size_t id) : OrderDataCompare(objptr, id) {}
-			OrderData::Order order() const { return OrderData::LAR; }
-		};
-		class OrderDataLargeEqual : public OrderDataCompare
-		{
-		public:
-			OrderDataLargeEqual(ObjectPtr objptr, size_t id) : OrderDataCompare(objptr, id) {}
-			OrderData::Order order() const { return OrderData::LAE; }
-		};
 
 		class OrderDataInc : public OrderData
 		{
 		public:
-			OrderDataInc(ObjectPtr objptr) : data(objptr) {}
-			OrderData::Order order() const { return OrderData::INC; }
+			OrderDataInc(ObjectPtr objptr) : OrderData(INC), data(objptr) {}
 			const ObjectPtr& getData() const { return data; }
 			void setData(const ObjectPtr &obj) { data = obj; }
 
@@ -381,18 +312,6 @@ namespace ICM
 			string getToString() const {
 				return data->to_string_code();
 			}
-		};
-
-		class OrderDataBegin : public OrderData
-		{
-		public:
-			OrderData::Order order() const { return OrderData::START; }
-		};
-
-		class OrderDataEnd : public OrderData
-		{
-		public:
-			OrderData::Order order() const { return OrderData::OVER; }
 		};
 
 		class OrderList

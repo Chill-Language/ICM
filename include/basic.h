@@ -37,7 +37,8 @@ using word = uint16_t;
 using dword = uint32_t;
 using qword = uint64_t;
 
-template <typename T> constexpr T MaxValue() { return T(-1); }
+template <typename T> constexpr T MaxValue();
+template <> constexpr size_t MaxValue<size_t>() { return SIZE_MAX; }
 
 namespace ICM
 {
