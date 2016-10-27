@@ -324,9 +324,9 @@ namespace ICM
 		void CreateOrder::createOrderSub(const Single& single) {
 			if (GlobalConfig.PrintOrder)
 				println(to_string_code(*single));
-			AST::Element *front = (AST::Element*)&(single->front());
-			if (front->isData()) {
-				ObjectPtr &op = getDataRef(*front);
+			AST::Element &front = single->front();
+			if (front.isData()) {
+				ObjectPtr &op = getDataRef(front);
 				if (op.isType(T_Keyword)) {
 					createOrderKeyword(single, op->dat<T_Keyword>());
 					return;
@@ -343,6 +343,13 @@ namespace ICM
 					createOrderSub(getReferNode(p));
 				}
 			}
+			//vector<AST::Element> args;
+			//for (auto &e : rangei(single->begin() + 1, single->end())) {
+			//	args.push_back(e);
+			//}
+			//addOrder(new ASTOrder::OrderDataFuncArgs(args));
+			//addOrder(new ASTOrder::OrderDataFuncFunc(front));
+			//addOrder(single, new ASTOrder::OrderData(OrderData::FCAL));
 			addOrder(single, new ASTOrder::OrderDataCheckCall(single));
 		}
 		void CreateOrder::createOrderSub(const Segment &segment) {
@@ -462,17 +469,26 @@ namespace ICM
 				KeywordNodeIDs.push(single->getIndex());
 				const ForStruct &forstruct = parseToOrderFor(*single);
 				ObjectPtr opvar = forstruct.getObjVar();
-				if (opvar.isType(T_Identifier))
-					setObjectIdentifier(opvar);
-				else
-					error();
 				createSingle(*forstruct.getRanexpBegin());
 				size_t bid = OrderDataList.size() - 1;
 				createSingle(*forstruct.getRanexpEnd());
 				size_t eid = OrderDataList.size() - 1;
-				addOrder(new OrderDataAssign(OrderData::LET, opvar, bid));
-				createOrderSub(forstruct.getDoexps());
-				addOrder(new OrderDataCompare(OrderData::LAE, opvar, eid));
+				if (opvar.isType(T_Identifier)) {
+#if USE_VARIABLE
+					VariableTableUnit &vtu = setObjectIdentifier(opvar);
+					addOrder(new OrderDataAssign(OrderData::LET, vtu, bid));
+					createOrderSub(forstruct.getDoexps());
+					addOrder(new OrderDataCompare(OrderData::LAE, vtu.getData(), eid));
+#else
+					setObjectIdentifier(opvar);
+					addOrder(new OrderDataAssign(OrderData::LET, opvar, bid));
+					createOrderSub(forstruct.getDoexps());
+					addOrder(new OrderDataCompare(OrderData::LAE, opvar, eid));
+#endif
+				}
+				else {
+					error();
+				}
 				OrderDataJumpNotIf *odjni = new OrderDataJumpNotIf(OrderDataList.size() - 1);
 				odjni->setExprefAdjusted();
 				odjni->setJmpID(eid + 2);
@@ -532,12 +548,6 @@ namespace ICM
 				Types::Identifier &ident = op->dat<T_Identifier>();
 				string name = ident.getName();
 				size_t id;
-				if (id = AddVariableTable.find(name)) {
-					op = ObjectPtr(AddVariableTable[id].getData());
-				}
-				else {
-					AddVariableTable.add(name, op);
-				}
 
 				createSingle((*single)[2]);
 				OrderData::Order order;
@@ -546,12 +556,30 @@ namespace ICM
 				case KeywordID::CPY: order = OrderData::CPY; break;
 				case KeywordID::REF: order = OrderData::REF; break;
 				}
+#if USE_VARIABLE
+				if (id = AddVariableTable.find(name)) {
+					addOrder(single, new OrderDataAssign(order, AddVariableTable[id], OrderDataList.size() - 1));
+				}
+				else {
+					AddVariableTable.add(name, new Objects::Nil());
+					addOrder(single, new OrderDataAssign(order, AddVariableTable[name], OrderDataList.size() - 1));
+				}
+
+				break;
+#else
+				if (id = AddVariableTable.find(name)) {
+					op = ObjectPtr(AddVariableTable[id].getData());
+				}
+				else {
+					AddVariableTable.add(name, op.get());
+				}
 				addOrder(single, new OrderDataAssign(order, op, OrderDataList.size() - 1));
 				break;
+#endif
 			}
 			}
 		}
-		void CreateOrder::setObjectIdentifier(ObjectPtr &op) {
+		VariableTableUnit& CreateOrder::setObjectIdentifier(ObjectPtr &op) {
 			Types::Identifier &ident = op->dat<T_Identifier>();
 			std::string name = ident.getName();
 			size_t i;
@@ -565,10 +593,15 @@ namespace ICM
 				op = ObjectPtr(AddVariableTable[i].getData());
 			}
 			else {
+#if USE_VARIABLE
+				AddVariableTable.add(name, new Objects::Nil());
+#else
 				ident.setData(ObjectPtr(new Objects::Nil()));
-				AddVariableTable.add(name, op);
+				AddVariableTable.add(name, op.get());
+#endif
 				//error("Unfind Identifier(" + ident->getName() + ").");
 			}
+			return AddVariableTable[name];
 		}
 	}
 }

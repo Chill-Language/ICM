@@ -26,10 +26,37 @@ namespace ICM
 		size_t id = 0;
 		string name;
 	};
-
 	//=======================================
 	// * Class VariableTableUnit
 	//=======================================
+#define USE_VARIABLE !true
+#if USE_VARIABLE
+	namespace TypeBase {
+		struct VariableType
+		{
+			size_t index = MaxValue<size_t>();
+			Object data;
+			bool isrefer = false;
+			bool isstatic = false;
+		};
+	}
+	class VariableTableUnit : public BaseTableUnit
+	{
+	public:
+		VariableTableUnit() = default;
+		VariableTableUnit(size_t id, const string &name, const Object *data)
+			: BaseTableUnit(id, name) {
+			this->data.data = *data;
+		}
+
+		void setData(const Object *data) { this->data.data = *data; }
+		const Object *getData() const { return &data.data; }
+		Object *getData() { return &data.data; }
+
+	private:
+		TypeBase::VariableType data;
+	};
+#else
 	class VariableTableUnit : public BaseTableUnit
 	{
 		using Identifier = Objects::Identifier;
@@ -44,6 +71,7 @@ namespace ICM
 	private:
 		ObjectPtr data;
 	};
+#endif
 
 	//=======================================
 	// * Class FuncTableUnit

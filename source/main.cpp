@@ -230,11 +230,6 @@ namespace ICM
 	}
 }
 
-namespace ICM
-{
-
-}
-
 void test()
 {
 	//test2();

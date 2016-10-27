@@ -5,6 +5,7 @@
 #include "ast.h"
 #include "keyword.h"
 #include "tabledata.h"
+#include "objectdef.h"
 
 namespace ICM
 {
@@ -21,6 +22,11 @@ namespace ICM
 				AT,
 				PTI, // print ident
 				LET, CPY, REF,
+				//
+				FARG, // farg => $(Global.Func.Args)
+				FFUN, // ffun => $(Global.Func.Func)
+				FCAL, // fcal $(Global.Func.Func), $(Global.Func.Args)
+				//
 				CALL, CCAL, CHKT,
 				CPYS, REFS,
 				EQU, SML, SME, LAR, LAE,
@@ -52,6 +58,9 @@ namespace ICM
 				case REF:      str.append("REF "); break;
 				case CPYS:     str.append("CPYS"); break;
 				case REFS:     str.append("REFS"); break;
+				case FARG:     str.append("FARG"); break;
+				case FFUN:     str.append("FFUN"); break;
+				case FCAL:     str.append("FCAL"); break;
 				case EQU:      str.append("EQU "); break;
 				case SML:      str.append("SML "); break;
 				case SME:      str.append("SME "); break;
@@ -101,7 +110,6 @@ namespace ICM
 		public:
 			OrderDataCall(const FuncTableUnit &ftu, size_t id, const vector<AST::Element*> &args)
 				: OrderData(CALL), ftu(ftu), id(id), args(args) {}
-			OrderData::Order order() const { return OrderData::CALL; }
 			vector<AST::Element*>& getData() { return args; }
 			const vector<AST::Element*>& getData() const { return args; }
 			ObjectPtr call(const DataList &dl) {
@@ -127,6 +135,47 @@ namespace ICM
 				return str;
 			}
 		};
+		//////////////////////////////////////
+		struct OrderDataFuncArgs : public OrderData
+		{
+			using NodeList = vector<AST::Element>;
+		public:
+			OrderDataFuncArgs(const NodeList &args)
+				: OrderData(FARG), Args(args) {}
+			NodeList Args;
+			void adjustID(const map<size_t, size_t> &map) {
+				for (auto &e : Args) {
+					if (e.isRefer()) {
+						AST::Element &r = static_cast<AST::Element&>(e);
+						r.setRefer(map.at(r.getRefer()));
+					}
+				}
+			}
+
+		private:
+			string getToString() const {
+				string str;
+				for (auto &e : Args)
+					str.append(to_string_code(e) + ", ");
+				if (Args.size()) {
+					str.pop_back();
+					str.pop_back();
+				}
+				return str;
+			}
+		};
+		struct OrderDataFuncFunc : public OrderData
+		{
+			OrderDataFuncFunc(const AST::Element &e)
+				: OrderData(FFUN), Data(e) {}
+			const AST::Element& Data;
+
+		private:
+			string getToString() const {
+				return to_string_code(Data);
+			}
+		};
+		//////////////////////////////////////
 
 		class OrderDataCheckType : public OrderData
 		{
@@ -258,6 +307,30 @@ namespace ICM
 		class OrderDataAssign : public OrderData
 		{
 		public:
+#if USE_VARIABLE
+			OrderDataAssign(Order order, VariableTableUnit &vtu, size_t id) : OrderData(order), id(id) {
+				this->data = &vtu;
+			}
+			OrderDataAssign(Order order, ObjectPtr objptr, size_t id) : OrderData(order), id(id) {
+				if (objptr.isType(T_Identifier)) {
+					auto &n = objptr->get<T_Identifier>()->getName();
+					this->data = &AddVariableTable[n];
+				}
+				else {
+					println("Error in OrderDataAssign.");
+				}
+			}
+			ObjectPtr getData() const { return ObjectPtr(data->getData()); }
+			void setData(const ObjectPtr &obj) { data->setData(obj.get()); }
+			size_t getRefid() const { return id; }
+
+		private:
+			VariableTableUnit *data;
+			size_t id;
+			string getToString() const {
+				return data->getData()->to_string_code() + ", {" + std::to_string(id) + "}";
+			}
+#else
 			OrderDataAssign(Order order, ObjectPtr objptr, size_t id) : OrderData(order), data(objptr), id(id) {}
 			const ObjectPtr& getData() const { return data; }
 			void setData(const ObjectPtr &obj) { data = obj; }
@@ -269,6 +342,7 @@ namespace ICM
 			string getToString() const {
 				return data->to_string_code() + ", {" + std::to_string(id) + "}";
 			}
+#endif
 		};
 
 		class OrderDataCpySingle : public OrderData
@@ -355,7 +429,7 @@ namespace ICM
 			void createOrderSub(const Segment &segment);
 			void createOrderKeyword(const Single& single, KeywordID keyword);
 			void createOrderKeywordSingle(KeywordID keyword);
-			void setObjectIdentifier(ObjectPtr &op);
+			VariableTableUnit& setObjectIdentifier(ObjectPtr &op);
 			void addRefer(const Single &single) {
 				if (OrderDataListReferMap.find(single->getIndex()) == OrderDataListReferMap.end()) {
 					size_t id = OrderDataList.size();

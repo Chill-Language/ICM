@@ -3,6 +3,7 @@
 
 #include "basic.h"
 #include "order.h"
+#include "objectdef.h"
 
 namespace ICM
 {
@@ -17,12 +18,20 @@ namespace ICM
 
 	private:
 		OrderList orderlist;
-		vector<ObjectPtr> tempresult;
 		ObjectPtr Result;
+		vector<ObjectPtr> tempresult;
+
+		struct {
+			struct {
+				Types::Function Func;
+				DataList Args;
+			} Func;
+		} Global;
+
 		void runFunc(const ObjectPtr &op, AST::Node *n, size_t id);
 		void runSub(const ObjectPtr &op, AST::Node *node, size_t i);
 		DataList getDataList(const vector<AST::Element*> &vb);
-		ObjectPtr getObjectPtr(AST::Element *e);
+		ObjectPtr getObjectPtr(const AST::Element &e);
 	};
 }
 

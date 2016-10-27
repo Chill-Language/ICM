@@ -155,7 +155,7 @@ namespace ICM
 				return index == ft.index && subid == ft.subid;
 			}
 
-		private:
+		public:
 			size_t index;
 			size_t subid = MaxValue<size_t>();
 		};
@@ -172,7 +172,7 @@ namespace ICM
 			explicit IdentifierType(const std::string &name = "") : name(name) {}
 			IdentifierType(const std::string &name, const ObjectPtr &op) : name(name), data(op) {}
 			std::string getName() const {
-				return name.to_string();
+				return name/*.to_string()*/;
 			}
 			const ObjectPtr& getData() const {
 				return data;
@@ -189,13 +189,13 @@ namespace ICM
 			}
 			// Method
 			string to_string() const {
-				return name.to_string() + "(" + ICM::to_string(data) + ")";
+				return name/*.to_string()*/ + "(" + ICM::to_string(data) + ")";
 			}
 			string to_output() const {
 				return data->to_output();
 			}
 			string to_string_code() const {
-				return name.to_string();
+				return name/*.to_string()*/;
 			}
 			void write(File &file) const {
 				file.write(data);
@@ -205,24 +205,13 @@ namespace ICM
 			}
 
 		private:
-			Common::charptr name;
+			string name;
+			//Common::charptr name;
 			ObjectPtr data;
 		};
 		template <> string to_string<IdentifierType>(const IdentifierType &it);
 		template <> string to_output<IdentifierType>(const IdentifierType &it);
 		template <> string to_string_code<IdentifierType>(const IdentifierType &it);
-
-		class VariableType
-		{
-		public:
-			VariableType() {}
-			Object* getData() { return &data; }
-			const Object* getData() const { return &data; }
-
-		private:
-			size_t index = MaxValue<size_t>();
-			Object data;
-		};
 	}
 }
 

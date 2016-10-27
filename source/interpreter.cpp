@@ -53,16 +53,16 @@ namespace ICM
 			println("Error Type.");
 		}
 	}
-	ObjectPtr Interpreter::getObjectPtr(AST::Element *e) {
-		if (e->isData())
-			return ObjectPtr(e->getData());
+	ObjectPtr Interpreter::getObjectPtr(const AST::Element &e) {
+		if (e.isData())
+			return ObjectPtr(e.getData());
 		else
-			return tempresult[e->getRefer()];
+			return tempresult[e.getRefer()];
 	}
 	DataList Interpreter::getDataList(const vector<AST::Element*> &vb) {
 		lightlist_creater<ObjectPtr> ndl(vb.size());
 		for (auto &e : vb)
-			ndl.push_back(getObjectPtr(e));
+			ndl.push_back(getObjectPtr(*e));
 		return ndl.data();
 	}
 	ObjectPtr Interpreter::run() {
@@ -97,10 +97,55 @@ namespace ICM
 			}
 			case OrderData::CHKT: {
 				ASTOrder::OrderDataCheckType *p = static_cast<ASTOrder::OrderDataCheckType*>(e);
-				if (!adjustObjectPtr(getObjectPtr(p->getData())).isType(p->getType())) {
+				if (!adjustObjectPtr(getObjectPtr(*p->getData())).isType(p->getType())) {
 					println("Error in Check Type.", p->to_string());
 					return ObjectPtr();
 				}
+				break;
+			}
+			case OrderData::FARG: {
+				auto *p = static_cast<ASTOrder::OrderDataFuncArgs*>(e);
+				auto &args = p->Args;
+				Global.Func.Args = createList(rangei(args.begin(), args.end()));
+				break;
+			}
+			case OrderData::FFUN: {
+				auto *p = static_cast<ASTOrder::OrderDataFuncFunc*>(e);
+				auto &args = Global.Func.Args;
+				const ObjectPtr &op = adjustObjectPtr(getObjectPtr(p->Data));
+				if (op->dat<T_Function>().subid != MaxValue<size_t>()) {
+					// TODO
+					Global.Func.Func = op->dat<T_Function>();
+					break;
+				}
+				if (!op.isType(T_Function)) {
+					println("Error in not function with ", op.to_string(), ".");
+					Global.Func.Func.index = 0;
+					Global.Func.Func.subid = 0;
+					break;
+				}
+				auto &ftu = DefFuncTable[op->dat<T_Function>().index];
+				size_t id = getCallID(ftu, args);
+				if (id == ftu.size()) {
+					println("Error Unfind args match function ", ftu.getName(), ".");
+					Global.Func.Func.index = 0;
+					Global.Func.Func.subid = 0;
+					break;
+				}
+				op->dat<T_Function>().subid = id;
+				Global.Func.Func = op->dat<T_Function>();
+				break;
+			}
+			case OrderData::FCAL: {
+				auto &args = Global.Func.Args;
+				auto &func = Global.Func.Func;
+				if (func.index == 0) {
+					tempresult[ProgramCounter] = ObjectPtr(new Object(T_Null));
+				}
+				else {
+					tempresult[ProgramCounter] = DefFuncTable[func.index][func.subid].call(args);
+				}
+				Result = tempresult[ProgramCounter];
 				break;
 			}
 			case OrderData::JUMP: {
@@ -175,6 +220,10 @@ namespace ICM
 			case OrderData::LET:
 			case OrderData::CPY:
 			case OrderData::REF: {
+#if USE_VARIABLE
+				ASTOrder::OrderDataAssign *p = static_cast<ASTOrder::OrderDataAssign*>(e);
+				p->setData(tempresult[p->getRefid()]);
+#else
 				ASTOrder::OrderDataAssign *p = static_cast<ASTOrder::OrderDataAssign*>(e);
 				Types::Identifier &ident = p->getData()->dat<T_Identifier>();
 				switch (e->order())
@@ -183,6 +232,7 @@ namespace ICM
 				case OrderData::CPY: ident.setCopy(tempresult[p->getRefid()]); break;
 				case OrderData::REF: ident.setRefer(tempresult[p->getRefid()]); break;
 				}
+#endif
 				tempresult[ProgramCounter] = p->getData();
 				Result = tempresult[ProgramCounter];
 				break;
@@ -204,7 +254,6 @@ namespace ICM
 					tempresult[ProgramCounter] = op;
 					break;
 				}
-
 				Result = tempresult[ProgramCounter];
 				break;
 			}
@@ -214,8 +263,23 @@ namespace ICM
 			case OrderData::LAR:
 			case OrderData::LAE: {
 				ASTOrder::OrderDataCompare *p = static_cast<ASTOrder::OrderDataCompare*>(e);
-				Types::Identifier &ident = p->getData()->dat<T_Identifier>();
 				bool r;
+#if USE_VARIABLE
+				if (e->order() == OrderData::EQU) {
+					r = p->getData()->equ(tempresult[p->getRefid()].get());
+				}
+				else {
+					const auto &r1 = p->getData()->dat<T_Number>();
+					const auto &r2 = adjustObjectPtr(tempresult[p->getRefid()])->dat<T_Number>();
+					switch (e->order()) {
+					case OrderData::SML: r = r1 < r2; break;
+					case OrderData::SME: r = r1 <= r2; break;
+					case OrderData::LAR: r = r1 > r2; break;
+					case OrderData::LAE: r = r1 >= r2; break;
+					}
+				}
+#else
+				Types::Identifier &ident = p->getData()->dat<T_Identifier>();
 				if (e->order() == OrderData::EQU) {
 					r = ident.getRealData()->equ(tempresult[p->getRefid()].get());
 				}
@@ -229,6 +293,7 @@ namespace ICM
 					case OrderData::LAE: r = r1 >= r2; break;
 					}
 				}
+#endif
 
 				tempresult[ProgramCounter] = ObjectPtr(new Objects::Boolean(r));
 				Result = tempresult[ProgramCounter];
@@ -236,7 +301,11 @@ namespace ICM
 			}
 			case OrderData::INC: {
 				ASTOrder::OrderDataInc *p = static_cast<ASTOrder::OrderDataInc*>(e);
+#if USE_VARIABLE
+				p->getData()->dat<T_Number>().operator+=(1);
+#else
 				p->getData()->get<T_Identifier>()->getRealData()->dat<T_Number>().operator+=(1);
+#endif
 				break;
 			}
 			case OrderData::OVER: {
