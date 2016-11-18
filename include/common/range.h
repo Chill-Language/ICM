@@ -84,7 +84,10 @@ template <typename T>
 class RangeIterator : public RangeBase<T, T>
 {
 public:
-	RangeIterator(const T &bg, const T &ed) : RangeBase<T, T>(bg, ed) {}
+	RangeIterator(const T &bg, const T &ed) : RangeBase<T, T>(bg, ed) {
+		if (bg >= ed)
+			this->_begin = this->_end;
+	}
 
 	auto operator[](size_t i) const {
 		return *(this->_begin + i);

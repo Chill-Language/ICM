@@ -17,7 +17,7 @@ namespace ICM
 		class Signature
 		{
 		public:
-			using List = vector<TypeObject>;
+			using List = lightlist<TypeObject>;
 			using InitList = std::initializer_list<TypeObject>;
 
 			Signature() = default;
@@ -28,6 +28,8 @@ namespace ICM
 			bool isLastArgs() const { return last_is_args; }
 			bool checkType(const Signature &sign) const;
 			bool checkType(const lightlist<TypeObject> &argT) const;
+
+			bool checkType(const vector<TypeObject>& argT) const;
 
 		private:
 			List InType;
@@ -80,7 +82,7 @@ namespace ICM
 		//=======================================
 		class FuncInitObject
 		{
-			using LFP = Object*(const Common::lightlist<Object*> &); // TODO
+			using LFP = ICM::Object*(const Common::lightlist<Object*> &); // TODO
 		public:
 			FuncObject get_f() {
 				const auto &f1 = std::bind(&FuncInitObject::func, this, std::placeholders::_1);
@@ -103,9 +105,8 @@ namespace ICM
 		{
 		public:
 			struct Node;
-			using NodePtr = shared_ptr<Node>;
-			using Nodes = vector<NodePtr>;
-			using TypeObjectPtr = TypeObject*;//shared_ptr<TypeObject>;
+			using NodePtr = unique_ptr<Node>;
+			using TypeObjectPtr = TypeObject*;
 		public:
 			struct Node
 			{
@@ -114,33 +115,33 @@ namespace ICM
 				Node(const TypeObjectPtr &top, Node* parent)
 					: data(top), parent(parent) {}
 
-				NodePtr find(const TypeObject &to) const {
+				Node* find(const TypeObject &to) const {
 					for (auto &p : children) {
 						if (p->data && *p->data == to)
-							return p;
+							return p.get();
 					}
 					return nullptr;
 				}
-				NodePtr find(const TypeObjectPtr &to) const {
+				Node* find(const TypeObjectPtr &to) const {
 					for (auto &p : children) {
 						if (p->data == nullptr && to == nullptr)
-							return p;
+							return p.get();
 						else if (p->data == to)
-							return p;
+							return p.get();
 					}
 					return nullptr;
 				}
-				NodePtr& push(const TypeObjectPtr &top) {
+				Node* push(const TypeObjectPtr &top) {
 					children.push_back(NodePtr(new Node(top, this)));
-					return children.back();
+					return children.back().get();
 				}
-				NodePtr& pushEnd(size_t id) {
+				Node* pushEnd(size_t id) {
 					NodePtr node(new Node(nullptr, this));
 					node->index = id;
-					children.push_back(node);
-					return children.back();
+					children.push_back(std::move(node));
+					return children.back().get();
 				}
-				const Nodes& getChildren() const {
+				const vector<NodePtr>& getChildren() const {
 					return children;
 				}
 				bool checkType(const TypeObject &type) const {
@@ -184,7 +185,7 @@ namespace ICM
 			private:
 				TypeObjectPtr data;
 				Node* parent;
-				Nodes children;
+				vector<NodePtr> children;
 				size_t index;
 				bool isargs = false;
 			};
@@ -192,17 +193,17 @@ namespace ICM
 			SignTree() : root(new Node()), level(1) {}
 
 			void insert(const FuncObject &funcO) {
-				NodePtr currptr = root;
+				Node* currptr = root.get();
 				size_t count = 1;
 				for (const TypeObject &to : funcO.getSign().getInType()) {
-					NodePtr ptr = currptr->find(to);
+					Node* ptr = currptr->find(to);
 					if (ptr) {
 						currptr = ptr;
 					}
 					else {
 						currptr = currptr->push(TypeObjectPtr(new TypeObject(to)));
 						if (count == level.size())
-							level.push_back(vector<const Nodes*>());
+							level.push_back(vector<const vector<NodePtr>*>());
 						level[count].push_back(&currptr->getChildren());
 					}
 					count++;
@@ -222,7 +223,7 @@ namespace ICM
 
 		private:
 			NodePtr root;
-			vector<vector<const Nodes*>> level;
+			vector<vector<const vector<NodePtr>*>> level;
 			vector<const FuncObject*> funcdata;
 		};
 

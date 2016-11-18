@@ -105,8 +105,11 @@ private:
 
 	void priOpen() {
 		const std::string &mode = getMode(tbmode, rwmode);
-		file = FilePtr(fopen(filename.c_str(), mode.c_str()), fclose);
-		setSize();
+		FILE *fp = fopen(filename.c_str(), mode.c_str());
+		if (fp) {
+			file = FilePtr(fp, fclose);
+			setSize();
+		}
 	}
 	void setSize() {
 		long size;

@@ -11,8 +11,8 @@ namespace ICM
 	namespace DefFunc
 	{
 		ObjectPtr callDefFunc(const string &name, const DataList &dl) {
-			if (DefFuncTable.find(name))
-				return checkCall(DefFuncTable[name], dl);
+			if (GlobalFunctionTable.find(name))
+				return checkCall(GlobalFunctionTable[name], dl);
 			else
 				return createError("Error in match function(" + name + ").");
 		}
@@ -96,7 +96,7 @@ namespace ICM
 				}
 				ObjectPtr func(const DataList &list) const {
 					const auto &rr = Common::Number::mod(list[0]->dat<T_Number>(), list[1]->dat<T_Number>());
-					return ObjectPtr(new Number(rr));
+					return ObjectPtr(new Number(rr.getNum()));
 				}
 			};
 			struct Rem : public FI
@@ -107,7 +107,7 @@ namespace ICM
 				}
 				ObjectPtr func(const DataList &list) const {
 					const auto &rr = Common::Number::rem(list[0]->dat<T_Number>(), list[1]->dat<T_Number>());
-					return ObjectPtr(new Number(rr));
+					return ObjectPtr(new Number(rr.getNum()));
 				}
 			};
 
@@ -180,7 +180,7 @@ namespace ICM
 				ObjectPtr func(const DataList &list) const {
 					auto &nn1 = list[0];
 					auto &nn2 = list[1];
-					return ObjectPtr(new Boolean(nn1->equ(nn2.get())));
+					return ObjectPtr(new Boolean(nn1->equ(nn2)));
 				}
 			};
 		}
@@ -195,7 +195,7 @@ namespace ICM
 				return ObjectPtr(new List(ListType(dl)));
 			}
 
-			const vector<ObjectPtr>& _disp(const ListType *l) {
+			const vector<Object*>& _disp(const ListType *l) {
 				return l->getData();
 			}
 
@@ -206,7 +206,7 @@ namespace ICM
 			ObjectPtr sort(const DataList &dl) {
 				Types::List *list = dl[0]->get<T_List>();
 				std::sort(list->begin(), list->end(), [](const ObjectPtr &a, const ObjectPtr &b) {
-					return *a->get<T_Number>() < *b->get<T_Number>();
+					return a->dat<T_Number>() < b->dat<T_Number>();
 				});
 				return ObjectPtr(dl[0]);
 			}
@@ -214,7 +214,7 @@ namespace ICM
 			ObjectPtr sort_f(const DataList &dl) {
 				auto &func = dl[1]->get<T_Function>()->getData();
 				// TODO
-				size_t id = getCallID(func, DataList({ ObjectPtr(new Number(NumberType(0))), ObjectPtr(new Number(NumberType(0))) }));
+				size_t id = getCallID(func, DataList({ new Number(NumberType(0)), new Number(NumberType(0)) }));
 				const auto &rf = func[id];
 
 				Types::List *list = dl[0]->get<T_List>();
@@ -235,8 +235,8 @@ namespace ICM
 				}
 				ObjectPtr func(const DataList &list) const {
 					auto &l = *list[0]->get<T_List>();
-					vector<ObjectPtr> nl;
-					for (size_t i : Range<size_t>(0, (size_t)list[1]->get<T_Number>()->getNum())) {
+					vector<Object*> nl;
+					for (size_t i : Range<size_t>(0, (size_t)list[1]->dat<T_Number>()/*->getNum()*/)) {
 						nl.insert(nl.end(), l.begin(), l.end());
 					}
 					return ObjectPtr(new List(ListType(nl)));
@@ -252,20 +252,20 @@ namespace ICM
 				ObjectPtr func(const DataList &list) const {
 					// TODO
 					auto &func = list[0]->get<T_Function>()->getData();
-					size_t id = getCallID(func, DataList({ ObjectPtr(new Number(NumberType(0))) }));
+					size_t id = getCallID(func, DataList({ new Number(NumberType(0)) }));
 					const auto &rf = func[id];
 
 					size_t minsize = list[1]->get<T_List>()->size();
 					size_t size = list.size();
 					for (auto i : range(1, size))
 						minsize = std::min(minsize, list[i]->get<T_List>()->size());
-					vector<ObjectPtr> dls;
+					vector<Object*> dls;
 					Object obj;
 					for (size_t i : range(0, minsize)) {
 						DataList ldl(size - 1);
 						for (auto id : range(1, size))
 							ldl[id - 1] = list[id]->get<T_List>()->getData()[i];
-						dls.push_back(rf.call(ldl));
+						dls.push_back(rf.call(ldl).get());
 					}
 					List *result = new List(ListType(dls));
 					return ObjectPtr(result);
@@ -291,10 +291,10 @@ namespace ICM
 					return S({ T_List, T_Number, T_Number }, T_List); // (L N N) -> L
 				}
 				ObjectPtr func(const DataList &list) const {
-					auto &v = const_cast<vector<ObjectPtr>&>(list[0]->get<T_List>()->getData());
-					size_t i1 = (size_t)list[1]->get<T_Number>()->getNum();
-					size_t i2 = (size_t)list[2]->get<T_Number>()->getNum();
-					ObjectPtr top = v[i1];
+					auto &v = const_cast<vector<Object*>&>(list[0]->get<T_List>()->getData());
+					size_t i1 = (size_t)list[1]->dat<T_Number>()/*->getNum()*/;
+					size_t i2 = (size_t)list[2]->dat<T_Number>()/*->getNum()*/;
+					Object* top = v[i1];
 					v[i1] = v[i2];
 					v[i2] = top;
 					return list[0];
@@ -308,7 +308,9 @@ namespace ICM
 					return S({ T_List, T_Number }, T_Vary); // (L N) -> V
 				}
 				ObjectPtr func(const DataList &list) const {
-					const ObjectPtr &op = list[0]->get<T_List>()->getData()[(size_t)list[1]->get<T_Number>()->getNum()];
+					const TypeBase::ListType &lt = list[0]->dat<T_List>();
+					size_t id = list[1]->dat<T_Number>()/*->getNum()*/;
+					const ObjectPtr &op = lt.getData()[id];
 					return op;
 				}
 			};
@@ -320,7 +322,7 @@ namespace ICM
 					return S({ T_List, T_Number, T_Vary }, T_Vary); // (L N V) -> V
 				}
 				ObjectPtr func(const DataList &list) const {
-					const ObjectPtr &op = list[0]->get<T_List>()->getData()[(size_t)list[1]->get<T_Number>()->getNum()];
+					const ObjectPtr &op = list[0]->get<T_List>()->getData()[(size_t)list[1]->dat<T_Number>()/*->getNum()*/];
 					ObjectPtr &rop = const_cast<ObjectPtr&>(op);
 					rop = list[2];
 					return rop;
@@ -338,7 +340,7 @@ namespace ICM
 			}
 			ObjectPtr p(const DataList &dl) {
 				for (auto &op : dl)
-					Common::Output::println(op.to_string());
+					Common::Output::println(op->to_string());
 				return Lists::list(dl);
 			}
 			ObjectPtr print(const DataList &dl) {
@@ -365,7 +367,7 @@ namespace ICM
 			}
 			ObjectPtr exitv(const DataList &dl) {
 				// TODO
-				std::exit((int)dl[0]->get<T_Number>()->getNum());
+				std::exit((int)dl[0]->dat<T_Number>()/*->getNum()*/);
 				return ObjectPtr(new Nil());
 			}
 		}
@@ -447,10 +449,6 @@ namespace ICM
 		DefFuncTable.add("dec", LST{ new Calc::Dec() });
 		DefFuncTable.add("++", "inc");
 		DefFuncTable.add("--", "dec");
-
-		//DefFuncTable.add("let", LST{ new Assign::Let() });
-		//DefFuncTable.add("cpy", LST{ new Assign::Cpy(), new Assign::CpyV() });
-		//DefFuncTable.add("ref", LST{ new Assign::Ref() });
 
 		DefFuncTable.add("list", Lst{
 			F(Lists::list, S({}, T_List)),               // Void -> L

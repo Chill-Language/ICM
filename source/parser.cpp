@@ -5,168 +5,157 @@
 
 namespace ICM
 {
-	MatchResult Match::matchNext()
+	namespace Parser
 	{
-		MatchResult mr;
-		MatchType type = MT_Null;
-		const char *begin = currptr;
-		int mode = 0;
-		vector<char> findchars;
-		vector<char> ignorechars;
-		bool firstfind = false;
-		static const char breakfindchars[] = " \n\t()[];"; // include '\0'
+		MatchResult Match::matchNext()
+		{
+			MatchResult mr;
+			MatchType type = MT_Null;
+			const char *begin = currptr;
+			int mode = 0;
+			vector<char> findchars;
+			vector<char> ignorechars;
+			bool firstfind = false;
+			static const char breakfindchars[] = " \n\t()[];"; // include '\0'
 
-		while (true) {
-			char c = *currptr;
-			if (c == '\n')
-				this->linenum++;
-			switch (mode)
-			{
-			case 0:  // No Match
-				switch (c)
+			while (true) {
+				char c = *currptr;
+				if (c == '\n')
+					this->linenum++;
+				switch (mode)
 				{
-				case '(':  /* Left Bracket */
-					++currptr;
-					mr = MatchResult(MT_LBracket, currptr - 1, currptr);
-					goto EndMatch;
-				case ')':  /* Right Bracket */
-					++currptr;
-					mr = MatchResult(MT_RBracket, currptr - 1, currptr);
-					goto EndMatch;
-				case '[':  /* Left Square Bracket */
-					++currptr;
-					mr = MatchResult(MT_LSBracket, currptr - 1, currptr);
-					goto EndMatch;
-				case ']':  /* Right Square Bracket */
-					++currptr;
-					mr = MatchResult(MT_RSBracket, currptr - 1, currptr);
-					goto EndMatch;
-				case ';':  /* Comment */
-					findchars = { '\n', '\0' };
-					//ignorechars = { '\\' };
-					type = MT_Comment;
-					begin = currptr;
-					mode = 1;
+					case 0:  // No Match
+						switch (c)
+						{
+							case '(':  /* Left Bracket */
+								++currptr;
+								mr = MatchResult(MT_LBracket, currptr - 1, currptr);
+								goto EndMatch;
+							case ')':  /* Right Bracket */
+								++currptr;
+								mr = MatchResult(MT_RBracket, currptr - 1, currptr);
+								goto EndMatch;
+							case '[':  /* Left Square Bracket */
+								++currptr;
+								mr = MatchResult(MT_LSBracket, currptr - 1, currptr);
+								goto EndMatch;
+							case ']':  /* Right Square Bracket */
+								++currptr;
+								mr = MatchResult(MT_RSBracket, currptr - 1, currptr);
+								goto EndMatch;
+							case ';':  /* Comment */
+								findchars = { '\n', '\0' };
+								//ignorechars = { '\\' };
+								type = MT_Comment;
+								begin = currptr;
+								mode = 1;
+								break;
+							case '"':  /* String */
+								findchars = { '"', '\0' };
+								//ignorechars = { '\\' };
+								type = MT_String;
+								begin = currptr + 1;
+								mode = 1;
+								break;
+							case '\'':  /* Symbol */
+								findchars = { '\'', '\0' };
+								type = MT_Symbol;
+								begin = currptr + 1;
+								mode = 1;
+								break;
+							case '-': /* (Maybe) Number */
+								type = MT_Number;
+								begin = currptr;
+								mode = 3;
+								firstfind = false;
+								break;
+							default:
+								if (isdigit(c)) /* Number */ {
+									type = MT_Number;
+									begin = currptr;
+									mode = 2;
+								}
+								else if (isalpha(c) || ispunct(c)) /* Idenit */ {
+									type = MT_Identifier;
+									begin = currptr;
+									mode = 2;
+								}
+						}
+						break;
+					case 1:  // Match Long with findchar
+						if (std::find(findchars.begin(), findchars.end(), c) != findchars.end()) {
+							mr = MatchResult(type, begin, currptr);
+							if (c != '\0')
+								++currptr;
+							goto EndMatch;
+						}
+						break;
+					case 2:  // Match Long without findchar
+						if (std::find(std::begin(breakfindchars), std::end(breakfindchars), c) != std::end(breakfindchars)) {
+							mr = MatchResult(type, begin, currptr);
+							goto EndMatch;
+						}
+						break;
+					case 3:  // Match Long with function find
+						if (isdigit(c)) {
+							firstfind = true;
+						}
+						else {
+							if (firstfind) {
+								mr = MatchResult(type, begin, currptr);
+								goto EndMatch;
+							}
+							else {
+								currptr -= 2;
+								type = MT_Identifier;
+								mode = 2;
+							}
+						}
+						break;
+					default:
+						break;
+				}
+				if (c == '\0')
 					break;
-				case '"':  /* String */
-					findchars = { '"', '\0' };
-					//ignorechars = { '\\' };
-					type = MT_String;
-					begin = currptr + 1;
-					mode = 1;
-					break;
-				case '\'':  /* Symbol */
-					findchars = { '\'', '\0' };
-					type = MT_Symbol;
-					begin = currptr + 1;
-					mode = 1;
-					break;
-				case '-': /* (Maybe) Number */
-					type = MT_Number;
-					begin = currptr;
-					mode = 3;
-					firstfind = false;
-					break;
-				default:
-					if (isdigit(c)) /* Number */ {
-						type = MT_Number;
-						begin = currptr;
-						mode = 2;
-					}
-					else if (isalpha(c) || ispunct(c)) /* Idenit */ {
-						type = MT_Identifier;
-						begin = currptr;
-						mode = 2;
-					}
-				}
-				break;
-			case 1:  // Match Long with findchar
-				if (std::find(findchars.begin(), findchars.end(), c) != findchars.end()) {
-					mr = MatchResult(type, begin, currptr);
-					if (c != '\0')
-						++currptr;
-					goto EndMatch;
-				}
-				break;
-			case 2:  // Match Long without findchar
-				if (std::find(std::begin(breakfindchars), std::end(breakfindchars), c) != std::end(breakfindchars)) {
-					mr = MatchResult(type, begin, currptr);
-					goto EndMatch;
-				}
-				break;
-			case 3:  // Match Long with function find
-				if (isdigit(c)) {
-					firstfind = true;
-				}
-				else {
-					if (firstfind) {
-						mr = MatchResult(type, begin, currptr);
-						goto EndMatch;
-					}
-					else {
-						currptr -= 2;
-						type = MT_Identifier;
-						mode = 2;
-					}
-				}
-				break;
-			default:
-				break;
+				++currptr;
 			}
-			if (c == '\0')
-				break;
-			++currptr;
-		}
-	EndMatch:
-		if (mr.getType() == MT_Identifier) {
-			if (mr.getString() == "Nil")
-				;//mr.setType(MT_Nil);
-			else if (mr.getString() == "T" || mr.getString() == "F")
-				mr.setType(MT_Boolean);
-			else if (DefKeywordTable.findKey(mr.getString()) != DefKeywordTable.size())
-				mr.setType(MT_Keyword);
-		}
+			EndMatch:
+			if (mr.getType() == MT_Identifier) {
+				if (mr.getString() == "Nil")
+					;//mr.setType(MT_Nil);
+				else if (mr.getString() == "T" || mr.getString() == "F")
+					mr.setType(MT_Boolean);
+				else if (GlobalKeywordTable.findKey(mr.getString()) != GlobalKeywordTable.size())
+					mr.setType(MT_Keyword);
+			}
 
-		return mr;
+			return mr;
+		}
 	}
 }
 
 namespace ICM
 {
+	ElementMemoryPool GlobalElementObjectPool;
+
 	namespace Parser
 	{
-		using namespace Objects;
-
-		Object* createObject(MatchType type, const string &str)
+		AST::Element createElementData(MatchType type, const string &str)
 		{
-			using namespace Objects;
-
-			Object *object;
-			switch (type)
-			{
-			//case ICM::MT_Nil:
-			//	object = new Nil();
-			//	break;
-			case ICM::MT_Number:
-				object = new Number(Common::Number::to_rational(str.c_str()));
-				break;
-			case ICM::MT_Boolean:
-				object = new Boolean(str == "T");
-				break;
-			case ICM::MT_String:
-				object = new String(str);
-				break;
-			case ICM::MT_Identifier:
-				object = new Identifier(TypeBase::IdentifierType(str));
-				break;
-			case ICM::MT_Keyword:
-				object = new Keyword(DefKeywordTable.getValue(str));
-				break;
+			switch (type) {
+			case MT_Boolean:
+				return AST::Element::Data(T_Boolean, str == "T");
+			case MT_Number:
+				return AST::Element::Data(T_Number, GlobalElementObjectPool.insert(Common::Number::to_rational(str.c_str())));
+			case MT_String:
+				return AST::Element::Data(T_String, GlobalElementObjectPool.insert(Objects::String(str)));
+			case MT_Keyword:
+				return AST::Element::Keyword(GlobalKeywordTable.getValue(str));
+			case MT_Identifier:
+				return AST::Element::Identifier(str);
 			default:
-				object = nullptr;
-				break;
+				return AST::Element::Data(T_Null, 0);
 			}
-			return object;
 		}
 
 		bool createAST(Match &match, AST &ast)
@@ -192,7 +181,7 @@ namespace ICM
 			while (mr.begin() != mr.end()) {
 
 				if (mr.getString()[0] != '\n') {
-					//println(&mr);
+					//println(mr);
 				}
 
 				switch (mr.getType()) {
@@ -210,7 +199,7 @@ namespace ICM
 					break;
 				case MT_LSBracket:
 					ast.pushNode();
-					ast.pushData(new Objects::Function(TypeBase::FunctionType(DefFuncTable.find("list"))));
+					ast.pushData(AST::Element::Keyword(Keyword::list_));
 					firstMatchBraket = false;
 					emptybreak = true;
 					break;
@@ -218,15 +207,12 @@ namespace ICM
 					ast.retNode();
 					break;
 				case MT_Identifier: case MT_Keyword:
-					ast.pushData(createObject(mr.getType(), mr.getString()));
-					firstMatchBraket = false;
-					break;
 				case MT_Number: case MT_String: case MT_Boolean:
-					if (firstMatchBraket) {
-						printf("Error '%s' is not function in line(%d).\n", mr.getString().c_str(), match.getCurLineNum());
-						return false;
-					}
-					ast.pushData(createObject(mr.getType(), mr.getString())); // TODO
+					//if (firstMatchBraket) {
+					//	printf("Error '%s' is not function in line(%d).\n", mr.getString().c_str(), match.getCurLineNum());
+					//	return false;
+					//}
+					ast.pushData(createElementData(mr.getType(), mr.getString()));
 					firstMatchBraket = false;
 					break;
 				default:
@@ -246,7 +232,6 @@ namespace ICM
 				printf("Error match ')' in line(%d).\n", match.getCurLineNum());
 				return false;
 			}
-			ast.reset();
 			return true;
 		}
 	}

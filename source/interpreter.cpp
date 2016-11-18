@@ -3,320 +3,192 @@
 
 namespace ICM
 {
-	DataList Interpreter::createList(const RangeIterator<vector<AST::Element>::iterator> &r)
-	{
-		vector<ObjectPtr> listnum;
-		for (const auto &l : r) {
-			if (l.isData()) {
-				const ObjectPtr &op = l.getData();
-				if (op.isType(T_Identifier))
-					listnum.push_back(adjustObjectPtr(op));
-				else
-					listnum.push_back(op);
+	DataList Interpreter::createDataList(const vector<AST::Element>& args) {
+		lightlist_creater<Object*> creater(args.size());
+		for (auto &e : args) {
+			if (e.isData()) {
+				creater.push_back(new Object(e.getData()));
+			}
+			else if (e.isVariable()) {
+				creater.push_back(e.getVariable().getData());
+			}
+			else if (e.isRefer()) {
+				creater.push_back(TempResult[e.getRefer()]);
 			}
 			else {
-				size_t id = l.getRefer();
-				const ObjectPtr &op = tempresult[id];
-				if (op.isType(T_Disperse)) {
-					Types::Disperse &l = op->dat<T_Disperse>();
-					listnum.insert(listnum.end(), l.begin(), l.end());
-				}
-				else
-					listnum.push_back(op);
+				println("Error !!");
 			}
 		}
-		return DataList(listnum);
+		return creater.data();
 	}
-	void Interpreter::runFunc(const ObjectPtr &op, AST::Node *n, size_t id) {
-		const auto &r = rangei(n->begin() + 1, n->end());
-		const DataList &dl = createList(r);
-		ObjectPtr &res = tempresult[id];
 
-		if (op.isType(T_Function)) {
-			const auto &ftu = op->get<T_Function>()->getData();
-			res = checkCall(ftu, dl);
-		}
-		else if (op.isType(T_Disperse)) {
-			const auto &ftu = DefFuncTable["call"];
-			auto ndl = op->get<T_Disperse>()->getData();
-			ndl.insert(ndl.end(), dl.begin(), dl.end());
-			res = checkCall(ftu, DataList(ndl));
-		}
-
-		Result = res;
-	}
-	void Interpreter::runSub(const ObjectPtr &op, AST::Node *node, size_t i) {
-		if (op.isType(T_Disperse) || op.isType(T_Function)) {
-			runFunc(op, node, i);
-		}
-		else {
-			println("Error Type.");
-		}
-	}
-	ObjectPtr Interpreter::getObjectPtr(const AST::Element &e) {
-		if (e.isData())
-			return ObjectPtr(e.getData());
-		else
-			return tempresult[e.getRefer()];
-	}
-	DataList Interpreter::getDataList(const vector<AST::Element*> &vb) {
-		lightlist_creater<ObjectPtr> ndl(vb.size());
-		for (auto &e : vb)
-			ndl.push_back(getObjectPtr(*e));
-		return ndl.data();
-	}
-	ObjectPtr Interpreter::run() {
-		using namespace ASTOrder;
+	Object* Interpreter::run() {
 		size_t ProgramCounter = 0;
-		//vector<size_t> VecPC;
 		while (true) {
-			//VecPC.push_back(ProgramCounter);
-			auto &e = orderlist[ProgramCounter];
-			//println("[", ProgramCounter, "] ", e->to_string());
-			switch (e->order()) {
-			case OrderData::CCAL: {
-				AST::Node *node = static_cast<ASTOrder::OrderDataCheckCall*>(e)->getData();
-				AST::Element *f = &node->front();
-				if (f->isData()) {
-					const ObjectPtr &op = adjustObjectPtr(ObjectPtr(f->getData()));
-					runSub(op, node, ProgramCounter);
+			using namespace Instruction;
+			auto &Inst = InstList[ProgramCounter];
+			//println(ProgramCounter, "| ", Inst->to_string());
+			switch (Inst->inst()) {
+			case ccal: {
+				Insts::CheckCall &inst = static_cast<Insts::CheckCall&>(*Inst);
+				AST::Element &func = inst.Func;
+				ObjectPtr op;
+				if (func.isVariable()) {
+					auto &ftu = func.getVariable().getData()->dat<T_Function>().getData();
+					op = checkCall(ftu, createDataList(inst.Args));
+				}
+				else if (func.isFunction()) {
+					auto &ftu = func.getFunction();
+					op = checkCall(ftu, createDataList(inst.Args));
+				}
+				TempResult[ProgramCounter] = op.get();
+				Result = TempResult[ProgramCounter];
+				break;
+			}
+			/*case farg: {
+				Insts::FuncArgs &inst = static_cast<Insts::FuncArgs&>(*Inst);
+				Global.Func.Args = createDataList(inst.Args);
+				break;
+			}
+			case fargl: {
+				Insts::FuncArgsLight &inst = *static_cast<Insts::FuncArgsLight*>(Inst);
+				Global.Func.Args = inst.Args;
+				break;
+			}
+			case fargv: {
+				break;
+			}
+			case fsub: {
+				Insts::FuncSub &inst = static_cast<Insts::FuncSub&>(*Inst);
+				auto &args = Global.Func.Args;
+				auto &ftu = GlobalFunctionTable[inst.Func.index];
+				size_t id = getCallID(ftu, args);
+				if (id != ftu.size()) {
+					Global.Func.Func.index = inst.Func.index;
+					Global.Func.Func.subid = id;
 				}
 				else {
-					const ObjectPtr &op = tempresult[f->getRefer()];
-					runSub(op, node, ProgramCounter);
-				}
-				break;
-			}
-			case OrderData::CALL: {
-				ASTOrder::OrderDataCall *p = static_cast<ASTOrder::OrderDataCall*>(e);
-				DataList dl = getDataList(p->getData());
-
-				tempresult[ProgramCounter] = p->call(dl);
-				Result = tempresult[ProgramCounter];
-				break;
-			}
-			case OrderData::CHKT: {
-				ASTOrder::OrderDataCheckType *p = static_cast<ASTOrder::OrderDataCheckType*>(e);
-				if (!adjustObjectPtr(getObjectPtr(*p->getData())).isType(p->getType())) {
-					println("Error in Check Type.", p->to_string());
-					return ObjectPtr();
-				}
-				break;
-			}
-			case OrderData::FARG: {
-				auto *p = static_cast<ASTOrder::OrderDataFuncArgs*>(e);
-				auto &args = p->Args;
-				Global.Func.Args = createList(rangei(args.begin(), args.end()));
-				break;
-			}
-			case OrderData::FFUN: {
-				auto *p = static_cast<ASTOrder::OrderDataFuncFunc*>(e);
-				auto &args = Global.Func.Args;
-				const ObjectPtr &op = adjustObjectPtr(getObjectPtr(p->Data));
-				if (op->dat<T_Function>().subid != MaxValue<size_t>()) {
-					// TODO
-					Global.Func.Func = op->dat<T_Function>();
-					break;
-				}
-				if (!op.isType(T_Function)) {
-					println("Error in not function with ", op.to_string(), ".");
-					Global.Func.Func.index = 0;
-					Global.Func.Func.subid = 0;
-					break;
-				}
-				auto &ftu = DefFuncTable[op->dat<T_Function>().index];
-				size_t id = getCallID(ftu, args);
-				if (id == ftu.size()) {
 					println("Error Unfind args match function ", ftu.getName(), ".");
 					Global.Func.Func.index = 0;
 					Global.Func.Func.subid = 0;
-					break;
 				}
-				op->dat<T_Function>().subid = id;
-				Global.Func.Func = op->dat<T_Function>();
 				break;
 			}
-			case OrderData::FCAL: {
+			case fsubr: {
+				break;
+			}
+			case fsubv: {
+				break;
+			}
+			case fcal: {
 				auto &args = Global.Func.Args;
 				auto &func = Global.Func.Func;
 				if (func.index == 0) {
-					tempresult[ProgramCounter] = ObjectPtr(new Object(T_Null));
+					println("Call Error");
+					return Result;
 				}
-				else {
-					tempresult[ProgramCounter] = DefFuncTable[func.index][func.subid].call(args);
-				}
-				Result = tempresult[ProgramCounter];
+				ObjectPtr &&op = GlobalFunctionTable[func.index][func.subid].call(args);
+				TempResult[ProgramCounter] = op.get();
+				Result = TempResult[ProgramCounter];
+				break;
+			}*/
+			case let:
+			case cpy:
+			case ref: {
+				Insts::Assign &inst = static_cast<Insts::Assign&>(*Inst);
+				if (inst.Data.isData())
+					GlobalVariableTable[inst.VTU].setData(inst.Data.getData().clone());
+				else if (inst.Data.isRefer())
+					GlobalVariableTable[inst.VTU].setData(TempResult[inst.Data.getRefer()]->clone());
 				break;
 			}
-			case OrderData::JUMP: {
-				ASTOrder::OrderDataJump *p = static_cast<ASTOrder::OrderDataJump*>(e);
-				size_t jmpid = p->getJmpid();
-				ProgramCounter = jmpid;
-				continue;
+			case stor: {
+				Insts::Store &inst = static_cast<Insts::Store&>(*Inst);
+				TempResult[ProgramCounter] = new Object(inst.Data.getData()); // TODO
+				Result = TempResult[ProgramCounter];
+				break;
 			}
-			case OrderData::JUMPNOT: {
-				ASTOrder::OrderDataJumpNotIf *p = static_cast<ASTOrder::OrderDataJumpNotIf*>(e);
-				size_t expid = p->getExpid();
-				ObjectPtr op = tempresult[expid];
-				if (op.isType(T_Identifier)) {
-					auto *pp = op->get<T_Identifier>();
-					if (pp->getValueType() == T_Boolean) {
-						op = pp->getRealData();
-					}
-					else {
-						println("If exp with non Type Boolean.");
-						break;
-					}
-				}
-				if (op.isType(T_Boolean)) {
-					bool result = op->dat<T_Boolean>();
-					if (!result) {
-						size_t jmpid = p->getJmpid();
-						ProgramCounter = jmpid;
+			case sing: {
+				TempResult[ProgramCounter] = Result;
+				Result = TempResult[ProgramCounter];
+				break;
+			}
+			case jump: {
+				Insts::Jump &inst = static_cast<Insts::Jump&>(*Inst);
+				ProgramCounter = inst.Index;
+				break;
+			}
+			case jmpf:
+			case jmpn: {
+				Insts::JumpNot &inst = static_cast<Insts::JumpNot&>(*Inst);
+				Object *op = getObject(inst.Data);
+				if (op->isType(T_Boolean)) {
+					bool r = op->dat<T_Boolean>();
+					if ((Inst->inst() == jmpf && r) || (Inst->inst() == jmpn && !r)) {
+						ProgramCounter = inst.Index;
 						continue;
 					}
 				}
 				else {
-					println("If exp with non Type Boolean.");
+					println("Error Not Boolean");
 				}
 				break;
 			}
-			case OrderData::SINGLE: {
-				const ObjectPtr &op = static_cast<ASTOrder::OrderDataSingle*>(e)->getData();
-				if (op.isType(T_Identifier))
-					tempresult[ProgramCounter] = static_cast<ASTOrder::OrderDataSingle*>(e)->getData();
-				else
-					tempresult[ProgramCounter] = ObjectPtr(op->clone());
-				Result = tempresult[ProgramCounter];
+			case inc: {
+				Insts::Inc &inst = static_cast<Insts::Inc&>(*Inst);
+				GlobalVariableTable[inst.VTU].getData()->dat<T_Number>() += 1;
 				break;
 			}
-			case OrderData::STORE: {
-				tempresult[ProgramCounter] = Result;
-				break;
-			}
-			case OrderData::AT: {
-				ASTOrder::OrderDataAt *p = static_cast<ASTOrder::OrderDataAt*>(e);
-				ObjectPtr top = tempresult[p->getRefid()];
-				if (top.isType(T_Identifier))
-					top = top->get<T_Identifier>()->getRealData();
-				Types::List &l = top->dat<T_List>();
-				ObjectPtr op = l.getData()[p->getIndex()];
-				if (op.isType(T_Identifier))
-					op = ObjectPtr(op->get<T_Identifier>()->getRealData());
-				tempresult[ProgramCounter] = op;
-				Result = tempresult[ProgramCounter];
-				break;
-			}
-			case OrderData::PTI: {
-				ASTOrder::OrderDataPrintIdent *p = static_cast<ASTOrder::OrderDataPrintIdent*>(e);
-				for (auto &i : p->getData()) {
-					println(tempresult[i]);
-				}
-
-				tempresult[ProgramCounter] = ObjectPtr(new Objects::Nil());
-				Result = tempresult[ProgramCounter];
-				break;
-			}
-			case OrderData::LET:
-			case OrderData::CPY:
-			case OrderData::REF: {
-#if USE_VARIABLE
-				ASTOrder::OrderDataAssign *p = static_cast<ASTOrder::OrderDataAssign*>(e);
-				p->setData(tempresult[p->getRefid()]);
-#else
-				ASTOrder::OrderDataAssign *p = static_cast<ASTOrder::OrderDataAssign*>(e);
-				Types::Identifier &ident = p->getData()->dat<T_Identifier>();
-				switch (e->order())
-				{
-				case OrderData::LET: ident.setData(tempresult[p->getRefid()]); break;
-				case OrderData::CPY: ident.setCopy(tempresult[p->getRefid()]); break;
-				case OrderData::REF: ident.setRefer(tempresult[p->getRefid()]); break;
-				}
-#endif
-				tempresult[ProgramCounter] = p->getData();
-				Result = tempresult[ProgramCounter];
-				break;
-			}
-			case OrderData::CPYS:
-			case OrderData::REFS: {
-				ASTOrder::OrderDataCpySingle *p = static_cast<ASTOrder::OrderDataCpySingle*>(e);
-				size_t id = p->getRefid();
-				ObjectPtr op(tempresult[id]);
-				Types::Identifier temp;
-				switch (e->order())
-				{
-				case OrderData::CPYS:
-					temp.setCopy(op);
-					tempresult[ProgramCounter] = temp.getData();
-					break;
-				case OrderData::REFS:
-					// TODO
-					tempresult[ProgramCounter] = op;
-					break;
-				}
-				Result = tempresult[ProgramCounter];
-				break;
-			}
-			case OrderData::EQU:
-			case OrderData::SML:
-			case OrderData::SME:
-			case OrderData::LAR:
-			case OrderData::LAE: {
-				ASTOrder::OrderDataCompare *p = static_cast<ASTOrder::OrderDataCompare*>(e);
+			case jpsm:
+			case jpse:
+			case jpla:
+			case jple: {
+				Insts::JumpCompare &inst = static_cast<Insts::JumpCompare&>(*Inst);
+				const auto &n1 = GlobalVariableTable[inst.VTU].getData()->dat<T_Number>();
+				const auto &n2 = getObject(inst.Data)->dat<T_Number>();
 				bool r;
-#if USE_VARIABLE
-				if (e->order() == OrderData::EQU) {
-					r = p->getData()->equ(tempresult[p->getRefid()].get());
+				switch (Inst->inst()) {
+				case jpsm: r = n1 < n2; break;
+				case jpse: r = n1 <= n2; break;
+				case jpla: r = n1 > n2; break;
+				case jple: r = n1 >= n2; break;
+				default:   r = false;
 				}
-				else {
-					const auto &r1 = p->getData()->dat<T_Number>();
-					const auto &r2 = adjustObjectPtr(tempresult[p->getRefid()])->dat<T_Number>();
-					switch (e->order()) {
-					case OrderData::SML: r = r1 < r2; break;
-					case OrderData::SME: r = r1 <= r2; break;
-					case OrderData::LAR: r = r1 > r2; break;
-					case OrderData::LAE: r = r1 >= r2; break;
-					}
+				if (r) {
+					ProgramCounter = inst.Index;
+					continue;
 				}
-#else
-				Types::Identifier &ident = p->getData()->dat<T_Identifier>();
-				if (e->order() == OrderData::EQU) {
-					r = ident.getRealData()->equ(tempresult[p->getRefid()].get());
+				break;
+			}
+			case list: {
+				Insts::List &inst = static_cast<Insts::List&>(*Inst);
+				// TODO
+				auto v = createDataList(inst.Data);
+				lightlist_creater<Object*> llc(v.size());
+				for (auto p : v) {
+					llc.push_back(p->clone());
 				}
-				else {
-					const auto &r1 = ident.getRealData()->dat<T_Number>();
-					const auto &r2 = adjustObjectPtr(tempresult[p->getRefid()])->dat<T_Number>();
-					switch (e->order()) {
-					case OrderData::SML: r = r1 < r2; break;
-					case OrderData::SME: r = r1 <= r2; break;
-					case OrderData::LAR: r = r1 > r2; break;
-					case OrderData::LAE: r = r1 >= r2; break;
-					}
-				}
-#endif
 
-				tempresult[ProgramCounter] = ObjectPtr(new Objects::Boolean(r));
-				Result = tempresult[ProgramCounter];
+				TempResult[ProgramCounter] = new Objects::List(TypeBase::ListType(llc.data()));
+				Result = TempResult[ProgramCounter];
 				break;
 			}
-			case OrderData::INC: {
-				ASTOrder::OrderDataInc *p = static_cast<ASTOrder::OrderDataInc*>(e);
-#if USE_VARIABLE
-				p->getData()->dat<T_Number>().operator+=(1);
-#else
-				p->getData()->get<T_Identifier>()->getRealData()->dat<T_Number>().operator+=(1);
-#endif
-				break;
-			}
-			case OrderData::OVER: {
-				//for (auto &e : VecPC)
-				//	print(e, "->");
+			case end: {
 				return Result;
 			}
 			}
 			ProgramCounter++;
 		}
-
 		return Result;
+	}
+	Object* Interpreter::getObject(AST::Element & element) {
+		if (element.isData())
+			return new Object(element.getData());
+		else if (element.isRefer())
+			return TempResult[element.getRefer()];
+		else if (element.isVariable())
+			return element.getVariable().getData();
+		println("Error in getObject");
+		return nullptr;
 	}
 }

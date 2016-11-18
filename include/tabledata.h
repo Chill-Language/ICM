@@ -8,7 +8,6 @@
 
 namespace ICM
 {
-	namespace Objects { class Identifier; }
 	//=======================================
 	// * Class BaseTableUnit
 	//=======================================
@@ -29,8 +28,6 @@ namespace ICM
 	//=======================================
 	// * Class VariableTableUnit
 	//=======================================
-#define USE_VARIABLE !true
-#if USE_VARIABLE
 	namespace TypeBase {
 		struct VariableType
 		{
@@ -44,34 +41,30 @@ namespace ICM
 	{
 	public:
 		VariableTableUnit() = default;
-		VariableTableUnit(size_t id, const string &name, const Object *data)
+		VariableTableUnit(Object &&data) {
+			this->data.data = data;
+		}
+		VariableTableUnit(size_t id, const string &name, const Object &data)
 			: BaseTableUnit(id, name) {
-			this->data.data = *data;
+			this->data.data = data;
+		}
+		VariableTableUnit(size_t id, const string &name, Object &&data)
+			: BaseTableUnit(id, name) {
+			this->data.data = data;
+		}
+		VariableTableUnit(size_t id, const string &name, const VariableTableUnit &unit)
+			: BaseTableUnit(id, name) {
+			this->data.data = unit.data.data;
 		}
 
 		void setData(const Object *data) { this->data.data = *data; }
+		void setData(Object &&data) { this->data.data = data; }
 		const Object *getData() const { return &data.data; }
 		Object *getData() { return &data.data; }
 
 	private:
 		TypeBase::VariableType data;
 	};
-#else
-	class VariableTableUnit : public BaseTableUnit
-	{
-		using Identifier = Objects::Identifier;
-	public:
-		VariableTableUnit() = default;
-		VariableTableUnit(size_t id, const string &name, const ObjectPtr &data)
-			: BaseTableUnit(id, name), data(data) {}
-
-		const Identifier *getData() const { return (Identifier*)data.get(); }
-		Identifier *getData() { return (Identifier*)(data.get()); }
-
-	private:
-		ObjectPtr data;
-	};
-#endif
 
 	//=======================================
 	// * Class FuncTableUnit
@@ -131,15 +124,17 @@ namespace ICM
 			}
 		}
 		template <typename... Args>
-		void add(const string &name, Args... args) {
+		Unit& add(const string &name, Args... args) {
 			count++;
 			data.push_back(Unit(count, name, args...));
 			keymap[name] = count;
+			return data.back();
 		}
-		void add(const string &name, const Unit &unit) {
+		Unit& add(const string &name, Unit &&unit) {
 			count++;
-			data.push_back(unit);
+			data.push_back(Unit(count, name, unit));
 			keymap[name] = count;
+			return data.back();
 		}
 		const Unit& operator[](size_t id) const {
 			return data[id];
@@ -171,11 +166,9 @@ namespace ICM
 
 	void createDefFuncTable();
 
-	extern FuncTable DefFuncTable;
-	extern FuncTable AddFuncTable;
-	extern VariableTable DefVariableTable;
-	extern VariableTable AddVariableTable;
-	extern BijectionKVMap<string, KeywordID> DefKeywordTable;
+	extern FuncTable GlobalFunctionTable;
+	extern VariableTable GlobalVariableTable;
+	extern BijectionKVMap<string, Keyword::KeywordID> GlobalKeywordTable;
 
 }
 #endif

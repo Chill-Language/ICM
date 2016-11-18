@@ -68,7 +68,7 @@ namespace ICM
 	public:
 		Object(TypeUnit type = T_Null, void *data = nullptr) : type(type), data(data) {}
 
-#define CheckTypeInfo() assert(TypeInfoTable.find(this->type) != TypeInfoTable.end())
+#define CheckTypeInfo() assert(this->type == 0 || TypeInfoTable.find(this->type) != TypeInfoTable.end())
 
 		string to_string() const {
 			CheckTypeInfo();
@@ -121,9 +121,23 @@ namespace ICM
 		template <typename T> const T& _ref() const { return *_ptr<T>(); }
 	};
 
+	struct StaticObject
+	{
+		StaticObject()
+			: Nil(T_Nil), True(T_Boolean, &Value_True), False(T_Boolean, &Value_False) {};
+		bool Value_True = true;
+		bool Value_False = false;
+		
+		Object Null;
+		Object Nil;
+		Object True;
+		Object False;
+	};
+
+	extern StaticObject Static;
+
 	// Types
-	using DataList = lightlist<ObjectPtr>;
-	//using DataList = std::vector<ObjectPtr>;
+	using DataList = lightlist<Object*>;
 	using CallFunc = ObjectPtr(const DataList&);
 	using FuncPtr = std::function<CallFunc>;
 	using LDataList = Common::lightlist<Object*>;
@@ -139,6 +153,8 @@ namespace ICM
 	std::string to_string(const Object &obj);
 	std::string to_string(const ObjectPtr &obj);
 	std::string to_string(const DataList &obj);
+	string to_string(const vector<ObjectPtr> &list);
+	string to_string(const vector<Object*> &list);
 }
 
 #endif

@@ -5,44 +5,46 @@
 #include "number.h"
 #include "tabledata.h"
 
-
 namespace ICM
 {
 	void addDefFuncs(FuncTable &DefFuncTable);
 	// Create Default FuncTable
 	void createDefFuncTable()
 	{
-		addDefFuncs(DefFuncTable);
+		addDefFuncs(GlobalFunctionTable);
 		// TODO : Memory leak
-#if USE_VARIABLE
-		DefVariableTable.add("Nil", new Objects::Nil());
-#else
-		ObjectPtr nil(new Objects::Identifier(TypeBase::IdentifierType("Nil", ObjectPtr())));
-		DefVariableTable.add("Nil", nil);
-#endif
+		GlobalVariableTable.add("Nil", Objects::Nil());
 		//DefVariableTable.add("NIL", nil);
 		//DefVariableTable.add("nil", nil);
 		//ObjectPtr nan(new Objects::Identifier("NaN", ObjectPtr(new Objects::Number(Common::Number::Rational(0, 0)))));
 		//DefVariableTable.add("NaN", nan);
 	}
 
-	BijectionKVMap<string, KeywordID> DefKeywordTable = {
-		{ "p",        KeywordID::PTI      },
-		{ "let",      KeywordID::LET      },
-		{ "cpy",      KeywordID::CPY      },
-		{ "ref",      KeywordID::REF      },
-		{ "if",       KeywordID::IF       },
-		{ "then",     KeywordID::THEN     },
-		{ "else",     KeywordID::ELSE     },
-		{ "elsif",    KeywordID::ELSIF    },
-		{ "loop",     KeywordID::LOOP     },
-		{ "while",    KeywordID::WHILE    },
-		{ "break",    KeywordID::BREAK    },
-		{ "for",      KeywordID::FOR      },
-		{ "in",       KeywordID::IN       },
-		{ "to",       KeywordID::TO       },
-		{ "case",     KeywordID::CASE     },
-		{ "when",     KeywordID::WHEN     },
-		{ "function", KeywordID::FUNCTION },
+	BijectionKVMap<string, Keyword::KeywordID> GlobalKeywordTable = {
+		{ "p",        Keyword::p_        },
+		{ "let",      Keyword::let_      },
+		{ "cpy",      Keyword::cpy_      },
+		{ "ref",      Keyword::ref_      },
+		{ "if",       Keyword::if_       },
+		{ "then",     Keyword::then_     },
+		{ "else",     Keyword::else_     },
+		{ "elsif",    Keyword::elsif_    },
+		{ "loop",     Keyword::loop_     },
+		{ "while",    Keyword::while_    },
+		{ "break",    Keyword::break_    },
+		{ "for",      Keyword::for_      },
+		{ "in",       Keyword::in_       },
+		{ "to",       Keyword::to_       },
+		{ "case",     Keyword::case_     },
+		{ "when",     Keyword::when_     },
+		{ "function", Keyword::function_ },
+		{ "disp",     Keyword::disp_     },
+		{ "list",     Keyword::list_     },
+		{ "defun",    Keyword::defun_    },
+		{ "define",   Keyword::define_   },
+		{ "call",     Keyword::call_     },
+		{ "do",       Keyword::do_       },
 	};
+
+	SerialBijectionMap<string> GlobalIdentifierMap;
 }

@@ -10,16 +10,16 @@ namespace ICM
 	//=======================================
 	size_t ObjectManager::newObjectPtr(Object *obj) {
 		TypeUnit typeID = obj->type;
-		auto &table = ObjectTypePool[typeID];
-		size_t id = table.currentIndex();
-		bool res = table.insert(obj);
+		auto &Table = ObjectTypePool[typeID];
+		size_t id = Table.currentIndex();
+		bool res = Table.insert(obj);
 		if (res) {
 			if (id == ObjectTypeCount[typeID].size()) {
 				ObjectTypeCount[typeID].push_back(0);
 			}
 		}
 		else {
-			id = table.findKey(obj);
+			id = Table.findKey(obj);
 		}
 		if (GlobalConfig.PrintObjectAllot)
 			println("New : ", to_string((DefaultType)typeID), ",", id, " V : ", obj->to_string());
@@ -111,7 +111,7 @@ namespace ICM
 		data[type].push_back(op);
 		return ObjectPoolPtr(type, index);
 	}
-	ObjectPool::Object* ObjectPool::get(const ObjectPoolPtr &op) const {
+	Object* ObjectPool::get(const ObjectPoolPtr &op) const {
 		return data[op.type()][op.index()]->clone();
 	}
 	void ObjectPool::del(const ObjectPoolPtr &op) {
@@ -148,8 +148,6 @@ namespace ICM
 	ObjectManager GlobalObjectManager;
 	SymbolTable GlobalSymbolTable;
 
-	FuncTable DefFuncTable;
-	FuncTable AddFuncTable;
-	VariableTable DefVariableTable;
-	VariableTable AddVariableTable;
+	FuncTable GlobalFunctionTable;
+	VariableTable GlobalVariableTable;
 }

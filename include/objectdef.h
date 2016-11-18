@@ -102,8 +102,8 @@ namespace ICM
 			Identifier(const TypeBase::IdentifierType &it) : DataObject<T_Identifier>(it) {}
 		};
 
-		vector<ObjectPtr>::iterator begin(Disperse *disp);
-		vector<ObjectPtr>::iterator end(Disperse *disp);
+		vector<Object*>::iterator begin(Disperse *disp);
+		vector<Object*>::iterator end(Disperse *disp);
 	}
 }
 

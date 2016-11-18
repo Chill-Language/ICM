@@ -8,8 +8,41 @@ namespace ICM
 	//=======================================
 	// * Class Keyword
 	//=======================================
-	enum class KeywordID { PTI, LET, CPY, REF, IF, THEN, ELSE, ELSIF, FOR, IN, TO, WHILE, LOOP, BREAK, CASE, WHEN, FUNCTION };
+	namespace Keyword
+	{
+		enum KeywordID {
+			p_,
+			let_,
+			set_,
+			cpy_,
+			ref_,
+			if_,
+			then_,
+			else_,
+			elsif_,
+			for_,
+			in_,
+			to_,
+			while_,
+			loop_,
+			break_,
+			case_,
+			when_,
+			function_,
+			defun_,
+			define_,
+			defstruct_,
+			with_,
+			list_,
+			disp_,
+			do_,
+			call_,
+		};
+	}
 
-	string to_string(KeywordID key);
+	string to_string(Keyword::KeywordID key);
+
+	extern SerialBijectionMap<string> GlobalIdentifierMap;
 }
+
 #endif

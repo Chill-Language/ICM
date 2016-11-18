@@ -208,6 +208,14 @@ public:
 	const _KTy& getKey(size_t id) const {
 		return  data[id];
 	}
+	size_t operator[](const _KTy &key) {
+		size_t id = findKey(key);
+		if (id == size()) {
+			id = currentIndex();
+			insert(key);
+		}
+		return id;
+	}
 
 	size_t size() const {
 		return data.size();

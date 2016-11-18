@@ -53,7 +53,8 @@ namespace Convert
 			while (begin != end) {
 				if (D != '\0')
 					str.push_back(D);
-				str.append(" ");
+				if (D != '\n')
+					str.append(" ");
 				str.append(func(*begin++));
 			}
 		}

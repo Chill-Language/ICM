@@ -226,7 +226,7 @@ namespace ICM
 		case ICM::T_Nil:        return new Nil;
 		case ICM::T_Error:      return new Error;
 		case ICM::T_Identifier: return new Identifier;
-		case ICM::T_Keyword:    return new Keyword;
+		case ICM::T_Keyword:    return new Objects::Keyword;
 		case ICM::T_List:       return new List;
 		case ICM::T_Disperse:   return nullptr; // TODO
 		case ICM::T_Number:     return new Objects::Number;
@@ -267,11 +267,11 @@ namespace ICM
 	namespace Objects
 	{
 		// Get Disperse Iterator
-		vector<ObjectPtr>::iterator begin(Objects::Disperse *disp)
+		vector<Object*>::iterator begin(Objects::Disperse *disp)
 		{
 			return disp->get<T_Disperse>()->begin();
 		}
-		vector<ObjectPtr>::iterator end(Objects::Disperse *disp)
+		vector<Object*>::iterator end(Objects::Disperse *disp)
 		{
 			return disp->get<T_Disperse>()->end();
 		}
@@ -281,4 +281,6 @@ namespace ICM
 	{
 		return t1 == (TypeUnit)t2;
 	}
+
+	StaticObject Static;
 }

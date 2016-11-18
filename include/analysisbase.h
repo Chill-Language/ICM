@@ -1,0 +1,56 @@
+#ifndef _ICM_COMPILER_ANALYSISBASE_H_
+#define _ICM_COMPILER_ANALYSISBASE_H_
+
+#include "ast.h"
+
+namespace ICM
+{
+	namespace Compiler
+	{
+		using namespace Keyword;
+
+		class AnalysisBase
+		{
+		protected:
+			using Element = AST::Element;
+			using Node = AST::Node;
+			using VecElt = vector<Element>;
+			using NodeRange = RangeIterator<Node::iterator>;
+			using NodeTable = vector<AST::NodePtr>;
+
+		public:
+			AnalysisBase(NodeTable &Table) : Table(Table) {}
+
+		protected:
+			NodeTable &Table;
+
+		protected:
+			bool isIdent(const Element &elt, const string &name) {
+				return elt.isIdentifier() && elt.getIdentifier() == name;
+			}
+			bool isKey(const Element &elt, KeywordID key) {
+				return elt.isKeyword() && elt.getKeyword() == key;
+			}
+			void error(const string &msg = "") {
+				println("Error ", msg);
+			}
+			void printTable() {
+				for (auto &e : rangei(Table.begin() + 1, Table.end()))
+					println(ICM::to_string(*e));
+			}
+			Node& GetNode(size_t id) {
+				assert(id < Table.size());
+				return *Table[id];
+			}
+			Element& GetElement(size_t id, size_t i) {
+				assert(i < GetNode(id).size());
+				return GetNode(id)[i];
+			}
+			Node& GetRefer(const Element &elt) {
+				return GetNode(elt.getRefer());
+			}
+		};
+	}
+}
+
+#endif

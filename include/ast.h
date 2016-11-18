@@ -3,44 +3,132 @@
 
 #include "basic.h"
 #include "object.h"
+#include "keyword.h"
+#include "tabledata.h"
+#include "typebase.h"
 
 namespace ICM
 {
+	class ElementMemoryPool
+	{
+	public:
+		template <typename T>
+		size_t insert(const T &t) {
+			size_t size = data.size();
+			data.resize(size + sizeof(T));
+			dat<T>(size) = t;
+			return size;
+		}
+		template <typename T = void>
+		T* get(size_t index) {
+			return reinterpret_cast<T*>(data.data() + index);
+		}
+		template <typename T>
+		T& dat(size_t index) {
+			return *get<T>(index);
+		}
+		size_t index() const {
+			return data.size();
+		}
+		void clear() {
+			data.clear();
+		}
+
+	private:
+		vector<byte> data;
+	};
+
+	extern ElementMemoryPool GlobalElementObjectPool;
+
 	namespace ASTBase
 	{
 		//=======================================
-		// * Class Element
+		// * Struct Element
 		//=======================================
-		class Element
+		struct Element
 		{
 		public:
-			enum EleType { E_Data, E_Refer };
+			enum EleType {
+				E_Refer,
+				
+				E_Keyword,
+				E_Identifier,
+
+				E_Nil, // TODO
+				E_Int,
+				E_Number,
+				E_String,
+				E_Boolean,
+
+				E_Variable,
+				E_Function,
+				E_DispData,
+				E_DispRefer,
+			};
 		public:
-			Element() {}
+			Element() = default;
 			explicit Element(EleType type) : type(type) {}
-			//~Element() { if (isData()) delete data.op; }
+			Element(const Element&) = default;
 
-			static Element Data(Object *op);
+			static Element Data(size_t type, size_t index);
 			static Element Refer(size_t index);
+			static Element Keyword(Keyword::KeywordID key);
+			static Element Identifier(const string &name);
+			static Element Variable(size_t index);
+			static Element Function(size_t index);
 
-			EleType getType() const { return type; }
-
-			bool isData() const { return type == E_Data; }
+			bool isData() const { return isNumber() || isBoolean() || isString() || type == E_Nil; }
 			bool isRefer() const { return type == E_Refer; }
+			bool isKeyword() const { return type == E_Keyword; }
+			bool isIdentifier() const { return type == E_Identifier; }
+			bool isVariable() const { return type == E_Variable; }
+			bool isFunction() const { return type == E_Function; }
+			bool isDisp() const { return isDispData() || isDispRefer(); }
+			bool isDispData() const { return type == E_DispData; }
+			bool isDispRefer() const { return type == E_DispRefer; }
+
+			bool isNumber() const { return type == E_Number; }
+			bool isBoolean() const { return type == E_Boolean; }
+			bool isString() const { return type == E_String; }
 
 			// Get/Set
-			ObjectPtr& getData() const { return *data.op; }
-			void setData(Object* op);
+			Object getData() const;
 
-			size_t getRefer() const { return data.id; }
-			void setRefer(size_t id) { data.id = id; }
+			size_t getRefer() const {
+				assert(isRefer() || isDispRefer());
+				return data.index;
+			}
+			void setRefer(size_t id) { data.index = id; }
+			
+			Keyword::KeywordID getKeyword() const {
+				assert(isKeyword());
+				return data.key;
+			}
+			const string& getIdentifier() const;
+			VariableTableUnit& getVariable() const;
+			FuncTableUnit& getFunction() const;
+			bool getBoolean() const {
+				return data.bvalue;
+			}
 
-		protected:
+			Element& setDisp() {
+				assert(isRefer() || isIdentifier());
+				if (type == E_Refer)
+					type = E_DispRefer;
+				else
+					type = E_DispData;
+				return *this;
+			}
+
+		private:
 			EleType type;
 			union {
-				ObjectPtr* op;
-				size_t id;
+				size_t index;
+				Keyword::KeywordID key;
+				int ivalue;
+				bool bvalue;
 			} data;
+			Element& setIndex(size_t id) { data.index = id; return *this; }
 		};
 
 		//=======================================
@@ -50,7 +138,11 @@ namespace ICM
 		{
 		public:
 			explicit Node(size_t id) : index(id) {}
+			Node(size_t id, vector<Element> &&VeE) : index(id), vector<Element>(VeE) {}
 
+			void push_front(const Element &elt) {
+				this->insert(this->begin(), elt);
+			}
 			// Index
 			void setIndex(size_t id) { this->index = id; }
 			size_t getIndex() const { return this->index; }
@@ -68,49 +160,41 @@ namespace ICM
 	public:
 		using Element = ASTBase::Element;
 		using Node = ASTBase::Node;
-		using NodePtr = shared_ptr<Node>;
+		using NodePtr = unique_ptr<Node>;
 	public:
-		AST() : root(new Node(0)), currindex(1), table({ root }), currptr(root.get()) {}
+		AST() : currindex(1), root(new Node(0)), currptr(root) {
+			Table.push_back(NodePtr(root));
+		}
 
-		void pushData(Object *op);
+		void pushData(Element&& element);
 		void pushNode();
 		bool retNode();
-		AST* reset() {
-			this->currptr = root.get();
-			return this;
-		}
+
 		bool empty() const {
-			return table.size() == 1;
+			return Table.size() == 1;
 		}
 		bool isend() const {
 			return farthptrs.empty();
 		}
 		auto getTableRange() const {
-			return range(table.begin() + 1, table.end());
+			return rangei(Table.begin() + 1, Table.end());
 		}
-		const vector<NodePtr>& getTable() const {
-			return table;
-		}
-		Node* getRoot() const {
-			return root.get();
+		vector<NodePtr>& getTable() {
+			return Table;
 		}
 
 	private:
-		NodePtr root;
+		vector<NodePtr> Table;
 		size_t currindex = 0;
-		vector<NodePtr> table;
+		Node* root;
 		Node *currptr;
 		stack<Node*> farthptrs;
 	};
 
-	string to_string(const AST *ast);
 	string to_string(const AST &ast);
-	string to_string_code(const AST &ast);
 	string to_string(const AST::Element &element);
-	string to_string_code(const AST::Element &element);
 	string to_string(const AST::Node &node);
-	string to_string_code(const AST::Node &node);
-	string to_string_for_order(const AST::Node &node);
+	string to_string(const vector<AST::Element> &vec);
 }
 
 #endif

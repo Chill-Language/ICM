@@ -31,11 +31,11 @@ namespace ICM
 		public:
 			bool operator==(const VoidType&) const { return true; }
 		};
-		using NumberType = Common::Number::Rational;
+		using NumberType = int;//Common::Number::Rational;
 		using BooleanType = bool;
 		using StringType = std::string;
 		using SymbolType = std::string;
-		using KeywordType = KeywordID;
+		using KeywordType = Keyword::KeywordID;
 
 
 		//=======================================
@@ -43,14 +43,14 @@ namespace ICM
 		//=======================================
 		class ListType
 		{
-			using DataList = vector<ObjectPtr>;
+			using DataList = vector<Object*>;
 		public:
 			ListType() {}
-			explicit ListType(const lightlist<ObjectPtr> &dl) : data(dl.begin(), dl.end()) {}
+			explicit ListType(const lightlist<Object*> &dl) : data(dl.begin(), dl.end()) {}
 			explicit ListType(const DataList &dl) : data(dl) {}
 			ListType(const ListType &lt) : data(lt.data) {}
 
-			ListType* push(const ObjectPtr &objp);
+			ListType* push(Object* objp);
 			ListType* push(const DataList &dl);
 			ListType& operator+=(const ListType &dl);
 			DataList::iterator begin() {
@@ -83,10 +83,10 @@ namespace ICM
 		//=======================================
 		class DisperseType
 		{
-			using DataList = vector<ObjectPtr>;
+			using DataList = vector<Object*>;
 		public:
 			DisperseType() {}
-			explicit DisperseType(const lightlist<ObjectPtr> &dl) : data(dl.begin(), dl.end()) {}
+			explicit DisperseType(const lightlist<Object*> &dl) : data(dl.begin(), dl.end()) {}
 			explicit DisperseType(const DataList &dl) : data(dl) {}
 
 			DataList::iterator begin() {
@@ -132,15 +132,15 @@ namespace ICM
 		template <> string to_string<ErrorType>(const ErrorType &et);
 
 		//=======================================
-		// * Class Function
+		// * Struct FunctionType
 		//=======================================
-		class FunctionType
+		struct FunctionType
 		{
 		public:
 			FunctionType() {}
 			FunctionType(size_t id) : index(id) {}
 			const FuncTableUnit& getData() const {
-				return DefFuncTable[index];
+				return GlobalFunctionTable[index];
 			}
 			string to_string() const {
 				return "F(" + getData().getName() + ")";
@@ -213,6 +213,8 @@ namespace ICM
 		template <> string to_output<IdentifierType>(const IdentifierType &it);
 		template <> string to_string_code<IdentifierType>(const IdentifierType &it);
 	}
+	string to_string(const TypeBase::FunctionType &ft);
+	string to_string(const TypeBase::VariableType &ft);
 }
 
 #endif

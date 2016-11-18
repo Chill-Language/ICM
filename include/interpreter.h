@@ -2,24 +2,26 @@
 #define _ICM_INTERPRETER_H_
 
 #include "basic.h"
-#include "order.h"
 #include "objectdef.h"
+#include "instruction.h"
 
 namespace ICM
 {
 	class Interpreter
 	{
-		using OrderList = vector<ASTOrder::OrderData*>; // ASTOrder::OrderList;
 	public:
-		Interpreter(const OrderList &ol)
-			: orderlist(ol), tempresult(ol.size(), ObjectPtr()) {}
-		ObjectPtr run();
-		DataList createList(const RangeIterator<vector<AST::Element>::iterator> &r);
+		Interpreter(Instruction::InstructionList &InstList)
+			: InstList(InstList), TempResult(InstList.size(), &Static.Null) {}
+
+		DataList createDataList(const vector<AST::Element> &args);
+		Object* run();
 
 	private:
-		OrderList orderlist;
-		ObjectPtr Result;
-		vector<ObjectPtr> tempresult;
+		Instruction::InstructionList& InstList;
+		Object* Result = &Static.Nil;
+		vector<Object*> TempResult;
+
+		Object* getObject(AST::Element &element);
 
 		struct {
 			struct {
@@ -27,11 +29,6 @@ namespace ICM
 				DataList Args;
 			} Func;
 		} Global;
-
-		void runFunc(const ObjectPtr &op, AST::Node *n, size_t id);
-		void runSub(const ObjectPtr &op, AST::Node *node, size_t i);
-		DataList getDataList(const vector<AST::Element*> &vb);
-		ObjectPtr getObjectPtr(const AST::Element &e);
 	};
 }
 

@@ -92,7 +92,7 @@ namespace ICM
 	{
 	public:
 		ObjectPtr() : data(nullptr) {}
-		ObjectPtr(nullptr_t) : data(nullptr) {}
+		ObjectPtr(std::nullptr_t) : data(nullptr) {}
 		ObjectPtr(Object *obj) : data(obj) {}
 		ObjectPtr(const ObjectPtr &op) : data(op.data) {}
 
@@ -103,7 +103,7 @@ namespace ICM
 			return this->type() == type;
 		}
 
-		bool operator==(nullptr_t) const {
+		bool operator==(std::nullptr_t) const {
 			return type() == T_Null;
 		}
 		operator bool() const {
@@ -126,7 +126,6 @@ namespace ICM
 	//=======================================
 	class ObjectPool
 	{
-		using Object = Object;
 	public:
 		struct ObjectPoolPtr
 		{

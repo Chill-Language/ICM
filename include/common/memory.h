@@ -18,21 +18,14 @@ namespace Memory
 
 	// New
 	template <typename T>
-	inline T* create(size_t length) {
-		//return (T*)malloc(length);
+	inline T* new_(size_t length) {
 		return new T[length]();
-	}
-	template <typename T>
-	inline T* create(size_t length, const T &inc) {
-		T* ptr = create<T>(length);
-		while (length--) {
-			*ptr = inc;
-			++ptr;
-		}
+		//return (T*)malloc(length * sizeof(T));
+		//return std::allocator<T>().allocate(length);
 	}
 
 	template <typename T>
-	inline void free(T *p) {
+	inline void delete_(T *p) {
 		delete[] p;
 	}
 
@@ -52,7 +45,7 @@ namespace Memory
 		if (from == nullptr)
 			return nullptr;
 		else
-			return copyTo(create<T>(length), from, length);
+			return copyTo(new_<T>(length), from, length);
 	}
 }
 END

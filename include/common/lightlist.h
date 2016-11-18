@@ -16,32 +16,32 @@ public:
 public:
 	lightlist() = default;
 
-	lightlist(size_t capacity)
-		: _capacity(capacity), data(Memory::create<T>(_capacity), Memory::free<T>) {}
+	explicit lightlist(size_t capacity)
+		: _capacity(capacity), data(Memory::new_<T>(_capacity), Memory::delete_<T>) {}
 
 	lightlist(T* begin, T* end)
-		: _capacity(end - begin), data(Memory::copyOf(begin, _capacity), Memory::free<T>) {}
+		: _capacity(end - begin), data(Memory::copyOf(begin, _capacity), Memory::delete_<T>) {}
 
 	template <typename Iter>
 	lightlist(Iter begin, Iter end)
-		: _capacity(end - begin), data(Memory::create<T>(_capacity), Memory::free<T>) {
+		: _capacity(end - begin), data(Memory::new_<T>(_capacity), Memory::delete_<T>) {
 		T* ptr = data.get();
 		for (Iter p = begin; p != end; ++p)
 			*ptr++ = *p;
 	}
 
 	template <typename Container>
-	lightlist(const Container &con)
+	explicit lightlist(const Container &con)
 		: lightlist(con.begin(), con.end()) {}
 
 	template <size_t N>
-	lightlist(T(&arr)[N])
+	explicit lightlist(T(&arr)[N])
 		: lightlist(std::begin(arr), std::end(arr)) {}
 
 	lightlist(const std::initializer_list<T> &il)
 		: lightlist(il.begin(), il.end()) {}
 
-	lightlist(const T &t)
+	explicit lightlist(const T &t)
 		: lightlist({ t }) {}
 
 	~lightlist() {}

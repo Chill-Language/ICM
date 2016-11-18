@@ -8,7 +8,7 @@ namespace ICM
 		//=======================================
 		// * Class List
 		//=======================================
-		ListType* ListType::push(const ObjectPtr &op) {
+		ListType* ListType::push(Object* op) {
 			data.push_back(op);
 			return this;
 		}
@@ -36,7 +36,7 @@ namespace ICM
 		string DisperseType::to_output() const {
 			string str;
 			for (auto &op : data)
-				str.append(op.to_output());
+				str.append(op->to_output());
 			return str;
 		}
 

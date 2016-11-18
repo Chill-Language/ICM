@@ -14,8 +14,8 @@ class charptr
 {
 public:
 	charptr() : _capacity(0), data(new char('\0')) {}
-	explicit charptr(size_t len) : _capacity(len + 1), data(Memory::create<char>(_capacity), Memory::free<char>) {}
-	explicit charptr(const char *ptr, size_t len) : _capacity(len + 1), data(Memory::copyOf(ptr, _capacity), Memory::free<char>) {}
+	explicit charptr(size_t len) : _capacity(len + 1), data(Memory::new_<char>(_capacity), Memory::delete_<char>) {}
+	explicit charptr(const char *ptr, size_t len) : _capacity(len + 1), data(Memory::copyOf(ptr, _capacity), Memory::delete_<char>) {}
 	explicit charptr(const std::string &str) : charptr(str.c_str(), str.length()) {}
 	operator char*() { return data.get(); }
 	operator const char*() const { return data.get(); }

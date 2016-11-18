@@ -39,15 +39,35 @@ namespace ICM
 			}
 			return true;
 		}
+		bool Signature::checkType(const vector<TypeObject> &argT) const {
+			// Check Size
+			if (last_is_args) {
+				if (argT.size() < InType.size())
+					return false;
+			}
+			else if (argT.size() != InType.size()) {
+				return false;
+			}
+			// Check Type
+			size_t size = last_is_args ? InType.size() - 1 : InType.size();
+			for (auto i : Range<size_t>(0, size))
+				if (!InType[i].checkType(argT[i]))
+					return false;
+			if (last_is_args) {
+				for (auto i : Range<size_t>(size, argT.size()))
+					if (!InType.back().checkType(argT[i]))
+						return false;
+			}
+			return true;
+		}
 		bool Signature::checkType(const Signature &sign) const {
 			return checkType(sign.InType);
 		}
 		lightlist<TypeObject> getTypeObjectList(const DataList &list)
 		{
-			lightlist_creater<TypeObject> typelist(list.size());
-			for (auto &e : list)
-				typelist.push_back(getTypeObject(e));
-			return typelist.data();
+			lightlist<TypeObject> typelist(list.size());
+			std::transform(_PointerIterator(list.begin()), _PointerIterator(list.end()), _PointerIterator(typelist.begin()), getTypeObject);
+			return typelist;
 		}
 	}
 
