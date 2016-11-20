@@ -19,6 +19,12 @@ namespace ICM
 			dat<T>(size) = t;
 			return size;
 		}
+		size_t insert(const void *ptr, size_t len) {
+			size_t size = data.size();
+			data.resize(size + len);
+			memcpy(get(size), ptr, len);
+			return size;
+		}
 		template <typename T = void>
 		T* get(size_t index) {
 			return reinterpret_cast<T*>(data.data() + index);

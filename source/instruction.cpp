@@ -42,6 +42,8 @@ namespace ICM
 
 	namespace Compiler
 	{
+		extern bool PrintCompilingProcess;
+
 		using namespace ICM::Instruction;
 
 		class InstructionCreater : public AnalysisBase
@@ -56,8 +58,10 @@ namespace ICM
 				InstList.push(begin);
 				createNode(GetNode(1), GetElement(0, 0)); // TODO
 				InstList.push(end);
-				for (size_t i : range(0, InstList.size())) {
-					println(i, "| ", InstList[i]->to_string());
+				if (PrintCompilingProcess) {
+					for (size_t i : range(0, InstList.size())) {
+						println(i, "| ", InstList[i]->to_string());
+					}
 				}
 				return InstList;
 			}
@@ -67,7 +71,8 @@ namespace ICM
 
 		private:
 			void createNode(Node &node, Element &refelt) {
-				println(to_string(node));
+				if (PrintCompilingProcess)
+					println(to_string(node));
 				assert(node.front().isKeyword());
 
 				switch (node[0].getKeyword()) {
@@ -227,18 +232,28 @@ namespace ICM
 				InstList.push(jpinst);
 			}
 			void createNodeLSRC(Node &node, Element &refelt) {
-				assert(node[1].isIdentifier());
-				const string &name = node[1].getIdentifier();
-				VariableTableUnit& vtu = setIdentifier(node[1]).getVariable();
-				ICM::Instruction::Instruction inst;
-				switch (node[0].getKeyword()) {
-				case Keyword::let_: inst = let; break;
-				case Keyword::cpy_: inst = cpy; break;
-				case Keyword::ref_: inst = ref; break;
-				default: break;
+				if (node.size() == 3) {
+					assert(node[1].isIdentifier());
+					Element &ident = node[1];
+					Element &value = node[2];
+					const string &name = ident.getIdentifier();
+					VariableTableUnit& vtu = setIdentifier(ident).getVariable();
+					ICM::Instruction::Instruction inst;
+					switch (node[0].getKeyword()) {
+					case Keyword::let_: inst = let; break;
+					case Keyword::cpy_: inst = cpy; break;
+					case Keyword::ref_: inst = ref; break;
+					default: break;
+					}
+					createReferNode(value);
+					InstList.push(new Insts::Assign(inst, vtu, value));
 				}
-				createReferNode(node[2]);
-				InstList.push(new Insts::Assign(inst, vtu, node[2]));
+				else {
+					Element &value = node[1];
+					createReferNode(value);
+					InstList.push(new Insts::CopySingle(value));
+					refelt.setRefer(InstList.size() - 1);
+				}
 			}
 			void createNodeList(Node &node, Element &refelt) {
 				Insts::List *inst = new Insts::List();
@@ -282,6 +297,8 @@ namespace ICM
 			void createReferNode(AST::Element &element) {
 				if (element.isRefer())
 					createNode(GetRefer(element), element);
+				else if (element.isIdentifier())
+					setIdentifier(element);
 			}
 
 			Element getElement(Element element) {
@@ -321,5 +338,10 @@ namespace ICM
 			InstructionCreater instcreater(Table);
 			return instcreater.create();
 		}
-	}
+
+		//=======================================
+		// * Class InstructionCreater
+		//=======================================
+
+		}
 }

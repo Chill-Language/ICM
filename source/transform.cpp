@@ -5,17 +5,23 @@ namespace ICM
 {
 	namespace Compiler
 	{
+		bool PrintCompilingProcess = true;
+
 		class PreliminaryCompile : public AnalysisBase
 		{
 		public:
 			PreliminaryCompile(NodeTable &Table) : AnalysisBase(Table) {}
 
 			void start() {
-				println("PreliminaryCompile");
+				if (PrintCompilingProcess)
+					println("PreliminaryCompile");
+
 				compileSub(GetNode(1), GetNode(0)[0]);
 
-				println("-->");
-				printTable();
+				if (PrintCompilingProcess) {
+					println("-->");
+					printTable();
+				}
 			}
 
 		private:
@@ -54,7 +60,8 @@ namespace ICM
 		private:
 			//
 			void compileSub(Node &node, Element &refelt) {
-				println(to_string(node));
+				if (PrintCompilingProcess)
+					println(to_string(node));
 				if (node[0].isKeyword())
 					compileKeyword(node, refelt);
 				else if (node[0].isIdentifier() || node[0].isRefer())
@@ -248,17 +255,20 @@ namespace ICM
 				KeywordID key = node.front().getKeyword();
 
 				if (node.size() == 3) {
-					if (!node[1].isIdentifier())
+					if (node[1].isIdentifier())
+						adjustElement(node[2]);
+					else
 						println("var must be Identifier.");
 				}
 				else if (node.size() == 2) {
-					if (!(key == ref_ || key == cpy_))
+					if (key == ref_ || key == cpy_)
+						adjustElement(node[1]);
+					else
 						println("Syntex error in '", key, "'.");
 				}
 				else {
 					println("Syntex error in '", key, "'.");
 				}
-				adjustElement(node[2]);
 			}
 		};
 
@@ -281,18 +291,22 @@ namespace ICM
 			DispNodeRecord dispNode;
 
 			void start() {
-				println("RoughAnalysis");
+				if (PrintCompilingProcess)
+					println("RoughAnalysis");
 				while (analysisNode(GetNode(0), 0));
 
-				println("-->");
-				printTable();
+				if (PrintCompilingProcess) {
+					println("-->");
+					printTable();
+				}
 			}
 
 
 			bool analysisNode(Node &refnode, size_t refpost) {
 				Element &refelt = refnode[refpost];
 				Node &node = GetRefer(refelt);
-				println(to_string(node));
+				if (PrintCompilingProcess)
+					println(to_string(node));
 				if (isKey(node[0], disp_)) {
 					dispNode = DispNodeRecord(&node, &refnode, refpost);
 				}

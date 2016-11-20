@@ -146,9 +146,9 @@ namespace ICM
 			case MT_Boolean:
 				return AST::Element::Data(T_Boolean, str == "T");
 			case MT_Number:
-				return AST::Element::Data(T_Number, GlobalElementObjectPool.insert(Common::Number::to_rational(str.c_str())));
+				return AST::Element::Data(T_Number, GlobalElementObjectPool.insert(Common::Number::to_rational(str.c_str()).getNum() / Common::Number::to_rational(str.c_str()).getDen()));
 			case MT_String:
-				return AST::Element::Data(T_String, GlobalElementObjectPool.insert(Objects::String(str)));
+				return AST::Element::Data(T_String, GlobalElementObjectPool.insert(str.c_str(), str.size() + 1));
 			case MT_Keyword:
 				return AST::Element::Keyword(GlobalKeywordTable.getValue(str));
 			case MT_Identifier:

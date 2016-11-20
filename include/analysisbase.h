@@ -25,19 +25,14 @@ namespace ICM
 			NodeTable &Table;
 
 		protected:
+			// Judge
 			bool isIdent(const Element &elt, const string &name) {
 				return elt.isIdentifier() && elt.getIdentifier() == name;
 			}
 			bool isKey(const Element &elt, KeywordID key) {
 				return elt.isKeyword() && elt.getKeyword() == key;
 			}
-			void error(const string &msg = "") {
-				println("Error ", msg);
-			}
-			void printTable() {
-				for (auto &e : rangei(Table.begin() + 1, Table.end()))
-					println(ICM::to_string(*e));
-			}
+			// Get
 			Node& GetNode(size_t id) {
 				assert(id < Table.size());
 				return *Table[id];
@@ -48,6 +43,14 @@ namespace ICM
 			}
 			Node& GetRefer(const Element &elt) {
 				return GetNode(elt.getRefer());
+			}
+			// Debug
+			void error(const string &msg = "") {
+				println("Error ", msg);
+			}
+			void printTable() {
+				for (auto &e : rangei(Table.begin() + 1, Table.end()))
+					println(ICM::to_string(*e));
 			}
 		};
 	}

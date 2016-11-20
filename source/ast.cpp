@@ -47,13 +47,15 @@ namespace ICM
 		}
 
 		Object Element::getData() const {
+			// TODO
+			// (Now) Create the copy.
 			switch (this->type) {
 			case E_Int:
 				return Object(T_Int, new int(this->data.ivalue)); // TODO
 			case E_Number:
-				return Object(T_Number, GlobalElementObjectPool.get(data.index));
+				return Object(T_Number, new TypeBase::NumberType(*(TypeBase::NumberType*)GlobalElementObjectPool.get(data.index))); // TODO
 			case E_String:
-				return Object(T_String, GlobalElementObjectPool.get(data.index));
+				return Object(T_String, new string((char*)GlobalElementObjectPool.get(data.index))); // TODO
 			case E_Boolean:
 				return Object(T_Boolean, new bool(this->data.bvalue)); // TODO
 			case E_Nil:

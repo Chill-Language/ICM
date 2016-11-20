@@ -115,11 +115,9 @@ namespace ICM
 	}
 }
 
+
 void test()
 {
-	//test3();
-	//exit(0);
-	//testSub();
 }
 
 ICM::Config GlobalConfig(false, true, false);
@@ -159,14 +157,15 @@ vector<Instruction::InstructionList> Compile(const char *text)
 	return VeI;
 }
 
-void Run(vector<Instruction::InstructionList> &VeI)
+void Run(vector<Instruction::InstructionList> &VeI, bool printResult)
 {
 	Timer t;
 
 	for (auto &instlist : VeI) {
-		Interpreter interpreter(instlist);
-		Object *result = interpreter.run();
-		println(result->to_output());
+		Object *result = ICM::Run(instlist);
+
+		if (printResult)
+			println(result->to_output());
 
 		if (GlobalConfig.PrintIntervalTime)
 			printIntervalTime(t);
@@ -219,7 +218,7 @@ int main(int argc, char *argv[])
 			//println("Input: \n", text.to_string());
 		}
 		auto instlist = Compile(text);
-		Run(instlist);
+		Run(instlist, LoopMatch);
 
 	} while (LoopMatch);
 

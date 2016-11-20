@@ -169,6 +169,14 @@ namespace ICM
 				string getToString() const { return GlobalVariableTable[VTU].getName() + ", " + ICM::to_string(Data); }
 			};
 
+			struct CopySingle : public InstDataBase<cpys>
+			{
+				CopySingle(const AST::Element &Data) : Data(Data) {}
+				AST::Element Data;
+			private:
+				string getToString() const { return ICM::to_string(Data); }
+			};
+
 			struct Store : public InstDataBase<stor>
 			{
 				Store(const AST::Element &Data) : Data(Data) {}
