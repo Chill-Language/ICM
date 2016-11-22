@@ -26,7 +26,7 @@ namespace ICM
 #define InstName(Inst) { Inst, #Inst }
 		BijectionMap<ICM::Instruction::Instruction, string> InstructionName = {
 			InstName(begin), InstName(end),
-			InstName(sing), InstName(stor),
+			InstName(sing), InstName(stor), InstName(nop),
 			InstName(call), InstName(ccal),
 			InstName(farg), InstName(fargl), InstName(fargv), InstName(fsub), InstName(fcal),
 			InstName(let), InstName(cpy), InstName(ref), InstName(set),
@@ -46,7 +46,7 @@ namespace ICM
 
 		using namespace ICM::Instruction;
 
-		class InstructionCreater : public AnalysisBase
+		class InstructionCreater : private AnalysisBase
 		{
 		public:
 			explicit InstructionCreater(vector<AST::NodePtr> &Table) : AnalysisBase(Table) {}
@@ -70,116 +70,79 @@ namespace ICM
 			ICM::Instruction::InstructionList InstList;
 
 		private:
-			void createNode(Node &node, Element &refelt) {
+			bool createNode(Node &node, Element &refelt) {
 				if (PrintCompilingProcess)
 					println(to_string(node));
 				assert(node.front().isKeyword());
 
 				switch (node[0].getKeyword()) {
-				case call_:
-					createNodeCall(node, refelt);
-					break;
-				case do_:
-					createNodeDo(node, refelt);
-					break;
-				case if_:
-					createNodeIf(node, refelt);
-					break;
-				case for_:
-					createNodeFor(node, refelt);
-					break;
+				case call_:  return createNodeCall(node, refelt);
+				case do_:    return createNodeDo(node, refelt);
+				case if_:    return createNodeIf(node, refelt);
+				case while_: return createNodeWhile(node, refelt);
+				case loop_:  return createNodeLoop(node, refelt);
+				case for_:   return createNodeFor(node, refelt);
+				case list_:  return createNodeList(node, refelt);
 				case let_:
 				case cpy_:
-				case ref_:
-					createNodeLSRC(node, refelt);
-					break;
-				case list_:
-					createNodeList(node, refelt);
-					break;
+				case ref_:   return createNodeLSRC(node, refelt);
+				case p_:     return createNodePrintIdent(node, refelt);
+				default:     return false;
 				}
 			}
 
-			// (I(x) args...)
-			void createNodeCall(Node &node, Element &refelt) {
+			// (call I(x) args...)
+			bool createNodeCall(Node &node, Element &refelt) {
 				vector<Element> Args;
-				Element &front = setIdentifier(node[1]);
-				createArgs(rangei(node.begin() + 2, node.end()), [&](Element &e) {
+				Element &front = node[1];
+				for (auto &e : rangei(node.begin() + 2, node.end())) {
+					if (e.isRefer()) {
+						createNode(GetRefer(e), e);
+					}
 					Args.push_back(e);
-				});
+				}
 				Insts::CheckCall *p = new Insts::CheckCall();
 				p->Args = Args;
 				p->Func = front;
 
 				InstList.push(p);
 				refelt.setRefer(InstList.size() - 1);
+				return true;
 			}
 
 			// (do ...)
-			void createNodeDo(Node &node, Element &refelt) {
+			bool createNodeDo(Node &node, Element &refelt) {
 				assert(node[0].getKeyword() == do_);
 				for (Element &e : rangei(node.begin() + 1, node.end())) {
-					if (e.isIdentifier()) {
-						setIdentifier(e);
-					}
-					else if (e.isRefer()) {
+					if (e.isRefer()) {
 						createNode(GetRefer(e), e);
 					}
 					else if (e.isData()) {
 						InstList.push(new Insts::Store(e));
 					}
+					else if (isKey(e, break_)) {
+						if (LoopBreakIDs.empty()) {
+							println("Error with break.");
+						}
+						else {
+							Insts::Jump *p = new Insts::Jump();
+							size_t id = LoopBreakIDs.top();
+							LoopBreakJumpPtrs.push_back(&p->Index);
+							InstList.push_back(p);
+						}
+					}
 				}
 				if (node.size() == 1) {
-					InstList.push(new Insts::Store(Element::Data(T_Nil, 0)));
+					InstList.push(nop);
 				}
 				refelt.setRefer(InstList.size() - 1);
+				return true;
 			}
 
-			/*void createNodeCall(Node &node, Element &refelt) {
-			InstructionData *pfsub, *pfarg;
-			Element &front = setIdentifier(node[0]);
-			if (front.isFunction()) {
-			// (F(x) args...)
-			auto *inst = new Insts::FuncSub();
-			inst->Func = front.getFunction().getID();
-			pfsub = inst;
-			}
-			else if (front.isVariable()) {
-			// (V(x) args...)
-			auto *inst = new Insts::FuncSubVarb();
-			inst->VFunc = front.getVariable().getData();
-			pfsub = inst;
-			}
-			else {
-			error();
-			return;
-			}
-			vector<Element> Args;
-			bool alldata = true;
-			createArgs(rangei(node.begin() + 1, node.end()), [&](Element &e) {
-			if (!e.isData() && !e.isVariable()) {
-			alldata = false;
-			}
-			Args.push_back(e);
-			});
-			if (alldata) {
-			auto *inst = new Insts::FuncArgsLight();
-			inst->Args = createDataList(Args);
-			pfarg = inst;
-			}
-			else {
-			auto *inst = new Insts::FuncArgs();
-			inst->Args = Args;
-			pfarg = inst;
-			}
-			InstList.push(pfarg);
-			InstList.push(pfsub);
-			InstList.push(new Insts::FuncCall());
-			refelt.setRefer(InstList.size() - 1);
-			}*/
 			// (if BE0 BEk BEn R{0} R{k} R{n} R{n+1})
-			void createNodeIf(Node &node, Element &refelt) {
+			bool createNodeIf(Node &node, Element &refelt) {
 				size_t count = node.size() / 2 - 1;
-				vector<Insts::Jump*> record;
+				vector<Insts::Jump*> recordJ;
 				for (size_t i : range(1, 1 + count)) {
 					Element &be = node[i];
 					Element &de = node[i + count];
@@ -189,34 +152,81 @@ namespace ICM
 					inst->Data = be;
 					InstList.push(inst);
 					createReferNode(de);
-					inst->Index = InstList.size();
 					auto *jinst = new Insts::Jump();
-					record.push_back(jinst);
+					recordJ.push_back(jinst);
 					InstList.push_back(jinst);
+					inst->Index = InstList.size();
 				}
 				createReferNode(node.back());
 				InstList.push(sing);
 				size_t index = InstList.size() - 1;
-				for (auto *p : record) {
+				for (auto *p : recordJ) {
 					p->Index = index;
 				}
 				refelt.setRefer(index);
+				return true;
+			}
+
+			stack<size_t> LoopBreakIDs;
+			vector<size_t*> LoopBreakJumpPtrs;
+			void adjustLoopBreakJump(size_t i) {
+				for (size_t *pi : LoopBreakJumpPtrs) {
+					*pi = i;
+				}
+				LoopBreakJumpPtrs.clear();
+			}
+
+			// (while E R{n})
+			bool createNodeWhile(Node &node, Element &refelt) {
+				LoopBreakIDs.push(node.getIndex());
+				Element &Bexp = node[1];
+				Element &Rdo = node[2];
+				size_t Bid = InstList.size();
+				createReferNode(Bexp);
+				auto *jpendinst = new Insts::JumpNot();
+				jpendinst->Data = Bexp;
+				InstList.push_back(jpendinst);
+				createReferNode(Rdo);
+				Insts::Jump *jmp = new Insts::Jump();
+				jmp->Index = Bid;
+				InstList.push_back(jmp);
+				jpendinst->Index = InstList.size();
+				InstList.push(nop);
+
+				refelt.setRefer(InstList.size() - 1);
+				adjustLoopBreakJump(refelt.getRefer());
+				LoopBreakIDs.pop();
+				return true;
+			}
+			// (loop R{n})
+			bool createNodeLoop(Node &node, Element &refelt) {
+				LoopBreakIDs.push(node.getIndex());
+				Element &Rdo = node[1];
+				size_t index = InstList.size();
+				createReferNode(Rdo);
+				auto *jpinst = new Insts::Jump();
+				InstList.push(jpinst);
+				jpinst->Index = index;
+				InstList.push(nop);
+
+				refelt.setRefer(InstList.size() - 1);
+				adjustLoopBreakJump(refelt.getRefer());
+				LoopBreakIDs.pop();
+				return true;
 			}
 			// (for I x y R{n})
-			void createNodeFor(Node &node, Element &refelt) {
+			bool createNodeFor(Node &node, Element &refelt) {
+				LoopBreakIDs.push(node.getIndex());
 				Element &I = node[1];
 				Element &vb = node[2];
 				Element &ve = node[3];
 				Element &Rdo = node[4];
 
-				setIdentifier(I);
 				size_t id = I.getVariable().getID();
 				GlobalVariableTable[id].setData(Objects::Number(0));
 				InstList.push(new Insts::Assign(let, GlobalVariableTable[id], vb));
 				size_t index = InstList.size();
 				createReferNode(Rdo);
-				if (ve.isIdentifier())
-					setIdentifier(ve);
 
 				Element ele;
 				if (ve.isVariable())
@@ -230,14 +240,20 @@ namespace ICM
 				InstList.push(new Insts::Inc(id));
 				jpinst->Index = index;
 				InstList.push(jpinst);
+				InstList.push(nop);
+
+				refelt.setRefer(InstList.size() - 1);
+				adjustLoopBreakJump(refelt.getRefer());
+				LoopBreakIDs.pop();
+				return true;
 			}
-			void createNodeLSRC(Node &node, Element &refelt) {
+			// (let/set/ref/cpy I x y R{n}), (ref/cpy I)
+			bool createNodeLSRC(Node &node, Element &refelt) {
 				if (node.size() == 3) {
-					assert(node[1].isIdentifier());
+					assert(node[1].isVariable());
 					Element &ident = node[1];
 					Element &value = node[2];
-					const string &name = ident.getIdentifier();
-					VariableTableUnit& vtu = setIdentifier(ident).getVariable();
+					VariableTableUnit& vtu = ident.getVariable();
 					ICM::Instruction::Instruction inst;
 					switch (node[0].getKeyword()) {
 					case Keyword::let_: inst = let; break;
@@ -254,8 +270,10 @@ namespace ICM
 					InstList.push(new Insts::CopySingle(value));
 					refelt.setRefer(InstList.size() - 1);
 				}
+				return true;
 			}
-			void createNodeList(Node &node, Element &refelt) {
+			// (list ...)
+			bool createNodeList(Node &node, Element &refelt) {
 				Insts::List *inst = new Insts::List();
 				for (auto &e : rangei(node.begin() + 1, node.end())) {
 					if (e.isRefer())
@@ -264,84 +282,30 @@ namespace ICM
 				}
 				InstList.push(inst);
 				refelt.setRefer(InstList.size() - 1);
+				return true;
 			}
-
-			template <typename Func>
-			void createArgs(const RangeIterator<vector<Element>::iterator> &r, Func func) {
-				for (auto &e : r) {
-					if (e.isIdentifier()) {
-						setIdentifier(e);
-					}
-					else if (e.isRefer()) {
+			// (p ...)
+			bool createNodePrintIdent(Node &node, Element &refelt) {
+				Insts::PrintIdent *inst = new Insts::PrintIdent();
+				for (auto &e : rangei(node.begin() + 1, node.end())) {
+					if (e.isRefer())
 						createNode(GetRefer(e), e);
-					}
-					func(e);
+					inst->Args.push_back(e);
 				}
+				InstList.push(inst);
+				refelt.setRefer(InstList.size() - 1);
+				return true;
 			}
 
-			DataList createDataList(const vector<Element> &args) {
-				lightlist_creater<Object*> creater(args.size());
-				for (auto &e : args) {
-					if (e.isData()) {
-						creater.push_back(new Object(e.getData()));
-					}
-					else if (e.isVariable()) {
-						creater.push_back(e.getVariable().getData());
-					}
-					else {
-						error();
-					}
-				}
-				return creater.data();
-			}
 			void createReferNode(AST::Element &element) {
 				if (element.isRefer())
 					createNode(GetRefer(element), element);
-				else if (element.isIdentifier())
-					setIdentifier(element);
 			}
-
-			Element getElement(Element element) {
-				if (element.isRefer()) {
-					createNode(GetRefer(element), element);
-					element.setRefer(InstList.size() - 1);
-				}
-				return element;
-			}
-			Element& setIdentifier(Element &element) {
-				assert(element.isIdentifier());
-				const string &name = element.getIdentifier();
-				size_t index;
-				if ((index = GlobalVariableTable.find(name))) {
-					element = Element::Variable(index);
-				}
-				else if ((index = GlobalFunctionTable.find(name))) {
-					element = Element::Function(index);
-				}
-				else {
-					auto &vtu = GlobalVariableTable.add(name, Objects::Nil());
-					element = Element::Variable(vtu.getID());
-				}
-				return element;
-			}
-
-			enum class Space
-			{
-				Global,
-				Function,
-			};
-			Space CurrentSpace = Space::Global;
-
 		};
 
 		InstructionList createInstruction(vector<AST::NodePtr>& Table) {
 			InstructionCreater instcreater(Table);
 			return instcreater.create();
 		}
-
-		//=======================================
-		// * Class InstructionCreater
-		//=======================================
-
-		}
+	}
 }

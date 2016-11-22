@@ -91,10 +91,10 @@
 
 ; Test 11
 (println "----------11----------")
-(p (let a 5)) ; a(5)
-(p (ref b a)) ; b(a(5))
-(p (ref a b)) ; a(5)
-(p (ref a a)) ; a(5)
+(p (let a 5)) ; Null ; old : a(5)
+(p (ref b a)) ; Null ; old : b(a(5))
+(p (ref a b)) ; Null ; old : a(5)
+(p (ref a a)) ; Null ; old : a(5)
 
 ; Test 12
 (println "----------12----------")
@@ -131,7 +131,7 @@
 ; Test 15
 (println "----------15----------")
 (p (if T 5 else 4))       ; 5
-(p (if F 5))              ; F
+(p (if F 5))              ; Nil ; old : F
 (let a T)
 (if a then                ; I'm T
 	(println "I'm T")
@@ -199,18 +199,3 @@ else
 )
 
 (println array)
-
-
-;(let a 5)
-;(for i in 1 to 9 (print i))
-;(print (do))
-;(print (disp (disp (disp [[[+ (disp [5 6])]]]))))
-;(+ (disp [(disp [2 5]) 1]) 5 6)
-;(+ 2 5 1 5 6)
-;(+ 5 6)
-;(if T (do 5 6))
-;(while T 6 +)
-;(pt (disp [1 2 3]))
-;(if T 5 else 6)
-;(if (if T T else F) 5 else (if T (if F 6)))
-;(if T 1 2 3 elsif F 4 5 else 6)

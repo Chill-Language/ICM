@@ -16,6 +16,8 @@ namespace ICM
 			sing, // sing a
 			stor, // stor
 			list, // list ...
+			nop,  // nop
+			pti,  // pti ...
 			// Function
 			call, // call f.i args...
 			ccal, // ccal f args...
@@ -104,6 +106,16 @@ namespace ICM
 			private:
 				string getToString() const {
 					return ICM::to_string(Func) + " " + ICM::to_string(Args);
+				}
+			};
+
+			struct PrintIdent : public InstDataBase<pti>
+			{
+				vector<AST::Element> Args;
+
+			private:
+				string getToString() const {
+					return ICM::to_string(Args);
 				}
 			};
 			/*

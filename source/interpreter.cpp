@@ -9,21 +9,30 @@ namespace ICM
 		Interpreter(Instruction::InstructionList &InstList)
 			: InstList(InstList), TempResult(InstList.size(), &Static.Null) {}
 
+		Object* getObject(const AST::Element &element) {
+			if (element.isData()) {
+				return new Object(element.getData());
+			}
+			else if (element.isVariable()) {
+				return element.getVariable().getData();
+			}
+			else if (element.isRefer()) {
+				return TempResult[element.getRefer()];
+			}
+			else if (element.isFunction()) {
+				return new Objects::Function(element.getFunction().getID());
+			}
+			else {
+				println("Error in getObject.");
+				return nullptr;
+			}
+		}
 		DataList createDataList(const vector<AST::Element> &args) {
 			lightlist_creater<Object*> creater(args.size());
 			for (auto &e : args) {
-				if (e.isData()) {
-					creater.push_back(new Object(e.getData()));
-				}
-				else if (e.isVariable()) {
-					creater.push_back(e.getVariable().getData());
-				}
-				else if (e.isRefer()) {
-					creater.push_back(TempResult[e.getRefer()]);
-				}
-				else {
-					println("Error in createDataList.");
-				}
+				Object *op = getObject(e);
+				if (op)
+					creater.push_back(op);
 			}
 			return creater.data();
 		}
@@ -145,7 +154,7 @@ namespace ICM
 				case jump: {
 					Insts::Jump &inst = static_cast<Insts::Jump&>(*Inst);
 					ProgramCounter = inst.Index;
-					break;
+					continue;
 				}
 				case jmpf:
 				case jmpn: {
@@ -202,6 +211,22 @@ namespace ICM
 					Result = TempResult[ProgramCounter];
 					break;
 				}
+				case pti: {
+					Insts::PrintIdent &inst = static_cast<Insts::PrintIdent&>(*Inst);
+					for (AST::Element &e : inst.Args) {
+						if (e.isVariable())
+							print(e.getVariable().getName(), "(");
+						Object *op = getObject(e);
+						if (op)
+							print(getObject(e)->to_string());
+						else
+							print("Null");
+						if (e.isVariable())
+							print(")");
+						println();
+					}
+					break;
+				}
 				case end: {
 					return Result;
 				}
@@ -215,17 +240,6 @@ namespace ICM
 		Instruction::InstructionList& InstList;
 		Object* Result = &Static.Nil;
 		vector<Object*> TempResult;
-
-		Object* getObject(AST::Element &element) {
-			if (element.isData())
-				return new Object(element.getData());
-			else if (element.isRefer())
-				return TempResult[element.getRefer()];
-			else if (element.isVariable())
-				return element.getVariable().getData();
-			println("Error in getObject");
-			return nullptr;
-		}
 
 		struct {
 			struct {

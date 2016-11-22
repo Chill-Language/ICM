@@ -1,13 +1,14 @@
 #include "transform.h"
 #include "analysisbase.h"
+#include "objectdef.h"
 
 namespace ICM
 {
 	namespace Compiler
 	{
-		bool PrintCompilingProcess = true;
+		bool PrintCompilingProcess = !true;
 
-		class PreliminaryCompile : public AnalysisBase
+		class PreliminaryCompile : private AnalysisBase
 		{
 		public:
 			PreliminaryCompile(NodeTable &Table) : AnalysisBase(Table) {}
@@ -71,13 +72,21 @@ namespace ICM
 			}
 			// call ...
 			void compileCall(Node &node, Element &refelt) {
-				for (auto &e : rangei(node.begin(), node.end())) {
+				checkCallList(rangei(node.begin(), node.end()));
+				node.push_front(Element::Keyword(call_));
+			}
+			void checkCallList(const RangeIterator<Node::iterator> &ri) {
+				for (auto &e : ri) {
 					if (e.isKeyword()) {
-						println("Error : DoList has Keyword.");
+						if (isKey(e, list_)) {
+							e = Element::Function(GlobalFunctionTable["list"].getID());
+						}
+						else {
+							println("Error : DoList has Keyword.");
+						}
 					}
 					adjustElement(e);
 				}
-				node.push_front(Element::Keyword(call_));
 			}
 			void compileKeyword(Node &node, Element &refelt) {
 				switch (node[0].getKeyword()) {
@@ -108,6 +117,12 @@ namespace ICM
 				case cpy_:
 					compileLSRC(node, refelt);
 					break;
+				case p_:
+					compilePrintIdent(node, refelt);
+					break;
+				case call_:
+					compileCallK(node, refelt);
+					break;
 				default:
 					println("Error with unkonwn Keyword.");
 				}
@@ -117,10 +132,16 @@ namespace ICM
 					adjustElement(e);
 				}
 			}
+			void compileCallK(Node &node, Element &refelt) {
+				checkCallList(rangei(node.begin() + 1, node.end()));
+			}
 			void compileList(Node &node, Element &refelt) {
 				for (auto &e : rangei(node.begin() + 1, node.end())) {
 					adjustElement(e);
 				}
+			}
+			void compilePrintIdent(Node &node, Element &refelt) {
+				checkCallList(rangei(node.begin() + 1, node.end()));
 			}
 			void compileDisp(Node &node, Element &refelt) {
 				if (node.size() == 2) {
@@ -177,14 +198,8 @@ namespace ICM
 							compileIfSub(rangei(iter + 1, ie), condList, dolists);
 							return;
 						}
-						else {
-							println("Syntax error.");
-							return;
-						}
 					}
-					else {
-						dolist.push_back(e);
-					}
+					dolist.push_back(e);
 				}
 			}
 			// (loop E...)
@@ -272,7 +287,7 @@ namespace ICM
 			}
 		};
 
-		class RoughAnalysis : public AnalysisBase
+		class RoughAnalysis : private AnalysisBase
 		{
 		public:
 			RoughAnalysis(NodeTable &Table) : AnalysisBase(Table) {}
@@ -339,17 +354,51 @@ namespace ICM
 			IdentifierAnalysis(NodeTable &Table) : AnalysisBase(Table) {}
 
 			void start() {
-				println("IdentifierAnalysis");
+				if (PrintCompilingProcess)
+					println("IdentifierAnalysis");
 
-				println("-->");
-				printTable();
+				setIdentSub(GetNode(1));
+
+				if (PrintCompilingProcess) {
+					println("-->");
+					printTable();
+				}
+			}
+
+			void setIdentSub(Node &node) {
+				if (PrintCompilingProcess)
+					println(to_string(node));
+				for (auto &e : node) {
+					if (e.isIdentifier())
+						setIdentifier(e);
+					else if (e.isRefer())
+						setIdentSub(GetRefer(e));
+				}
+			}
+
+		private:
+			Element& setIdentifier(Element &element) {
+				assert(element.isIdentifier());
+				const string &name = element.getIdentifier();
+				size_t index;
+				if ((index = GlobalVariableTable.find(name))) {
+					element = Element::Variable(index);
+				}
+				else if ((index = GlobalFunctionTable.find(name))) {
+					element = Element::Function(index);
+				}
+				else {
+					auto &vtu = GlobalVariableTable.add(name, Objects::Nil());
+					element = Element::Variable(vtu.getID());
+				}
+				return element;
 			}
 		};
 
 		void transform(vector<AST::NodePtr> &Table) {
 			PreliminaryCompile(Table).start();
 			RoughAnalysis(Table).start();
-			//IdentifierAnalysis(Table).start();
+			IdentifierAnalysis(Table).start();
 		};
 	}
 }

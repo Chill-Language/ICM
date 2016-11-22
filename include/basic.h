@@ -9,6 +9,7 @@
 #include <vector>
 #include <stack>
 #include <map>
+#include <list>
 #include <functional>
 #include <algorithm>
 #include <initializer_list>
@@ -31,6 +32,7 @@ using std::map;
 using std::stack;
 using std::shared_ptr;
 using std::unique_ptr;
+using std::list;
 using std::to_string;
 using namespace Common;
 
