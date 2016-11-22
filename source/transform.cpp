@@ -6,7 +6,7 @@ namespace ICM
 {
 	namespace Compiler
 	{
-		bool PrintCompilingProcess = !true;
+		bool PrintCompilingProcess = false;
 
 		class PreliminaryCompile : private AnalysisBase
 		{
@@ -17,7 +17,7 @@ namespace ICM
 				if (PrintCompilingProcess)
 					println("PreliminaryCompile");
 
-				compileSub(GetNode(1), GetNode(0)[0]);
+				compileSub(GetNode(1), GetElement(0, 0));
 
 				if (PrintCompilingProcess) {
 					println("-->");
@@ -26,6 +26,22 @@ namespace ICM
 			}
 
 		private:
+			Element& adjustElement(Element &elt) {
+				if (elt.isRefer())
+					compileSub(GetRefer(elt), elt);
+				return elt;
+			}
+			bool adjustNode(Node &node, size_t begin = 0) {
+				for (Element &e : rangei(node.begin() + begin, node.end())) {
+					if (e.isKeyword()) {
+						if (isKey(e, list_)) {
+							e = Element::Function(GlobalFunctionTable["list"].getID());
+						}
+					}
+					adjustElement(e);
+				}
+				return true;
+			}
 			bool checkBoolExp(const Element &elt) {
 				if (elt.isIdentifier() || elt.isRefer() || elt.isBoolean())
 					return true;
@@ -39,11 +55,6 @@ namespace ICM
 				dolist.insert(dolist.end(), nr.begin(), nr.end());
 				return dolist;
 			}
-			Element& adjustElement(Element &elt) {
-				if (elt.isRefer())
-					compileSub(GetRefer(elt), elt);
-				return elt;
-			}
 			void resetNode(Node &node) {
 				Element front = node.front();
 				node.clear();
@@ -55,116 +66,62 @@ namespace ICM
 				Table.push_back(std::move(std::unique_ptr<Node>(p)));
 				Element e = Element::Refer(id);
 				node.push_back(e);
-				compileDo(*p, e);
+				adjustNode(*p, 1);
 			}
 
 		private:
 			//
-			void compileSub(Node &node, Element &refelt) {
+			bool compileSub(Node &node, Element &refelt) {
 				if (PrintCompilingProcess)
 					println(to_string(node));
 				if (node[0].isKeyword())
-					compileKeyword(node, refelt);
+					return compileKeyword(node, refelt);
 				else if (node[0].isIdentifier() || node[0].isRefer())
-					compileCall(node, refelt);
+					return compileCall(node, refelt);
 				else
-					println("Error in compileSub.");
+					return error("Error in compileSub.");
 			}
 			// call ...
-			void compileCall(Node &node, Element &refelt) {
-				checkCallList(rangei(node.begin(), node.end()));
+			bool compileCall(Node &node, Element &refelt) {
+				adjustNode(node);
 				node.push_front(Element::Keyword(call_));
+				return true;
 			}
-			void checkCallList(const RangeIterator<Node::iterator> &ri) {
-				for (auto &e : ri) {
-					if (e.isKeyword()) {
-						if (isKey(e, list_)) {
-							e = Element::Function(GlobalFunctionTable["list"].getID());
-						}
-						else {
-							println("Error : DoList has Keyword.");
-						}
-					}
-					adjustElement(e);
-				}
-			}
-			void compileKeyword(Node &node, Element &refelt) {
+			bool compileKeyword(Node &node, Element &refelt) {
 				switch (node[0].getKeyword()) {
-				case if_:
-					compileIf(node, refelt);
-					break;
-				case for_:
-					compileFor(node, refelt);
-					break;
-				case while_:
-					compileWhile(node, refelt);
-					break;
-				case loop_:
-					compileLoop(node, refelt);
-					break;
-				case do_:
-					compileDo(node, refelt);
-					break;
-				case list_:
-					compileList(node, refelt);
-					break;
-				case disp_:
-					compileDisp(node, refelt);
-					break;
+				case if_:    return compileIf(node, refelt);
+				case for_:   return compileFor(node, refelt);
+				case while_: return compileWhile(node, refelt);
+				case loop_:  return compileLoop(node, refelt);
+				case do_:    return adjustNode(node, 1);
+				case list_:  return adjustNode(node, 1);
+				case p_:     return adjustNode(node, 1);
+				case call_:  return adjustNode(node, 1);
+				case disp_:  return compileDisp(node, refelt);
 				case let_:
 				case set_:
 				case ref_:
-				case cpy_:
-					compileLSRC(node, refelt);
-					break;
-				case p_:
-					compilePrintIdent(node, refelt);
-					break;
-				case call_:
-					compileCallK(node, refelt);
-					break;
-				default:
-					println("Error with unkonwn Keyword.");
+				case cpy_:   return compileLSRC(node, refelt);
+				default:     return error("Error with unkonwn Keyword.");
 				}
 			}
-			void compileDo(Node &node, Element &refelt) {
-				for (auto &e : rangei(node.begin() + 1, node.end())) {
-					adjustElement(e);
-				}
-			}
-			void compileCallK(Node &node, Element &refelt) {
-				checkCallList(rangei(node.begin() + 1, node.end()));
-			}
-			void compileList(Node &node, Element &refelt) {
-				for (auto &e : rangei(node.begin() + 1, node.end())) {
-					adjustElement(e);
-				}
-			}
-			void compilePrintIdent(Node &node, Element &refelt) {
-				checkCallList(rangei(node.begin() + 1, node.end()));
-			}
-			void compileDisp(Node &node, Element &refelt) {
+			// (disp V|R)
+			// --> (disp V|R)
+			bool compileDisp(Node &node, Element &refelt) {
 				if (node.size() == 2) {
 					Element &e = node[1];
 					if (e.isIdentifier() || e.isRefer()) {
-						//refelt = Element(e).setDisp();
 						if (e.isRefer()) {
 							compileSub(GetRefer(e), e);
 						}
-					}
-					else {
-						println("Error in compile disp.");
-						return;
+						return true;
 					}
 				}
-				else {
-					println("Error in compile disp.");
-					return;
-				}
+				return error("Syntex error with disp.");
 			}
 			// (if E0 E1... elsif E2 E3... else E4 E5...)
 			// --> (if E0 E2 E4 R{do E1...} R{do E3...} R{do E5...})
-			void compileIf(Node &node, Element &refelt) {
+			bool compileIf(Node &node, Element &refelt) {
 				VecElt condlist;
 				vector<VecElt> dolists;
 				compileIfSub(rangei(node.begin() + 1, node.end()), condlist, dolists);
@@ -176,8 +133,9 @@ namespace ICM
 				for (auto &dolist : dolists) {
 					setDoNode(node, dolist);
 				}
+				return true;
 			}
-			void compileIfSub(const NodeRange &nr, VecElt &condList, vector<VecElt> &dolists) {
+			bool compileIfSub(const NodeRange &nr, VecElt &condList, vector<VecElt> &dolists) {
 				Element &bexp = *nr.begin();
 				checkBoolExp(adjustElement(bexp));
 				condList.push_back(bexp);
@@ -189,72 +147,57 @@ namespace ICM
 				for (auto iter = ib; iter != ie; ++iter) {
 					Element &e = *iter;
 					if (e.isKeyword()) {
-						if (e.getKeyword() == else_) {
+						if (e.getKeyword() == elsif_) {
+							return compileIfSub(rangei(iter + 1, ie), condList, dolists);
+						}
+						else if (e.getKeyword() == else_) {
 							VecElt elsedolist = createDoList(rangei(iter + 1, ie));
 							dolists.push_back(elsedolist);
-							return;
-						}
-						else if (e.getKeyword() == elsif_) {
-							compileIfSub(rangei(iter + 1, ie), condList, dolists);
-							return;
+							return true;
 						}
 					}
 					dolist.push_back(e);
 				}
+				return true;
 			}
 			// (loop E...)
 			// --> (loop R{do E...})
-			void compileLoop(Node &node, Element &refelt) {
-				if (node.size() == 1) {
-					println("dolist will not be blank.");
-					return;
-				}
+			bool compileLoop(Node &node, Element &refelt) {
+				if (node.size() == 1)
+					return error("dolist will not be blank.");
 				VecElt dolist = createDoList(rangei(node.begin() + 1, node.end()));
 				resetNode(node);
 				setDoNode(node, dolist);
+				return true;
 			}
 			// (while E0 E...)
 			// --> (while E0 R{do E...})
-			void compileWhile(Node &node, Element &refelt) {
-				if (node.size() == 1) {
-					println("none boolean exp.");
-					return;
-				}
-				else if (node.size() == 2) {
-					println("dolist will not be blank.");
-					return;
-				}
+			bool compileWhile(Node &node, Element &refelt) {
+				if (node.size() == 1)
+					return error("none boolean exp.");
+				else if (node.size() == 2)
+					return error("dolist will not be blank.");
 				Element &bexp = node[1];
 				checkBoolExp(adjustElement(bexp));
 				VecElt dolist = createDoList(rangei(node.begin() + 2, node.end()));
 				resetNode(node);
 				node.push_back(bexp);
 				setDoNode(node, dolist);
+				return true;
 			}
 			// (for I in E0 to E1 E...)
 			// --> (for I E0 E1 R{do E...})
-			void compileFor(Node &node, Element &refelt) {
-				if (node.size() < 6) {
-					println("Syntex error for 'for'.");
-					return;
-				}
-				if (!node[1].isIdentifier()) {
-					println("for var must be Identifier.");
-					return;
-				}
-				if (!isKey(node[2], in_) || !isKey(node[4], to_)) {
-					println("Syntex error for 'for'.");
-					return;
-				}
-				//if (!(node[3].isData() || node[3].isRefer())
-				//	|| !(node[5].isData() || node[5].isRefer())) {
-				//	println("Syntex error for 'for'.");
-				//	return;
-				//}
-				if (node.size() == 6) {
-					println("dolist will not be blank.");
-					return;
-				}
+			bool compileFor(Node &node, Element &refelt) {
+				// Check
+				if (node.size() < 6)
+					return error("Syntex error for 'for'.");
+				else if (node.size() == 6)
+					return error("dolist will not be blank.");
+				else if (!node[1].isIdentifier())
+					return error("for var must be Identifier.");
+				else if (!isKey(node[2], in_) || !isKey(node[4], to_))
+					return error("Syntex error for 'for'.");
+				// Compile
 				Element I = node[1];
 				Element E0 = adjustElement(node[3]);
 				Element E1 = adjustElement(node[5]);
@@ -264,26 +207,30 @@ namespace ICM
 				node.push_back(E0);
 				node.push_back(E1);
 				setDoNode(node, dolist);
+				return true;
 			}
 			// (let/set/ref/cpy I E) or (ref/cpy E)
-			void compileLSRC(Node &node, Element &refelt) {
+			bool compileLSRC(Node &node, Element &refelt) {
 				KeywordID key = node.front().getKeyword();
 
 				if (node.size() == 3) {
-					if (node[1].isIdentifier())
+					if (node[1].isIdentifier()) {
 						adjustElement(node[2]);
+						return true;
+					}
 					else
-						println("var must be Identifier.");
+						return error("var must be Identifier.");
 				}
 				else if (node.size() == 2) {
-					if (key == ref_ || key == cpy_)
+					if (key == ref_ || key == cpy_) {
 						adjustElement(node[1]);
+						return true;
+					}
 					else
-						println("Syntex error in '", key, "'.");
+						return error("Syntex error in '" + ICM::to_string(key) + "'.");
 				}
-				else {
-					println("Syntex error in '", key, "'.");
-				}
+				else
+					return error("Syntex error in '" + ICM::to_string(key) + "'.");
 			}
 		};
 

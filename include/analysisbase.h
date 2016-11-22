@@ -45,8 +45,9 @@ namespace ICM
 				return GetNode(elt.getRefer());
 			}
 			// Debug
-			void error(const string &msg = "") {
-				println("Error ", msg);
+			bool error(const string &msg = "") {
+				println(msg);
+				return false;
 			}
 			void printTable() {
 				for (auto &e : rangei(Table.begin() + 1, Table.end()))

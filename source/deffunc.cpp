@@ -373,6 +373,23 @@ namespace ICM
 		}
 
 		//=======================================
+		// * BoolCalc
+		//=======================================
+		namespace BoolCalc
+		{
+			struct Not : public FI
+			{
+			private:
+				S sign() const {
+					return S({ T_Boolean }, T_Boolean); // Bool -> Bool
+				}
+				ObjectPtr func(const DataList &list) const {
+					return ObjectPtr(new Boolean(!list[0]->dat<T_Boolean>()));
+				}
+			};
+		}
+
+		//=======================================
 		// * Config
 		//=======================================
 		namespace Config
@@ -482,6 +499,7 @@ namespace ICM
 		//	F(System::p, S({}, T_List)),               // Void -> L
 		//	F(System::p, S({ T_Vary }, T_List, true)), // Var* -> L
 		//});
+		DefFuncTable.add("not", LST{ new DefFunc::BoolCalc::Not() });
 		DefFuncTable.add("dcall", Lst{
 			F(System::dcall, S({ T_Vary, T_Function, T_Vary }, T_Vary)), // (Var F Var) -> Var
 		});

@@ -26,7 +26,7 @@ namespace ICM
 #define InstName(Inst) { Inst, #Inst }
 		BijectionMap<ICM::Instruction::Instruction, string> InstructionName = {
 			InstName(begin), InstName(end),
-			InstName(sing), InstName(stor), InstName(nop),
+			InstName(sing), InstName(stor), InstName(nop), InstName(list), InstName(pti),
 			InstName(call), InstName(ccal),
 			InstName(farg), InstName(fargl), InstName(fargv), InstName(fsub), InstName(fcal),
 			InstName(let), InstName(cpy), InstName(ref), InstName(set),
@@ -42,7 +42,7 @@ namespace ICM
 
 	namespace Compiler
 	{
-		extern bool PrintCompilingProcess;
+		bool PrintCompilingProcess2 = true;
 
 		using namespace ICM::Instruction;
 
@@ -58,7 +58,7 @@ namespace ICM
 				InstList.push(begin);
 				createNode(GetNode(1), GetElement(0, 0)); // TODO
 				InstList.push(end);
-				if (PrintCompilingProcess) {
+				if (PrintCompilingProcess2) {
 					for (size_t i : range(0, InstList.size())) {
 						println(i, "| ", InstList[i]->to_string());
 					}
@@ -71,7 +71,7 @@ namespace ICM
 
 		private:
 			bool createNode(Node &node, Element &refelt) {
-				if (PrintCompilingProcess)
+				if (PrintCompilingProcess2)
 					println(to_string(node));
 				assert(node.front().isKeyword());
 
