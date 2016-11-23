@@ -115,7 +115,6 @@ namespace ICM
 	}
 }
 
-
 void test()
 {
 }

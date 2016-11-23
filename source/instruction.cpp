@@ -68,7 +68,14 @@ namespace ICM
 
 		private:
 			ICM::Instruction::InstructionList InstList;
-
+		
+		private:
+			size_t CurrInstID() {
+				return InstList.size() - 1;
+			}
+			size_t NextInstID() {
+				return InstList.size();
+			}
 		private:
 			bool createNode(Node &node, Element &refelt) {
 				if (PrintCompilingProcess2)
@@ -95,7 +102,9 @@ namespace ICM
 			bool createNodeCall(Node &node, Element &refelt) {
 				vector<Element> Args;
 				Element &front = node[1];
-				for (auto &e : rangei(node.begin() + 2, node.end())) {
+				if (front.isRefer())
+					createNode(GetRefer(front), front);
+				for (Element &e : rangei(node.begin() + 2, node.end())) {
 					if (e.isRefer()) {
 						createNode(GetRefer(e), e);
 					}
@@ -106,7 +115,7 @@ namespace ICM
 				p->Func = front;
 
 				InstList.push(p);
-				refelt.setRefer(InstList.size() - 1);
+				refelt.setRefer(CurrInstID());
 				return true;
 			}
 
@@ -117,7 +126,7 @@ namespace ICM
 					if (e.isRefer()) {
 						createNode(GetRefer(e), e);
 					}
-					else if (e.isData()) {
+					else if (e.isData() || e.isFunction() || e.isVariable()) {
 						InstList.push(new Insts::Store(e));
 					}
 					else if (isKey(e, break_)) {
@@ -135,7 +144,7 @@ namespace ICM
 				if (node.size() == 1) {
 					InstList.push(nop);
 				}
-				refelt.setRefer(InstList.size() - 1);
+				refelt.setRefer(CurrInstID());
 				return true;
 			}
 
@@ -155,11 +164,11 @@ namespace ICM
 					auto *jinst = new Insts::Jump();
 					recordJ.push_back(jinst);
 					InstList.push_back(jinst);
-					inst->Index = InstList.size();
+					inst->Index = NextInstID();
 				}
 				createReferNode(node.back());
 				InstList.push(sing);
-				size_t index = InstList.size() - 1;
+				size_t index = CurrInstID();
 				for (auto *p : recordJ) {
 					p->Index = index;
 				}
@@ -181,7 +190,7 @@ namespace ICM
 				LoopBreakIDs.push(node.getIndex());
 				Element &Bexp = node[1];
 				Element &Rdo = node[2];
-				size_t Bid = InstList.size();
+				size_t Bid = NextInstID();
 				createReferNode(Bexp);
 				auto *jpendinst = new Insts::JumpNot();
 				jpendinst->Data = Bexp;
@@ -190,10 +199,10 @@ namespace ICM
 				Insts::Jump *jmp = new Insts::Jump();
 				jmp->Index = Bid;
 				InstList.push_back(jmp);
-				jpendinst->Index = InstList.size();
+				jpendinst->Index = NextInstID();
 				InstList.push(nop);
 
-				refelt.setRefer(InstList.size() - 1);
+				refelt.setRefer(CurrInstID());
 				adjustLoopBreakJump(refelt.getRefer());
 				LoopBreakIDs.pop();
 				return true;
@@ -202,14 +211,14 @@ namespace ICM
 			bool createNodeLoop(Node &node, Element &refelt) {
 				LoopBreakIDs.push(node.getIndex());
 				Element &Rdo = node[1];
-				size_t index = InstList.size();
+				size_t index = NextInstID();
 				createReferNode(Rdo);
 				auto *jpinst = new Insts::Jump();
 				InstList.push(jpinst);
 				jpinst->Index = index;
 				InstList.push(nop);
 
-				refelt.setRefer(InstList.size() - 1);
+				refelt.setRefer(CurrInstID());
 				adjustLoopBreakJump(refelt.getRefer());
 				LoopBreakIDs.pop();
 				return true;
@@ -225,7 +234,7 @@ namespace ICM
 				size_t id = I.getVariable().getID();
 				GlobalVariableTable[id].setData(Objects::Number(0));
 				InstList.push(new Insts::Assign(let, GlobalVariableTable[id], vb));
-				size_t index = InstList.size();
+				size_t index = NextInstID();
 				createReferNode(Rdo);
 
 				Element ele;
@@ -242,7 +251,7 @@ namespace ICM
 				InstList.push(jpinst);
 				InstList.push(nop);
 
-				refelt.setRefer(InstList.size() - 1);
+				refelt.setRefer(CurrInstID());
 				adjustLoopBreakJump(refelt.getRefer());
 				LoopBreakIDs.pop();
 				return true;
@@ -268,7 +277,7 @@ namespace ICM
 					Element &value = node[1];
 					createReferNode(value);
 					InstList.push(new Insts::CopySingle(value));
-					refelt.setRefer(InstList.size() - 1);
+					refelt.setRefer(CurrInstID());
 				}
 				return true;
 			}
@@ -281,7 +290,7 @@ namespace ICM
 					inst->Data.push_back(e);
 				}
 				InstList.push(inst);
-				refelt.setRefer(InstList.size() - 1);
+				refelt.setRefer(CurrInstID());
 				return true;
 			}
 			// (p ...)
@@ -293,7 +302,7 @@ namespace ICM
 					inst->Args.push_back(e);
 				}
 				InstList.push(inst);
-				refelt.setRefer(InstList.size() - 1);
+				refelt.setRefer(CurrInstID());
 				return true;
 			}
 

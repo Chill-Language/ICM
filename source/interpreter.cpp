@@ -55,6 +55,16 @@ namespace ICM
 						auto &ftu = func.getFunction();
 						op = checkCall(ftu, createDataList(inst.Args));
 					}
+					else if (func.isRefer()) {
+						Object *fp = TempResult[func.getRefer()];
+						if (fp->type == T_Function) {
+							auto &ftu = fp->dat<T_Function>().getData();
+							op = checkCall(ftu, createDataList(inst.Args));
+						}
+						else {
+							println("'", fp->to_string(), "' is not Function.");
+						}
+					}
 					TempResult[ProgramCounter] = op.get();
 					Result = TempResult[ProgramCounter];
 					break;
@@ -136,13 +146,13 @@ namespace ICM
 				}
 				case cpys: {
 					Insts::CopySingle &inst = static_cast<Insts::CopySingle&>(*Inst);
-					TempResult[ProgramCounter] = inst.Data.getData().clone(); // TODO
+					TempResult[ProgramCounter] = getObject(inst.Data)->clone(); // TODO
 					Result = TempResult[ProgramCounter];
 					break;
 				}
 				case stor: {
 					Insts::Store &inst = static_cast<Insts::Store&>(*Inst);
-					TempResult[ProgramCounter] = new Object(inst.Data.getData()); // TODO
+					TempResult[ProgramCounter] = getObject(inst.Data); // TODO
 					Result = TempResult[ProgramCounter];
 					break;
 				}
@@ -169,6 +179,7 @@ namespace ICM
 					}
 					else {
 						println("Error Not Boolean");
+						return nullptr;
 					}
 					break;
 				}

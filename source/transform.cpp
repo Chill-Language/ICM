@@ -6,7 +6,7 @@ namespace ICM
 {
 	namespace Compiler
 	{
-		bool PrintCompilingProcess = false;
+		bool PrintCompilingProcess = !false;
 
 		class PreliminaryCompile : private AnalysisBase
 		{
@@ -33,11 +33,6 @@ namespace ICM
 			}
 			bool adjustNode(Node &node, size_t begin = 0) {
 				for (Element &e : rangei(node.begin() + begin, node.end())) {
-					if (e.isKeyword()) {
-						if (isKey(e, list_)) {
-							e = Element::Function(GlobalFunctionTable["list"].getID());
-						}
-					}
 					adjustElement(e);
 				}
 				return true;
@@ -234,67 +229,6 @@ namespace ICM
 			}
 		};
 
-		class RoughAnalysis : private AnalysisBase
-		{
-		public:
-			RoughAnalysis(NodeTable &Table) : AnalysisBase(Table) {}
-
-
-			struct DispNodeRecord
-			{
-				DispNodeRecord() : DispNodeRecord(0, 0, 0) {}
-				DispNodeRecord(Node *node, Node *refnode, size_t refpost)
-					: node(node), refnode(refnode), refpost(refpost) {}
-
-				Node *node;
-				Node *refnode;
-				size_t refpost;
-			};
-			DispNodeRecord dispNode;
-
-			void start() {
-				if (PrintCompilingProcess)
-					println("RoughAnalysis");
-				while (analysisNode(GetNode(0), 0));
-
-				if (PrintCompilingProcess) {
-					println("-->");
-					printTable();
-				}
-			}
-
-
-			bool analysisNode(Node &refnode, size_t refpost) {
-				Element &refelt = refnode[refpost];
-				Node &node = GetRefer(refelt);
-				if (PrintCompilingProcess)
-					println(to_string(node));
-				if (isKey(node[0], disp_)) {
-					dispNode = DispNodeRecord(&node, &refnode, refpost);
-				}
-				else if (isKey(node[0], list_)) {
-					DispNodeRecord &tnr = dispNode;
-					if (tnr.node == &refnode) {
-						setRefNodeNew(node, *tnr.refnode, tnr.refpost);
-						dispNode = DispNodeRecord();
-						return true;
-					}
-				}
-				for (size_t i = 0; i < node.size(); i++) {
-					if (node[i].isRefer()) {
-						if (analysisNode(node, i))
-							return true;
-					}
-				}
-				return false;
-			}
-			void setRefNodeNew(Node &node, Node &refnode, size_t refpost) {
-				refnode.erase(refnode.begin() + refpost);
-				refnode.insert(refnode.begin() + refpost, node.begin() + 1, node.end());
-			}
-
-		};
-
 		class IdentifierAnalysis : public AnalysisBase
 		{
 		public:
@@ -315,17 +249,19 @@ namespace ICM
 			void setIdentSub(Node &node) {
 				if (PrintCompilingProcess)
 					println(to_string(node));
-				for (auto &e : node) {
+				for (size_t i : range(0, node.size())) {
+					Element &e = node[i];
 					if (e.isIdentifier())
 						setIdentifier(e);
 					else if (e.isRefer())
 						setIdentSub(GetRefer(e));
+					else if (e.isKeyword() && i != 0)
+						setKeyword(e);
 				}
 			}
 
 		private:
-			Element& setIdentifier(Element &element) {
-				assert(element.isIdentifier());
+			void setIdentifier(Element &element) {
 				const string &name = element.getIdentifier();
 				size_t index;
 				if ((index = GlobalVariableTable.find(name))) {
@@ -338,13 +274,16 @@ namespace ICM
 					auto &vtu = GlobalVariableTable.add(name, Objects::Nil());
 					element = Element::Variable(vtu.getID());
 				}
-				return element;
+			}
+			void setKeyword(Element &element) {
+				if (isKey(element, list_)) {
+					element = Element::Function(GlobalFunctionTable["list"].getID());
+				}
 			}
 		};
 
 		void transform(vector<AST::NodePtr> &Table) {
 			PreliminaryCompile(Table).start();
-			RoughAnalysis(Table).start();
 			IdentifierAnalysis(Table).start();
 		};
 	}

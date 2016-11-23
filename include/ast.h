@@ -83,7 +83,7 @@ namespace ICM
 			static Element Variable(size_t index);
 			static Element Function(size_t index);
 
-			bool isData() const { return isNumber() || isBoolean() || isString() || type == E_Nil; }
+			bool isData() const { return isNumber() || isBoolean() || isString() || type == E_Nil || type == E_Int; }
 			bool isRefer() const { return type == E_Refer; }
 			bool isKeyword() const { return type == E_Keyword; }
 			bool isIdentifier() const { return type == E_Identifier; }
@@ -100,31 +100,16 @@ namespace ICM
 			// Get/Set
 			Object getData() const;
 
-			size_t getRefer() const {
-				assert(isRefer() || isDispRefer());
-				return data.index;
-			}
+			size_t getRefer() const;
 			void setRefer(size_t id) { data.index = id; }
 			
-			Keyword::KeywordID getKeyword() const {
-				assert(isKeyword());
-				return data.key;
-			}
+			Keyword::KeywordID getKeyword() const;
 			const string& getIdentifier() const;
 			VariableTableUnit& getVariable() const;
 			FuncTableUnit& getFunction() const;
-			bool getBoolean() const {
-				return data.bvalue;
-			}
+			bool getBoolean() const;
 
-			Element& setDisp() {
-				assert(isRefer() || isIdentifier());
-				if (type == E_Refer)
-					type = E_DispRefer;
-				else
-					type = E_DispData;
-				return *this;
-			}
+			Element& setDisp();
 
 		private:
 			EleType type;

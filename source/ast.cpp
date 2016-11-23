@@ -11,8 +11,12 @@ namespace ICM
 	{
 		Element Element::Data(size_t type, size_t index) {
 			EleType et;
-			if (type == T_Number) {
-				et = E_Number;
+			if (type == T_Number) { // TODO
+				et = E_Int;
+				Element r(et);
+				r.data.ivalue = index;
+				return r;
+				//et = E_Number;
 			}
 			else if (type == T_String) {
 				et = E_String;
@@ -47,11 +51,12 @@ namespace ICM
 		}
 
 		Object Element::getData() const {
+			assert(isData());
 			// TODO
 			// (Now) Create the copy.
 			switch (this->type) {
 			case E_Int:
-				return Object(T_Int, new int(this->data.ivalue)); // TODO
+				return Object(T_Number, new int(this->data.ivalue)); // TODO
 			case E_Number:
 				return Object(T_Number, new TypeBase::NumberType(*(TypeBase::NumberType*)GlobalElementObjectPool.get(data.index))); // TODO
 			case E_String:
@@ -63,14 +68,37 @@ namespace ICM
 			}
 			return Object();
 		}
+		size_t Element::getRefer() const {
+			assert(isRefer() || isDispRefer());
+			return data.index;
+		}
+		Keyword::KeywordID Element::getKeyword() const {
+			assert(isKeyword());
+			return data.key;
+		}
 		const string& Element::getIdentifier() const {
+			assert(isIdentifier());
 			return GlobalIdentifierMap.getKey(data.index);
 		}
 		VariableTableUnit& Element::getVariable() const {
+			assert(isVariable());
 			return GlobalVariableTable[data.index];
 		}
 		FuncTableUnit& Element::getFunction() const {
+			assert(isFunction());
 			return GlobalFunctionTable[data.index];
+		}
+		bool Element::getBoolean() const {
+			assert(isBoolean());
+			return data.bvalue;
+		}
+		Element & Element::setDisp() {
+			assert(isRefer() || isIdentifier());
+			if (type == E_Refer)
+				type = E_DispRefer;
+			else
+				type = E_DispData;
+			return *this;
 		}
 	}
 	//=======================================
