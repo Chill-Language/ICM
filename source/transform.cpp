@@ -112,7 +112,7 @@ namespace ICM
 						return true;
 					}
 				}
-				return error("Syntex error with disp.");
+				return error("Syntax error with disp.");
 			}
 			// (if E0 E1... elsif E2 E3... else E4 E5...)
 			// --> (if E0 E2 E4 R{do E1...} R{do E3...} R{do E5...})
@@ -185,13 +185,13 @@ namespace ICM
 			bool compileFor(Node &node, Element &refelt) {
 				// Check
 				if (node.size() < 6)
-					return error("Syntex error for 'for'.");
+					return error("Syntax error for 'for'.");
 				else if (node.size() == 6)
 					return error("dolist will not be blank.");
 				else if (!node[1].isIdentifier())
 					return error("for var must be Identifier.");
 				else if (!isKey(node[2], in_) || !isKey(node[4], to_))
-					return error("Syntex error for 'for'.");
+					return error("Syntax error for 'for'.");
 				// Compile
 				Element I = node[1];
 				Element E0 = adjustElement(node[3]);
@@ -222,10 +222,10 @@ namespace ICM
 						return true;
 					}
 					else
-						return error("Syntex error in '" + ICM::to_string(key) + "'.");
+						return error("Syntax error in '" + ICM::to_string(key) + "'.");
 				}
 				else
-					return error("Syntex error in '" + ICM::to_string(key) + "'.");
+					return error("Syntax error in '" + ICM::to_string(key) + "'.");
 			}
 		};
 
