@@ -30,6 +30,14 @@ public:
 			*ptr++ = *p;
 	}
 
+	template <typename Iter>
+	lightlist(Iter begin, Iter end, size_t capacity)
+		: _capacity(capacity), data(Memory::new_<T>(_capacity), Memory::delete_<T>) {
+		T* ptr = data.get();
+		for (Iter p = begin; p != end; ++p)
+			*ptr++ = *p;
+	}
+
 	template <typename Container>
 	explicit lightlist(const Container &con)
 		: lightlist(con.begin(), con.end()) {}

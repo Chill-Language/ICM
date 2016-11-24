@@ -164,7 +164,7 @@ void Run(vector<Instruction::InstructionList> &VeI, bool printResult)
 		Object *result = ICM::Run(instlist);
 
 		if (printResult)
-			println("=> ", result->to_output(), "\n");
+			println("=> ", result ? result->to_output() : "Null", "\n");
 
 		if (GlobalConfig.PrintIntervalTime)
 			printIntervalTime(t);

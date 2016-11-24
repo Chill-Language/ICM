@@ -42,7 +42,7 @@ namespace ICM
 
 	namespace Compiler
 	{
-		bool PrintCompilingProcess2 = true;
+		bool PrintCompilingProcess2 = false;
 
 		using namespace ICM::Instruction;
 
@@ -100,19 +100,16 @@ namespace ICM
 
 			// (call I(x) args...)
 			bool createNodeCall(Node &node, Element &refelt) {
-				vector<Element> Args;
+				vector<Element> Data;
 				Element &front = node[1];
-				if (front.isRefer())
-					createNode(GetRefer(front), front);
-				for (Element &e : rangei(node.begin() + 2, node.end())) {
+				for (Element &e : rangei(node.begin() + 1, node.end())) {
 					if (e.isRefer()) {
 						createNode(GetRefer(e), e);
 					}
-					Args.push_back(e);
+					Data.push_back(e);
 				}
 				Insts::CheckCall *p = new Insts::CheckCall();
-				p->Args = Args;
-				p->Func = front;
+				p->Data = Data;
 
 				InstList.push(p);
 				refelt.setRefer(CurrInstID());

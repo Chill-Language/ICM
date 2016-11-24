@@ -6,7 +6,7 @@ namespace ICM
 {
 	namespace Compiler
 	{
-		bool PrintCompilingProcess = !false;
+		bool PrintCompilingProcess = false;
 
 		class PreliminaryCompile : private AnalysisBase
 		{
@@ -249,6 +249,7 @@ namespace ICM
 			void setIdentSub(Node &node) {
 				if (PrintCompilingProcess)
 					println(to_string(node));
+				bool change = false;
 				for (size_t i : range(0, node.size())) {
 					Element &e = node[i];
 					if (e.isIdentifier())
@@ -257,7 +258,13 @@ namespace ICM
 						setIdentSub(GetRefer(e));
 					else if (e.isKeyword() && i != 0)
 						setKeyword(e);
+					else if (isKey(e, disp_)) {
+						setKeyword(e);
+						change = true;
+					}
 				}
+				if (change)
+					node.push_front(Element::Keyword(call_));
 			}
 
 		private:
@@ -278,6 +285,9 @@ namespace ICM
 			void setKeyword(Element &element) {
 				if (isKey(element, list_)) {
 					element = Element::Function(GlobalFunctionTable["list"].getID());
+				}
+				else if (isKey(element, disp_)) {
+					element = Element::Function(GlobalFunctionTable["disp"].getID());
 				}
 			}
 		};

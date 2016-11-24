@@ -27,15 +27,70 @@ namespace ICM
 				return nullptr;
 			}
 		}
-		DataList createDataList(const vector<AST::Element> &args) {
-			lightlist_creater<Object*> creater(args.size());
-			for (auto &e : args) {
+		DataList createDataList(vector<AST::Element> &args) {
+			return createDataList(rangei(args.begin(), args.end()));
+		}
+		DataList createDataList(const RangeIterator<AST::Node::iterator> &ri) {
+			lightlist_creater<Object*> creater(ri.size());
+			for (auto &e : ri) {
 				Object *op = getObject(e);
 				if (op)
 					creater.push_back(op);
 			}
 			return creater.data();
 		}
+		DataList createDispCallList(vector<AST::Element> &el, const FuncTableUnit* &ftup) {
+			list<Object*> datalist;
+			for (auto &e : el) {
+				Object *op = getObject(e);
+				if (op) {
+					if (op->type == T_Disperse) {
+						auto &ve = op->dat<T_Disperse>().getData();
+						datalist.insert(datalist.end(), ve.begin(), ve.end());
+					}
+					else {
+						datalist.push_back(op);
+					}
+				}
+			}
+			Object *fp = datalist.front();
+			datalist.pop_front();
+			if (fp->type != T_Function) {
+				println("'", fp->to_string(), "' is not Function.");
+				return DataList();
+			}
+			ftup = &fp->dat<T_Function>().getData();
+			return DataList(datalist.begin(), datalist.end(), datalist.size());
+		}
+		Object* CheckCall(vector<AST::Element> &Data) {
+			const FuncTableUnit *ftup;
+
+			AST::Element &front = Data.front();
+			if (front.isFunction()) {
+				ftup = &front.getFunction();
+			}
+			else if (front.isVariable() || front.isRefer()) {
+				Object *fp = getObject(front);
+				if (fp->type == T_Disperse) {
+				}
+				else if (fp->type != T_Function) {
+					println("'", fp->to_string(), "' is not Function.");
+					return nullptr;
+				}
+				else {
+					ftup = &fp->dat<T_Function>().getData();
+				}
+			}
+			else {
+				println("Error in CheckCall.");
+				return nullptr;
+			}
+
+			DataList dl = createDispCallList(Data, ftup);
+			ObjectPtr op = checkCall(*ftup, dl);
+			return op.get();
+		}
+
 		Object* run() {
 			size_t ProgramCounter = 0;
 			while (true) {
@@ -45,27 +100,7 @@ namespace ICM
 				switch (Inst->inst()) {
 				case ccal: {
 					Insts::CheckCall &inst = static_cast<Insts::CheckCall&>(*Inst);
-					AST::Element &func = inst.Func;
-					ObjectPtr op;
-					if (func.isVariable()) {
-						auto &ftu = func.getVariable().getData()->dat<T_Function>().getData();
-						op = checkCall(ftu, createDataList(inst.Args));
-					}
-					else if (func.isFunction()) {
-						auto &ftu = func.getFunction();
-						op = checkCall(ftu, createDataList(inst.Args));
-					}
-					else if (func.isRefer()) {
-						Object *fp = TempResult[func.getRefer()];
-						if (fp->type == T_Function) {
-							auto &ftu = fp->dat<T_Function>().getData();
-							op = checkCall(ftu, createDataList(inst.Args));
-						}
-						else {
-							println("'", fp->to_string(), "' is not Function.");
-						}
-					}
-					TempResult[ProgramCounter] = op.get();
+					TempResult[ProgramCounter] = CheckCall(inst.Data);
 					Result = TempResult[ProgramCounter];
 					break;
 				}

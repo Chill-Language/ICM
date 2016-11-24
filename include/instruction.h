@@ -100,12 +100,11 @@ namespace ICM
 
 			struct CheckCall : public InstDataBase<ccal>
 			{
-				AST::Element Func;
-				vector<AST::Element> Args;
+				vector<AST::Element> Data;
 
 			private:
 				string getToString() const {
-					return ICM::to_string(Func) + " " + ICM::to_string(Args);
+					return ICM::to_string(Data);
 				}
 			};
 
