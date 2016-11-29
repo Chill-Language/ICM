@@ -1,6 +1,4 @@
-#ifndef _ICM_AST_H_
-#define _ICM_AST_H_
-
+#pragma once
 #include "basic.h"
 #include "object.h"
 #include "keyword.h"
@@ -187,5 +185,3 @@ namespace ICM
 	string to_string(const AST::Node &node);
 	string to_string(const vector<AST::Element> &vec);
 }
-
-#endif

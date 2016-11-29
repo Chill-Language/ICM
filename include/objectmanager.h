@@ -1,6 +1,4 @@
-#ifndef _ICM_OBJECTMANAGER_H_
-#define _ICM_OBJECTMANAGER_H_
-
+#pragma once
 #include "basic.h"
 #include "bijectionmap.h"
 #include "objectenum.h"
@@ -199,5 +197,3 @@ namespace ICM
 	//=======================================
 	extern SymbolTable GlobalSymbolTable;
 }
-
-#endif

@@ -1,6 +1,4 @@
-#ifndef _ICM_COMPILER_ANALYSISBASE_H_
-#define _ICM_COMPILER_ANALYSISBASE_H_
-
+#pragma once
 #include "ast.h"
 
 namespace ICM
@@ -56,5 +54,3 @@ namespace ICM
 		};
 	}
 }
-
-#endif

@@ -1,6 +1,4 @@
-#ifndef _ICM_OBJECTS_H_
-#define _ICM_OBJECTS_H_
-
+#pragma once
 #include "basic.h"
 #include "objectenum.h"
 #include "objectmanager.h"
@@ -156,5 +154,3 @@ namespace ICM
 	string to_string(const vector<ObjectPtr> &list);
 	string to_string(const vector<Object*> &list);
 }
-
-#endif

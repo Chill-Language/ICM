@@ -1,6 +1,4 @@
-#ifndef _ICM_PARSER_H_
-#define _ICM_PARSER_H_
-
+#pragma once
 #include "ast.h"
 #include "keyword.h"
 
@@ -83,5 +81,3 @@ namespace ICM
 		bool createAST(Match &match, AST &ast);
 	}
 }
-
-#endif

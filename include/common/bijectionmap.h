@@ -2,8 +2,7 @@
 // Date:	08/29/2016
 // Version:	1.0.0.0
 
-#ifndef _SYSTEM_BIJECTIONMAP_H_
-#define _SYSTEM_BIJECTIONMAP_H_
+#pragma once
 #include "macro.h"
 #include <map>
 #include <vector>
@@ -244,5 +243,3 @@ private:
 	}
 };
 END
-
-#endif

@@ -1,6 +1,4 @@
-#ifndef _ICM_COMPILER_TRANSFORM_H_
-#define _ICM_COMPILER_TRANSFORM_H_
-
+#pragma once
 #include "ast.h"
 
 namespace ICM
@@ -10,5 +8,3 @@ namespace ICM
 		void transform(vector<AST::NodePtr> &);
 	}
 }
-
-#endif

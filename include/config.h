@@ -1,6 +1,4 @@
-#ifndef _ICM_CONFIG_H_
-#define _ICM_CONFIG_H_
-
+#pragma once
 namespace ICM
 {
 	class Config
@@ -26,6 +24,3 @@ namespace ICM
 }
 
 extern ICM::Config GlobalConfig;
-
-
-#endif

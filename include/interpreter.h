@@ -1,6 +1,4 @@
-#ifndef _ICM_INTERPRETER_H_
-#define _ICM_INTERPRETER_H_
-
+#pragma once
 #include "instruction.h"
 
 namespace ICM
@@ -9,5 +7,3 @@ namespace ICM
 
 	Object* Run(Instruction::InstructionList &instlist);
 }
-
-#endif

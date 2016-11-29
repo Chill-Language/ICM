@@ -1,6 +1,4 @@
-#ifndef _ICM_KEYWORD_H_
-#define _ICM_KEYWORD_H_
-
+#pragma once
 #include "basic.h"
 
 namespace ICM
@@ -44,5 +42,3 @@ namespace ICM
 
 	extern SerialBijectionMap<string> GlobalIdentifierMap;
 }
-
-#endif

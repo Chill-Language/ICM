@@ -3,8 +3,7 @@
 // Version:      2.1.0.0
 // Description:  Basic on 'to_string', using 'printf'.
 
-#ifndef _SYSTEM_PRINTS_H_
-#define _SYSTEM_PRINTS_H_
+#pragma once
 #include "macro.h"
 #include <string>
 
@@ -119,5 +118,3 @@ namespace Output
 	}
 }
 END
-
-#endif

@@ -1,6 +1,4 @@
-#ifndef _ICM_TYPEBASE_H_
-#define _ICM_TYPEBASE_H_
-
+#pragma once
 #include "basic.h"
 #include "object.h"
 #include "number.h"
@@ -216,5 +214,3 @@ namespace ICM
 	string to_string(const TypeBase::FunctionType &ft);
 	string to_string(const TypeBase::VariableType &ft);
 }
-
-#endif

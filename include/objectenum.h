@@ -1,6 +1,4 @@
-#ifndef _ICM_OBJECTENUM_H_
-#define _ICM_OBJECTENUM_H_
-
+#pragma once
 namespace ICM
 {
 	//===========================================================
@@ -66,5 +64,3 @@ namespace ICM
 	std::string to_string(DefaultType type);
 	bool operator==(TypeUnit t1, DefaultType t2);
 }
-
-#endif

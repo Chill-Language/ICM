@@ -2,8 +2,7 @@
 // Date:	08/09/2016
 // Version:	2.0.0.0
 
-#ifndef _SYSTEM_NUMBER_H_
-#define _SYSTEM_NUMBER_H_
+#pragma once
 #include "macro.h"
 #include <cmath>
 #include <string>
@@ -75,5 +74,3 @@ namespace Number
 	Rational to_rational(const std::string &str);
 }
 END
-
-#endif

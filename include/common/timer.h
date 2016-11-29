@@ -2,8 +2,7 @@
 // Date:    11/05/2016
 // Version: 1.0.0.0
 
-#ifndef _SYSTEM_TIMER_H_
-#define _SYSTEM_TIMER_H_
+#pragma once
 #include "macro.h"
 #include <ctime>
 
@@ -22,5 +21,3 @@ public:
 	clock_t time;
 };
 END
-
-#endif

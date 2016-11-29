@@ -1,6 +1,4 @@
-#ifndef _ICM_INSTRUCTION_H_
-#define _ICM_INSTRUCTION_H_
-
+#pragma once
 #include "basic.h"
 #include "ast.h"
 #include "keyword.h"
@@ -262,5 +260,3 @@ namespace ICM
 		ICM::Instruction::InstructionList createInstruction(vector<AST::NodePtr> &Table);
 	}
 }
-
-#endif

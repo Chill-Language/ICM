@@ -2,13 +2,60 @@
 // Date:	06/14/2016
 // Version:	2.0.0.0
 
-#ifndef _SYSTEM_MEMORY_H_
-#define _SYSTEM_MEMORY_H_
+#pragma once
 #include "macro.h"
 #include <cstdlib>
 #include <cstring>
 
 SYSTEM BEGIN
+#if _ITERATOR_DEBUG_LEVEL != 0
+template <typename T>
+class pointer_iterator : public std::iterator<std::random_access_iterator_tag, T, ptrdiff_t, T*, T&>
+{
+public:
+	using _Unchecked_type = iterator;
+
+	explicit pointer_iterator(T* p) : p(p) {}
+	bool operator!=(const pointer_iterator& i) const {
+		return p != i.p;
+	}
+	bool operator<(const pointer_iterator& i) const {
+		return p < i.p;
+	}
+	T& operator*() const {
+		return *p;
+	}
+	const pointer_iterator& operator++() {
+		++p;
+		return *this;
+	}
+	int operator+(const pointer_iterator &i) const {
+		return p + i.p;
+	}
+	int operator-(const pointer_iterator &i) const {
+		return p - i.p;
+	}
+	pointer_iterator operator+(int i) const {
+		return pointer_iterator(p + i);
+	}
+	pointer_iterator operator-(int i) const {
+		return pointer_iterator(p - i);
+	}
+
+	T* p;
+};
+
+template <typename T>
+inline pointer_iterator<T> _PointerIterator(T* p) {
+	return pointer_iterator<T>(p);
+}
+#else
+	template <typename T>
+inline T* _PointerIterator(T* p) {
+	return p;
+}
+#endif
+
 namespace Memory
 {
 	template <typename T>
@@ -49,5 +96,3 @@ namespace Memory
 	}
 }
 END
-
-#endif

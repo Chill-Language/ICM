@@ -1,6 +1,4 @@
-#ifndef _ICM_TYPEOBJECT_H_
-#define _ICM_TYPEOBJECT_H_
-
+#pragma once
 #include "basic.h"
 #include "object.h"
 #include "lightlist.h"
@@ -55,5 +53,3 @@ namespace ICM
 	ICM::TypeObject getTypeObject(const ObjectPtr &op);
 	std::string to_string(const TypeObject &to);
 }
-
-#endif

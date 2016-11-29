@@ -1,6 +1,4 @@
-#ifndef _ICM_TABLEDATA_H_
-#define _ICM_TABLEDATA_H_
-
+#pragma once
 #include "basic.h"
 #include "object.h"
 #include "function.h"
@@ -171,4 +169,3 @@ namespace ICM
 	extern BijectionKVMap<string, Keyword::KeywordID> GlobalKeywordTable;
 
 }
-#endif

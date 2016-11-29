@@ -2,8 +2,7 @@
 // Date:    06/15/2016
 // Version: 2.1.0.0
 
-#ifndef _SYSTEM_CHARPTR_H_
-#define _SYSTEM_CHARPTR_H_
+#pragma once
 #include "macro.h"
 #include "memory.h"
 #include <string>
@@ -31,5 +30,3 @@ private:
 	std::shared_ptr<char> data;
 };
 END
-
-#endif

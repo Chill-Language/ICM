@@ -1,6 +1,4 @@
-#ifndef _ICM_OBJECTSDEF_H_
-#define _ICM_OBJECTSDEF_H_
-
+#pragma once
 #include "basic.h"
 #include "object.h"
 #include "typebase.h"
@@ -106,5 +104,3 @@ namespace ICM
 		vector<Object*>::iterator end(Disperse *disp);
 	}
 }
-
-#endif

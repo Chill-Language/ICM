@@ -2,8 +2,7 @@
 // Date:	08/10/2016
 // Version:	1.0.0.0
 
-#ifndef _SYSTEM_LIGHTLIST_H_
-#define _SYSTEM_LIGHTLIST_H_
+#pragma once
 #include "macro.h"
 #include "memory.h"
 
@@ -115,5 +114,3 @@ private:
 	lightlist<T> _data;
 };
 END
-
-#endif

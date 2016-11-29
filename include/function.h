@@ -1,6 +1,4 @@
-#ifndef _ICM_FUNCTION_H_
-#define _ICM_FUNCTION_H_
-
+#pragma once
 #include "object.h"
 #include "typeobject.h"
 
@@ -38,7 +36,7 @@ namespace ICM
 		};
 	}
 
-	string to_string(const Function::Signature& sign);
+	string to_string(const ICM::Function::Signature& sign);
 
 	namespace Function
 	{
@@ -250,5 +248,3 @@ namespace ICM
 	ObjectPtr checkCall(const ICM::FuncTableUnit &ftb, const ICM::DataList &dl);
 	std::string to_string(const ICM::Function::Signature &sign);
 }
-
-#endif
