@@ -50,11 +50,16 @@ inline pointer_iterator<T> _PointerIterator(T* p) {
 	return pointer_iterator<T>(p);
 }
 #else
-	template <typename T>
+template <typename T>
 inline T* _PointerIterator(T* p) {
 	return p;
 }
 #endif
+
+using byte = uint8_t;
+using word = uint16_t;
+using dword = uint32_t;
+using qword = uint64_t;
 
 namespace Memory
 {
@@ -67,13 +72,20 @@ namespace Memory
 	template <typename T>
 	inline T* new_(size_t length) {
 		return new T[length]();
-		//return (T*)malloc(length * sizeof(T));
-		//return std::allocator<T>().allocate(length);
 	}
 
 	template <typename T>
 	inline void delete_(T *p) {
 		delete[] p;
+	}
+
+	template <typename T = byte>
+	inline T* alloc_(size_t length) {
+		return (T*)std::malloc(length * sizeof(T));
+	}
+	template <typename T = void>
+	inline void free_(T *p) {
+		std::free(p);
 	}
 
 	template <typename T>

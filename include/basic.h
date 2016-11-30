@@ -34,63 +34,10 @@ using std::list;
 using std::to_string;
 using namespace Common;
 
-using byte = uint8_t;
-using word = uint16_t;
-using dword = uint32_t;
-using qword = uint64_t;
-
 template <typename T> constexpr T MaxValue() { return std::numeric_limits<T>::max(); }
 
 namespace ICM
 {
-#if _ITERATOR_DEBUG_LEVEL != 0
-	template <typename T>
-	class pointer_iterator : public std::iterator<std::random_access_iterator_tag, T, ptrdiff_t, T*, T&>
-	{
-	public:
-		using _Unchecked_type = iterator;
-
-		explicit pointer_iterator(T* p) : p(p) {}
-		bool operator!=(const pointer_iterator& i) const {
-			return p != i.p;
-		}
-		bool operator<(const pointer_iterator& i) const {
-			return p < i.p;
-		}
-		T& operator*() const {
-			return *p;
-		}
-		const pointer_iterator& operator++() {
-			++p;
-			return *this;
-		}
-		int operator+(const pointer_iterator &i) const {
-			return p + i.p;
-		}
-		int operator-(const pointer_iterator &i) const {
-			return p - i.p;
-		}
-		pointer_iterator operator+(int i) const {
-			return pointer_iterator(p + i);
-		}
-		pointer_iterator operator-(int i) const {
-			return pointer_iterator(p - i);
-		}
-
-		T* p;
-	};
-
-	template <typename T>
-	inline pointer_iterator<T> _PointerIterator(T* p) {
-		return pointer_iterator<T>(p);
-	}
-#else
-	template <typename T>
-	inline T* _PointerIterator(T* p) {
-		return p;
-	}
-#endif
-
 	std::string to_string();
 }
 

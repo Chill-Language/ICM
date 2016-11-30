@@ -16,25 +16,21 @@ public:
 	lightlist() = default;
 
 	explicit lightlist(size_t capacity)
-		: _capacity(capacity), data(Memory::new_<T>(_capacity), Memory::delete_<T>) {}
+		: _capacity(capacity), data(Memory::alloc_<T>(_capacity), Memory::free_<T>) {}
 
-	lightlist(T* begin, T* end)
-		: _capacity(end - begin), data(Memory::copyOf(begin, _capacity), Memory::delete_<T>) {}
+	lightlist(const std::initializer_list<T> &il)
+		: lightlist(il.begin(), il.end()) {}
 
 	template <typename Iter>
 	lightlist(Iter begin, Iter end)
-		: _capacity(end - begin), data(Memory::new_<T>(_capacity), Memory::delete_<T>) {
-		T* ptr = data.get();
-		for (Iter p = begin; p != end; ++p)
-			*ptr++ = *p;
+		: lightlist(static_cast<size_t>(end - begin)) {
+		std::copy(begin, end, _PointerIterator(data.get()));
 	}
 
 	template <typename Iter>
-	lightlist(Iter begin, Iter end, size_t capacity)
-		: _capacity(capacity), data(Memory::new_<T>(_capacity), Memory::delete_<T>) {
-		T* ptr = data.get();
-		for (Iter p = begin; p != end; ++p)
-			*ptr++ = *p;
+	lightlist(Iter begin, size_t capacity)
+		: lightlist(capacity) {
+		std::copy_n(begin, _capacity, _PointerIterator(data.get()));
 	}
 
 	template <typename Container>
@@ -42,11 +38,8 @@ public:
 		: lightlist(con.begin(), con.end()) {}
 
 	template <size_t N>
-	explicit lightlist(T(&arr)[N])
+	explicit lightlist(T (&arr)[N])
 		: lightlist(std::begin(arr), std::end(arr)) {}
-
-	lightlist(const std::initializer_list<T> &il)
-		: lightlist(il.begin(), il.end()) {}
 
 	explicit lightlist(const T &t)
 		: lightlist({ t }) {}
@@ -70,7 +63,7 @@ public:
 
 	size_t size() const { return _capacity; }
 	bool empty() const { return _capacity == 0; }
-	void resize(size_t nsize) { _capacity = nsize; }
+	void resize(size_t nsize) { _capacity = std::min(_capacity, nsize); }
 
 private:
 	size_t _capacity = 0;

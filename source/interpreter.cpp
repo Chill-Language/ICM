@@ -60,7 +60,7 @@ namespace ICM
 				return DataList();
 			}
 			ftup = &fp->dat<T_Function>().getData();
-			return DataList(datalist.begin(), datalist.end(), datalist.size());
+			return DataList(datalist.begin(), datalist.size());
 		}
 		Object* CheckCall(vector<AST::Element> &Data) {
 			const FuncTableUnit *ftup;
