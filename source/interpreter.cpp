@@ -1,3 +1,4 @@
+#include "basic.h"
 #include "interpreter.h"
 #include "objectdef.h"
 

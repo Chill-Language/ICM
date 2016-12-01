@@ -94,14 +94,17 @@ public:
 };
 
 template <typename T>
-Range<T> range(const T &a, const T &b)
+inline Range<T> range(const T &a, const T &b)
 {
 	return Range<T>(a, b);
 }
-Range<size_t> range(int a, size_t b);
+inline Range<size_t> range(int a, size_t b)
+{
+	return Range<size_t>(a, b);
+}
 
 template <typename T>
-RangeIterator<T> rangei(T a, T b)
+inline RangeIterator<T> rangei(T a, T b)
 {
 	return RangeIterator<T>(a, b);
 }

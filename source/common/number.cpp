@@ -1,3 +1,4 @@
+#include "basic.h"
 #include "number.h"
 
 SYSTEM BEGIN

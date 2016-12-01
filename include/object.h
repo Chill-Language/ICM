@@ -66,7 +66,7 @@ namespace ICM
 	public:
 		Object(TypeUnit type = T_Null, void *data = nullptr) : type(type), data(data) {}
 
-#define CheckTypeInfo() assert(this->type == 0 || TypeInfoTable.find(this->type) != TypeInfoTable.end())
+#define CheckTypeInfo() assert(this && (this->type == 0 || TypeInfoTable.find(this->type) != TypeInfoTable.end()))
 
 		string to_string() const {
 			CheckTypeInfo();
@@ -97,6 +97,8 @@ namespace ICM
 			CheckTypeInfo();
 			return this == obj || (this->type == obj->type && TypeInfoTable[type].equal(this->data, obj->data));
 		}
+
+#undef CheckTypeInfo
 
 		// New Change (Building):
 	public:

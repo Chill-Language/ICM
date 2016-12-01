@@ -13,7 +13,7 @@ template <typename T>
 class pointer_iterator : public std::iterator<std::random_access_iterator_tag, T, ptrdiff_t, T*, T&>
 {
 public:
-	using _Unchecked_type = iterator;
+	using _Unchecked_type = std::iterator<std::random_access_iterator_tag, T, ptrdiff_t, T*, T&>;
 
 	explicit pointer_iterator(T* p) : p(p) {}
 	bool operator!=(const pointer_iterator& i) const {

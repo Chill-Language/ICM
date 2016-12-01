@@ -1,3 +1,4 @@
+#include "basic.h"
 #include "deffunc.h"
 #include "keyword.h"
 #include "objectdef.h"

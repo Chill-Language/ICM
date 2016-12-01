@@ -1,3 +1,4 @@
+#include "basic.h"
 #include "instruction.h"
 #include "objectdef.h"
 #include "analysisbase.h"

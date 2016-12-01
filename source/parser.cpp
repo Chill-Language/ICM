@@ -1,3 +1,4 @@
+#include "basic.h"
 #include "parser.h"
 #include "objectdef.h"
 #include "number.h"
