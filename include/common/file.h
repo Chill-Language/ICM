@@ -3,6 +3,8 @@
 // Version: 2.0.0.0
 
 #pragma once
+#ifndef _SYSTEM_FILE_H_
+#define _SYSTEM_FILE_H_
 #include "macro.h"
 #include "charptr.h"
 #include <cstdio>
@@ -174,3 +176,5 @@ private:
 #endif
 };
 END
+
+#endif

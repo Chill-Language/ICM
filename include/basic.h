@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _ICM_BASIC_H_
+#define _ICM_BASIC_H_
 // Includes
 //  default
 #include <string>
@@ -85,3 +86,5 @@ namespace ICM
 		println(rest...);
 	}
 }
+
+#endif

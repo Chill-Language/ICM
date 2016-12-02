@@ -3,6 +3,8 @@
 // Version:	2.0.0.0
 
 #pragma once
+#ifndef _SYSTEM_NUMBER_H_
+#define _SYSTEM_NUMBER_H_
 #include "macro.h"
 #include <cmath>
 #include <string>
@@ -74,3 +76,5 @@ namespace Number
 	Rational to_rational(const std::string &str);
 }
 END
+
+#endif

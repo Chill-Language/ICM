@@ -79,6 +79,23 @@ namespace ICM
 		}
 	}
 
+	namespace TypeNew
+	{
+		struct TypeBase
+		{
+			TypeBase() {}
+
+			union {
+				size_t index;
+				byte bytes[sizeof(size_t)];
+			};
+
+			byte property() {
+				return bytes[sizeof(size_t) - 1];
+			}
+		};
+	}
+
 	namespace FunctionNew
 	{
 		struct Signature
@@ -117,6 +134,14 @@ namespace ICM
 
 void test()
 {
+	TypeNew::TypeBase s;
+	s.index = 0x123456789abcdef0;
+
+	println(Convert::to_hex(0x23456008));
+	println(sizeof(s.index));
+	println(Convert::to_hex(s.index));
+	println(Convert::to_hex(s.property()));
+	exit(0);
 }
 
 ICM::Config GlobalConfig(false, true, false);

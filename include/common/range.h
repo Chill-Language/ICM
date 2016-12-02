@@ -3,6 +3,8 @@
 // Version:	2.0.0.0
 
 #pragma once
+#ifndef _SYSTEM_RANGE_H_
+#define _SYSTEM_RANGE_H_
 #include "macro.h"
 #include <string>
 #include "prints.h"
@@ -118,3 +120,5 @@ std::string to_string(const RangeBase<T1, T2> &r)
 	return "range(" + to_string(r._begin) + "," + to_string(r._end) + ")";
 }
 END
+
+#endif

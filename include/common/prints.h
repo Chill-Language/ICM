@@ -4,6 +4,8 @@
 // Description:  Basic on 'to_string', using 'printf'.
 
 #pragma once
+#ifndef _SYSTEM_PRINTS_H_
+#define _SYSTEM_PRINTS_H_
 #include "macro.h"
 #include <string>
 
@@ -70,6 +72,32 @@ namespace Convert
 	}
 }
 
+namespace Convert
+{
+	// To Hex
+	template <typename T>
+	std::string to_hex(T value, const char *fmt)
+	{
+		const size_t len = sizeof(T) * 2 + 1;
+		char data[len];
+#if defined(_MSC_VER)
+		sprintf_s(data, len, fmt, value);
+#else
+		sprintf(data, fmt, value);
+#endif
+		return to_string(data);
+	}
+
+	inline std::string to_hex(int8_t i) { return to_hex(i, "%02x"); }
+	inline std::string to_hex(uint8_t i) { return to_hex(i, "%02x"); }
+	inline std::string to_hex(int16_t i) { return to_hex(i, "%04x"); }
+	inline std::string to_hex(uint16_t i) { return to_hex(i, "%04x"); }
+	inline std::string to_hex(int32_t i) { return to_hex(i, "%08x"); }
+	inline std::string to_hex(uint32_t i) { return to_hex(i, "%08x"); }
+	inline std::string to_hex(int64_t i) { return to_hex(i, "%016llx"); }
+	inline std::string to_hex(uint64_t i) { return to_hex(i, "%016llx"); }
+}
+
 namespace Output
 {
 	// Print
@@ -118,3 +146,5 @@ namespace Output
 	}
 }
 END
+
+#endif

@@ -3,6 +3,8 @@
 // Version:	2.0.0.0
 
 #pragma once
+#ifndef _SYSTEM_MEMORY_H_
+#define _SYSTEM_MEMORY_H_
 #include "macro.h"
 #include <cstdlib>
 #include <cstring>
@@ -108,3 +110,5 @@ namespace Memory
 	}
 }
 END
+
+#endif

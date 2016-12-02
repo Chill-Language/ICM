@@ -3,6 +3,8 @@
 // Version:	1.0.0.0
 
 #pragma once
+#ifndef _SYSTEM_BIJECTIONMAP_H_
+#define _SYSTEM_BIJECTIONMAP_H_
 #include "macro.h"
 #include <map>
 #include <vector>
@@ -243,3 +245,5 @@ private:
 	}
 };
 END
+
+#endif
