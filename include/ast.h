@@ -1,49 +1,10 @@
 #pragma once
 #include "basic.h"
-#include "object.h"
 #include "keyword.h"
-#include "tabledata.h"
-#include "typebase.h"
+#include "objectenum.h"
 
 namespace ICM
 {
-	class ElementMemoryPool
-	{
-	public:
-		template <typename T>
-		size_t insert(const T &t) {
-			size_t size = data.size();
-			data.resize(size + sizeof(T));
-			dat<T>(size) = t;
-			return size;
-		}
-		size_t insert(const void *ptr, size_t len) {
-			size_t size = data.size();
-			data.resize(size + len);
-			memcpy(get(size), ptr, len);
-			return size;
-		}
-		template <typename T = void>
-		T* get(size_t index) {
-			return reinterpret_cast<T*>(data.data() + index);
-		}
-		template <typename T>
-		T& dat(size_t index) {
-			return *get<T>(index);
-		}
-		size_t index() const {
-			return data.size();
-		}
-		void clear() {
-			data.clear();
-		}
-
-	private:
-		vector<byte> data;
-	};
-
-	extern ElementMemoryPool GlobalElementObjectPool;
-
 	namespace ASTBase
 	{
 		//=======================================
@@ -51,27 +12,21 @@ namespace ICM
 		//=======================================
 		struct Element
 		{
-		public:
-			enum EleType {
+		private:
+			enum ElementType {
+				E_Data,
 				E_Refer,
-				
-				E_Keyword,
-				E_Identifier,
-
-				E_Nil, // TODO
-				E_Int,
-				E_Number,
-				E_String,
-				E_Boolean,
-
-				E_Variable,
-				E_Function,
-				E_DispData,
-				E_DispRefer,
+				E_Ident,
+				E_Key,
 			};
+			enum IndetifierType {
+				I_Variable,
+				I_Function,
+			};
+
 		public:
 			Element() = default;
-			explicit Element(EleType type) : type(type) {}
+			explicit Element(ElementType et, size_t id = 0) { setEltType(et); setSubType(id); }
 			Element(const Element&) = default;
 
 			static Element Data(size_t type, size_t index);
@@ -81,42 +36,44 @@ namespace ICM
 			static Element Variable(size_t index);
 			static Element Function(size_t index);
 
-			bool isData() const { return isNumber() || isBoolean() || isString() || type == E_Nil || type == E_Int; }
-			bool isRefer() const { return type == E_Refer; }
-			bool isKeyword() const { return type == E_Keyword; }
-			bool isIdentifier() const { return type == E_Identifier; }
-			bool isVariable() const { return type == E_Variable; }
-			bool isFunction() const { return type == E_Function; }
-			bool isDisp() const { return isDispData() || isDispRefer(); }
-			bool isDispData() const { return type == E_DispData; }
-			bool isDispRefer() const { return type == E_DispRefer; }
+			bool isData() const { return getEltType() == E_Data; }
+			bool isRefer() const { return getEltType() == E_Refer; }
+			bool isKeyword() const { return getEltType() == E_Key; }
+			bool isIdentifier() const { return getEltType() == E_Ident; }
 
-			bool isNumber() const { return type == E_Number; }
-			bool isBoolean() const { return type == E_Boolean; }
-			bool isString() const { return type == E_String; }
+			bool isVariable() const { return isIdentifier() && getSubType() == I_Variable; }
+			bool isFunction() const { return isIdentifier() && getSubType() == I_Function; }
+
+			bool isNumber() const { return isData() && getSubType() == T_Number; }
+			bool isBoolean() const { return isData() && getSubType() == T_Boolean; }
+			bool isString() const { return isData() && getSubType() == T_String; }
 
 			// Get/Set
-			Object getData() const;
+			TypeUnit getDataType() const { return getSubType(); }
+			size_t getIndex() const { return data.index; }
 
 			size_t getRefer() const;
 			void setRefer(size_t id) { data.index = id; }
-			
+
 			Keyword::KeywordID getKeyword() const;
-			const string& getIdentifier() const;
-			VariableTableUnit& getVariable() const;
-			FuncTableUnit& getFunction() const;
 			bool getBoolean() const;
 
-			Element& setDisp();
-
 		private:
-			EleType type;
+			struct {
+				uint8_t etype = 0;
+				uint8_t stype = 0;
+			} prop;
+
 			union {
-				size_t index;
-				Keyword::KeywordID key;
-				int ivalue;
+				size_t index = 0;
 				bool bvalue;
 			} data;
+
+			void setEltType(ElementType etype) { prop.etype = (uint8_t)etype; }
+			ElementType getEltType() const { return (ElementType)prop.etype; }
+			void setSubType(size_t id) { prop.stype = (uint8_t)id; }
+			size_t getSubType() const { return (size_t)prop.stype; }
+
 			Element& setIndex(size_t id) { data.index = id; return *this; }
 		};
 

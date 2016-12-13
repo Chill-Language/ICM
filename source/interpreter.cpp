@@ -1,6 +1,7 @@
 #include "basic.h"
 #include "interpreter.h"
 #include "objectdef.h"
+#include "temp-getelement.h"
 
 namespace ICM
 {
@@ -12,16 +13,16 @@ namespace ICM
 
 		Object* getObject(const AST::Element &element) {
 			if (element.isData()) {
-				return new Object(element.getData());
+				return new Object(getData(element));
 			}
 			else if (element.isVariable()) {
-				return element.getVariable().getData();
+				return getVariable(element).getData();
 			}
 			else if (element.isRefer()) {
 				return TempResult[element.getRefer()];
 			}
 			else if (element.isFunction()) {
-				return new Objects::Function(element.getFunction().getID());
+				return new Objects::Function(getFunction(element).getID());
 			}
 			else {
 				println("Error in getObject.");
@@ -68,7 +69,7 @@ namespace ICM
 
 			AST::Element &front = Data.front();
 			if (front.isFunction()) {
-				ftup = &front.getFunction();
+				ftup = &getFunction(front);
 			}
 			else if (front.isVariable() || front.isRefer()) {
 				Object *fp = getObject(front);
@@ -157,24 +158,24 @@ namespace ICM
 				case ref: {
 					Insts::Assign &inst = static_cast<Insts::Assign&>(*Inst);
 					if (inst.Data.isData())
-						GlobalVariableTable[inst.VTU].setData(inst.Data.getData());
+						GlobalVariableTable[inst.VTU].setData(getData(inst.Data));
 					else if (inst.Data.isRefer())
 						GlobalVariableTable[inst.VTU].setData(TempResult[inst.Data.getRefer()]);
 					else if (inst.Data.isVariable()) {
 						switch (Inst->inst()) {
 						case let:
-							GlobalVariableTable[inst.VTU].setData(inst.Data.getVariable().getData());
+							GlobalVariableTable[inst.VTU].setData(getVariable(inst.Data).getData());
 							break;
 						case cpy:
-							GlobalVariableTable[inst.VTU].setData(inst.Data.getVariable().getData()->clone());
+							GlobalVariableTable[inst.VTU].setData(getVariable(inst.Data).getData()->clone());
 							break;
 						case ref:
-							GlobalVariableTable[inst.VTU].setData(inst.Data.getVariable().getData()); // TODO
+							GlobalVariableTable[inst.VTU].setData(getVariable(inst.Data).getData()); // TODO
 							break;
 						}
 					}
 					else if (inst.Data.isFunction()) {
-						GlobalVariableTable[inst.VTU].setData(new Objects::Function(inst.Data.getFunction().getID()));
+						GlobalVariableTable[inst.VTU].setData(new Objects::Function(getFunction(inst.Data).getID()));
 					}
 					else
 						println("Error in Assign.");
@@ -262,7 +263,7 @@ namespace ICM
 					Insts::PrintIdent &inst = static_cast<Insts::PrintIdent&>(*Inst);
 					for (AST::Element &e : inst.Args) {
 						if (e.isVariable())
-							print(e.getVariable().getName(), "(");
+							print(getVariable(e).getName(), "(");
 						Object *op = getObject(e);
 						if (op)
 							print(getObject(e)->to_string());

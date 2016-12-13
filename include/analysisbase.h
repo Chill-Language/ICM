@@ -1,5 +1,6 @@
 #pragma once
 #include "ast.h"
+#include "temp-getelement.h"
 
 namespace ICM
 {
@@ -25,7 +26,7 @@ namespace ICM
 		protected:
 			// Judge
 			bool isIdent(const Element &elt, const string &name) {
-				return elt.isIdentifier() && elt.getIdentifier() == name;
+				return elt.isIdentifier() && getIdentifier(elt) == name;
 			}
 			bool isKey(const Element &elt, KeywordID key) {
 				return elt.isKeyword() && elt.getKeyword() == key;

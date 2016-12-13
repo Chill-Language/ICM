@@ -43,10 +43,10 @@ namespace ICM
 		TosFunc* to_string_code;
 
 		void* alloc() const {
-			return std::malloc(size);
+			return Memory::alloc(size);
 		}
 		void* mcopy(const void *src) const {
-			return std::memcpy(alloc(), src, size);
+			return Memory::mcopy(alloc(), src, size);
 		}
 		void* copy(const void *src) const {
 			void *dst = alloc();

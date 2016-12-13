@@ -336,6 +336,17 @@ namespace ICM
 		//=======================================
 		namespace System
 		{
+			struct Type : public FI
+			{
+			private:
+				S sign() const {
+					return S({ T_Vary }, T_Type); // V -> T
+				}
+				ObjectPtr func(const DataList &list) const {
+					ICM::println(ICM::to_string((DefaultType)(list[0]->type)));
+					return nullptr;
+				}
+			};
 			ObjectPtr call(const DataList &dl) {
 				return checkCall(dl[0]->get<T_Function>()->getData(), DataList(dl.begin() + 1, dl.end()));
 			}
@@ -504,6 +515,7 @@ namespace ICM
 		DefFuncTable.add("dcall", Lst{
 			F(System::dcall, S({ T_Vary, T_Function, T_Vary }, T_Vary)), // (Var F Var) -> Var
 		});
+		DefFuncTable.add("type", LST{ new System::Type() });
 		DefFuncTable.add("exit", Lst{
 			F(System::exit, S({}, T_Nil)),            // Void -> N
 			F(System::exitv, S({ T_Number }, T_Nil)), // N -> N

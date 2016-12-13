@@ -18,7 +18,7 @@ public:
 	lightlist() = default;
 
 	explicit lightlist(size_t capacity)
-		: _capacity(capacity), data(Memory::alloc_<T>(_capacity), Memory::free_<T>) {}
+		: _capacity(capacity), data(Memory::alloc<T>(_capacity), Memory::free<T>) {}
 
 	lightlist(const std::initializer_list<T> &il)
 		: lightlist(il.begin(), il.end()) {}

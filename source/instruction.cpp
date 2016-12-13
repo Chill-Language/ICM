@@ -2,6 +2,7 @@
 #include "instruction.h"
 #include "objectdef.h"
 #include "analysisbase.h"
+#include "literal.h"
 
 namespace ICM
 {
@@ -229,7 +230,7 @@ namespace ICM
 				Element &ve = node[3];
 				Element &Rdo = node[4];
 
-				size_t id = I.getVariable().getID();
+				size_t id = getVariable(I).getID();
 				GlobalVariableTable[id].setData(Objects::Number(0));
 				InstList.push(new Insts::Assign(let, GlobalVariableTable[id], vb));
 				size_t index = NextInstID();
@@ -237,7 +238,7 @@ namespace ICM
 
 				Element ele;
 				if (ve.isVariable())
-					ele = Element::Data(ve.getVariable().getData()->type, GlobalElementObjectPool.insert(ve.getVariable().getData()));
+					ele = Element::Data(getVariable(ve).getData()->type, GlobalElementPool.insert(getVariable(ve).getData()));
 				else {
 					createReferNode(ve);
 					ele = ve;
@@ -260,7 +261,7 @@ namespace ICM
 					assert(node[1].isVariable());
 					Element &ident = node[1];
 					Element &value = node[2];
-					VariableTableUnit& vtu = ident.getVariable();
+					VariableTableUnit& vtu = getVariable(ident);
 					ICM::Instruction::Instruction inst;
 					switch (node[0].getKeyword()) {
 					case Keyword::let_: inst = let; break;

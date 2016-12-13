@@ -5,6 +5,7 @@
 #include "instruction.h"
 #include "transform.h"
 #include "timer.h"
+#include "literal.h"
 
 extern size_t CheckCallCount;
 using namespace ICM;
@@ -13,36 +14,51 @@ namespace ICM
 {
 	namespace Types
 	{
+		template <typename _VTy>
+		inline constexpr uint_t bitsize(uint_t offset = 0) {
+			return sizeof(_VTy) * 8 - offset;
+		}
+		inline uint_t getRealIndex(uint_t v) {
+			constexpr uint_t i = ~((uint_t)0x1 << bitsize<uint_t>(1));
+			return v & i;
+		}
+		inline bool getHighBit(uint_t v) {
+			return (v >> bitsize<uint_t>(1)) != 0;
+		}
+		inline bool isMutable(TypeUnit type) {
+			return getHighBit(type);
+		}
+		bool isMatch(TypeUnit type, TypeUnit ctype) {
+			if (isMutable(ctype))
+				return type == ctype;
+			else
+				return getRealIndex(type) == getRealIndex(ctype);
+		}
+
 		struct TypeObject
 		{
 		public:
 			enum Property {
-				Const,
-				Static,
+				Mutable,
 				Mult,
 				Repeat,
-				Volatile,
 			};
 		public:
-			bool isconst() const { return getProperty<Const>(); }
-			bool isstatic() const { return getProperty<Static>(); }
-			bool ismult() const { return getProperty<Mult>(); }
-			bool isrepeat() const { return getProperty<Repeat>(); }
-			bool isvolatile() const { return getProperty<Volatile>(); }
+			bool isMutable() const { return getProperty<Mutable>(); }
+			bool isMult() const { return getProperty<Mult>(); }
+			bool isRepeat() const { return getProperty<Repeat>(); }
 
-			void setconst() { setProperty<Const>(); }
-			void setstatic() { setProperty<Static>(); }
-			void setmult() { setProperty<Mult>(); }
-			void setrepeat() { setProperty<Repeat>(); }
-			void setvolatile() { setProperty<Volatile>(); }
+			void setMutable() { setProperty<Mutable>(); }
+			void setMult() { setProperty<Mult>(); }
+			void setRepeat() { setProperty<Repeat>(); }
 
 		public:
 			TypeUnit data = T_Null;
 		private:
-			size_t property = 0;
+			uint_t property = 0;
 			union {
 				void* ptr;
-				size_t idx;
+				uint_t idx;
 			} extand;
 
 		private:
@@ -60,40 +76,19 @@ namespace ICM
 		string to_string(const TypeObject &to) {
 			string str;
 			str.append(to_string((DefaultType)to.data));
-			if (to.isconst() || to.isstatic() || to.isvolatile()) {
-				str.push_back('.');
-				if (to.isconst())
-					str.push_back('c');
-				if (to.isstatic())
-					str.push_back('s');
-				if (to.isvolatile())
-					str.push_back('v');
+			str.push_back('.');
+			if (to.isMutable()) {
+				str.push_back('m');
 			}
-			if (to.ismult()) {
+			if (to.isMult()) {
 				str.append("()");
 			}
-			if (to.isrepeat())
+			if (to.isRepeat()) {
 				str.push_back('*');
+			}
 
 			return str;
 		}
-	}
-
-	namespace TypeNew
-	{
-		struct TypeBase
-		{
-			TypeBase() {}
-
-			union {
-				size_t index;
-				byte bytes[sizeof(size_t)];
-			};
-
-			byte property() {
-				return bytes[sizeof(size_t) - 1];
-			}
-		};
 	}
 
 	namespace FunctionNew
@@ -132,16 +127,34 @@ namespace ICM
 	}
 }
 
+namespace ICM
+{
+	namespace Compiler
+	{
+	}
+}
+
+namespace ICM
+{
+	namespace Runtime
+	{
+		struct Element
+		{
+
+		};
+	}
+}
+
+constexpr int_t func(int_t index, int_t size)
+{
+	//assert(index < size);
+	//assert(index + size >= 0);
+	return (index + size) % size;
+}
+
 void test()
 {
-	TypeNew::TypeBase s;
-	s.index = 0x123456789abcdef0;
-
-	println(Convert::to_hex(0x23456008));
-	println(sizeof(s.index));
-	println(Convert::to_hex(s.index));
-	println(Convert::to_hex(s.property()));
-	exit(0);
+	//exit(0);
 }
 
 ICM::Config GlobalConfig(false, true, false);
@@ -153,7 +166,7 @@ void printIntervalTime(Timer &t)
 
 vector<Instruction::InstructionList> Compile(const char *text)
 {
-	GlobalElementObjectPool.clear();
+	Compiler::GlobalElementPool.clear();
 	vector<Instruction::InstructionList> VeI;
 
 	Parser::Match match(text);

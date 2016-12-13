@@ -31,17 +31,10 @@ namespace ICM
 		DEFTYPE(List, TypeBase::ListType);
 		DEFTYPE(Disperse, TypeBase::DisperseType);
 		// Compile Types (Platform Dependent)
-		DEFTYPE(Int, int);
-		DEFTYPE(UInt, unsigned int);
-		DEFTYPE(Short, short);
-		DEFTYPE(UShort, unsigned short);
-		DEFTYPE(Long, long);
-		DEFTYPE(ULong, unsigned long);
-		DEFTYPE(LLong, long long);
-		DEFTYPE(ULLong, unsigned long long);
+		DEFTYPE(Int, int_t);
+		DEFTYPE(UInt, uint_t);
 		DEFTYPE(Float, float);
 		DEFTYPE(Double, double);
-		DEFTYPE(LDouble, long double);
 		DEFTYPE(CPointer, void*);
 		// Compile Types (Platform Independent)
 		DEFTYPE(Byte, byte);

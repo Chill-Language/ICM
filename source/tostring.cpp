@@ -4,6 +4,7 @@
 #include "tabledata.h"
 #include "parser.h"
 #include "instruction.h"
+#include "temp-getelement.h"
 
 namespace ICM
 {
@@ -135,41 +136,33 @@ namespace ICM
 	//=======================================
 	string to_string(const AST::Element &element) {
 		if (element.isData())
-			return "D(" + element.getData().to_string_code() + ")";
+			return "D(" + getData(element).to_string_code() + ")";
 		else if (element.isRefer())
 			return "R{" + std::to_string(element.getRefer()) + "}";
-		else if (element.isDispData())
-			return "Dp(" + element.getIdentifier() + ")";
-		else if (element.isDispRefer())
-			return "Dp{" + std::to_string(element.getRefer()) + "}";
 		else if (element.isKeyword())
 			return "K(" + ICM::to_string(element.getKeyword()) + ")";
 		else if (element.isVariable())
-			return "V(" + element.getVariable().getName() + ")";
+			return "V(" + getVariable(element).getName() + ")";
 		else if (element.isFunction())
-			return "F(" + element.getFunction().getName() + ")";
+			return "F(" + getFunction(element).getName() + ")";
 		else if (element.isIdentifier())
-			return "I(" + element.getIdentifier() + ")";
+			return "I(" + getIdentifier(element) + ")";
 		else
 			return "UnkonwnElement";
 	}
 	string to_string_2(const AST::Element &element) {
 		if (element.isData())
-			return element.getData().to_string_code();
+			return getData(element).to_string_code();
 		else if (element.isRefer())
 			return "{" + std::to_string(element.getRefer()) + "}";
-		else if (element.isDispData())
-			return "Dp(" + element.getIdentifier() + ")";
-		else if (element.isDispRefer())
-			return "Dp{" + std::to_string(element.getRefer()) + "}";
 		else if (element.isKeyword())
 			return ICM::to_string(element.getKeyword());
 		else if (element.isVariable())
-			return element.getVariable().getName();
+			return getVariable(element).getName();
 		else if (element.isFunction())
-			return element.getFunction().getName();
+			return getFunction(element).getName();
 		else if (element.isIdentifier())
-			return element.getIdentifier();
+			return getIdentifier(element);
 		else
 			return "UnkonwnElement";
 	}
@@ -196,7 +189,7 @@ namespace ICM
 	// Old
 	string to_string_old(const AST::Element &element) {
 		if (element.isData())
-			return "D(" + element.getData().to_string() + ")";
+			return "D(" + getData(element).to_string() + ")";
 		else
 			return "R[" + std::to_string(element.getRefer()) + "]";
 	}

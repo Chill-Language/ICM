@@ -199,3 +199,9 @@ else
 )
 
 (println array)
+
+; Test 20
+(println "----------20----------")
+(p (type 5)) ; Number
+(let a 5) (p (type a)) ; Number
+(cpy a 5) (p (type a)) ; Number

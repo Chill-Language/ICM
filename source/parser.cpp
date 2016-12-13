@@ -3,6 +3,7 @@
 #include "objectdef.h"
 #include "number.h"
 #include "tabledata.h"
+#include "literal.h"
 
 namespace ICM
 {
@@ -137,20 +138,17 @@ namespace ICM
 
 namespace ICM
 {
-	ElementMemoryPool GlobalElementObjectPool;
-
 	namespace Parser
 	{
 		AST::Element createElementData(MatchType type, const string &str)
 		{
 			switch (type) {
 			case MT_Boolean:
-				return AST::Element::Data(T_Boolean, str == "T");
+				return AST::Element::Data(T_Boolean, Compiler::GlobalElementPool.setBoolean(str == "T"));
 			case MT_Number:
-				//return AST::Element::Data(T_Number, GlobalElementObjectPool.insert(Common::Number::to_rational(str.c_str()).getNum() / Common::Number::to_rational(str.c_str()).getDen()));
-				return AST::Element::Data(T_Number, Common::Number::to_rational(str.c_str()).getNum() / Common::Number::to_rational(str.c_str()).getDen());
+				return AST::Element::Data(T_Number, Compiler::GlobalElementPool.setNumber(Common::Number::to_rational(str.c_str()).getNum() / Common::Number::to_rational(str.c_str()).getDen()));
 			case MT_String:
-				return AST::Element::Data(T_String, GlobalElementObjectPool.insert(str.c_str(), str.size() + 1));
+				return AST::Element::Data(T_String, Compiler::GlobalElementPool.setString(str.c_str(), str.size() + 1));
 			case MT_Keyword:
 				return AST::Element::Keyword(GlobalKeywordTable.getValue(str));
 			case MT_Identifier:

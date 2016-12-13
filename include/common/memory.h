@@ -31,16 +31,16 @@ public:
 		++p;
 		return *this;
 	}
-	int operator+(const pointer_iterator &i) const {
+	ptrdiff_t operator+(const pointer_iterator &i) const {
 		return p + i.p;
 	}
-	int operator-(const pointer_iterator &i) const {
+	ptrdiff_t operator-(const pointer_iterator &i) const {
 		return p - i.p;
 	}
-	pointer_iterator operator+(int i) const {
+	pointer_iterator operator+(ptrdiff_t i) const {
 		return pointer_iterator(p + i);
 	}
-	pointer_iterator operator-(int i) const {
+	pointer_iterator operator-(ptrdiff_t i) const {
 		return pointer_iterator(p - i);
 	}
 
@@ -66,28 +66,44 @@ using qword = uint64_t;
 namespace Memory
 {
 	template <typename T>
-	inline size_t get_size(size_t length) {
-		return length * (sizeof(T) / sizeof(char));
+	inline constexpr size_t get_size(size_t length) {
+		return length * sizeof(T);
 	}
 
-	// New
+	// New/Delete
 	template <typename T>
 	inline T* new_(size_t length) {
 		return new T[length]();
 	}
-
 	template <typename T>
 	inline void delete_(T *p) {
 		delete[] p;
 	}
-
+	// Alloc/Free
 	template <typename T = byte>
-	inline T* alloc_(size_t length) {
+	inline T* alloc(size_t length) {
 		return (T*)std::malloc(length * sizeof(T));
 	}
 	template <typename T = void>
-	inline void free_(T *p) {
+	inline void free(T *p) {
 		std::free(p);
+	}
+	// Construct/Destruct
+	template <typename T>
+	inline void construct(T *data) {
+		new (data) T();
+	}
+	template <typename T>
+	inline void destruct(T *data) {
+		data->~T();
+	}
+	// MCopy/NCopy
+	inline void* mcopy(void* to, const void* from, size_t length) {
+		return std::memcpy(to, from, length);
+	}
+	template <typename T>
+	inline T& ncopy(T& to, const T& from) {
+		return to = from;
 	}
 
 	template <typename T>
@@ -98,7 +114,7 @@ namespace Memory
 
 	template <typename T>
 	inline T* copyTo(T* to, const T* from, size_t length) {
-		return (T*)memcpy((void*)to, (void*)from, get_size<T>(length));
+		return (T*)std::memcpy((void*)to, (void*)from, get_size<T>(length));
 	}
 
 	template <typename T>

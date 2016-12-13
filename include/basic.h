@@ -13,6 +13,8 @@
 #include <algorithm>
 #include <initializer_list>
 #include <cassert>
+#include <bitset>
+#include <utility>
 //  common
 #include "file.h"
 #include "prints.h"
@@ -23,6 +25,8 @@
 #include "bijectionmap.h"
 
 // Declares
+using int_t = std::conditional_t<std::is_same<size_t, uint64_t>::value, int64_t, int32_t>;
+using uint_t = std::conditional_t<std::is_same<size_t, uint64_t>::value, uint64_t, uint32_t>;
 
 // Using
 using std::string;
@@ -32,6 +36,7 @@ using std::stack;
 using std::shared_ptr;
 using std::unique_ptr;
 using std::list;
+using std::bitset;
 using std::to_string;
 using namespace Common;
 

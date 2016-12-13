@@ -270,7 +270,7 @@ namespace ICM
 
 		private:
 			void setIdentifier(Element &element) {
-				const string &name = element.getIdentifier();
+				const string &name = getIdentifier(element);
 				size_t index;
 				if ((index = GlobalVariableTable.find(name))) {
 					element = Element::Variable(index);

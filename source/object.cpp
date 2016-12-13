@@ -35,15 +35,8 @@ namespace ICM
 		// Compile Types (Platform Dependent)
 		DEFTYPENAME(Int);
 		DEFTYPENAME(UInt);
-		DEFTYPENAME(Short);
-		DEFTYPENAME(UShort);
-		DEFTYPENAME(Long);
-		DEFTYPENAME(ULong);
-		DEFTYPENAME(LLong);
-		DEFTYPENAME(ULLong);
 		DEFTYPENAME(Float);
 		DEFTYPENAME(Double);
-		DEFTYPENAME(LDouble);
 		DEFTYPENAME(CPointer);
 		// Compile Types (Platform Independent)
 		DEFTYPENAME(Byte);
@@ -188,15 +181,8 @@ namespace ICM
 		// Compile Types (Platform Dependent)
 		TypeInfoPair<T_Int>(),
 		TypeInfoPair<T_UInt>(),
-		TypeInfoPair<T_Short>(),
-		TypeInfoPair<T_UShort>(),
-		TypeInfoPair<T_Long>(),
-		TypeInfoPair<T_ULong>(),
-		TypeInfoPair<T_LLong>(),
-		TypeInfoPair<T_ULLong>(),
 		TypeInfoPair<T_Float>(),
 		TypeInfoPair<T_Double>(),
-		TypeInfoPair<T_LDouble>(),
 		TypeInfoPair<T_CPointer>(),
 		// Compile Types (Platform Independent)
 		TypeInfoPair<T_Byte>(),

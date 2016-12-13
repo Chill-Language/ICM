@@ -30,17 +30,10 @@ namespace ICM
 		// String Types
 		T_Char,          // Char
 		// Compile Types (Platform Dependent)
-		T_Int,           // Int      : int
-		T_UInt,          // UInt     : unsigned int
-		T_Short,         // Short    : short
-		T_UShort,        // UShort   : unsigned short
-		T_Long,          // Long     : long
-		T_ULong,         // ULong    : unsigned long
-		T_LLong,         // LLong    : long long
-		T_ULLong,        // ULLong   : unsigned long long
+		T_Int,           // Int      : int_t
+		T_UInt,          // UInt     : uint_t
 		T_Float,         // Float    : float
 		T_Double,        // Double   : double
-		T_LDouble,       // LDouble  : long double
 		T_CPointer,      // CPointer : void*
 		// Compile Types (Platform Independent)
 		T_Byte,          // Byte   :  1 byte
@@ -60,7 +53,7 @@ namespace ICM
 		END_TYPE_ENUM,   // End Enum Mark
 	}; // Interval : [ T_Null, END_TYPE_ENUM )
 
-	using TypeUnit = size_t;
+	using TypeUnit = uint_t;
 	std::string to_string(DefaultType type);
 	bool operator==(TypeUnit t1, DefaultType t2);
 }

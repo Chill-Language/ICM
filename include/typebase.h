@@ -4,6 +4,7 @@
 #include "number.h"
 #include "keyword.h"
 #include "tabledata.h"
+#include "literal.h"
 
 namespace ICM
 {
@@ -29,11 +30,17 @@ namespace ICM
 		public:
 			bool operator==(const VoidType&) const { return true; }
 		};
-		using NumberType = int;//Common::Number::Rational;
+		/*using NumberType = int_t;//Common::Number::Rational;
 		using BooleanType = bool;
 		using StringType = std::string;
 		using SymbolType = std::string;
-		using KeywordType = Keyword::KeywordID;
+		using KeywordType = ICM::Keyword::KeywordID;*/
+
+		using NumberType = Compiler::Literal::Number;
+		using BooleanType = Compiler::Literal::Boolean;
+		using StringType = Compiler::Literal::String;
+		using SymbolType = std::string;
+		using KeywordType = ICM::Keyword::KeywordID;
 
 
 		//=======================================
