@@ -23,8 +23,6 @@ namespace ICM
 			MT_Symbol,
 		};
 
-		string to_string(MatchType type);
-
 		class MatchResult
 		{
 		public:

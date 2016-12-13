@@ -97,7 +97,7 @@ namespace ICM
 				}
 				ObjectPtr func(const DataList &list) const {
 					const auto &rr = Common::Number::mod(list[0]->dat<T_Number>(), list[1]->dat<T_Number>());
-					return ObjectPtr(new Number(rr.getNum()));
+					return ObjectPtr(new Number((int_t)rr.getNum()));
 				}
 			};
 			struct Rem : public FI
@@ -108,7 +108,7 @@ namespace ICM
 				}
 				ObjectPtr func(const DataList &list) const {
 					const auto &rr = Common::Number::rem(list[0]->dat<T_Number>(), list[1]->dat<T_Number>());
-					return ObjectPtr(new Number(rr.getNum()));
+					return ObjectPtr(new Number((int_t)rr.getNum()));
 				}
 			};
 

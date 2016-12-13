@@ -14,32 +14,38 @@ namespace ICM
 		{
 		private:
 			enum ElementType {
+				E_Void,
 				E_Data,
 				E_Refer,
 				E_Ident,
 				E_Key,
 			};
 			enum IndetifierType {
+				I_Void,
 				I_Variable,
 				I_Function,
 			};
 
 		public:
 			Element() = default;
-			explicit Element(ElementType et, size_t id = 0) { setEltType(et); setSubType(id); }
+			Element(ElementType et, size_t id, size_t index)
+				: etype((uint8_t)et), stype((uint8_t)id), index(index) {}
 			Element(const Element&) = default;
+			
+			// Static Function
+			static Element Data(size_t type, size_t index) { return Element(E_Data, type, index); }
+			static Element Refer(size_t index) { return Element(E_Refer, 0, index); }
+			static Element Keyword(Keyword::KeywordID key) { return Element(E_Key, key, 0); }
+			static Element Identifier(size_t index) { return Element(E_Ident, 0, index); }
 
-			static Element Data(size_t type, size_t index);
-			static Element Refer(size_t index);
-			static Element Keyword(Keyword::KeywordID key);
-			static Element Identifier(const string &name);
-			static Element Variable(size_t index);
-			static Element Function(size_t index);
+			static Element Variable(size_t index) { return Element(E_Ident, I_Variable, index); }
+			static Element Function(size_t index) { return Element(E_Ident, I_Function, index); }
 
-			bool isData() const { return getEltType() == E_Data; }
-			bool isRefer() const { return getEltType() == E_Refer; }
-			bool isKeyword() const { return getEltType() == E_Key; }
-			bool isIdentifier() const { return getEltType() == E_Ident; }
+			// Judge
+			bool isData() const { return isEltType(E_Data); }
+			bool isRefer() const { return isEltType(E_Refer); }
+			bool isKeyword() const { return isEltType(E_Key); }
+			bool isIdentifier() const { return isEltType(E_Ident); }
 
 			bool isVariable() const { return isIdentifier() && getSubType() == I_Variable; }
 			bool isFunction() const { return isIdentifier() && getSubType() == I_Function; }
@@ -48,33 +54,26 @@ namespace ICM
 			bool isBoolean() const { return isData() && getSubType() == T_Boolean; }
 			bool isString() const { return isData() && getSubType() == T_String; }
 
+			// Get/Set Index
+			void setIndex(size_t id) { index = id; }
+			size_t getIndex() const { return index; }
+
 			// Get/Set
-			TypeUnit getDataType() const { return getSubType(); }
-			size_t getIndex() const { return data.index; }
-
-			size_t getRefer() const;
-			void setRefer(size_t id) { data.index = id; }
-
-			Keyword::KeywordID getKeyword() const;
-			bool getBoolean() const;
+			void setRefer(size_t id) { assert(isRefer()); setIndex(id); }
+			size_t getRefer() const { assert(isRefer()); return getIndex(); }
+			TypeUnit getDataType() const { assert(isData()); return getSubType(); }
+			Keyword::KeywordID getKeyword() const { assert(isKeyword()); return (Keyword::KeywordID)getSubType(); }
 
 		private:
-			struct {
-				uint8_t etype = 0;
-				uint8_t stype = 0;
-			} prop;
-
 			union {
-				size_t index = 0;
-				bool bvalue;
-			} data;
+				struct { uint8_t etype, stype; };
+				uint32_t type = 0;
+			};
+			uint_t index = 0;
 
-			void setEltType(ElementType etype) { prop.etype = (uint8_t)etype; }
-			ElementType getEltType() const { return (ElementType)prop.etype; }
-			void setSubType(size_t id) { prop.stype = (uint8_t)id; }
-			size_t getSubType() const { return (size_t)prop.stype; }
-
-			Element& setIndex(size_t id) { data.index = id; return *this; }
+		private:
+			bool isEltType(ElementType et) const { return (ElementType)this->etype == et; }
+			size_t getSubType() const { return (size_t)this->stype; }
 		};
 
 		//=======================================

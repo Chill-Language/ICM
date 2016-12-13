@@ -15,14 +15,29 @@ namespace ICM
 		{
 			struct StringType
 			{
+				StringType()
+					: data(nullptr) {}
 				StringType(char *data)
-					:data(data) {}
+					: data(data) {}
 				char *data = nullptr;
+				const char* c_str() const {
+					return data;
+				}
+				StringType& operator+=(const StringType& st) {
+					string s1(data), s2(st.data);
+					string *s = new string(s1 + s2); // TODO
+					data = (char*)(s->c_str());      // TODO
+					return *this;
+				}
+				bool operator==(const StringType& st) const {
+					string s1(data), s2(st.data);
+					return s1 == s2;
+				}
 			};
 
 			using Boolean = bool;
 			using Number = int_t;
-			using String = std::string;
+			using String = StringType;
 			using Symbol = uint_t;
 			using Int = int_t;
 			using UInt = uint_t;
@@ -52,5 +67,7 @@ namespace ICM
 		extern ElementPool GlobalElementPool;
 	}
 
-
+	inline string to_string(const Compiler::Literal::StringType &st) {
+		return string(st.data);
+	}
 }

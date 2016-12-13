@@ -12,7 +12,7 @@ namespace ICM
 		assert(elt.isData());
 		void *dat = Compiler::GlobalElementPool.get(elt.getIndex());
 		if (elt.getDataType() == T_String) {
-			dat = new string(static_cast<char*>(dat));
+			dat = new Compiler::Literal::StringType(static_cast<char*>(dat));
 		}
 		else if (elt.getDataType() == T_Nil) {
 			dat = nullptr;
