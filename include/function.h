@@ -246,5 +246,5 @@ namespace ICM
 	//=======================================
 	size_t getCallID(const FuncTableUnit &ftu, const DataList &dl);
 	ObjectPtr checkCall(const ICM::FuncTableUnit &ftb, const ICM::DataList &dl);
-	std::string to_string(const ICM::Function::Signature &sign);
+	string to_string(const ICM::Function::Signature &sign);
 }

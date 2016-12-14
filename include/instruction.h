@@ -169,7 +169,7 @@ namespace ICM
 
 			struct Assign : public InstructionData
 			{
-				Assign(Instruction inst, VariableTableUnit &VTU, AST::Element &elt)
+				Assign(Instruction inst, VarbTableUnit &VTU, AST::Element &elt)
 					: InstructionData(inst), VTU(VTU.getID()), Data(elt) {}
 				size_t VTU;
 				AST::Element Data;

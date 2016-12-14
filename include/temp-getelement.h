@@ -20,16 +20,16 @@ namespace ICM
 		// TODO
 		return *Object(elt.getDataType(), dat).clone();
 	}
-	inline const string& getIdentifier(const AST::Element &elt) {
-		assert(elt.isIdentifier());
-		return GlobalIdentifierMap.getKey(elt.getIndex());
+	inline const string& getIdent(const AST::Element &elt) {
+		assert(elt.isIdent());
+		return GlobalIdentMap.getKey(elt.getIndex());
 	}
-	inline VariableTableUnit& getVariable(const AST::Element &elt) {
-		assert(elt.isVariable());
+	inline VarbTableUnit& getVariable(const AST::Element &elt) {
+		assert(elt.isIdentType(I_Variable));
 		return GlobalVariableTable[elt.getIndex()];
 	}
 	inline FuncTableUnit& getFunction(const AST::Element &elt) {
-		assert(elt.isFunction());
+		assert(elt.isIdentType(I_Function));
 		return GlobalFunctionTable[elt.getIndex()];
 	}
 }

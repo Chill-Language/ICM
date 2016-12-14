@@ -1,7 +1,6 @@
 #pragma once
 #include "basic.h"
-#include "object.h"
-#include "lightlist.h"
+#include "objectenum.h"
 
 namespace ICM
 {
@@ -50,6 +49,6 @@ namespace ICM
 		const FuncTableUnit *functableunit = nullptr;
 	};
 
-	ICM::TypeObject getTypeObject(const ObjectPtr &op);
-	std::string to_string(const TypeObject &to);
+	// Get TypeObject
+	string to_string(const TypeObject &to);
 }

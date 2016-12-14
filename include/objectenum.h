@@ -1,4 +1,5 @@
 #pragma once
+
 namespace ICM
 {
 	//===========================================================
@@ -54,6 +55,6 @@ namespace ICM
 	}; // Interval : [ T_Null, END_TYPE_ENUM )
 
 	using TypeUnit = uint_t;
-	std::string to_string(DefaultType type);
+	string to_string(DefaultType type);
 	bool operator==(TypeUnit t1, DefaultType t2);
 }

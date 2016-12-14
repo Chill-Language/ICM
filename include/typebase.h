@@ -30,11 +30,6 @@ namespace ICM
 		public:
 			bool operator==(const VoidType&) const { return true; }
 		};
-		/*using NumberType = int_t;//Common::Number::Rational;
-		using BooleanType = bool;
-		using StringType = std::string;
-		using SymbolType = std::string;
-		using KeywordType = ICM::Keyword::KeywordID;*/
 
 		using NumberType = Compiler::Literal::Number;
 		using BooleanType = Compiler::Literal::Boolean;

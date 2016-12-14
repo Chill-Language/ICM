@@ -207,7 +207,7 @@ public:
 		return _find(keymap, key);
 	}
 	const _KTy& getKey(size_t id) const {
-		return  data[id];
+		return data[id];
 	}
 	size_t operator[](const _KTy &key) {
 		size_t id = findKey(key);

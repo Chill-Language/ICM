@@ -26,7 +26,7 @@ namespace ICM
 		protected:
 			// Judge
 			bool isIdent(const Element &elt, const string &name) {
-				return elt.isIdentifier() && getIdentifier(elt) == name;
+				return elt.isIdent() && getIdent(elt) == name;
 			}
 			bool isKey(const Element &elt, KeywordID key) {
 				return elt.isKeyword() && elt.getKeyword() == key;

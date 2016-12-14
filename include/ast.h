@@ -2,6 +2,7 @@
 #include "basic.h"
 #include "keyword.h"
 #include "objectenum.h"
+#include "identifier.h"
 
 namespace ICM
 {
@@ -20,11 +21,6 @@ namespace ICM
 				E_Ident,
 				E_Key,
 			};
-			enum IndetifierType {
-				I_Void,
-				I_Variable,
-				I_Function,
-			};
 
 		public:
 			Element() = default;
@@ -37,22 +33,16 @@ namespace ICM
 			static Element Refer(size_t index) { return Element(E_Refer, 0, index); }
 			static Element Keyword(Keyword::KeywordID key) { return Element(E_Key, key, 0); }
 			static Element Identifier(size_t index) { return Element(E_Ident, 0, index); }
-
-			static Element Variable(size_t index) { return Element(E_Ident, I_Variable, index); }
-			static Element Function(size_t index) { return Element(E_Ident, I_Function, index); }
+			static Element Identifier(IdentType type, size_t index) { return Element(E_Ident, type, index); }
 
 			// Judge
 			bool isData() const { return isEltType(E_Data); }
 			bool isRefer() const { return isEltType(E_Refer); }
 			bool isKeyword() const { return isEltType(E_Key); }
-			bool isIdentifier() const { return isEltType(E_Ident); }
+			bool isIdent() const { return isEltType(E_Ident); }
 
-			bool isVariable() const { return isIdentifier() && getSubType() == I_Variable; }
-			bool isFunction() const { return isIdentifier() && getSubType() == I_Function; }
-
-			bool isNumber() const { return isData() && getSubType() == T_Number; }
-			bool isBoolean() const { return isData() && getSubType() == T_Boolean; }
-			bool isString() const { return isData() && getSubType() == T_String; }
+			bool isDataType(TypeUnit type) const { return isData() && getSubType() == type; }
+			bool isIdentType(IdentType type) const { return isIdent() && getSubType() == type; }
 
 			// Get/Set Index
 			void setIndex(size_t id) { index = id; }
@@ -62,6 +52,7 @@ namespace ICM
 			void setRefer(size_t id) { assert(isRefer()); setIndex(id); }
 			size_t getRefer() const { assert(isRefer()); return getIndex(); }
 			TypeUnit getDataType() const { assert(isData()); return getSubType(); }
+			size_t getIndetType() const { assert(isIdent()); return getSubType(); }
 			Keyword::KeywordID getKeyword() const { assert(isKeyword()); return (Keyword::KeywordID)getSubType(); }
 
 		private:

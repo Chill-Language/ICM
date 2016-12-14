@@ -93,7 +93,7 @@ namespace ICM
 		return str;
 	}
 	// Function
-	std::string to_string(const Function::Signature::List &list) {
+	string to_string(const Function::Signature::List &list) {
 		return Convert::to_string(list.begin(), list.end());
 	}
 
@@ -141,12 +141,12 @@ namespace ICM
 			return "R{" + std::to_string(element.getRefer()) + "}";
 		else if (element.isKeyword())
 			return "K(" + ICM::to_string(element.getKeyword()) + ")";
-		else if (element.isVariable())
+		else if (element.isIdentType(I_Variable))
 			return "V(" + getVariable(element).getName() + ")";
-		else if (element.isFunction())
+		else if (element.isIdentType(I_Function))
 			return "F(" + getFunction(element).getName() + ")";
-		else if (element.isIdentifier())
-			return "I(" + getIdentifier(element) + ")";
+		else if (element.isIdent())
+			return "I(" + getIdent(element) + ")";
 		else
 			return "UnkonwnElement";
 	}
@@ -157,12 +157,12 @@ namespace ICM
 			return "{" + std::to_string(element.getRefer()) + "}";
 		else if (element.isKeyword())
 			return ICM::to_string(element.getKeyword());
-		else if (element.isVariable())
+		else if (element.isIdentType(I_Variable))
 			return getVariable(element).getName();
-		else if (element.isFunction())
+		else if (element.isIdentType(I_Function))
 			return getFunction(element).getName();
-		else if (element.isIdentifier())
-			return getIdentifier(element);
+		else if (element.isIdent())
+			return getIdent(element);
 		else
 			return "UnkonwnElement";
 	}

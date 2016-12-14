@@ -239,18 +239,6 @@ namespace ICM
 		else
 			return op;
 	}
-	// Get TypeObject
-	TypeObject getTypeObject(const ObjectPtr &op)
-	{
-		if (op.isType(T_Function)) {
-			TypeObject t(T_Function);
-			auto &ft = op->get<T_Function>()->getData();
-			t.setFuncTableUnit(&ft);
-			return t;
-		}
-		else
-			return ICM::TypeObject(op.type());
-	}
 	namespace Objects
 	{
 		// Get Disperse Iterator

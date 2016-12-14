@@ -72,7 +72,7 @@ namespace ICM
 		};
 	}
 
-	std::string to_string(const Parser::MatchResult &mr);
+	string to_string(const Parser::MatchResult &mr);
 
 	namespace Parser
 	{

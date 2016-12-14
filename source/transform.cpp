@@ -39,7 +39,7 @@ namespace ICM
 				return true;
 			}
 			bool checkBoolExp(const Element &elt) {
-				if (elt.isIdentifier() || elt.isRefer() || elt.isBoolean())
+				if (elt.isIdent() || elt.isRefer() || elt.isDataType(T_Boolean))
 					return true;
 				println("Error : BoolExp has Non Boolean Value.");
 				return false;
@@ -72,7 +72,7 @@ namespace ICM
 					println(to_string(node));
 				if (node[0].isKeyword())
 					return compileKeyword(node, refelt);
-				else if (node[0].isIdentifier() || node[0].isRefer())
+				else if (node[0].isIdent() || node[0].isRefer())
 					return compileCall(node, refelt);
 				else
 					return error("Error in compileSub.");
@@ -106,7 +106,7 @@ namespace ICM
 			bool compileDisp(Node &node, Element &refelt) {
 				if (node.size() == 2) {
 					Element &e = node[1];
-					if (e.isIdentifier() || e.isRefer()) {
+					if (e.isIdent() || e.isRefer()) {
 						if (e.isRefer()) {
 							compileSub(GetRefer(e), e);
 						}
@@ -189,7 +189,7 @@ namespace ICM
 					return error("Syntax error for 'for'.");
 				else if (node.size() == 6)
 					return error("dolist will not be blank.");
-				else if (!node[1].isIdentifier())
+				else if (!node[1].isIdent())
 					return error("for var must be Identifier.");
 				else if (!isKey(node[2], in_) || !isKey(node[4], to_))
 					return error("Syntax error for 'for'.");
@@ -210,7 +210,7 @@ namespace ICM
 				KeywordID key = node.front().getKeyword();
 
 				if (node.size() == 3) {
-					if (node[1].isIdentifier()) {
+					if (node[1].isIdent()) {
 						adjustElement(node[2]);
 						return true;
 					}
@@ -253,7 +253,7 @@ namespace ICM
 				bool change = false;
 				for (size_t i : range(0, node.size())) {
 					Element &e = node[i];
-					if (e.isIdentifier())
+					if (e.isIdent())
 						setIdentifier(e);
 					else if (e.isRefer())
 						setIdentSub(GetRefer(e));
@@ -270,25 +270,25 @@ namespace ICM
 
 		private:
 			void setIdentifier(Element &element) {
-				const string &name = getIdentifier(element);
+				const string &name = getIdent(element);
 				size_t index;
 				if ((index = GlobalVariableTable.find(name))) {
-					element = Element::Variable(index);
+					element = Element::Identifier(I_Variable, index);
 				}
 				else if ((index = GlobalFunctionTable.find(name))) {
-					element = Element::Function(index);
+					element = Element::Identifier(I_Function, index);
 				}
 				else {
 					auto &vtu = GlobalVariableTable.add(name, Objects::Nil());
-					element = Element::Variable(vtu.getID());
+					element = Element::Identifier(I_Variable, vtu.getID());
 				}
 			}
 			void setKeyword(Element &element) {
 				if (isKey(element, list_)) {
-					element = Element::Function(GlobalFunctionTable["list"].getID());
+					element = Element::Identifier(I_Function, GlobalFunctionTable["list"].getID());
 				}
 				else if (isKey(element, disp_)) {
-					element = Element::Function(GlobalFunctionTable["disp"].getID());
+					element = Element::Identifier(I_Function, GlobalFunctionTable["disp"].getID());
 				}
 			}
 		};

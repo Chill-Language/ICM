@@ -47,5 +47,5 @@ namespace ICM
 		{ "do",       Keyword::do_       },
 	};
 
-	SerialBijectionMap<string> GlobalIdentifierMap;
+	SerialBijectionMap<string> GlobalIdentMap;
 }

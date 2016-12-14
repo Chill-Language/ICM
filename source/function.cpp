@@ -64,6 +64,17 @@ namespace ICM
 		bool Signature::checkType(const Signature &sign) const {
 			return checkType(sign.InType);
 		}
+		inline ICM::TypeObject getTypeObject(const ObjectPtr &op)
+		{
+			if (op.isType(T_Function)) {
+				TypeObject t(T_Function);
+				auto &ft = op->get<T_Function>()->getData();
+				t.setFuncTableUnit(&ft);
+				return t;
+			}
+			else
+				return ICM::TypeObject(op.type());
+		}
 		lightlist<TypeObject> getTypeObjectList(const DataList &list)
 		{
 			lightlist<TypeObject> typelist(list.size());

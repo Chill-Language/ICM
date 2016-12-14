@@ -15,13 +15,13 @@ namespace ICM
 			if (element.isData()) {
 				return new Object(getData(element));
 			}
-			else if (element.isVariable()) {
+			else if (element.isIdentType(I_Variable)) {
 				return getVariable(element).getData();
 			}
 			else if (element.isRefer()) {
 				return TempResult[element.getRefer()];
 			}
-			else if (element.isFunction()) {
+			else if (element.isIdentType(I_Function)) {
 				return new Objects::Function(getFunction(element).getID());
 			}
 			else {
@@ -68,10 +68,10 @@ namespace ICM
 			const FuncTableUnit *ftup;
 
 			AST::Element &front = Data.front();
-			if (front.isFunction()) {
+			if (front.isIdentType(I_Function)) {
 				ftup = &getFunction(front);
 			}
-			else if (front.isVariable() || front.isRefer()) {
+			else if (front.isIdentType(I_Variable) || front.isRefer()) {
 				Object *fp = getObject(front);
 				if (fp->type == T_Disperse) {
 				}
@@ -161,7 +161,7 @@ namespace ICM
 						GlobalVariableTable[inst.VTU].setData(getData(inst.Data));
 					else if (inst.Data.isRefer())
 						GlobalVariableTable[inst.VTU].setData(TempResult[inst.Data.getRefer()]);
-					else if (inst.Data.isVariable()) {
+					else if (inst.Data.isIdentType(I_Variable)) {
 						switch (Inst->inst()) {
 						case let:
 							GlobalVariableTable[inst.VTU].setData(getVariable(inst.Data).getData());
@@ -174,7 +174,7 @@ namespace ICM
 							break;
 						}
 					}
-					else if (inst.Data.isFunction()) {
+					else if (inst.Data.isIdentType(I_Function)) {
 						GlobalVariableTable[inst.VTU].setData(new Objects::Function(getFunction(inst.Data).getID()));
 					}
 					else
@@ -262,14 +262,14 @@ namespace ICM
 				case pti: {
 					Insts::PrintIdent &inst = static_cast<Insts::PrintIdent&>(*Inst);
 					for (AST::Element &e : inst.Args) {
-						if (e.isVariable())
+						if (e.isIdentType(I_Variable))
 							print(getVariable(e).getName(), "(");
 						Object *op = getObject(e);
 						if (op)
 							print(getObject(e)->to_string());
 						else
 							print("Null");
-						if (e.isVariable())
+						if (e.isIdentType(I_Variable))
 							print(")");
 						println();
 					}

@@ -125,7 +125,7 @@ namespace ICM
 					if (e.isRefer()) {
 						createNode(GetRefer(e), e);
 					}
-					else if (e.isData() || e.isFunction() || e.isVariable()) {
+					else if (e.isData() || e.isIdentType(I_Function) || e.isIdentType(I_Variable)) {
 						InstList.push(new Insts::Store(e));
 					}
 					else if (isKey(e, break_)) {
@@ -237,7 +237,7 @@ namespace ICM
 				createReferNode(Rdo);
 
 				Element ele;
-				if (ve.isVariable())
+				if (ve.isIdentType(I_Variable))
 					ele = Element::Data(getVariable(ve).getData()->type, GlobalElementPool.insert(getVariable(ve).getData()));
 				else {
 					createReferNode(ve);
@@ -258,10 +258,10 @@ namespace ICM
 			// (let/set/ref/cpy I x y R{n}), (ref/cpy I)
 			bool createNodeLSRC(Node &node, Element &refelt) {
 				if (node.size() == 3) {
-					assert(node[1].isVariable());
+					assert(node[1].isIdentType(I_Variable));
 					Element &ident = node[1];
 					Element &value = node[2];
-					VariableTableUnit& vtu = getVariable(ident);
+					VarbTableUnit& vtu = getVariable(ident);
 					ICM::Instruction::Instruction inst;
 					switch (node[0].getKeyword()) {
 					case Keyword::let_: inst = let; break;

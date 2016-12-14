@@ -112,7 +112,7 @@ inline RangeIterator<T> rangei(T a, T b)
 }
 
 template <typename T1, typename T2>
-std::string to_string(const RangeBase<T1, T2> &r)
+inline std::string to_string(const RangeBase<T1, T2> &r)
 {
 	using Convert::to_string;
 	using std::to_string;

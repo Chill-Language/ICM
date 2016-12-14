@@ -136,6 +136,44 @@ namespace ICM
 
 namespace ICM
 {
+	namespace Tables
+	{
+		struct IdentifierUnit
+		{
+			IdentifierUnit(const string &name)
+				: name(name) {}
+
+			IdentType type = I_Void;
+			string name;
+		};
+
+		class IdentifierTable
+		{
+		public:
+
+		public:
+			IdentifierTable() {}
+			size_t insert(const string &name) {
+				size_t id = KeyMap.insert(name);
+				if (id >= Data.size())
+					Data.push_back(IdentifierUnit(name));
+				else
+					Data[id] = IdentifierUnit(name);
+				return id;
+			}
+			IdentifierUnit& get(size_t id) {
+				return Data.at(id);
+			}
+
+		private:
+			SerialBijectionMap<string> KeyMap;
+			vector<IdentifierUnit> Data;
+		};
+	}
+}
+
+namespace ICM
+{
 	namespace Runtime
 	{
 		struct Element

@@ -3,6 +3,7 @@
 #include "object.h"
 #include "function.h"
 #include "keyword.h"
+#include "identifier.h"
 
 namespace ICM
 {
@@ -23,8 +24,26 @@ namespace ICM
 		size_t id = 0;
 		string name;
 	};
+
 	//=======================================
-	// * Class VariableTableUnit
+	// * Class IdentTableUnit
+	//=======================================
+	class IdentTableUnit : public BaseTableUnit
+	{
+	public:
+		IdentTableUnit() = default;
+		IdentTableUnit(size_t id, const string &name)
+			: BaseTableUnit(id, name) {}
+
+		virtual IdentType type() const = 0;
+
+		bool isVarb() const { return type() == I_Variable; };
+		bool isFunc() const { return type() == I_Function; };
+	};
+
+
+	//=======================================
+	// * Class VarbTableUnit
 	//=======================================
 	namespace TypeBase {
 		struct VariableType
@@ -35,25 +54,18 @@ namespace ICM
 			bool isstatic = false;
 		};
 	}
-	class VariableTableUnit : public BaseTableUnit
+
+	class VarbTableUnit : public IdentTableUnit
 	{
 	public:
-		VariableTableUnit() = default;
-		VariableTableUnit(Object &&data) {
+		VarbTableUnit() = default;
+
+		VarbTableUnit(size_t id, const string &name, const Object &data)
+			: IdentTableUnit(id, name) {
 			this->data.data = data;
 		}
-		VariableTableUnit(size_t id, const string &name, const Object &data)
-			: BaseTableUnit(id, name) {
-			this->data.data = data;
-		}
-		VariableTableUnit(size_t id, const string &name, Object &&data)
-			: BaseTableUnit(id, name) {
-			this->data.data = data;
-		}
-		VariableTableUnit(size_t id, const string &name, const VariableTableUnit &unit)
-			: BaseTableUnit(id, name) {
-			this->data.data = unit.data.data;
-		}
+
+		IdentType type() const { return I_Variable; }
 
 		void setData(const Object *data) { this->data.data = *data; }
 		void setData(Object &&data) { this->data.data = data; }
@@ -67,7 +79,7 @@ namespace ICM
 	//=======================================
 	// * Class FuncTableUnit
 	//=======================================
-	class FuncTableUnit : public BaseTableUnit
+	class FuncTableUnit : public IdentTableUnit
 	{
 	public:
 		using FuncObject = ICM::Function::FuncObject;
@@ -75,15 +87,17 @@ namespace ICM
 
 		FuncTableUnit() = default;
 		FuncTableUnit(size_t id, const string &name, const std::initializer_list<FuncObject> &func)
-			: BaseTableUnit(id, name), func(func) {
+			: IdentTableUnit(id, name), func(func) {
 			initSignTree();
 		}
 		FuncTableUnit(size_t id, const string &name, const std::initializer_list<FuncInitObject*> &func)
-			: BaseTableUnit(id, name) {
+			: IdentTableUnit(id, name) {
 			for (auto *p : func)
 				this->func.push_back(p->get_f());
 			initSignTree();
 		}
+
+		IdentType type() const { return I_Function; }
 
 		size_t size() const { return func.size(); }
 		const FuncObject& operator[](size_t i) const { return func[i]; }
@@ -159,7 +173,7 @@ namespace ICM
 		map<string, size_t> keymap;
 	};
 
-	using VariableTable = Table<VariableTableUnit>;
+	using VariableTable = Table<VarbTableUnit>;
 	using FuncTable = Table<FuncTableUnit>;
 
 	void createDefFuncTable();
