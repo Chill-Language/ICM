@@ -79,6 +79,16 @@ public:
 		read(&element, 1);
 	}
 
+	template <typename T>
+	bool getft(T &element) {
+		int s = fscanf(file.get(), Convert::format<T>(), &element);
+		return s != EOF && s != 0;
+	}
+	bool getft(char *dst, size_t len) {
+		int s = fscanf(file.get(), "%s", dst, len);
+		return s != EOF && s != 0;
+	}
+
 	operator FILE*() const {
 		return file.get();
 	}
@@ -87,6 +97,9 @@ public:
 	}
 	size_t size() const {
 		return _size;
+	}
+	bool eof() const {
+		return feof(file.get()) != 0;
 	}
 	std::string getText() const {
 		if (bad()) return "";
@@ -172,6 +185,11 @@ private:
 		FILE *file;
 		fopen_s(&file, filename, mode);
 		return file;
+	}
+	template <typename... Args>
+	inline static int fscanf(FILE *file, const char *format, Args... args)
+	{
+		return fscanf_s(file, format, args...);
 	}
 #endif
 };

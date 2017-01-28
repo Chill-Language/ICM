@@ -456,76 +456,76 @@ namespace ICM
 		using Lst = std::initializer_list<F>;
 		using LST = std::initializer_list<FI*>;
 
-		DefFuncTable.add("+", LST{
+		DefFuncTable.insert("+", LST{
 			new Calc::Add<T_Void>(),
 			new Calc::Add<T_Number>(),
 			new Calc::Add<T_String>(),
 			new Calc::Add<T_List>(),
 		});
-		DefFuncTable.add("-", LST{ new Calc::Sub() });
-		DefFuncTable.add("*", LST{ new Calc::Mul(), new Lists::Mul() });
-		DefFuncTable.add("/", LST{ new Calc::Div() });
-		DefFuncTable.add("mod", LST{ new Calc::Mod() });
-		DefFuncTable.add("rem", LST{ new Calc::Rem() });
+		DefFuncTable.insert("-", LST{ new Calc::Sub() });
+		DefFuncTable.insert("*", LST{ new Calc::Mul(), new Lists::Mul() });
+		DefFuncTable.insert("/", LST{ new Calc::Div() });
+		DefFuncTable.insert("mod", LST{ new Calc::Mod() });
+		DefFuncTable.insert("rem", LST{ new Calc::Rem() });
 
-		DefFuncTable.add("=", LST{ new Comp::Equ() });
-		DefFuncTable.add("<", LST{ new Comp::NumSmallS() });
-		DefFuncTable.add("<=", LST{ new Comp::NumSmallE() });
-		DefFuncTable.add(">", LST{ new Comp::NumLargeL() });
-		DefFuncTable.add(">=", LST{ new Comp::NumLargeE() });
+		DefFuncTable.insert("=", LST{ new Comp::Equ() });
+		DefFuncTable.insert("<", LST{ new Comp::NumSmallS() });
+		DefFuncTable.insert("<=", LST{ new Comp::NumSmallE() });
+		DefFuncTable.insert(">", LST{ new Comp::NumLargeL() });
+		DefFuncTable.insert(">=", LST{ new Comp::NumLargeE() });
 
-		DefFuncTable.add("inc", LST{ new Calc::Inc() });
-		DefFuncTable.add("dec", LST{ new Calc::Dec() });
-		DefFuncTable.add("++", "inc");
-		DefFuncTable.add("--", "dec");
+		DefFuncTable.insert("inc", LST{ new Calc::Inc() });
+		DefFuncTable.insert("dec", LST{ new Calc::Dec() });
+		DefFuncTable.insert("++", "inc");
+		DefFuncTable.insert("--", "dec");
 
-		DefFuncTable.add("list", Lst{
+		DefFuncTable.insert("list", Lst{
 			F(Lists::list, S({}, T_List)),               // Void -> L
 			F(Lists::list, S({ T_Vary }, T_List, true)), // Var* -> L
 		});
-		DefFuncTable.add("disp", Lst{
+		DefFuncTable.insert("disp", Lst{
 			F(Lists::disp, S({ T_List }, T_Disperse)),       // L -> D
 		});
-		DefFuncTable.add("sort", Lst{
+		DefFuncTable.insert("sort", Lst{
 			F(Lists::sort, S({ T_List }, T_List)), // L -> L
 			F(Lists::sort_f, S({ T_List, T(T_Function,S({ T_Number,T_Number },T_Number)) }, T_List)), // (L F) -> L
 		});
-		DefFuncTable.add("foreach", LST{ new Lists::Foreach() });
-		DefFuncTable.add("size", LST{ new Lists::Size() });
-		DefFuncTable.add("swap", LST{ new Lists::Swap() });
-		DefFuncTable.add("at", LST{ new Lists::At() });
-		DefFuncTable.add("set", LST{ new Lists::Set() });
-		DefFuncTable.add("call", Lst{
+		DefFuncTable.insert("foreach", LST{ new Lists::Foreach() });
+		DefFuncTable.insert("size", LST{ new Lists::Size() });
+		DefFuncTable.insert("swap", LST{ new Lists::Swap() });
+		DefFuncTable.insert("at", LST{ new Lists::At() });
+		DefFuncTable.insert("set", LST{ new Lists::Set() });
+		DefFuncTable.insert("call", Lst{
 			F(System::call, S({ T_Function }, T_Vary)),    // F -> V
 			F(System::call, S({ T_Function, T_Vary }, T_Vary, true)),    // (F V*) -> V
 		});
-		DefFuncTable.add("print", Lst{
+		DefFuncTable.insert("print", Lst{
 			F(System::print, S({}, T_List)),               // Void -> L
 			F(System::print, S({ T_Vary }, T_List, true)), // Var* -> L
 		});
-		DefFuncTable.add("println", Lst{
+		DefFuncTable.insert("println", Lst{
 			F(System::println, S({}, T_List)),               // Void -> L
 			F(System::println, S({ T_Vary }, T_List, true)), // Var* -> L
 		});
-		//DefFuncTable.add("p", Lst{
+		//DefFuncTable.insert("p", Lst{
 		//	F(System::p, S({}, T_List)),               // Void -> L
 		//	F(System::p, S({ T_Vary }, T_List, true)), // Var* -> L
 		//});
-		DefFuncTable.add("not", LST{ new DefFunc::BoolCalc::Not() });
-		DefFuncTable.add("dcall", Lst{
+		DefFuncTable.insert("not", LST{ new DefFunc::BoolCalc::Not() });
+		DefFuncTable.insert("dcall", Lst{
 			F(System::dcall, S({ T_Vary, T_Function, T_Vary }, T_Vary)), // (Var F Var) -> Var
 		});
-		DefFuncTable.add("type", LST{ new System::Type() });
-		DefFuncTable.add("exit", Lst{
+		DefFuncTable.insert("type", LST{ new System::Type() });
+		DefFuncTable.insert("exit", Lst{
 			F(System::exit, S({}, T_Nil)),            // Void -> N
 			F(System::exitv, S({ T_Number }, T_Nil)), // N -> N
 		});
-		DefFuncTable.add("system", Lst{
+		DefFuncTable.insert("system", Lst{
 			F(System::system, S({ T_String }, T_Number)), // S -> N
 		});
-		DefFuncTable.add("Config.SetDebugMode", LST{ new DefFunc::Config::DebugMode() });
-		DefFuncTable.add("Config.SetPrintIntervalTime", LST{ new DefFunc::Config::PrintIntervalTime() });
-		DefFuncTable.add("Config.PrintAST", LST{ new DefFunc::Config::PrintAST() });
-		DefFuncTable.add("Config.PrintOrder", LST{ new DefFunc::Config::PrintOrder() });
+		DefFuncTable.insert("Config.SetDebugMode", LST{ new DefFunc::Config::DebugMode() });
+		DefFuncTable.insert("Config.SetPrintIntervalTime", LST{ new DefFunc::Config::PrintIntervalTime() });
+		DefFuncTable.insert("Config.PrintAST", LST{ new DefFunc::Config::PrintAST() });
+		DefFuncTable.insert("Config.PrintOrder", LST{ new DefFunc::Config::PrintOrder() });
 	}
 }

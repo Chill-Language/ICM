@@ -10,17 +10,21 @@ namespace ICM
 
 		enum MatchType {
 			MT_Null,
+			MT_Blank,
+			MT_Comment,
 			MT_LBracket,
 			MT_RBracket,
 			MT_LSBracket,
 			MT_RSBracket,
-			MT_Comment,
+			MT_LLBracket,
+			MT_RLBracket,
 			MT_Identifier,
+			MT_Suffix,
 			MT_Keyword,
 			MT_Boolean,
 			MT_Number,
 			MT_String,
-			MT_Symbol,
+			MT_DSymbol,
 		};
 
 		class MatchResult
@@ -72,6 +76,7 @@ namespace ICM
 		};
 	}
 
+	string to_string(Parser::MatchType mt);
 	string to_string(const Parser::MatchResult &mr);
 
 	namespace Parser

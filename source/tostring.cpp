@@ -39,17 +39,21 @@ namespace ICM
 
 		switch (type) {
 		case MT_Null:       return "Null";
+		case MT_Blank:      return "Blank";
+		case MT_Comment:    return "Comment";
 		case MT_LBracket:   return "LBracket";
 		case MT_RBracket:   return "RBracket";
 		case MT_LSBracket:  return "LSBracket";
 		case MT_RSBracket:  return "RSBracket";
-		case MT_Comment:    return "Comment";
+		case MT_LLBracket:  return "LLBracket";
+		case MT_RLBracket:  return "RLBracket";
 		case MT_Identifier: return "Identifier";
+		case MT_Suffix:     return "Suffix";
 		case MT_Keyword:    return "Keyword";
 		case MT_Number:     return "Number";
 		case MT_Boolean:    return "Boolean";
 		case MT_String:     return "String";
-		case MT_Symbol:     return "Symbol";
+		case MT_DSymbol:    return "DSymbol";
 		default:            return "UnfoundType";
 		}
 	}

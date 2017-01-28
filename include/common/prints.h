@@ -12,6 +12,19 @@
 SYSTEM BEGIN
 namespace Convert
 {
+	// Format
+	template <typename T> inline constexpr char* format();
+	template <> inline constexpr char* format<int>() { return "%d"; }
+	template <> inline constexpr char* format<long>() { return "%ld"; }
+	template <> inline constexpr char* format<long long>() { return "%lld"; }
+	template <> inline constexpr char* format<unsigned>() { return "%u"; }
+	template <> inline constexpr char* format<unsigned long>() { return "%lu"; }
+	template <> inline constexpr char* format<unsigned long long>() { return "%llu"; }
+	template <> inline constexpr char* format<float>() { return "%f"; }
+	template <> inline constexpr char* format<double>() { return "%f"; }
+	template <> inline constexpr char* format<long double>() { return "%Lf"; }
+	template <> inline constexpr char* format<char>() { return "%c"; }
+
 	// To String
 	//   String & const char*
 	inline const std::string& to_string(const std::string &str)

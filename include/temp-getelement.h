@@ -17,8 +17,8 @@ namespace ICM
 		else if (elt.getDataType() == T_Nil) {
 			dat = nullptr;
 		}
-		// TODO
-		return *Object(elt.getDataType(), dat).clone();
+		TypeUnit type = elt.getDataType();
+		return Object(type, TypeInfoTable[type].copy(dat)); // TODO
 	}
 	inline const string& getIdent(const AST::Element &elt) {
 		assert(elt.isIdent());

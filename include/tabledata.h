@@ -115,19 +115,50 @@ namespace ICM
 	};
 
 	//=======================================
-	// * Class Table<Unit>
+	// * Class VarbTable
 	//=======================================
-	template <typename Unit>
-	class Table
+	class VarbTable
 	{
+		using Unit = VarbTableUnit;
 	public:
-		Table() {
+		VarbTable() {
+			data.insert("", Unit());
+		}
+		template <typename... Args>
+		size_t insert(const string &name) {
+			return data.insert(name, Unit(data.currentIndex(), name, Objects::Nil()));
+		}
+		size_t find(const string &name) const {
+			auto iter = data.find(name);
+			if (iter != data.size())
+				return iter;
+			return 0;
+		}
+		const Unit& operator[](size_t id) const {
+			return data[id];
+		}
+		Unit& operator[](size_t id) {
+			return data[id];
+		}
+
+	private:
+		IndexTable<string, Unit> data;
+	};
+
+	//=======================================
+	// * Class FuncTable
+	//=======================================
+	class FuncTable
+	{
+		using Unit = FuncTableUnit;
+	public:
+		FuncTable() {
 			data.push_back(Unit());
 		}
-		void add(const string &name, const char *nameref) {
-			add(name, string(nameref));
+		void insert(const string &name, const char *nameref) {
+			insert(name, string(nameref));
 		}
-		void add(const string &name, const string &nameref) {
+		void insert(const string &name, const string &nameref) {
 			size_t id = find(nameref);
 			if (id) {
 				count++;
@@ -136,17 +167,11 @@ namespace ICM
 			}
 		}
 		template <typename... Args>
-		Unit& add(const string &name, Args... args) {
+		size_t insert(const string &name, Args... args) {
 			count++;
 			data.push_back(Unit(count, name, args...));
 			keymap[name] = count;
-			return data.back();
-		}
-		Unit& add(const string &name, Unit &&unit) {
-			count++;
-			data.push_back(Unit(count, name, unit));
-			keymap[name] = count;
-			return data.back();
+			return count;
 		}
 		const Unit& operator[](size_t id) const {
 			return data[id];
@@ -173,13 +198,22 @@ namespace ICM
 		map<string, size_t> keymap;
 	};
 
-	using VariableTable = Table<VarbTableUnit>;
-	using FuncTable = Table<FuncTableUnit>;
-
 	void createDefFuncTable();
 
+	//=======================================
+	// * Class StringTable
+	//=======================================
+	class StringTable
+	{
+	public:
+		
+	private:
+		SerialBijectionMap<string> data;
+	};
+
+
 	extern FuncTable GlobalFunctionTable;
-	extern VariableTable GlobalVariableTable;
-	extern BijectionKVMap<string, Keyword::KeywordID> GlobalKeywordTable;
+	extern VarbTable GlobalVariableTable;
+	extern BijectionKVMap<string, ICM::Keyword::KeywordID> GlobalKeywordTable;
 
 }

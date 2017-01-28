@@ -6,8 +6,9 @@
 #ifndef _SYSTEM_MEMORY_H_
 #define _SYSTEM_MEMORY_H_
 #include "macro.h"
+#include <xutility>
+#include <stdint.h>
 #include <cstdlib>
-#include <cstring>
 
 SYSTEM BEGIN
 #if _ITERATOR_DEBUG_LEVEL != 0
@@ -108,7 +109,7 @@ namespace Memory
 
 	template <typename T>
 	inline T* clear(T* dat, size_t length) {
-		bzero((void*)dat, get_size<T>(length));
+		std::memset((void*)dat, 0, get_size<T>(length));
 		return dat;
 	}
 

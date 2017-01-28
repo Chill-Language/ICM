@@ -9,6 +9,142 @@ namespace ICM
 {
 	namespace Parser
 	{
+		MatchType getFirstCharKey(char key)
+		{
+			static const Parser::MatchType MatchTypeKeyTable[] = {
+				MT_Null, // '\0'
+				MT_Null,
+				MT_Null,
+				MT_Null,
+				MT_Null,
+				MT_Null,
+				MT_Null,
+				MT_Null,
+				MT_Null,
+				MT_Blank,
+				MT_Blank,
+				MT_Null,
+				MT_Null,
+				MT_Blank,
+				MT_Null,
+				MT_Null,
+				MT_Null,
+				MT_Null,
+				MT_Null,
+				MT_Null,
+				MT_Null,
+				MT_Null,
+				MT_Null,
+				MT_Null,
+				MT_Null,
+				MT_Null,
+				MT_Null,
+				MT_Null,
+				MT_Null,
+				MT_Null,
+				MT_Null,
+				MT_Null,
+				MT_Blank, // ' '
+
+				MT_Identifier,
+				MT_String,
+				MT_Suffix,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_DSymbol,
+				MT_LBracket,
+				MT_RBracket,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Null,
+				MT_Identifier,
+				MT_Null,
+				MT_Identifier,
+				MT_Number,
+				MT_Number,
+				MT_Number,
+				MT_Number,
+				MT_Number,
+				MT_Number,
+				MT_Number,
+				MT_Number,
+				MT_Number,
+				MT_Number,
+				MT_Identifier,
+				MT_Comment,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_LSBracket,
+				MT_Identifier,
+				MT_RSBracket,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Null,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_Identifier,
+				MT_LLBracket,
+				MT_Identifier,
+				MT_RLBracket,
+				MT_Identifier,
+			};
+
+			return MatchTypeKeyTable[key];
+		}
+
 		MatchResult Match::matchNext()
 		{
 			MatchResult mr;
@@ -45,6 +181,14 @@ namespace ICM
 								++currptr;
 								mr = MatchResult(MT_RSBracket, currptr - 1, currptr);
 								goto EndMatch;
+							case '{':  /* Left Large Bracket */
+								++currptr;
+								mr = MatchResult(MT_LLBracket, currptr - 1, currptr);
+								goto EndMatch;
+							case '}':  /* Right Large Bracket */
+								++currptr;
+								mr = MatchResult(MT_RLBracket, currptr - 1, currptr);
+								goto EndMatch;
 							case ';':  /* Comment */
 								findchars = { '\n', '\0' };
 								//ignorechars = { '\\' };
@@ -61,7 +205,7 @@ namespace ICM
 								break;
 							case '\'':  /* Symbol */
 								findchars = { '\'', '\0' };
-								type = MT_Symbol;
+								type = MT_DSymbol;
 								begin = currptr + 1;
 								mode = 1;
 								break;

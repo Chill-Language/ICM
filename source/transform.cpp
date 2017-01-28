@@ -279,8 +279,8 @@ namespace ICM
 					element = Element::Identifier(I_Function, index);
 				}
 				else {
-					auto &vtu = GlobalVariableTable.add(name, Objects::Nil());
-					element = Element::Identifier(I_Variable, vtu.getID());
+					size_t id = GlobalVariableTable.insert(name);
+					element = Element::Identifier(I_Variable, id);
 				}
 			}
 			void setKeyword(Element &element) {

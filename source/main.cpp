@@ -136,7 +136,7 @@ namespace ICM
 
 namespace ICM
 {
-	namespace Tables
+	namespace Tables_OLD
 	{
 		struct IdentifierUnit
 		{
@@ -168,6 +168,19 @@ namespace ICM
 		private:
 			SerialBijectionMap<string> KeyMap;
 			vector<IdentifierUnit> Data;
+		};
+	}
+
+	namespace Runtime
+	{
+		struct DynamicVariableTableUnit
+		{
+			Object* data = nullptr;
+		};
+
+		class DynamicVariableTable
+		{
+
 		};
 	}
 }
@@ -246,6 +259,7 @@ void Run(vector<Instruction::InstructionList> &VeI, bool printResult)
 			printIntervalTime(t);
 	}
 }
+
 
 int main(int argc, char *argv[])
 {

@@ -14,11 +14,11 @@ namespace ICM
 	{
 		addDefFuncs(GlobalFunctionTable);
 		// TODO : Memory leak
-		GlobalVariableTable.add("Nil", Objects::Nil());
-		//DefVariableTable.add("NIL", nil);
-		//DefVariableTable.add("nil", nil);
+		GlobalVariableTable.insert("Nil");
+		//DefVariableTable.insert("NIL", nil);
+		//DefVariableTable.insert("nil", nil);
 		//ObjectPtr nan(new Objects::Identifier("NaN", ObjectPtr(new Objects::Number(Common::Number::Rational(0, 0)))));
-		//DefVariableTable.add("NaN", nan);
+		//DefVariableTable.insert("NaN", nan);
 	}
 
 	BijectionKVMap<string, Keyword::KeywordID> GlobalKeywordTable = {

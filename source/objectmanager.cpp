@@ -150,5 +150,5 @@ namespace ICM
 	SymbolTable GlobalSymbolTable;
 
 	FuncTable GlobalFunctionTable;
-	VariableTable GlobalVariableTable;
+	VarbTable GlobalVariableTable;
 }
