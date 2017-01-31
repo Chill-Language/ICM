@@ -12,11 +12,16 @@ namespace ICM
 
 		IdentType type;
 		size_t index;
-		union {
+		/*union {
 			Object  svdata; // Reference From StVarb
 			Object* dvref;  // Reference From DyVarb
 			size_t  rvref;  // Reference From ReVarb
-		};
+		};*/
+
+		// TODO
+		DyVarbTableUnit StVarb;
+		DyVarbTableUnit DyVarb;
+		size_t FunctionIndex;
 	};
 
 
@@ -32,6 +37,9 @@ namespace ICM
 		}
 		size_t find(const string &name) const {
 			return IndexTable::find(name);
+		}
+		IdentTableUnit& at(size_t index) {
+			return IndexTable::get(index);
 		}
 		size_t size() const {
 			return IndexTable::size();

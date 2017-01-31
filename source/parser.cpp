@@ -296,7 +296,7 @@ namespace ICM
 			case MT_Keyword:
 				return AST::Element::Keyword(GlobalKeywordTable.getValue(str));
 			case MT_Identifier:
-				return AST::Element::Identifier(GlobalIdentMap[str]);
+				return AST::Element::Identifier(Compiler::GlobalIdentNameMap[str]);
 			default:
 				return AST::Element::Data(T_Null, 0);
 			}

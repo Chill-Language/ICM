@@ -65,6 +65,7 @@ namespace ICM
 		};
 
 		extern ElementPool GlobalElementPool;
+		extern SerialBijectionMap<string> GlobalIdentNameMap;
 	}
 
 	inline string to_string(const Compiler::Literal::StringType &st) {

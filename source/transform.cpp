@@ -272,31 +272,38 @@ namespace ICM
 			void setIdentifier(Element &element) {
 				const string &name = getIdent(element);
 				size_t index = GlobalIdentTable.find(name);
-				/*if (index != GlobalIdentTable.size()) {
-
+#if _USE_IDENTTABLE_
+				if (index != GlobalIdentTable.size()) {
+					IdentTableUnit &itu = GlobalIdentTable.at(index);
+					setIdent(element, itu.type, index);
 				}
 				else {
-					size_t id = GlobalDyVarbTable.insert(name);
-					element = Element::Identifier(I_DyVarb, id);
-				}*/
+					size_t id = GlobalIdentTable.insert(name, I_DyVarb);
+					setIdent(element, I_DyVarb, index);
+				}
+#else
 				if ((index = GlobalDyVarbTable.find(name))) {
-					element = Element::Identifier(I_DyVarb, index);
+					setDyVarb(element, index);
 				}
 				else if ((index = GlobalFunctionTable.find(name))) {
-					element = Element::Identifier(I_Function, index);
+					setFunction(element, index);
 				}
 				else {
 					size_t id = GlobalDyVarbTable.insert(name);
-					element = Element::Identifier(I_DyVarb, id);
+					setDyVarb(element, id);
 				}
+#endif
 			}
 			void setKeyword(Element &element) {
+#if _USE_IDENTTABLE_
+#else
 				if (isKey(element, list_)) {
-					element = Element::Identifier(I_Function, GlobalFunctionTable["list"].getID());
+					setFunction(element, GlobalFunctionTable["list"].getID());
 				}
 				else if (isKey(element, disp_)) {
-					element = Element::Identifier(I_Function, GlobalFunctionTable["disp"].getID());
+					setFunction(element, GlobalFunctionTable["disp"].getID());
 				}
+#endif
 			}
 		};
 

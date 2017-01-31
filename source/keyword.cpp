@@ -6,6 +6,8 @@
 #include "number.h"
 #include "tabledata.h"
 
+#include "temp-getelement.h"
+
 namespace ICM
 {
 	void addDefFuncs(FuncTable &DefFuncTable);
@@ -13,6 +15,14 @@ namespace ICM
 	void createDefFuncTable()
 	{
 		addDefFuncs(GlobalFunctionTable);
+		//
+#if _USE_IDENTTABLE_
+		for (const auto &var : GlobalFunctionTable.keymap) {
+			size_t id = GlobalIdentTable.insert(var.first, I_Function);
+			GlobalIdentTable.at(id).FunctionIndex = GlobalFunctionTable.find(var.first);
+		}
+		GlobalIdentTable.insert("Nil", I_DyVarb);
+#endif
 		// TODO : Memory leak
 		GlobalDyVarbTable.insert("Nil");
 		//DefVariableTable.insert("NIL", nil);
@@ -46,6 +56,4 @@ namespace ICM
 		{ "call",     Keyword::call_     },
 		{ "do",       Keyword::do_       },
 	};
-
-	SerialBijectionMap<string> GlobalIdentMap;
 }

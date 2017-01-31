@@ -4,7 +4,8 @@
 #include "function.h"
 #include "keyword.h"
 #include "identifier.h"
-#include "identtable.h"
+
+#define _USE_IDENTTABLE_ false
 
 namespace ICM
 {
@@ -166,6 +167,9 @@ namespace ICM
 	private:
 		size_t count = 0;
 		vector<Unit> data;
+#if _USE_IDENTTABLE_
+	public: // TODO
+#endif
 		map<string, size_t> keymap;
 	};
 
@@ -182,9 +186,15 @@ namespace ICM
 		SerialBijectionMap<string> data;
 	};
 
-	extern IdentTable GlobalIdentTable;
 	extern FuncTable GlobalFunctionTable;
 	extern DyVarbTable GlobalDyVarbTable;
 	extern BijectionKVMap<string, ICM::Keyword::KeywordID> GlobalKeywordTable;
 
+}
+
+#include "identtable.h"
+
+namespace ICM
+{
+	extern IdentTable GlobalIdentTable;
 }

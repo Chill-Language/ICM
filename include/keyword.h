@@ -39,6 +39,4 @@ namespace ICM
 	}
 
 	string to_string(Keyword::KeywordID key);
-
-	extern SerialBijectionMap<string> GlobalIdentMap;
 }
