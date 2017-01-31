@@ -214,5 +214,4 @@ namespace ICM
 		template <> string to_string_code<IdentifierType>(const IdentifierType &it);
 	}
 	string to_string(const TypeBase::FunctionType &ft);
-	string to_string(const TypeBase::VariableType &ft);
 }

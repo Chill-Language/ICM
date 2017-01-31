@@ -15,8 +15,8 @@ namespace ICM
 			if (element.isData()) {
 				return new Object(getData(element));
 			}
-			else if (element.isIdentType(I_Variable)) {
-				return getVariable(element).getData();
+			else if (element.isIdentType(I_DyVarb)) {
+				return getDyVarb(element).getData();
 			}
 			else if (element.isRefer()) {
 				return TempResult[element.getRefer()];
@@ -71,7 +71,7 @@ namespace ICM
 			if (front.isIdentType(I_Function)) {
 				ftup = &getFunction(front);
 			}
-			else if (front.isIdentType(I_Variable) || front.isRefer()) {
+			else if (front.isIdentType(I_DyVarb) || front.isRefer()) {
 				Object *fp = getObject(front);
 				if (fp->type == T_Disperse) {
 				}
@@ -158,24 +158,24 @@ namespace ICM
 				case ref: {
 					Insts::Assign &inst = static_cast<Insts::Assign&>(*Inst);
 					if (inst.Data.isData())
-						GlobalVariableTable[inst.VTU].setData(getData(inst.Data));
+						GlobalDyVarbTable[inst.VTU].setData(getData(inst.Data));
 					else if (inst.Data.isRefer())
-						GlobalVariableTable[inst.VTU].setData(TempResult[inst.Data.getRefer()]);
-					else if (inst.Data.isIdentType(I_Variable)) {
+						GlobalDyVarbTable[inst.VTU].setData(TempResult[inst.Data.getRefer()]);
+					else if (inst.Data.isIdentType(I_DyVarb)) {
 						switch (Inst->inst()) {
 						case let:
-							GlobalVariableTable[inst.VTU].setData(getVariable(inst.Data).getData());
+							GlobalDyVarbTable[inst.VTU].setData(getDyVarb(inst.Data).getData());
 							break;
 						case cpy:
-							GlobalVariableTable[inst.VTU].setData(getVariable(inst.Data).getData()->clone());
+							GlobalDyVarbTable[inst.VTU].setData(getDyVarb(inst.Data).getData()->clone());
 							break;
 						case ref:
-							GlobalVariableTable[inst.VTU].setData(getVariable(inst.Data).getData()); // TODO
+							GlobalDyVarbTable[inst.VTU].setData(getDyVarb(inst.Data).getData()); // TODO
 							break;
 						}
 					}
 					else if (inst.Data.isIdentType(I_Function)) {
-						GlobalVariableTable[inst.VTU].setData(new Objects::Function(getFunction(inst.Data).getID()));
+						GlobalDyVarbTable[inst.VTU].setData(new Objects::Function(getFunction(inst.Data).getID()));
 					}
 					else
 						println("Error in Assign.");
@@ -222,7 +222,7 @@ namespace ICM
 				}
 				case inc: {
 					Insts::Inc &inst = static_cast<Insts::Inc&>(*Inst);
-					GlobalVariableTable[inst.VTU].getData()->dat<T_Number>() += 1;
+					GlobalDyVarbTable[inst.VTU].getData()->dat<T_Number>() += 1;
 					break;
 				}
 				case jpsm:
@@ -230,7 +230,7 @@ namespace ICM
 				case jpla:
 				case jple: {
 					Insts::JumpCompare &inst = static_cast<Insts::JumpCompare&>(*Inst);
-					const auto &n1 = GlobalVariableTable[inst.VTU].getData()->dat<T_Number>();
+					const auto &n1 = GlobalDyVarbTable[inst.VTU].getData()->dat<T_Number>();
 					const auto &n2 = getObject(inst.Data)->dat<T_Number>();
 					bool r;
 					switch (Inst->inst()) {
@@ -262,14 +262,14 @@ namespace ICM
 				case pti: {
 					Insts::PrintIdent &inst = static_cast<Insts::PrintIdent&>(*Inst);
 					for (AST::Element &e : inst.Args) {
-						if (e.isIdentType(I_Variable))
-							print(getVariable(e).getName(), "(");
+						if (e.isIdentType(I_DyVarb))
+							print(getDyVarb(e).getName(), "(");
 						Object *op = getObject(e);
 						if (op)
 							print(getObject(e)->to_string());
 						else
 							print("Null");
-						if (e.isIdentType(I_Variable))
+						if (e.isIdentType(I_DyVarb))
 							print(")");
 						println();
 					}

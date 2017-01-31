@@ -4,17 +4,18 @@
 #include "function.h"
 #include "keyword.h"
 #include "identifier.h"
+#include "identtable.h"
 
 namespace ICM
 {
 	//=======================================
-	// * Class BaseTableUnit
+	// * Class IdentTableUnit
 	//=======================================
-	class BaseTableUnit
+	class IdentTableUnit_OLD
 	{
 	public:
-		BaseTableUnit() = default;
-		BaseTableUnit(size_t id, const string &name)
+		IdentTableUnit_OLD() = default;
+		IdentTableUnit_OLD(size_t id, const string &name)
 			: id(id), name(name) {}
 
 		size_t getID() const { return id; }
@@ -25,61 +26,33 @@ namespace ICM
 		string name;
 	};
 
+
 	//=======================================
-	// * Class IdentTableUnit
+	// * Class DyVarbTableUnit
 	//=======================================
-	class IdentTableUnit : public BaseTableUnit
+	class DyVarbTableUnit : public IdentTableUnit_OLD
 	{
 	public:
-		IdentTableUnit() = default;
-		IdentTableUnit(size_t id, const string &name)
-			: BaseTableUnit(id, name) {}
+		DyVarbTableUnit() = default;
 
-		virtual IdentType type() const = 0;
-
-		bool isVarb() const { return type() == I_Variable; };
-		bool isFunc() const { return type() == I_Function; };
-	};
-
-
-	//=======================================
-	// * Class VarbTableUnit
-	//=======================================
-	namespace TypeBase {
-		struct VariableType
-		{
-			size_t index = MaxValue<size_t>();
-			Object data;
-			bool isrefer = false;
-			bool isstatic = false;
-		};
-	}
-
-	class VarbTableUnit : public IdentTableUnit
-	{
-	public:
-		VarbTableUnit() = default;
-
-		VarbTableUnit(size_t id, const string &name, const Object &data)
-			: IdentTableUnit(id, name) {
-			this->data.data = data;
+		DyVarbTableUnit(size_t id, const string &name, const Object &data)
+			: IdentTableUnit_OLD(id, name) {
+			this->data = data;
 		}
 
-		IdentType type() const { return I_Variable; }
-
-		void setData(const Object *data) { this->data.data = *data; }
-		void setData(Object &&data) { this->data.data = data; }
-		const Object *getData() const { return &data.data; }
-		Object *getData() { return &data.data; }
+		void setData(const Object *data) { this->data = *data; }
+		void setData(Object &&data) { this->data = data; }
+		const Object *getData() const { return &data; }
+		Object *getData() { return &data; }
 
 	private:
-		TypeBase::VariableType data;
+		Object data;
 	};
 
 	//=======================================
 	// * Class FuncTableUnit
 	//=======================================
-	class FuncTableUnit : public IdentTableUnit
+	class FuncTableUnit : public IdentTableUnit_OLD
 	{
 	public:
 		using FuncObject = ICM::Function::FuncObject;
@@ -87,17 +60,15 @@ namespace ICM
 
 		FuncTableUnit() = default;
 		FuncTableUnit(size_t id, const string &name, const std::initializer_list<FuncObject> &func)
-			: IdentTableUnit(id, name), func(func) {
+			: IdentTableUnit_OLD(id, name), func(func) {
 			initSignTree();
 		}
 		FuncTableUnit(size_t id, const string &name, const std::initializer_list<FuncInitObject*> &func)
-			: IdentTableUnit(id, name) {
+			: IdentTableUnit_OLD(id, name) {
 			for (auto *p : func)
 				this->func.push_back(p->get_f());
 			initSignTree();
 		}
-
-		IdentType type() const { return I_Function; }
 
 		size_t size() const { return func.size(); }
 		const FuncObject& operator[](size_t i) const { return func[i]; }
@@ -117,11 +88,11 @@ namespace ICM
 	//=======================================
 	// * Class VarbTable
 	//=======================================
-	class VarbTable
+	class DyVarbTable
 	{
-		using Unit = VarbTableUnit;
+		using Unit = DyVarbTableUnit;
 	public:
-		VarbTable() {
+		DyVarbTable() {
 			data.insert("", Unit());
 		}
 		template <typename... Args>
@@ -211,9 +182,9 @@ namespace ICM
 		SerialBijectionMap<string> data;
 	};
 
-
+	extern IdentTable GlobalIdentTable;
 	extern FuncTable GlobalFunctionTable;
-	extern VarbTable GlobalVariableTable;
+	extern DyVarbTable GlobalDyVarbTable;
 	extern BijectionKVMap<string, ICM::Keyword::KeywordID> GlobalKeywordTable;
 
 }

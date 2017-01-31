@@ -14,7 +14,7 @@ namespace ICM
 	{
 		addDefFuncs(GlobalFunctionTable);
 		// TODO : Memory leak
-		GlobalVariableTable.insert("Nil");
+		GlobalDyVarbTable.insert("Nil");
 		//DefVariableTable.insert("NIL", nil);
 		//DefVariableTable.insert("nil", nil);
 		//ObjectPtr nan(new Objects::Identifier("NaN", ObjectPtr(new Objects::Number(Common::Number::Rational(0, 0)))));

@@ -39,6 +39,12 @@ public:
 	_VTy& operator[](size_t id) {
 		return data[id];
 	}
+	const _VTy& get(size_t id) const {
+		return data[id];
+	}
+	_VTy& get(size_t id) {
+		return data[id];
+	}
 	_KTy& getKey(size_t id) {
 		return keymap.getKey(id);
 	}

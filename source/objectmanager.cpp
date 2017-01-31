@@ -149,6 +149,7 @@ namespace ICM
 	ObjectManager GlobalObjectManager;
 	SymbolTable GlobalSymbolTable;
 
+	IdentTable GlobalIdentTable;
 	FuncTable GlobalFunctionTable;
-	VarbTable GlobalVariableTable;
+	DyVarbTable GlobalDyVarbTable;
 }

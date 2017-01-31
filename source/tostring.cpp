@@ -131,10 +131,6 @@ namespace ICM
 	{
 		return TypeBase::to_string(ft);
 	}
-	string to_string(const TypeBase::VariableType& vt)
-	{
-		return TypeBase::to_string(vt);
-	}
 	//=======================================
 	// * AST
 	//=======================================
@@ -145,8 +141,8 @@ namespace ICM
 			return "R{" + std::to_string(element.getRefer()) + "}";
 		else if (element.isKeyword())
 			return "K(" + ICM::to_string(element.getKeyword()) + ")";
-		else if (element.isIdentType(I_Variable))
-			return "V(" + getVariable(element).getName() + ")";
+		else if (element.isIdentType(I_DyVarb))
+			return "V(" + getDyVarb(element).getName() + ")";
 		else if (element.isIdentType(I_Function))
 			return "F(" + getFunction(element).getName() + ")";
 		else if (element.isIdent())
@@ -161,8 +157,8 @@ namespace ICM
 			return "{" + std::to_string(element.getRefer()) + "}";
 		else if (element.isKeyword())
 			return ICM::to_string(element.getKeyword());
-		else if (element.isIdentType(I_Variable))
-			return getVariable(element).getName();
+		else if (element.isIdentType(I_DyVarb))
+			return getDyVarb(element).getName();
 		else if (element.isIdentType(I_Function))
 			return getFunction(element).getName();
 		else if (element.isIdent())

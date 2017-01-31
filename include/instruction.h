@@ -64,7 +64,6 @@ namespace ICM
 	namespace Instruction
 	{
 		using FuncType = TypeBase::FunctionType;
-		using VarbType = TypeBase::VariableType;
 
 		class InstructionData
 		{
@@ -169,13 +168,13 @@ namespace ICM
 
 			struct Assign : public InstructionData
 			{
-				Assign(Instruction inst, VarbTableUnit &VTU, AST::Element &elt)
+				Assign(Instruction inst, DyVarbTableUnit &VTU, AST::Element &elt)
 					: InstructionData(inst), VTU(VTU.getID()), Data(elt) {}
 				size_t VTU;
 				AST::Element Data;
 
 			private:
-				string getToString() const { return GlobalVariableTable[VTU].getName() + ", " + ICM::to_string(Data); }
+				string getToString() const { return GlobalDyVarbTable[VTU].getName() + ", " + ICM::to_string(Data); }
 			};
 
 			struct CopySingle : public InstDataBase<cpys>
@@ -218,7 +217,7 @@ namespace ICM
 				Inc(size_t VTU) : VTU(VTU) {}
 				size_t VTU;
 			private:
-				string getToString() const { return GlobalVariableTable[VTU].getName(); }
+				string getToString() const { return GlobalDyVarbTable[VTU].getName(); }
 			};
 
 			struct Compare : public InstructionData
@@ -228,7 +227,7 @@ namespace ICM
 				size_t VTU;
 				AST::Element Data;
 			protected:
-				string getToString() const { return GlobalVariableTable[VTU].getName() + ", " + ICM::to_string(Data); }
+				string getToString() const { return GlobalDyVarbTable[VTU].getName() + ", " + ICM::to_string(Data); }
 			};
 			struct JumpCompare : public Compare
 			{

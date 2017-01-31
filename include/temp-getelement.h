@@ -24,9 +24,9 @@ namespace ICM
 		assert(elt.isIdent());
 		return GlobalIdentMap.getKey(elt.getIndex());
 	}
-	inline VarbTableUnit& getVariable(const AST::Element &elt) {
-		assert(elt.isIdentType(I_Variable));
-		return GlobalVariableTable[elt.getIndex()];
+	inline DyVarbTableUnit& getDyVarb(const AST::Element &elt) {
+		assert(elt.isIdentType(I_DyVarb));
+		return GlobalDyVarbTable[elt.getIndex()];
 	}
 	inline FuncTableUnit& getFunction(const AST::Element &elt) {
 		assert(elt.isIdentType(I_Function));

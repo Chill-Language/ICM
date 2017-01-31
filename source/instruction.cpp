@@ -125,7 +125,7 @@ namespace ICM
 					if (e.isRefer()) {
 						createNode(GetRefer(e), e);
 					}
-					else if (e.isData() || e.isIdentType(I_Function) || e.isIdentType(I_Variable)) {
+					else if (e.isData() || e.isIdentType(I_Function) || e.isIdentType(I_DyVarb)) {
 						InstList.push(new Insts::Store(e));
 					}
 					else if (isKey(e, break_)) {
@@ -230,15 +230,15 @@ namespace ICM
 				Element &ve = node[3];
 				Element &Rdo = node[4];
 
-				size_t id = getVariable(I).getID();
-				GlobalVariableTable[id].setData(Objects::Number(0));
-				InstList.push(new Insts::Assign(let, GlobalVariableTable[id], vb));
+				size_t id = getDyVarb(I).getID();
+				GlobalDyVarbTable[id].setData(Objects::Number(0));
+				InstList.push(new Insts::Assign(let, GlobalDyVarbTable[id], vb));
 				size_t index = NextInstID();
 				createReferNode(Rdo);
 
 				Element ele;
-				if (ve.isIdentType(I_Variable))
-					ele = Element::Data(getVariable(ve).getData()->type, GlobalElementPool.insert(getVariable(ve).getData()));
+				if (ve.isIdentType(I_DyVarb))
+					ele = Element::Data(getDyVarb(ve).getData()->type, GlobalElementPool.insert(getDyVarb(ve).getData()));
 				else {
 					createReferNode(ve);
 					ele = ve;
@@ -258,10 +258,10 @@ namespace ICM
 			// (let/set/ref/cpy I x y R{n}), (ref/cpy I)
 			bool createNodeLSRC(Node &node, Element &refelt) {
 				if (node.size() == 3) {
-					assert(node[1].isIdentType(I_Variable));
+					assert(node[1].isIdentType(I_DyVarb));
 					Element &ident = node[1];
 					Element &value = node[2];
-					VarbTableUnit& vtu = getVariable(ident);
+					DyVarbTableUnit& vtu = getDyVarb(ident);
 					ICM::Instruction::Instruction inst;
 					switch (node[0].getKeyword()) {
 					case Keyword::let_: inst = let; break;

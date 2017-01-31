@@ -271,16 +271,23 @@ namespace ICM
 		private:
 			void setIdentifier(Element &element) {
 				const string &name = getIdent(element);
-				size_t index;
-				if ((index = GlobalVariableTable.find(name))) {
-					element = Element::Identifier(I_Variable, index);
+				size_t index = GlobalIdentTable.find(name);
+				/*if (index != GlobalIdentTable.size()) {
+
+				}
+				else {
+					size_t id = GlobalDyVarbTable.insert(name);
+					element = Element::Identifier(I_DyVarb, id);
+				}*/
+				if ((index = GlobalDyVarbTable.find(name))) {
+					element = Element::Identifier(I_DyVarb, index);
 				}
 				else if ((index = GlobalFunctionTable.find(name))) {
 					element = Element::Identifier(I_Function, index);
 				}
 				else {
-					size_t id = GlobalVariableTable.insert(name);
-					element = Element::Identifier(I_Variable, id);
+					size_t id = GlobalDyVarbTable.insert(name);
+					element = Element::Identifier(I_DyVarb, id);
 				}
 			}
 			void setKeyword(Element &element) {
