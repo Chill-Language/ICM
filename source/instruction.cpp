@@ -230,15 +230,15 @@ namespace ICM
 				Element &ve = node[3];
 				Element &Rdo = node[4];
 
-				size_t id = getDyVarb(I).getID();
+				size_t id = getIdentID(I);
 				setDyVarbData(id, Objects::Number(0));
-				InstList.push(new Insts::Assign(let, getDyVarbTableUnit(id), vb));
+				InstList.push(new Insts::Assign(let, id, vb));
 				size_t index = NextInstID();
 				createReferNode(Rdo);
 
 				Element ele;
 				if (ve.isIdentType(I_DyVarb))
-					ele = Element::Data(getDyVarb(ve).getData()->type, GlobalElementPool.insert(getDyVarb(ve).getData()));
+					ele = Element::Data(getDyVarbData(ve)->type, GlobalElementPool.insert(getDyVarbData(ve)));
 				else {
 					createReferNode(ve);
 					ele = ve;
@@ -261,7 +261,7 @@ namespace ICM
 					assert(node[1].isIdentType(I_DyVarb));
 					Element &ident = node[1];
 					Element &value = node[2];
-					DyVarbTableUnit& vtu = getDyVarb(ident);
+					size_t ident_id = getIdentID(ident);
 					ICM::Instruction::Instruction inst;
 					switch (node[0].getKeyword()) {
 					case Keyword::let_: inst = let; break;
@@ -270,7 +270,7 @@ namespace ICM
 					default: break;
 					}
 					createReferNode(value);
-					InstList.push(new Insts::Assign(inst, vtu, value));
+					InstList.push(new Insts::Assign(inst, ident_id, value));
 				}
 				else {
 					Element &value = node[1];

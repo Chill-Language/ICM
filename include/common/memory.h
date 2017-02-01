@@ -6,9 +6,10 @@
 #ifndef _SYSTEM_MEMORY_H_
 #define _SYSTEM_MEMORY_H_
 #include "macro.h"
-#include <xutility>
-#include <stdint.h>
+#include <utility>
+#include <cstdint>
 #include <cstdlib>
+#include <cstring>
 
 SYSTEM BEGIN
 #if _ITERATOR_DEBUG_LEVEL != 0

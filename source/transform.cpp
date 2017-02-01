@@ -272,7 +272,6 @@ namespace ICM
 			void setIdentifier(Element &element) {
 				const string &name = getIdent(element);
 				size_t index = GlobalIdentTable.find(name);
-#if _USE_IDENTTABLE_
 				if (index != GlobalIdentTable.size()) {
 					IdentTableUnit &itu = GlobalIdentTable.at(index);
 					setIdent(element, itu.type, index);
@@ -281,35 +280,14 @@ namespace ICM
 					index = GlobalIdentTable.insert(name, I_DyVarb);
 					setIdent(element, I_DyVarb, index);
 				}
-#else
-				if ((index = GlobalDyVarbTable.find(name))) {
-					setDyVarb(element, index);
-				}
-				else if ((index = GlobalFunctionTable.find(name))) {
-					setFunction(element, index);
-				}
-				else {
-					size_t id = GlobalDyVarbTable.insert(name);
-					setDyVarb(element, id);
-				}
-#endif
 			}
 			void setKeyword(Element &element) {
-#if _USE_IDENTTABLE_
 				if (isKey(element, list_)) {
 					setIdent(element, I_Function, GlobalIdentTable.find("list"));
 				}
 				else if (isKey(element, disp_)) {
 					setIdent(element, I_Function, GlobalIdentTable.find("disp"));
 				}
-#else
-				if (isKey(element, list_)) {
-					setFunction(element, GlobalFunctionTable["list"].getID());
-				}
-				else if (isKey(element, disp_)) {
-					setFunction(element, GlobalFunctionTable["disp"].getID());
-				}
-#endif
 			}
 		};
 

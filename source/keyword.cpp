@@ -16,21 +16,19 @@ namespace ICM
 	{
 		addDefFuncs(GlobalFunctionTable);
 		//
-#if _USE_IDENTTABLE_
-		for (const auto &var : GlobalFunctionTable.keymap) {
+		for (const auto &var : GlobalFunctionTable) {
 			size_t id = GlobalIdentTable.insert(var.first, I_Function);
 			GlobalIdentTable.at(id).FunctionIndex = GlobalFunctionTable.find(var.first);
 		}
 		size_t id = GlobalIdentTable.insert("Nil", I_DyVarb);
-		GlobalIdentTable.at(id).DyVarb.setData(Object(T_Nil));
-#else
+		setDyVarbData(id, Object(T_Nil));
+
 		// TODO : Memory leak
-		GlobalDyVarbTable.insert("Nil");
+		//GlobalDyVarbTable.insert("Nil");
 		//DefVariableTable.insert("NIL", nil);
 		//DefVariableTable.insert("nil", nil);
 		//ObjectPtr nan(new Objects::Identifier("NaN", ObjectPtr(new Objects::Number(Common::Number::Rational(0, 0)))));
 		//DefVariableTable.insert("NaN", nan);
-#endif
 	}
 
 	BijectionKVMap<string, Keyword::KeywordID> GlobalKeywordTable = {

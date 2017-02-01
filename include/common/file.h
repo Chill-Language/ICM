@@ -7,6 +7,7 @@
 #define _SYSTEM_FILE_H_
 #include "macro.h"
 #include "charptr.h"
+#include "prints.h"
 #include <cstdio>
 #include <cstring>
 #include <string>

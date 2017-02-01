@@ -13,17 +13,19 @@ SYSTEM BEGIN
 namespace Convert
 {
 	// Format
-	template <typename T> inline constexpr char* format();
-	template <> inline constexpr char* format<int>() { return "%d"; }
-	template <> inline constexpr char* format<long>() { return "%ld"; }
-	template <> inline constexpr char* format<long long>() { return "%lld"; }
-	template <> inline constexpr char* format<unsigned>() { return "%u"; }
-	template <> inline constexpr char* format<unsigned long>() { return "%lu"; }
-	template <> inline constexpr char* format<unsigned long long>() { return "%llu"; }
-	template <> inline constexpr char* format<float>() { return "%f"; }
-	template <> inline constexpr char* format<double>() { return "%f"; }
-	template <> inline constexpr char* format<long double>() { return "%Lf"; }
-	template <> inline constexpr char* format<char>() { return "%c"; }
+	template <typename T> struct Format;
+	template <> struct Format<int> { static constexpr char text[] = "%d"; };
+	template <> struct Format<long> { static constexpr char text[] = "%ld"; };
+	template <> struct Format<long long> { static constexpr char text[] = "%lld"; };
+	template <> struct Format<unsigned> { static constexpr char text[] = "%u"; };
+	template <> struct Format<unsigned long> { static constexpr char text[] = "%lu"; };
+	template <> struct Format<unsigned long long> { static constexpr char text[] = "%llu"; };
+	template <> struct Format<float> { static constexpr char text[] = "%f"; };
+	template <> struct Format<double> { static constexpr char text[] = "%f"; };
+	template <> struct Format<long double> { static constexpr char text[] = "%Lf"; };
+	template <> struct Format<char> { static constexpr char text[] = "%c"; };
+
+	template <typename T> inline constexpr char* format() { return Format<T>::text; }
 
 	// To String
 	//   String & const char*
@@ -131,7 +133,7 @@ namespace Output
 		print(first);
 		print(rest...);
 	}
-	
+
 	// Pintln
 	inline void println()
 	{
@@ -150,7 +152,7 @@ namespace Output
 		print(rest...);
 		println();
 	}
-	
+
 	// PutError
 	inline void putError(const char *msg)
 	{

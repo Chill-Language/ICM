@@ -16,7 +16,7 @@ namespace ICM
 				return new Object(getData(element));
 			}
 			else if (element.isIdentType(I_DyVarb)) {
-				return getDyVarb(element).getData();
+				return getDyVarbData(element);
 			}
 			else if (element.isRefer()) {
 				return TempResult[element.getRefer()];
@@ -166,13 +166,13 @@ namespace ICM
 					else if (inst.Data.isIdentType(I_DyVarb)) {
 						switch (Inst->inst()) {
 						case let:
-							setDyVarbData(inst.VTU, getDyVarb(inst.Data).getData());
+							setDyVarbData(inst.VTU, getDyVarbData(inst.Data));
 							break;
 						case cpy:
-							setDyVarbData(inst.VTU, getDyVarb(inst.Data).getData()->clone());
+							setDyVarbData(inst.VTU, getDyVarbData(inst.Data)->clone());
 							break;
 						case ref:
-							setDyVarbData(inst.VTU, getDyVarb(inst.Data).getData()); // TODO
+							setDyVarbData(inst.VTU, getDyVarbData(inst.Data)); // TODO
 							break;
 						}
 					}
@@ -265,7 +265,7 @@ namespace ICM
 					Insts::PrintIdent &inst = static_cast<Insts::PrintIdent&>(*Inst);
 					for (AST::Element &e : inst.Args) {
 						if (e.isIdentType(I_DyVarb))
-							print(getDyVarb(e).getName(), "(");
+							print(getIdentName(e), "(");
 						Object *op = getObject(e);
 						if (op)
 							print(getObject(e)->to_string());

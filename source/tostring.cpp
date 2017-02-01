@@ -142,7 +142,7 @@ namespace ICM
 		else if (element.isKeyword())
 			return "K(" + ICM::to_string(element.getKeyword()) + ")";
 		else if (element.isIdentType(I_DyVarb))
-			return "V(" + getDyVarb(element).getName() + ")";
+			return "V(" + getIdentName(element) + ")";
 		else if (element.isIdentType(I_Function))
 			return "F(" + getFunction(element).getName() + ")";
 		else if (element.isIdent())
@@ -158,7 +158,7 @@ namespace ICM
 		else if (element.isKeyword())
 			return ICM::to_string(element.getKeyword());
 		else if (element.isIdentType(I_DyVarb))
-			return getDyVarb(element).getName();
+			return getIdentName(element);
 		else if (element.isIdentType(I_Function))
 			return getFunction(element).getName();
 		else if (element.isIdent())

@@ -170,13 +170,13 @@ namespace ICM
 
 			struct Assign : public InstructionData
 			{
-				Assign(Instruction inst, DyVarbTableUnit &VTU, AST::Element &elt)
-					: InstructionData(inst), VTU(VTU.getID()), Data(elt) {}
+				Assign(Instruction inst, size_t VTUID, AST::Element &elt)
+					: InstructionData(inst), VTU(VTUID), Data(elt) {}
 				size_t VTU;
 				AST::Element Data;
 
 			private:
-				string getToString() const { return getDyVarbName(VTU) + ", " + ICM::to_string(Data); }
+				string getToString() const { return getIdentName(VTU) + ", " + ICM::to_string(Data); }
 			};
 
 			struct CopySingle : public InstDataBase<cpys>
@@ -219,7 +219,7 @@ namespace ICM
 				Inc(size_t VTU) : VTU(VTU) {}
 				size_t VTU;
 			private:
-				string getToString() const { return getDyVarbName(VTU); }
+				string getToString() const { return getIdentName(VTU); }
 			};
 
 			struct Compare : public InstructionData
@@ -229,7 +229,7 @@ namespace ICM
 				size_t VTU;
 				AST::Element Data;
 			protected:
-				string getToString() const { return getDyVarbName(VTU) + ", " + ICM::to_string(Data); }
+				string getToString() const { return getIdentName(VTU) + ", " + ICM::to_string(Data); }
 			};
 			struct JumpCompare : public Compare
 			{

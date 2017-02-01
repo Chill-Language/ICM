@@ -151,5 +151,4 @@ namespace ICM
 
 	IdentTable GlobalIdentTable;
 	FuncTable GlobalFunctionTable;
-	DyVarbTable GlobalDyVarbTable;
 }

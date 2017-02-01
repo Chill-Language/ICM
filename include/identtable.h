@@ -19,8 +19,8 @@ namespace ICM
 		};*/
 
 		// TODO
-		DyVarbTableUnit StVarb;
-		DyVarbTableUnit DyVarb;
+		Object StVarb;
+		Object DyVarb;
 		size_t FunctionIndex;
 	};
 
@@ -43,6 +43,9 @@ namespace ICM
 		}
 		size_t size() const {
 			return IndexTable::size();
+		}
+		const string& getName(size_t index) const {
+			return IndexTable::getKey(index);
 		}
 
 	};

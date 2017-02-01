@@ -2,7 +2,7 @@
 namespace ICM
 {
 	enum IdentType {
-		I_Void,
+		I_Void = 0,
 		// Data
 		I_Data,
 		// Struct
