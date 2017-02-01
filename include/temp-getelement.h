@@ -25,8 +25,12 @@ namespace ICM
 		return Compiler::GlobalIdentNameMap.getKey(elt.getIndex());
 	}
 #if _USE_IDENTTABLE_
+	inline DyVarbTableUnit& getDyVarb(const AST::Element &elt);
 	inline void setIdent(AST::Element &elt, IdentType type, size_t index) {
 		elt = AST::Element::Identifier(type, index);
+		if (type == I_DyVarb) {
+			getDyVarb(elt).setID(index);
+		}
 	}
 	inline DyVarbTableUnit& getDyVarb(const AST::Element &elt) {
 		assert(elt.isIdentType(I_DyVarb));
@@ -35,6 +39,23 @@ namespace ICM
 	inline FuncTableUnit& getFunction(const AST::Element &elt) {
 		assert(elt.isIdentType(I_Function));
 		return GlobalFunctionTable[GlobalIdentTable.at(elt.getIndex()).FunctionIndex];
+	}
+
+	inline DyVarbTableUnit& getDyVarbTableUnit(size_t ident_index) {
+		assert(GlobalIdentTable.at(ident_index).type == I_DyVarb);
+		return GlobalIdentTable.at(ident_index).DyVarb;
+	}
+	inline void setDyVarbData(size_t ident_index, Object &&data) {
+		getDyVarbTableUnit(ident_index).setData(&data);
+	}
+	inline void setDyVarbData(size_t ident_index, Object *data) {
+		getDyVarbTableUnit(ident_index).setData(data);
+	}
+	inline Object* getDyVarbData(size_t ident_index) {
+		return getDyVarbTableUnit(ident_index).getData();
+	}
+	inline string getDyVarbName(size_t ident_index) {
+		return getDyVarbTableUnit(ident_index).getName();
 	}
 #else
 	inline void setDyVarb(AST::Element &elt, size_t index) {
@@ -50,6 +71,22 @@ namespace ICM
 	inline FuncTableUnit& getFunction(const AST::Element &elt) {
 		assert(elt.isIdentType(I_Function));
 		return GlobalFunctionTable[elt.getIndex()];
+	}
+
+	inline DyVarbTableUnit& getDyVarbTableUnit(size_t ident_index) {
+		return GlobalDyVarbTable[ident_index];
+	}
+	inline void setDyVarbData(size_t ident_index, Object &&data) {
+		getDyVarbTableUnit(ident_index).setData(&data);
+	}
+	inline void setDyVarbData(size_t ident_index, Object *data) {
+		getDyVarbTableUnit(ident_index).setData(data);
+	}
+	inline Object* getDyVarbData(size_t ident_index) {
+		return getDyVarbTableUnit(ident_index).getData();
+	}
+	inline string getDyVarbName(size_t ident_index) {
+		return getDyVarbTableUnit(ident_index).getName();
 	}
 #endif
 }

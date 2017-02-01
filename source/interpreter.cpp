@@ -157,25 +157,27 @@ namespace ICM
 				case cpy:
 				case ref: {
 					Insts::Assign &inst = static_cast<Insts::Assign&>(*Inst);
-					if (inst.Data.isData())
-						GlobalDyVarbTable[inst.VTU].setData(getData(inst.Data));
-					else if (inst.Data.isRefer())
-						GlobalDyVarbTable[inst.VTU].setData(TempResult[inst.Data.getRefer()]);
+					if (inst.Data.isData()) {
+						setDyVarbData(inst.VTU, getData(inst.Data));
+					}
+					else if (inst.Data.isRefer()) {
+						setDyVarbData(inst.VTU, TempResult[inst.Data.getRefer()]);
+					}
 					else if (inst.Data.isIdentType(I_DyVarb)) {
 						switch (Inst->inst()) {
 						case let:
-							GlobalDyVarbTable[inst.VTU].setData(getDyVarb(inst.Data).getData());
+							setDyVarbData(inst.VTU, getDyVarb(inst.Data).getData());
 							break;
 						case cpy:
-							GlobalDyVarbTable[inst.VTU].setData(getDyVarb(inst.Data).getData()->clone());
+							setDyVarbData(inst.VTU, getDyVarb(inst.Data).getData()->clone());
 							break;
 						case ref:
-							GlobalDyVarbTable[inst.VTU].setData(getDyVarb(inst.Data).getData()); // TODO
+							setDyVarbData(inst.VTU, getDyVarb(inst.Data).getData()); // TODO
 							break;
 						}
 					}
 					else if (inst.Data.isIdentType(I_Function)) {
-						GlobalDyVarbTable[inst.VTU].setData(new Objects::Function(getFunction(inst.Data).getID()));
+						setDyVarbData(inst.VTU, new Objects::Function(getFunction(inst.Data).getID()));
 					}
 					else
 						println("Error in Assign.");
@@ -222,7 +224,7 @@ namespace ICM
 				}
 				case inc: {
 					Insts::Inc &inst = static_cast<Insts::Inc&>(*Inst);
-					GlobalDyVarbTable[inst.VTU].getData()->dat<T_Number>() += 1;
+					getDyVarbData(inst.VTU)->dat<T_Number>() += 1;
 					break;
 				}
 				case jpsm:
@@ -230,7 +232,7 @@ namespace ICM
 				case jpla:
 				case jple: {
 					Insts::JumpCompare &inst = static_cast<Insts::JumpCompare&>(*Inst);
-					const auto &n1 = GlobalDyVarbTable[inst.VTU].getData()->dat<T_Number>();
+					const auto &n1 = getDyVarbData(inst.VTU)->dat<T_Number>();
 					const auto &n2 = getObject(inst.Data)->dat<T_Number>();
 					bool r;
 					switch (Inst->inst()) {

@@ -278,7 +278,7 @@ namespace ICM
 					setIdent(element, itu.type, index);
 				}
 				else {
-					size_t id = GlobalIdentTable.insert(name, I_DyVarb);
+					index = GlobalIdentTable.insert(name, I_DyVarb);
 					setIdent(element, I_DyVarb, index);
 				}
 #else
@@ -296,6 +296,12 @@ namespace ICM
 			}
 			void setKeyword(Element &element) {
 #if _USE_IDENTTABLE_
+				if (isKey(element, list_)) {
+					setIdent(element, I_Function, GlobalIdentTable.find("list"));
+				}
+				else if (isKey(element, disp_)) {
+					setIdent(element, I_Function, GlobalIdentTable.find("disp"));
+				}
 #else
 				if (isKey(element, list_)) {
 					setFunction(element, GlobalFunctionTable["list"].getID());

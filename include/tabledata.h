@@ -5,7 +5,7 @@
 #include "keyword.h"
 #include "identifier.h"
 
-#define _USE_IDENTTABLE_ false
+#define _USE_IDENTTABLE_ true
 
 namespace ICM
 {
@@ -19,6 +19,7 @@ namespace ICM
 		IdentTableUnit_OLD(size_t id, const string &name)
 			: id(id), name(name) {}
 
+		void setID(size_t id) { this->id = id; }
 		size_t getID() const { return id; }
 		const string& getName() const { return name; }
 

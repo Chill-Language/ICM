@@ -231,8 +231,8 @@ namespace ICM
 				Element &Rdo = node[4];
 
 				size_t id = getDyVarb(I).getID();
-				GlobalDyVarbTable[id].setData(Objects::Number(0));
-				InstList.push(new Insts::Assign(let, GlobalDyVarbTable[id], vb));
+				setDyVarbData(id, Objects::Number(0));
+				InstList.push(new Insts::Assign(let, getDyVarbTableUnit(id), vb));
 				size_t index = NextInstID();
 				createReferNode(Rdo);
 

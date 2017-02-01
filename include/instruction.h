@@ -5,6 +5,8 @@
 #include "tabledata.h"
 #include "typebase.h"
 
+#include "temp-getelement.h"
+
 namespace ICM
 {
 	namespace Instruction
@@ -174,7 +176,7 @@ namespace ICM
 				AST::Element Data;
 
 			private:
-				string getToString() const { return GlobalDyVarbTable[VTU].getName() + ", " + ICM::to_string(Data); }
+				string getToString() const { return getDyVarbName(VTU) + ", " + ICM::to_string(Data); }
 			};
 
 			struct CopySingle : public InstDataBase<cpys>
@@ -217,7 +219,7 @@ namespace ICM
 				Inc(size_t VTU) : VTU(VTU) {}
 				size_t VTU;
 			private:
-				string getToString() const { return GlobalDyVarbTable[VTU].getName(); }
+				string getToString() const { return getDyVarbName(VTU); }
 			};
 
 			struct Compare : public InstructionData
@@ -227,7 +229,7 @@ namespace ICM
 				size_t VTU;
 				AST::Element Data;
 			protected:
-				string getToString() const { return GlobalDyVarbTable[VTU].getName() + ", " + ICM::to_string(Data); }
+				string getToString() const { return getDyVarbName(VTU) + ", " + ICM::to_string(Data); }
 			};
 			struct JumpCompare : public Compare
 			{
