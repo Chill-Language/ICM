@@ -509,8 +509,8 @@ namespace ICM
 		DefFuncTable.insert(">", LST{ new Comp::NumLargeL() });
 		DefFuncTable.insert(">=", LST{ new Comp::NumLargeE() });
 
-		DefFuncTable.insert("inc", LST{ new Calc::Inc() });
-		DefFuncTable.insert("dec", LST{ new Calc::Dec() });
+		//DefFuncTable.insert("inc", LST{ new Calc::Inc() });
+		//DefFuncTable.insert("dec", LST{ new Calc::Dec() });
 		DefFuncTable.insert("++", "inc");
 		DefFuncTable.insert("--", "dec");
 

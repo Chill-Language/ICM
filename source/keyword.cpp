@@ -21,7 +21,7 @@ namespace ICM
 			GlobalIdentTable.at(id).FunctionIndex = GlobalFunctionTable.find(var.first);
 		}
 		size_t id = GlobalIdentTable.insert("Nil", I_DyVarb);
-		setDyVarbData(id, Object(T_Nil));
+		setDyVarbData(id, &Static.Nil);
 
 		// TODO : Memory leak
 		//GlobalDyVarbTable.insert("Nil");

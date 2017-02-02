@@ -8,7 +8,9 @@ namespace ICM
 	struct IdentTableUnit
 	{
 		IdentTableUnit(IdentType type = I_Void, size_t index = 0)
-			: type(type), index(index) {}
+			: type(type), index(index) {
+			DyVarb = &(Static.Nil);
+		}
 
 		IdentType type;
 		size_t index;

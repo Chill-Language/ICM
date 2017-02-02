@@ -231,7 +231,7 @@ namespace ICM
 				Element &Rdo = node[4];
 
 				size_t id = getIdentID(I);
-				setDyVarbData(id, Objects::Number(0));
+				setDyVarbData(id, new Objects::Number(0)); // TODO
 				InstList.push(new Insts::Assign(let, id, vb));
 				size_t index = NextInstID();
 				createReferNode(Rdo);

@@ -48,10 +48,6 @@ namespace ICM
 		assert(GlobalIdentTable.at(ident_index).type == I_DyVarb);
 		return GlobalIdentTable.at(ident_index).DyVarb;
 	}
-	inline void setDyVarbData(size_t ident_index, Object &&data) {
-		assert(GlobalIdentTable.at(ident_index).type == I_DyVarb);
-		GlobalIdentTable.at(ident_index).DyVarb = new Object(data);
-	}
 	inline void setDyVarbData(size_t ident_index, Object *data) {
 		assert(GlobalIdentTable.at(ident_index).type == I_DyVarb);
 		GlobalIdentTable.at(ident_index).DyVarb = data;

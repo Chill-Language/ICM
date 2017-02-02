@@ -158,7 +158,7 @@ namespace ICM
 				case ref: {
 					Insts::Assign &inst = static_cast<Insts::Assign&>(*Inst);
 					if (inst.Data.isData()) {
-						setDyVarbData(inst.VTU, getData(inst.Data));
+						setDyVarbData(inst.VTU, new Object(getData(inst.Data))); // TODO
 					}
 					else if (inst.Data.isRefer()) {
 						setDyVarbData(inst.VTU, TempResult[inst.Data.getRefer()]);

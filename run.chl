@@ -155,11 +155,11 @@ else
 	(loop
 		(print i "*" j "=" (* i j) " ")
 		(if (= i j) break)
-		(inc i)
+		(let i (+ i 1))
 	)
 	(println)
 	(if (= j 9) break)
-	(inc j)
+	(let j (+ j 1))
 )
 
 ; Test 17
@@ -169,10 +169,10 @@ else
 	(let i 1)
 	(while (<= i j)
 		(print i "*" j "=" (* i j) " ")
-		(inc i)
+		(let i (+ i 1))
 	)
 	(println)
-	(inc j)
+	(let j (+ j 1))
 )
 
 ; Test 18
