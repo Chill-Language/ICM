@@ -205,3 +205,32 @@ else
 (p (type 5)) ; Number
 (let a 5) (p (type a)) ; Number
 (cpy a 5) (p (type a)) ; Number
+
+; Test 21
+(println "----------21----------")
+(let a [])
+(let b 5)
+(push a b)
+(let b 50)
+(push a b)
+(println a) ; [5 50]
+
+; Test 22
+(println "----------22----------")
+(let arr [2 3])
+(let count 5)
+
+(Config.SetPrintIntervalTime T)
+(while (< count 100)
+	(let b T)
+	(for i in 1 to (- (size arr) 1)
+		(if (= (mod count (at arr i)) 0)
+			(let b F)
+			break
+		)
+	)
+	(if b (push arr count))
+	(let count (+ count 2))
+)
+(Config.SetPrintIntervalTime F)
+(println arr)

@@ -65,6 +65,12 @@ namespace ICM
 			size_t size() const {
 				return data.size();
 			}
+			size_t capacity() const {
+				return data.capacity();
+			}
+			void reserve(size_t length) {
+				data.reserve(length);
+			}
 			// Method
 			bool operator==(const ListType &lt) const {
 				return this->data == lt.data;

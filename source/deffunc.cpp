@@ -244,6 +244,41 @@ namespace ICM
 				}
 			};
 
+			class Reserve : public FI
+			{
+				S sign() const {
+					return S({ T_List, T_Number }, T_List); // (L N) -> L
+				}
+				ObjectPtr func(const DataList &list) const {
+					ListType &l = *list[0]->get<T_List>();
+					l.reserve(*list[1]->get<T_Number>());
+					return list[0];
+				}
+			};
+
+			class Capacity : public FI
+			{
+				S sign() const {
+					return S({ T_List }, T_Number); // L -> N
+				}
+				ObjectPtr func(const DataList &list) const {
+					ListType &l = *list[0]->get<T_List>();
+					return ObjectPtr(new Number(NumberType(l.capacity())));
+				}
+			};
+
+			class Push : public FI
+			{
+				S sign() const {
+					return S({ T_List, T_Vary }, T_List); // (L V) -> L
+				}
+				ObjectPtr func(const DataList &list) const {
+					ListType &l = *list[0]->get<T_List>();
+					l.push(list[1]);
+					return list[0];
+				}
+			};
+
 			struct Foreach : public FI
 			{
 			private:
@@ -492,6 +527,9 @@ namespace ICM
 		});
 		DefFuncTable.insert("foreach", LST{ new Lists::Foreach() });
 		DefFuncTable.insert("size", LST{ new Lists::Size() });
+		DefFuncTable.insert("push", LST{ new Lists::Push() });
+		DefFuncTable.insert("reserve", LST{ new Lists::Reserve() });
+		DefFuncTable.insert("capacity", LST{ new Lists::Capacity() });
 		DefFuncTable.insert("swap", LST{ new Lists::Swap() });
 		DefFuncTable.insert("at", LST{ new Lists::At() });
 		DefFuncTable.insert("set", LST{ new Lists::Set() });

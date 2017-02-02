@@ -20,7 +20,7 @@ namespace ICM
 
 		// TODO
 		Object StVarb;
-		Object DyVarb;
+		Object *DyVarb;
 		size_t FunctionIndex;
 	};
 

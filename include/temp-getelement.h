@@ -28,33 +28,41 @@ namespace ICM
 		elt = AST::Element::Identifier(type, index);
 	}
 
-	inline Object* getDyVarbData(size_t ident_index) {
-		assert(GlobalIdentTable.at(ident_index).type == I_DyVarb);
-		return &GlobalIdentTable.at(ident_index).DyVarb;
-	}
-	inline void setDyVarbData(size_t ident_index, Object &&data) {
-		*getDyVarbData(ident_index) = data;
-	}
-	inline void setDyVarbData(size_t ident_index, Object *data) {
-		*getDyVarbData(ident_index) = *data;
-	}
-
-	inline const string& getIdentName(size_t ident_index) {
-		return GlobalIdentTable.getName(ident_index);
-	}
+	// Ident
 
 	inline size_t getIdentID(const AST::Element &elt) {
 		assert(!elt.isIdentType(I_Void));
 		return elt.getIndex();
 	}
+	inline const string& getIdentName(size_t ident_index) {
+		return GlobalIdentTable.getName(ident_index);
+	}
 	inline const string& getIdentName(const AST::Element &elt) {
 		assert(!elt.isIdentType(I_Void));
 		return getIdentName(elt.getIndex());
+	}
+
+	// DyVarb
+
+	inline Object* getDyVarbData(size_t ident_index) {
+		assert(GlobalIdentTable.at(ident_index).type == I_DyVarb);
+		return GlobalIdentTable.at(ident_index).DyVarb;
+	}
+	inline void setDyVarbData(size_t ident_index, Object &&data) {
+		assert(GlobalIdentTable.at(ident_index).type == I_DyVarb);
+		GlobalIdentTable.at(ident_index).DyVarb = new Object(data);
+	}
+	inline void setDyVarbData(size_t ident_index, Object *data) {
+		assert(GlobalIdentTable.at(ident_index).type == I_DyVarb);
+		GlobalIdentTable.at(ident_index).DyVarb = data;
 	}
 	inline Object* getDyVarbData(const AST::Element &elt) {
 		assert(elt.isIdentType(I_DyVarb));
 		return getDyVarbData(elt.getIndex());
 	}
+
+	// Function
+
 	inline FuncTableUnit& getFunction(const AST::Element &elt) {
 		assert(elt.isIdentType(I_Function));
 		return GlobalFunctionTable[GlobalIdentTable.at(elt.getIndex()).FunctionIndex];

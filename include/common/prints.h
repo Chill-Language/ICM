@@ -14,16 +14,16 @@ namespace Convert
 {
 	// Format
 	template <typename T> struct Format;
-	template <> struct Format<int> { static constexpr char text[] = "%d"; };
-	template <> struct Format<long> { static constexpr char text[] = "%ld"; };
-	template <> struct Format<long long> { static constexpr char text[] = "%lld"; };
-	template <> struct Format<unsigned> { static constexpr char text[] = "%u"; };
-	template <> struct Format<unsigned long> { static constexpr char text[] = "%lu"; };
-	template <> struct Format<unsigned long long> { static constexpr char text[] = "%llu"; };
-	template <> struct Format<float> { static constexpr char text[] = "%f"; };
-	template <> struct Format<double> { static constexpr char text[] = "%f"; };
-	template <> struct Format<long double> { static constexpr char text[] = "%Lf"; };
-	template <> struct Format<char> { static constexpr char text[] = "%c"; };
+	template <> struct Format<int> { static constexpr char *text = "%d"; };
+	template <> struct Format<long> { static constexpr char *text = "%ld"; };
+	template <> struct Format<long long> { static constexpr char *text = "%lld"; };
+	template <> struct Format<unsigned> { static constexpr char *text = "%u"; };
+	template <> struct Format<unsigned long> { static constexpr char *text = "%lu"; };
+	template <> struct Format<unsigned long long> { static constexpr char *text = "%llu"; };
+	template <> struct Format<float> { static constexpr char *text = "%f"; };
+	template <> struct Format<double> { static constexpr char *text = "%f"; };
+	template <> struct Format<long double> { static constexpr char *text = "%Lf"; };
+	template <> struct Format<char> { static constexpr char *text = "%c"; };
 
 	template <typename T> inline constexpr char* format() { return Format<T>::text; }
 
