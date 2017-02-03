@@ -135,8 +135,8 @@ namespace ICM
 	// * AST
 	//=======================================
 	string to_string(const AST::Element &element) {
-		if (element.isData())
-			return "D(" + getData(element).to_string_code() + ")";
+		if (element.isLiteral())
+			return "D(" + getLiteral(element).to_string_code() + ")";
 		else if (element.isRefer())
 			return "R{" + std::to_string(element.getRefer()) + "}";
 		else if (element.isKeyword())
@@ -151,8 +151,8 @@ namespace ICM
 			return "UnkonwnElement";
 	}
 	string to_string_2(const AST::Element &element) {
-		if (element.isData())
-			return getData(element).to_string_code();
+		if (element.isLiteral())
+			return getLiteral(element).to_string_code();
 		else if (element.isRefer())
 			return "{" + std::to_string(element.getRefer()) + "}";
 		else if (element.isKeyword())
@@ -188,8 +188,8 @@ namespace ICM
 	}
 	// Old
 	string to_string_old(const AST::Element &element) {
-		if (element.isData())
-			return "D(" + getData(element).to_string() + ")";
+		if (element.isLiteral())
+			return "D(" + getLiteral(element).to_string() + ")";
 		else
 			return "R[" + std::to_string(element.getRefer()) + "]";
 	}

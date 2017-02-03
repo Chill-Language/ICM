@@ -85,18 +85,23 @@ namespace ICM
 				assert(node.front().isKeyword());
 
 				switch (node[0].getKeyword()) {
-				case call_:  return createNodeCall(node, refelt);
-				case do_:    return createNodeDo(node, refelt);
-				case if_:    return createNodeIf(node, refelt);
-				case while_: return createNodeWhile(node, refelt);
-				case loop_:  return createNodeLoop(node, refelt);
-				case for_:   return createNodeFor(node, refelt);
-				case list_:  return createNodeList(node, refelt);
-				case let_:
-				case cpy_:
-				case ref_:   return createNodeLSRC(node, refelt);
-				case p_:     return createNodePrintIdent(node, refelt);
-				default:     return false;
+				case call_:     return createNodeCall(node, refelt);
+				case do_:       return createNodeDo(node, refelt);
+				case if_:       return createNodeIf(node, refelt);
+				case while_:    return createNodeWhile(node, refelt);
+				case loop_:     return createNodeLoop(node, refelt);
+				case for_:      return createNodeFor(node, refelt);
+				case list_:     return createNodeList(node, refelt);
+				case let_:	    
+				case cpy_:	    
+				case ref_:      return createNodeLSRC(node, refelt);
+				case p_:        return createNodePrintIdent(node, refelt);
+				case dim_:      return createNodeDim(node, refelt);
+				case restrict_: return createNodeRestrict(node, refelt);
+				case function_: return false;
+				case define_:   return false;
+				case defun_:    return false;
+				default:        return false;
 				}
 			}
 
@@ -125,7 +130,7 @@ namespace ICM
 					if (e.isRefer()) {
 						createNode(GetRefer(e), e);
 					}
-					else if (e.isData() || e.isIdentType(I_Function) || e.isIdentType(I_DyVarb)) {
+					else if (e.isLiteral() || e.isIdentType(I_Function) || e.isIdentType(I_DyVarb)) {
 						InstList.push(new Insts::Store(e));
 					}
 					else if (isKey(e, break_)) {
@@ -238,7 +243,7 @@ namespace ICM
 
 				Element ele;
 				if (ve.isIdentType(I_DyVarb))
-					ele = Element::Data(getDyVarbData(ve)->type, GlobalElementPool.insert(getDyVarbData(ve)));
+					ele = Element::Literal(getDyVarbData(ve)->type, GlobalElementPool.insert(getDyVarbData(ve)));
 				else {
 					createReferNode(ve);
 					ele = ve;
@@ -278,6 +283,28 @@ namespace ICM
 					InstList.push(new Insts::CopySingle(value));
 					refelt.setRefer(CurrInstID());
 				}
+				return true;
+			}
+			bool createNodeDim(Node &node, Element &refelt) {
+				// TODO
+				assert(node.size() == 3);
+				assert(node[1].isIdentType(I_StVarb));
+				assert(node[2].isIdentType(I_Type));
+				Element &ident = node[1];
+				Element &type = node[2];
+				size_t ident_id = getIdentID(ident);
+				InstList.push(new Insts::Assign(dim, ident_id, type));
+				return true;
+			}
+			bool createNodeRestrict(Node &node, Element &refelt) {
+				// TODO
+				assert(node.size() == 3);
+				assert(node[1].isIdentType(I_DyVarb));
+				assert(node[2].isIdentType(I_Type));
+				Element &ident = node[1];
+				Element &type = node[2];
+				size_t ident_id = getIdentID(ident);
+				InstList.push(new Insts::Assign(rest, ident_id, type));
 				return true;
 			}
 			// (list ...)

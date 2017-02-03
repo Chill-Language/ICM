@@ -12,8 +12,8 @@ namespace ICM
 			: InstList(InstList), TempResult(InstList.size(), &Static.Null) {}
 
 		Object* getObject(const AST::Element &element) {
-			if (element.isData()) {
-				return new Object(getData(element));
+			if (element.isLiteral()) {
+				return new Object(getLiteral(element));
 			}
 			else if (element.isRefer()) {
 				return TempResult[element.getRefer()];
@@ -154,8 +154,8 @@ namespace ICM
 				case cpy:
 				case ref: {
 					Insts::Assign &inst = static_cast<Insts::Assign&>(*Inst);
-					if (inst.Data.isData()) {
-						setDyVarbData(inst.VTU, new Object(getData(inst.Data))); // TODO
+					if (inst.Data.isLiteral()) {
+						setDyVarbData(inst.VTU, new Object(getLiteral(inst.Data))); // TODO
 					}
 					else if (inst.Data.isRefer()) {
 						setDyVarbData(inst.VTU, TempResult[inst.Data.getRefer()]);
@@ -173,11 +173,20 @@ namespace ICM
 							break;
 						}
 					}
-					else if (inst.Data.isIdentType(I_Function)) {
-						setDyVarbData(inst.VTU, new Objects::Function(getFunction(inst.Data).getID()));
+					else if (inst.Data.isIdent()) {
+						setDyVarbData(inst.VTU, getIdentData(inst.Data));
 					}
 					else
 						println("Error in Assign.");
+					break;
+				}
+				case dim: {
+					Insts::Assign &inst = static_cast<Insts::Assign&>(*Inst);
+					break;
+				}
+				case rest: {
+					Insts::Assign &inst = static_cast<Insts::Assign&>(*Inst);
+					setDyVarbRestType(inst.VTU, getType(inst.Data));
 					break;
 				}
 				case cpys: {

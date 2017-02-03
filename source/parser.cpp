@@ -288,17 +288,17 @@ namespace ICM
 		{
 			switch (type) {
 			case MT_Boolean:
-				return AST::Element::Data(T_Boolean, Compiler::GlobalElementPool.setBoolean(str == "T"));
+				return AST::Element::Literal(T_Boolean, Compiler::GlobalElementPool.setBoolean(str == "T"));
 			case MT_Number:
-				return AST::Element::Data(T_Number, Compiler::GlobalElementPool.setNumber((int_t)(Common::Number::to_rational(str.c_str()).getNum() / Common::Number::to_rational(str.c_str()).getDen())));
+				return AST::Element::Literal(T_Number, Compiler::GlobalElementPool.setNumber((int_t)(Common::Number::to_rational(str.c_str()).getNum() / Common::Number::to_rational(str.c_str()).getDen())));
 			case MT_String:
-				return AST::Element::Data(T_String, Compiler::GlobalElementPool.setString(str.c_str(), str.size() + 1));
+				return AST::Element::Literal(T_String, Compiler::GlobalElementPool.setString(str.c_str(), str.size() + 1));
 			case MT_Keyword:
 				return AST::Element::Keyword(GlobalKeywordTable.getValue(str));
 			case MT_Identifier:
 				return AST::Element::Identifier(Compiler::GlobalIdentNameMap[str]);
 			default:
-				return AST::Element::Data(T_Null, 0);
+				return AST::Element::Literal(T_Null, 0);
 			}
 		}
 

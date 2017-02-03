@@ -41,6 +41,9 @@ namespace ICM
 			return str;
 		}
 
+		template<> string to_string<TypeType>(const TypeType &tt) {
+			return tt.to_string();
+		}
 		template <> string to_string<ListType>(const ListType &lt) {
 			return lt.to_string();
 		}
@@ -52,6 +55,9 @@ namespace ICM
 		}
 		template <> string to_string<FunctionType>(const FunctionType &ft) {
 			return ft.to_string();
+		}
+		template<> string to_output<TypeType>(const TypeType &tt) {
+			return tt.to_output();
 		}
 		template <> string to_output<ListType>(const ListType &lt) {
 			return lt.to_output();

@@ -9,16 +9,16 @@ namespace ICM
 {
 	// Functions
 
-	inline Object getData(const AST::Element &elt) {
-		assert(elt.isData());
+	inline Object getLiteral(const AST::Element &elt) {
+		assert(elt.isLiteral());
 		void *dat = Compiler::GlobalElementPool.get(elt.getIndex());
-		if (elt.getDataType() == T_String) {
+		if (elt.getLiteralType() == T_String) {
 			dat = new Compiler::Literal::StringType(static_cast<char*>(dat)); // TODO
 		}
-		else if (elt.getDataType() == T_Nil) {
+		else if (elt.getLiteralType() == T_Nil) {
 			dat = nullptr;
 		}
-		TypeUnit type = elt.getDataType();
+		TypeUnit type = elt.getLiteralType();
 		return Object(type, TypeInfoTable[type].copy(dat)); // TODO
 	}
 	inline const string& getIdent(const AST::Element &elt) {
@@ -69,6 +69,12 @@ namespace ICM
 		return getDyVarbData(elt.getIndex());
 	}
 
+	inline void setDyVarbRestType(size_t ident_index, TypeUnit type) {
+		assert(GlobalIdentTable.at(ident_index).type == I_DyVarb);
+		IdentTableUnit &itu = GlobalIdentTable.at(ident_index);
+		itu.restype = type;
+	}
+
 	// Function
 
 	inline FuncTableUnit& getFunction(const AST::Element &elt) {
@@ -91,21 +97,26 @@ namespace ICM
 		return getConstData(elt.getIndex());
 	}
 
+	inline TypeUnit getType(const AST::Element &elt) {
+		assert(elt.isIdentType(I_Type));
+		return GlobalIdentTable.at(elt.getIndex()).TypeIndex;
+	}
+
 	// Indet
 
 	inline Object* getIdentData(const AST::Element &elt) {
 		if (elt.isIdentType(I_DyVarb)) {
 			return getDyVarbData(elt);
 		}
-		else if (elt.isIdentType(I_Function)) {
-			return new Objects::Function(getFunction(elt).getID());
-		}
 		else if (elt.isIdentType(I_Data)) {
 			return getConstData(elt);
 		}
-		//else if (elt.isIdentType(I_Type)) {
-		//	return new Objects::Type(GlobalIdentTable.at(elt.getIndex()).TypeIndex);
-		//}
+		else if (elt.isIdentType(I_Function)) {
+			return new Objects::Function(getFunction(elt).getID());
+		}
+		else if (elt.isIdentType(I_Type)) {
+			return new Objects::Type(GlobalIdentTable.at(elt.getIndex()).TypeIndex);
+		}
 		return nullptr;
 	}
 }

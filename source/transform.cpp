@@ -39,7 +39,7 @@ namespace ICM
 				return true;
 			}
 			bool checkBoolExp(const Element &elt) {
-				if (elt.isIdent() || elt.isRefer() || elt.isDataType(T_Boolean))
+				if (elt.isIdent() || elt.isRefer() || elt.isLiteralType(T_Boolean))
 					return true;
 				println("Error : BoolExp has Non Boolean Value.");
 				return false;
@@ -98,6 +98,8 @@ namespace ICM
 				case set_:
 				case ref_:
 				case cpy_:   return compileLSRC(node, refelt);
+				case dim_:
+				case restrict_: return true;
 				default:     return error("Error with unkonwn Keyword.");
 				}
 			}

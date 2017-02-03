@@ -23,7 +23,7 @@ namespace ICM
 		// Identifier Types
 		DEFTYPE(Function, TypeBase::FunctionType);
 		DEFTYPE(Keyword, TypeBase::KeywordType);
-		DEFTYPE(Type, TypeUnit);
+		DEFTYPE(Type, TypeBase::TypeType);
 		// List Types
 		DEFTYPE(List, TypeBase::ListType);
 		DEFTYPE(Disperse, TypeBase::DisperseType);
@@ -84,6 +84,7 @@ namespace ICM
 		using Disperse = DataObject<T_Disperse>;
 		using Keyword = DataObject<T_Keyword>;
 		using Function = DataObject<T_Function>;
+		using Type = DataObject<T_Type>;
 
 		vector<Object*>::iterator begin(Disperse *disp);
 		vector<Object*>::iterator end(Disperse *disp);

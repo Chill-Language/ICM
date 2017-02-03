@@ -378,8 +378,7 @@ namespace ICM
 					return S({ T_Vary }, T_Type); // V -> T
 				}
 				ObjectPtr func(const DataList &list) const {
-					ICM::println(ICM::to_string((DefaultType)(list[0]->type)));
-					return nullptr;
+					return ObjectPtr(new Objects::Type(list[0]->type));
 				}
 			};
 			ObjectPtr call(const DataList &dl) {

@@ -37,9 +37,32 @@ namespace ICM
 		using SymbolType = std::string;
 		using KeywordType = ICM::Keyword::KeywordID;
 
+		//=======================================
+		// * Class TypeType
+		//=======================================
+		class TypeType
+		{
+		public:
+			TypeType(TypeUnit type = T_Null) : data(type) {}
+			string to_string() const {
+				return TypeInfoTable.at(data).name;
+			}
+			string to_output() const {
+				return TypeInfoTable.at(data).name;
+			}
+			bool operator==(const TypeType &tt) const {
+				return data == tt.data;
+			}
+
+		private:
+			TypeUnit data;
+		};
+		template <> string to_string<TypeType>(const TypeType &lt);
+		template <> string to_output<TypeType>(const TypeType &lt);
+
 
 		//=======================================
-		// * Class List
+		// * Class ListType
 		//=======================================
 		class ListType
 		{
@@ -85,7 +108,7 @@ namespace ICM
 		template <> string to_output<ListType>(const ListType &lt);
 
 		//=======================================
-		// * Class Disperse
+		// * Class DisperseType
 		//=======================================
 		class DisperseType
 		{

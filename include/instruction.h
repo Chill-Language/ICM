@@ -56,6 +56,9 @@ namespace ICM
 			cpsm, cpse, cpla, cple, cpeq, cpne, // cpxx a b
 			// Calc
 			add, sub, mul, div, mod, rem, // xxx a b
+			// Varb
+			dim,  // dim a type
+			rest, // rest a type
 		};
 
 		extern BijectionMap<Instruction, string> InstructionName;

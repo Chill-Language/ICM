@@ -16,7 +16,7 @@ namespace ICM
 		private:
 			enum ElementType {
 				E_Void,
-				E_Data,
+				E_Literal,
 				E_Refer,
 				E_Ident,
 				E_Key,
@@ -29,19 +29,19 @@ namespace ICM
 			Element(const Element&) = default;
 			
 			// Static Function
-			static Element Data(size_t type, size_t index) { return Element(E_Data, type, index); }
+			static Element Literal(size_t type, size_t index) { return Element(E_Literal, type, index); }
 			static Element Refer(size_t index) { return Element(E_Refer, 0, index); }
 			static Element Keyword(Keyword::KeywordID key) { return Element(E_Key, key, 0); }
 			static Element Identifier(size_t index) { return Element(E_Ident, 0, index); }
 			static Element Identifier(IdentType type, size_t index) { return Element(E_Ident, type, index); }
 
 			// Judge
-			bool isData() const { return isEltType(E_Data); }
+			bool isLiteral() const { return isEltType(E_Literal); }
 			bool isRefer() const { return isEltType(E_Refer); }
 			bool isKeyword() const { return isEltType(E_Key); }
 			bool isIdent() const { return isEltType(E_Ident); }
 
-			bool isDataType(TypeUnit type) const { return isData() && getSubType() == type; }
+			bool isLiteralType(TypeUnit type) const { return isLiteral() && getSubType() == type; }
 			bool isIdentType(IdentType type) const { return isIdent() && getSubType() == type; }
 
 			// Get/Set Index
@@ -51,7 +51,7 @@ namespace ICM
 			// Get/Set
 			void setRefer(size_t id) { assert(isRefer()); setIndex(id); }
 			size_t getRefer() const { assert(isRefer()); return getIndex(); }
-			TypeUnit getDataType() const { assert(isData()); return getSubType(); }
+			TypeUnit getLiteralType() const { assert(isLiteral()); return getSubType(); }
 			size_t getIndetType() const { assert(isIdent()); return getSubType(); }
 			Keyword::KeywordID getKeyword() const { assert(isKeyword()); return (Keyword::KeywordID)getSubType(); }
 

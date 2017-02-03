@@ -202,12 +202,6 @@ else
 
 ; Test 20
 (println "----------20----------")
-(p (type 5)) ; Number
-(let a 5) (p (type a)) ; Number
-(cpy a 5) (p (type a)) ; Number
-
-; Test 21
-(println "----------21----------")
 (let a [])
 (let b 5)
 (push a b)
@@ -215,8 +209,8 @@ else
 (push a b)
 (println a) ; [5 50]
 
-; Test 22
-(println "----------22----------")
+; Test 21
+(println "----------21----------")
 (let arr [2 3])
 (let count 5)
 
@@ -234,3 +228,17 @@ else
 )
 (Config.SetPrintIntervalTime F)
 (println arr)
+
+; Test 22
+(println "----------22----------")
+(p (type 5)) ; Number
+(let a 5) (p (type a)) ; Number
+(cpy a 5) (p (type a)) ; Number
+
+; Test 23
+(println "----------23----------")
+(let str "String")
+(p str)
+(restrict str String)
+(let str 6)
+(p str)
