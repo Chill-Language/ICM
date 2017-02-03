@@ -35,6 +35,8 @@ namespace ICM
 			disp_,
 			do_,
 			call_,
+			restrict_,
+			dim_,
 		};
 	}
 

@@ -164,16 +164,13 @@ namespace ICM
 		TypeInfoPair<T_Error>(),
 		// Literal Types
 		TypeInfoPair<T_Boolean>(),
-		TypeInfoPair<T_Identifier>(),
 		TypeInfoPair<T_Number>(),
 		TypeInfoPair<T_String>(),
 		TypeInfoPair<T_Symbol>(),
 		// Identifier Types
 		TypeInfoPair<T_Function>(),
 		TypeInfoPair<T_Keyword>(),
-		TypeInfoPair<T_Reference>(),
 		TypeInfoPair<T_Type>(),
-		TypeInfoPair<T_Variable>(),
 		// List Types
 		//TypeInfoPair<T_Array>(),
 		TypeInfoPair<T_List>(),
@@ -212,7 +209,6 @@ namespace ICM
 		case ICM::T_Object:     return new Object;
 		case ICM::T_Nil:        return new Nil;
 		case ICM::T_Error:      return new Error;
-		case ICM::T_Identifier: return new Identifier;
 		case ICM::T_Keyword:    return new Objects::Keyword;
 		case ICM::T_List:       return new List;
 		case ICM::T_Disperse:   return nullptr; // TODO
@@ -222,7 +218,7 @@ namespace ICM
 		case ICM::T_Function:   return new Objects::Function;
 		case ICM::T_Type:       return nullptr; // TODO
 		case ICM::T_Boolean:    return new Boolean;
-			//case ICM::T_Symbol:     return new Symbol;
+		//case ICM::T_Symbol:     return new Symbol;
 		default:
 			println("Unfind Type.");
 			return nullptr;
@@ -231,13 +227,6 @@ namespace ICM
 	// Create Error
 	ObjectPtr createError(const string &errinfo) {
 		return ObjectPtr(new Objects::Error(TypeBase::ErrorType(errinfo)));
-	}
-	// Adjust ObjectPtr
-	const ObjectPtr& adjustObjectPtr(const ObjectPtr &op) {
-		if (op.isType(T_Identifier))
-			return adjustObjectPtr(op->get<T_Identifier>()->getData());
-		else
-			return op;
 	}
 	namespace Objects
 	{

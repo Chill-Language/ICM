@@ -3,6 +3,7 @@
 #include "literal.h"
 #include "object.h"
 #include "tabledata.h"
+#include "objectdef.h"
 
 namespace ICM
 {
@@ -44,13 +45,24 @@ namespace ICM
 
 	// DyVarb
 
+	inline void setDyVarbData(size_t ident_index, Object *data) {
+		assert(GlobalIdentTable.at(ident_index).type == I_DyVarb);
+		IdentTableUnit &itu = GlobalIdentTable.at(ident_index);
+		if (itu.restype == T_Vary || itu.restype == data->type) {
+			itu.DyVarb = data;
+		}
+		else {
+			println("Error in set DyVarb for different type.");
+		}
+	}
+	inline void setDyVarbResType(size_t ident_index, TypeUnit type) {
+		assert(GlobalIdentTable.at(ident_index).type == I_DyVarb);
+		IdentTableUnit &itu = GlobalIdentTable.at(ident_index);
+		itu.restype = type;
+	}
 	inline Object* getDyVarbData(size_t ident_index) {
 		assert(GlobalIdentTable.at(ident_index).type == I_DyVarb);
 		return GlobalIdentTable.at(ident_index).DyVarb;
-	}
-	inline void setDyVarbData(size_t ident_index, Object *data) {
-		assert(GlobalIdentTable.at(ident_index).type == I_DyVarb);
-		GlobalIdentTable.at(ident_index).DyVarb = data;
 	}
 	inline Object* getDyVarbData(const AST::Element &elt) {
 		assert(elt.isIdentType(I_DyVarb));
@@ -62,5 +74,38 @@ namespace ICM
 	inline FuncTableUnit& getFunction(const AST::Element &elt) {
 		assert(elt.isIdentType(I_Function));
 		return GlobalFunctionTable[GlobalIdentTable.at(elt.getIndex()).FunctionIndex];
+	}
+
+	// Data
+
+	inline void setConstData(size_t ident_index, Object *data) {
+		assert(GlobalIdentTable.at(ident_index).type == I_Data);
+		GlobalIdentTable.at(ident_index).Data = data;
+	}
+	inline Object* getConstData(size_t ident_index) {
+		assert(GlobalIdentTable.at(ident_index).type == I_Data);
+		return GlobalIdentTable.at(ident_index).Data;
+	}
+	inline Object* getConstData(const AST::Element &elt) {
+		assert(elt.isIdentType(I_Data));
+		return getConstData(elt.getIndex());
+	}
+
+	// Indet
+
+	inline Object* getIdentData(const AST::Element &elt) {
+		if (elt.isIdentType(I_DyVarb)) {
+			return getDyVarbData(elt);
+		}
+		else if (elt.isIdentType(I_Function)) {
+			return new Objects::Function(getFunction(elt).getID());
+		}
+		else if (elt.isIdentType(I_Data)) {
+			return getConstData(elt);
+		}
+		//else if (elt.isIdentType(I_Type)) {
+		//	return new Objects::Type(GlobalIdentTable.at(elt.getIndex()).TypeIndex);
+		//}
+		return nullptr;
 	}
 }

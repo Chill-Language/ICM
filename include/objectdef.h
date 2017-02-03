@@ -17,16 +17,13 @@ namespace ICM
 		DEFTYPE(Error, TypeBase::ErrorType);
 		// Literal Types
 		DEFTYPE(Boolean, TypeBase::BooleanType);
-		DEFTYPE(Identifier, TypeBase::IdentifierType);
 		DEFTYPE(Number, TypeBase::NumberType);
 		DEFTYPE(String, TypeBase::StringType);
 		DEFTYPE(Symbol, TypeBase::SymbolType);
 		// Identifier Types
 		DEFTYPE(Function, TypeBase::FunctionType);
 		DEFTYPE(Keyword, TypeBase::KeywordType);
-		DEFTYPE(Reference, TypeBase::IdentifierType);
-		DEFTYPE(Type, TypeBase::IdentifierType);
-		DEFTYPE(Variable, TypeBase::IdentifierType);
+		DEFTYPE(Type, TypeUnit);
 		// List Types
 		DEFTYPE(List, TypeBase::ListType);
 		DEFTYPE(Disperse, TypeBase::DisperseType);
@@ -87,11 +84,6 @@ namespace ICM
 		using Disperse = DataObject<T_Disperse>;
 		using Keyword = DataObject<T_Keyword>;
 		using Function = DataObject<T_Function>;
-		class Identifier : public DataObject<T_Identifier> {
-		public:
-			Identifier() : DataObject<T_Identifier>() {}
-			Identifier(const TypeBase::IdentifierType &it) : DataObject<T_Identifier>(it) {}
-		};
 
 		vector<Object*>::iterator begin(Disperse *disp);
 		vector<Object*>::iterator end(Disperse *disp);

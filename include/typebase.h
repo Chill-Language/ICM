@@ -168,56 +168,6 @@ namespace ICM
 		template <> string to_string<FunctionType>(const FunctionType &ft);
 		template <> string to_output<FunctionType>(const FunctionType &ft);
 		template <> string to_string_code<FunctionType>(const FunctionType &ft);
-
-		//=======================================
-		// * Class Identifier
-		//=======================================
-		class IdentifierType
-		{
-		public:
-			explicit IdentifierType(const std::string &name = "") : name(name) {}
-			IdentifierType(const std::string &name, const ObjectPtr &op) : name(name), data(op) {}
-			std::string getName() const {
-				return name/*.to_string()*/;
-			}
-			const ObjectPtr& getData() const {
-				return data;
-			}
-			const ObjectPtr& getRealData() const;
-			void setData(const ObjectPtr &op);
-			void setCopy(const ObjectPtr &op);
-			void setRefer(const ObjectPtr &op);
-			DefaultType getValueType() const {
-				return data.type();
-			}
-			bool operator==(const IdentifierType &it) const {
-				return data == it.data;
-			}
-			// Method
-			string to_string() const {
-				return name/*.to_string()*/ + "(" + ICM::to_string(data) + ")";
-			}
-			string to_output() const {
-				return data->to_output();
-			}
-			string to_string_code() const {
-				return name/*.to_string()*/;
-			}
-			void write(File &file) const {
-				file.write(data);
-			}
-			void read(File &file) {
-				file.read(data);
-			}
-
-		private:
-			string name;
-			//Common::charptr name;
-			ObjectPtr data;
-		};
-		template <> string to_string<IdentifierType>(const IdentifierType &it);
-		template <> string to_output<IdentifierType>(const IdentifierType &it);
-		template <> string to_string_code<IdentifierType>(const IdentifierType &it);
 	}
 	string to_string(const TypeBase::FunctionType &ft);
 }

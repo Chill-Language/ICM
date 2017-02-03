@@ -9,7 +9,7 @@ namespace ICM
 	{
 		IdentTableUnit(IdentType type = I_Void, size_t index = 0)
 			: type(type), index(index) {
-			DyVarb = &(Static.Nil);
+			DyVarb = &Static.Nil;
 		}
 
 		IdentType type;
@@ -20,10 +20,14 @@ namespace ICM
 			size_t  rvref;  // Reference From ReVarb
 		};*/
 
+		TypeUnit restype = T_Vary; // Restrict Type
+
 		// TODO
 		Object StVarb;
 		Object *DyVarb;
+		Object *Data;
 		size_t FunctionIndex;
+		TypeUnit TypeIndex;
 	};
 
 

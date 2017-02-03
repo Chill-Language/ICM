@@ -12,7 +12,7 @@ namespace ICM
 {
 	void addDefFuncs(FuncTable &DefFuncTable);
 	// Create Default FuncTable
-	void createDefFuncTable()
+	void createIdentTable()
 	{
 		addDefFuncs(GlobalFunctionTable);
 		//
@@ -20,8 +20,14 @@ namespace ICM
 			size_t id = GlobalIdentTable.insert(var.first, I_Function);
 			GlobalIdentTable.at(id).FunctionIndex = GlobalFunctionTable.find(var.first);
 		}
-		size_t id = GlobalIdentTable.insert("Nil", I_DyVarb);
-		setDyVarbData(id, &Static.Nil);
+		setDyVarbData(GlobalIdentTable.insert("true", I_DyVarb), &Static.True);
+		setDyVarbData(GlobalIdentTable.insert("false", I_DyVarb), &Static.False);
+		// Import TypeInfoTable
+		for (const auto &elt : TypeInfoTable) {
+			const TypeInfo &info = elt.second;
+			size_t id = GlobalIdentTable.insert(info.name, I_Type);
+			GlobalIdentTable.at(id).TypeIndex = info.index;
+		}
 
 		// TODO : Memory leak
 		//GlobalDyVarbTable.insert("Nil");
@@ -55,5 +61,7 @@ namespace ICM
 		{ "define",   Keyword::define_   },
 		{ "call",     Keyword::call_     },
 		{ "do",       Keyword::do_       },
+		{ "restrict", Keyword::restrict_ },
+		{ "dim",      Keyword::dim_      },
 	};
 }

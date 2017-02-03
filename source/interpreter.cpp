@@ -15,14 +15,11 @@ namespace ICM
 			if (element.isData()) {
 				return new Object(getData(element));
 			}
-			else if (element.isIdentType(I_DyVarb)) {
-				return getDyVarbData(element);
-			}
 			else if (element.isRefer()) {
 				return TempResult[element.getRefer()];
 			}
-			else if (element.isIdentType(I_Function)) {
-				return new Objects::Function(getFunction(element).getID());
+			else if (element.isIdent()) {
+				return getIdentData(element);
 			}
 			else {
 				println("Error in getObject.");

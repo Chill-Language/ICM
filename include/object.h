@@ -149,7 +149,6 @@ namespace ICM
 	}
 	Object* createObject(DefaultType type);
 	ObjectPtr createError(const string &errinfo);
-	const ObjectPtr& adjustObjectPtr(const ObjectPtr &ptr);
 	string to_string(const ObjectPtr &obj);
 	string to_string(const DataList &obj);
 	string to_string(const vector<ObjectPtr> &list);

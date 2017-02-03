@@ -41,58 +41,6 @@ namespace ICM
 			return str;
 		}
 
-		//=======================================
-		// * Class Identifier
-		//=======================================
-		void IdentifierType::setData(const ObjectPtr &op) {
-			if (op->type == T_Identifier)
-				data = op->get<T_Identifier>()->getData();
-			else
-				data = op;
-		}
-		void IdentifierType::setCopy(const ObjectPtr &op) {
-			if (op.isType(T_Identifier))
-				setCopy(op->get<T_Identifier>()->getData());
-			else
-				data = ObjectPtr(op->clone());
-		}
-		void IdentifierType::setRefer(const ObjectPtr &op) {
-			if (op->type == T_Identifier) {
-				const ObjectPtr &sop = op->get<T_Identifier>()->getData();
-				const ObjectPtr &refop = sop.isType(T_Identifier) ? sop : op;
-				const ObjectPtr &refopdata = refop->get<T_Identifier>()->getData();
-				if (data.get() != refopdata.get())
-					data = refop;
-				else
-					data = refopdata;
-			}
-			else
-				data = op;
-		}
-
-		const ObjectPtr& IdentifierType::getRealData() const {
-			if (data.isType(T_Identifier))
-				return data->get<T_Identifier>()->getData();
-			else
-				return data;
-		}
-
-		/*ObjectPtr GetElt(const ObjectPtr &op) {
-		if (op.isType(T_Variable))
-		return GetElt(op.get<Variable>()->getData());
-		else if (op.isType(T_Reference))
-		return GetElt(op.get<Reference>()->getData());
-		else
-		return op;
-		}
-		ObjectPtr GetRef(const ObjectPtr &op) {
-		if (op.isType(T_Variable))
-		return ObjectPtr(new Reference("R", op));
-		if (op.isType(T_Reference))
-		return op;
-		else
-		return ObjectPtr(new Reference("R", op));
-		}*/
 		template <> string to_string<ListType>(const ListType &lt) {
 			return lt.to_string();
 		}
@@ -105,9 +53,6 @@ namespace ICM
 		template <> string to_string<FunctionType>(const FunctionType &ft) {
 			return ft.to_string();
 		}
-		template <> string to_string<IdentifierType>(const IdentifierType &ft) {
-			return ft.to_string();
-		}
 		template <> string to_output<ListType>(const ListType &lt) {
 			return lt.to_output();
 		}
@@ -117,14 +62,8 @@ namespace ICM
 		template <> string to_output<FunctionType>(const FunctionType &ft) {
 			return ft.to_output();
 		}
-		template <> string to_output<IdentifierType>(const IdentifierType &it) {
-			return it.to_output();
-		}
 		template <> string to_string_code<FunctionType>(const FunctionType &ft) {
 			return ft.to_string_code();
-		}
-		template <> string to_string_code<IdentifierType>(const IdentifierType &it) {
-			return it.to_string_code();
 		}
 	}
 }

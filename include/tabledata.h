@@ -108,7 +108,7 @@ namespace ICM
 		map<string, size_t> keymap;
 	};
 
-	void createDefFuncTable();
+	void createIdentTable();
 
 	//=======================================
 	// * Class StringTable

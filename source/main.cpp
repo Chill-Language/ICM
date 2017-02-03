@@ -86,7 +86,7 @@ void Run(vector<Instruction::InstructionList> &VeI, bool printResult)
 int main(int argc, char *argv[])
 {
 	// Initialize
-	createDefFuncTable();
+	createIdentTable();
 	const bool LoopMatch = (argc <= 1);
 	//const bool LoopMatch = false;
 
