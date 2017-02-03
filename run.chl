@@ -233,12 +233,12 @@ else
 (println "----------22----------")
 (p (type 5)) ; Number
 (let a 5) (p (type a)) ; Number
-(cpy a 5) (p (type a)) ; Number
+(ref a 5) (p (type a)) ; Number
 
 ; Test 23
 (println "----------23----------")
-(let str "String")
-(p str)
 (restrict str String)
+(let str "String")
+(p str) ; "String"
 (let str 6)
-(p str)
+(p str) ; "String"

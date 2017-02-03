@@ -19,16 +19,13 @@ namespace ICM
 		DEFTYPENAME(Error);
 		// Literal Types
 		DEFTYPENAME(Boolean);
-		DEFTYPENAME(Identifier);
 		DEFTYPENAME(Number);
 		DEFTYPENAME(String);
 		DEFTYPENAME(Symbol);
 		// Identifier Types
 		DEFTYPENAME(Function);
 		DEFTYPENAME(Keyword);
-		DEFTYPENAME(Reference);
 		DEFTYPENAME(Type);
-		DEFTYPENAME(Variable);
 		// List Types
 		DEFTYPENAME(List);
 		DEFTYPENAME(Disperse);
