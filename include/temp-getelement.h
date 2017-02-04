@@ -22,8 +22,10 @@ namespace ICM
 		return Object(type, TypeInfoTable[type].copy(dat)); // TODO
 	}
 	inline const string& getIdent(const AST::Element &elt) {
-		assert(elt.isIdentType(I_Void));
-		return Compiler::GlobalIdentNameMap.getKey(elt.getIndex());
+		if (elt.isIdentType(I_Void))
+			return Compiler::GlobalIdentNameMap.getKey(elt.getIndex());
+		else
+			return GlobalIdentTable.getName(elt.getIndex());
 	}
 	inline void setIdent(AST::Element &elt, IdentType type, size_t index) {
 		elt = AST::Element::Identifier(type, index);

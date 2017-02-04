@@ -38,6 +38,7 @@ namespace ICM
 			InstName(jpsm), InstName(jpse), InstName(jpla), InstName(jple),
 			InstName(cpsm), InstName(cpse), InstName(cpla), InstName(cple), InstName(cpeq), InstName(cpne),
 			InstName(add), InstName(sub), InstName(mul), InstName(div), InstName(mod), InstName(rem),
+			InstName(dim), InstName(rest),
 		};
 #undef InstName
 	}
