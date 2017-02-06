@@ -117,7 +117,7 @@ namespace ICM
 					Data.push_back(e);
 				}
 				Insts::CheckCall *p = new Insts::CheckCall();
-				p->Data = Data;
+				p->Data = ConvertToInstElement(Data);
 
 				InstList.push(p);
 				refelt.setRefer(CurrInstID());
@@ -132,7 +132,7 @@ namespace ICM
 						createNode(GetRefer(e), e);
 					}
 					else if (e.isLiteral() || e.isIdentType(I_Function) || e.isIdentType(I_DyVarb)) {
-						InstList.push(new Insts::Store(e));
+						InstList.push(new Insts::Store(ConvertToInstElement(e)));
 					}
 					else if (isKey(e, break_)) {
 						if (LoopBreakIDs.empty()) {
@@ -163,7 +163,7 @@ namespace ICM
 
 					createReferNode(be);
 					auto *inst = new Insts::JumpNot();
-					inst->Data = be;
+					inst->Data = ConvertToInstElement(be);
 					InstList.push(inst);
 					createReferNode(de);
 					auto *jinst = new Insts::Jump();
@@ -198,7 +198,7 @@ namespace ICM
 				size_t Bid = NextInstID();
 				createReferNode(Bexp);
 				auto *jpendinst = new Insts::JumpNot();
-				jpendinst->Data = Bexp;
+				jpendinst->Data = ConvertToInstElement(Bexp);
 				InstList.push_back(jpendinst);
 				createReferNode(Rdo);
 				Insts::Jump *jmp = new Insts::Jump();
@@ -238,19 +238,15 @@ namespace ICM
 
 				size_t id = getIdentID(I);
 				setDyVarbData(id, new Objects::Number(0)); // TODO
-				InstList.push(new Insts::Assign(let, id, vb));
+
+				createReferNode(vb);
+				createReferNode(ve);
+
+				InstList.push(new Insts::Assign(let, id, ConvertToInstElement(vb)));
 				size_t index = NextInstID();
 				createReferNode(Rdo);
 
-				Element ele;
-				if (ve.isIdentType(I_DyVarb))
-					ele = Element::Literal(getDyVarbData(ve)->type, GlobalElementPool.insert(getDyVarbData(ve)));
-				else {
-					createReferNode(ve);
-					ele = ve;
-				}
-
-				auto *jpinst = new Insts::JumpCompare(jpse, id, ve);
+				auto *jpinst = new Insts::JumpCompare(jpse, id, ConvertToInstElement(ve));
 				InstList.push(new Insts::Inc(id));
 				jpinst->Index = index;
 				InstList.push(jpinst);
@@ -276,12 +272,12 @@ namespace ICM
 					default: break;
 					}
 					createReferNode(value);
-					InstList.push(new Insts::Assign(inst, ident_id, value));
+					InstList.push(new Insts::Assign(inst, ident_id, ConvertToInstElement(value)));
 				}
 				else {
 					Element &value = node[1];
 					createReferNode(value);
-					InstList.push(new Insts::CopySingle(value));
+					InstList.push(new Insts::CopySingle(ConvertToInstElement(value)));
 					refelt.setRefer(CurrInstID());
 				}
 				return true;
@@ -294,7 +290,7 @@ namespace ICM
 				Element &ident = node[1];
 				Element &type = node[2];
 				size_t ident_id = getIdentID(ident);
-				InstList.push(new Insts::Assign(dim, ident_id, type));
+				InstList.push(new Insts::Assign(dim, ident_id, ConvertToInstElement(type)));
 				return true;
 			}
 			bool createNodeRestrict(Node &node, Element &refelt) {
@@ -305,7 +301,7 @@ namespace ICM
 				Element &ident = node[1];
 				Element &type = node[2];
 				size_t ident_id = getIdentID(ident);
-				InstList.push(new Insts::Assign(rest, ident_id, type));
+				InstList.push(new Insts::Assign(rest, ident_id, ConvertToInstElement(type)));
 				return true;
 			}
 			// (list ...)
@@ -314,7 +310,7 @@ namespace ICM
 				for (auto &e : rangei(node.begin() + 1, node.end())) {
 					if (e.isRefer())
 						createNode(GetRefer(e), e);
-					inst->Data.push_back(e);
+					inst->Data.push_back(ConvertToInstElement(e));
 				}
 				InstList.push(inst);
 				refelt.setRefer(CurrInstID());
@@ -326,7 +322,7 @@ namespace ICM
 				for (auto &e : rangei(node.begin() + 1, node.end())) {
 					if (e.isRefer())
 						createNode(GetRefer(e), e);
-					inst->Args.push_back(e);
+					inst->Args.push_back(ConvertToInstElement(e));
 				}
 				InstList.push(inst);
 				refelt.setRefer(CurrInstID());

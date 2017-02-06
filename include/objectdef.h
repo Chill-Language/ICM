@@ -1,4 +1,5 @@
 #pragma once
+//#pragma message("===Compiling objectdef.h===")
 #include "basic.h"
 #include "object.h"
 #include "typebase.h"

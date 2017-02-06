@@ -272,7 +272,7 @@ namespace ICM
 
 		private:
 			void setIdentifier(Element &element) {
-				const string &name = getIdent(element);
+				const string &name = getIdentName(element);
 				size_t index = GlobalIdentTable.find(name);
 				if (index != GlobalIdentTable.size()) {
 					IdentTableUnit &itu = GlobalIdentTable.at(index);

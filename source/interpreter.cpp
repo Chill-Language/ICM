@@ -1,7 +1,7 @@
 #include "basic.h"
 #include "interpreter.h"
 #include "objectdef.h"
-#include "temp-getelement.h"
+#include "temp-getelement2.h"
 
 namespace ICM
 {
@@ -11,9 +11,9 @@ namespace ICM
 		Interpreter(Instruction::InstructionList &InstList)
 			: InstList(InstList), TempResult(InstList.size(), &Static.Null) {}
 
-		Object* getObject(const AST::Element &element) {
+		Object* getObject(const Instruction::Element &element) {
 			if (element.isLiteral()) {
-				return new Object(getLiteral(element));
+				return createObjectFromLiteral(element);
 			}
 			else if (element.isRefer()) {
 				return TempResult[element.getRefer()];
@@ -26,10 +26,10 @@ namespace ICM
 				return nullptr;
 			}
 		}
-		DataList createDataList(vector<AST::Element> &args) {
+		DataList createDataList(vector<Instruction::Element> &args) {
 			return createDataList(rangei(args.begin(), args.end()));
 		}
-		DataList createDataList(const RangeIterator<AST::Node::iterator> &ri) {
+		DataList createDataList(const RangeIterator<vector<Instruction::Element>::iterator> &ri) {
 			lightlist_creater<Object*> creater(ri.size());
 			for (auto &e : ri) {
 				Object *op = getObject(e);
@@ -38,7 +38,7 @@ namespace ICM
 			}
 			return creater.data();
 		}
-		DataList createDispCallList(vector<AST::Element> &el, const FuncTableUnit* &ftup) {
+		DataList createDispCallList(vector<Instruction::Element> &el, const FuncTableUnit* &ftup) {
 			list<Object*> datalist;
 			for (auto &e : el) {
 				Object *op = getObject(e);
@@ -61,10 +61,10 @@ namespace ICM
 			ftup = &fp->dat<T_Function>().getData();
 			return DataList(datalist.begin(), datalist.size());
 		}
-		Object* CheckCall(vector<AST::Element> &Data) {
+		Object* CheckCall(vector<Instruction::Element> &Data) {
 			const FuncTableUnit *ftup;
 
-			AST::Element &front = Data.front();
+			Instruction::Element &front = Data.front();
 			if (front.isIdentType(I_Function)) {
 				ftup = &getFunction(front);
 			}
@@ -155,7 +155,7 @@ namespace ICM
 				case ref: {
 					Insts::Assign &inst = static_cast<Insts::Assign&>(*Inst);
 					if (inst.Data.isLiteral()) {
-						setDyVarbData(inst.VTU, new Object(getLiteral(inst.Data))); // TODO
+						setDyVarbData(inst.VTU, createObjectFromLiteral(inst.Data));
 					}
 					else if (inst.Data.isRefer()) {
 						setDyVarbData(inst.VTU, TempResult[inst.Data.getRefer()]);
@@ -269,7 +269,7 @@ namespace ICM
 				}
 				case pti: {
 					Insts::PrintIdent &inst = static_cast<Insts::PrintIdent&>(*Inst);
-					for (AST::Element &e : inst.Args) {
+					for (Element &e : inst.Args) {
 						if (e.isIdentType(I_DyVarb))
 							print(getIdentName(e), "(");
 						Object *op = getObject(e);

@@ -1,11 +1,10 @@
 #pragma once
 #include "basic.h"
-#include "ast.h"
 #include "keyword.h"
 #include "tabledata.h"
 #include "typebase.h"
 
-#include "temp-getelement.h"
+#include "temp-getelement2.h"
 
 namespace ICM
 {
@@ -66,6 +65,84 @@ namespace ICM
 
 	string to_string(Instruction::Instruction inst);
 
+
+	namespace ASTBase
+	{
+		struct Element;
+	}
+
+	namespace Instruction
+	{
+		//=======================================
+		// * Struct Element
+		//=======================================
+		struct Element
+		{
+		private:
+			enum ElementType {
+				E_Void,
+				E_Literal,
+				E_Refer,
+				E_Ident,
+				E_Key,
+			};
+
+		public:
+			Element() = default;
+			Element(ElementType et, size_t id, size_t index)
+				: etype((uint8_t)et), stype((uint8_t)id), index(index) {}
+			Element(const Element&) = default;
+
+			// Static Function
+			static Element Literal(size_t type, size_t index) { return Element(E_Literal, type, index); }
+			static Element Refer(size_t index) { return Element(E_Refer, 0, index); }
+			static Element Keyword(Keyword::KeywordID key) { return Element(E_Key, key, 0); }
+			static Element Identifier(size_t index) { return Element(E_Ident, 0, index); }
+			static Element Identifier(IdentType type, size_t index) { return Element(E_Ident, type, index); }
+
+			// Judge
+			bool isLiteral() const { return isEltType(E_Literal); }
+			bool isRefer() const { return isEltType(E_Refer); }
+			bool isKeyword() const { return isEltType(E_Key); }
+			bool isIdent() const { return isEltType(E_Ident); }
+
+			bool isLiteralType(TypeUnit type) const { return isLiteral() && getSubType() == type; }
+			bool isIdentType(IdentType type) const { return isIdent() && getSubType() == type; }
+
+			// Get/Set Index
+			void setIndex(size_t id) { index = id; }
+			size_t getIndex() const { return index; }
+
+			// Get/Set
+			void setRefer(size_t id) { assert(isRefer()); setIndex(id); }
+			size_t getRefer() const { assert(isRefer()); return getIndex(); }
+			TypeUnit getLiteralType() const { assert(isLiteral()); return getSubType(); }
+			size_t getIndetType() const { assert(isIdent()); return getSubType(); }
+			Keyword::KeywordID getKeyword() const { assert(isKeyword()); return (Keyword::KeywordID)getSubType(); }
+
+		private:
+			union {
+				struct { uint8_t etype, stype; };
+				uint32_t type = 0;
+			};
+			uint_t index = 0;
+
+		private:
+			bool isEltType(ElementType et) const { return (ElementType)this->etype == et; }
+			size_t getSubType() const { return (size_t)this->stype; }
+		};
+
+		inline Element ConvertToInstElement(const ASTBase::Element &elt) {
+			return *(const Element*)(&elt);
+		}
+		inline vector<Element> ConvertToInstElement(const vector<ASTBase::Element> &elt) {
+			return *(const vector<Element>*)(&elt);
+		}
+	}
+
+	string to_string(const Instruction::Element &elt);
+	string to_string(const vector<Instruction::Element> &elt);
+
 	namespace Instruction
 	{
 		using FuncType = TypeBase::FunctionType;
@@ -92,7 +169,7 @@ namespace ICM
 
 			struct List : public InstDataBase<list>
 			{
-				vector<AST::Element> Data;
+				vector<Element> Data;
 
 			private:
 				string getToString() const {
@@ -102,7 +179,7 @@ namespace ICM
 
 			struct CheckCall : public InstDataBase<ccal>
 			{
-				vector<AST::Element> Data;
+				vector<Element> Data;
 
 			private:
 				string getToString() const {
@@ -112,7 +189,7 @@ namespace ICM
 
 			struct PrintIdent : public InstDataBase<pti>
 			{
-				vector<AST::Element> Args;
+				vector<Element> Args;
 
 			private:
 				string getToString() const {
@@ -123,7 +200,7 @@ namespace ICM
 			// FuncArgs
 			struct FuncArgs : public InstDataBase<farg>
 			{
-				vector<AST::Element> Args;
+				vector<Element> Args;
 
 			private:
 				string getToString() const { return ICM::to_string(Args); }
@@ -137,7 +214,7 @@ namespace ICM
 			};
 			struct FuncArgsVary : public InstDataBase<fargv>
 			{
-				vector<AST::Element> Args;
+				vector<Element> Args;
 
 			private:
 				string getToString() const { return ICM::to_string(Args); }
@@ -173,10 +250,10 @@ namespace ICM
 
 			struct Assign : public InstructionData
 			{
-				Assign(Instruction inst, size_t VTUID, AST::Element &elt)
+				Assign(Instruction inst, size_t VTUID, const Element &elt)
 					: InstructionData(inst), VTU(VTUID), Data(elt) {}
 				size_t VTU;
-				AST::Element Data;
+				Element Data;
 
 			private:
 				string getToString() const { return getIdentName(VTU) + ", " + ICM::to_string(Data); }
@@ -184,23 +261,23 @@ namespace ICM
 
 			struct CopySingle : public InstDataBase<cpys>
 			{
-				CopySingle(const AST::Element &Data) : Data(Data) {}
-				AST::Element Data;
+				CopySingle(const Element &Data) : Data(Data) {}
+				Element Data;
 			private:
 				string getToString() const { return ICM::to_string(Data); }
 			};
 
 			struct Store : public InstDataBase<stor>
 			{
-				Store(const AST::Element &Data) : Data(Data) {}
-				AST::Element Data;
+				Store(const Element &Data) : Data(Data) {}
+				Element Data;
 			private:
 				string getToString() const { return ICM::to_string(Data); }
 			};
 
 			struct JumpNot : public InstDataBase<jmpn>
 			{
-				AST::Element Data;
+				Element Data;
 				size_t Index;
 			private:
 				string getToString() const {
@@ -227,16 +304,16 @@ namespace ICM
 
 			struct Compare : public InstructionData
 			{
-				Compare(Instruction inst, size_t VTU, const AST::Element &Data)
+				Compare(Instruction inst, size_t VTU, const Element &Data)
 					: InstructionData(inst), VTU(VTU), Data(Data) {}
 				size_t VTU;
-				AST::Element Data;
+				Element Data;
 			protected:
 				string getToString() const { return getIdentName(VTU) + ", " + ICM::to_string(Data); }
 			};
 			struct JumpCompare : public Compare
 			{
-				JumpCompare(Instruction inst, size_t VTU, const AST::Element &Data)
+				JumpCompare(Instruction inst, size_t VTU, const Element &Data)
 					: Compare(inst, VTU, Data) {}
 				size_t Index;
 			private:
@@ -257,10 +334,5 @@ namespace ICM
 		private:
 
 		};
-	}
-
-	namespace Compiler
-	{
-		ICM::Instruction::InstructionList createInstruction(vector<AST::NodePtr> &Table);
 	}
 }

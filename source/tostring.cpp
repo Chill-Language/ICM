@@ -144,9 +144,9 @@ namespace ICM
 		else if (element.isIdentType(I_DyVarb))
 			return "V(" + getIdentName(element) + ")";
 		else if (element.isIdentType(I_Function))
-			return "F(" + getFunction(element).getName() + ")";
+			return "F(" + getIdentName(element) + ")";
 		else if (element.isIdent())
-			return "I(" + getIdent(element) + ")";
+			return "I(" + getIdentName(element) + ")";
 		else
 			return "UnkonwnElement";
 	}
@@ -160,9 +160,9 @@ namespace ICM
 		else if (element.isIdentType(I_DyVarb))
 			return getIdentName(element);
 		else if (element.isIdentType(I_Function))
-			return getFunction(element).getName();
+			return getIdentName(element);
 		else if (element.isIdent())
-			return getIdent(element);
+			return getIdentName(element);
 		else
 			return "UnkonwnElement";
 	}
@@ -212,5 +212,13 @@ namespace ICM
 		}
 		str.append("\n}");
 		return str;
+	}
+
+
+	string to_string(const Instruction::Element &elt) {
+		return to_string(*(ASTBase::Element*)&elt);
+	}
+	string to_string(const vector<Instruction::Element> &elt) {
+		return to_string(*(vector<ASTBase::Element>*)&elt);
 	}
 }

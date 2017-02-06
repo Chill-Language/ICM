@@ -37,6 +37,14 @@ void printIntervalTime(Timer &t)
 	println("Current Interval Time : ", t.detTime());
 }
 
+namespace ICM
+{
+	namespace Compiler
+	{
+		ICM::Instruction::InstructionList createInstruction(vector<AST::NodePtr> &Table);
+	}
+}
+
 vector<Instruction::InstructionList> Compile(const char *text)
 {
 	Compiler::GlobalElementPool.clear();
