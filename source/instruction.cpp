@@ -237,7 +237,7 @@ namespace ICM
 				Element &Rdo = node[4];
 
 				size_t id = getIdentID(I);
-				setDyVarbData(id, new Objects::Number(0)); // TODO
+				setDyVarbData(id, &Static.Zero); // TODO
 
 				createReferNode(vb);
 				createReferNode(ve);

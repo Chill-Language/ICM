@@ -123,15 +123,23 @@ namespace ICM
 
 	struct StaticObject
 	{
-		StaticObject()
-			: Nil(T_Nil), True(T_Boolean, &Value_True), False(T_Boolean, &Value_False) {};
+		StaticObject() :
+			Null(),
+			Nil(T_Nil),
+			True(T_Boolean, &Value_True),
+			False(T_Boolean, &Value_False),
+			Zero(T_Number, &Value_Zero)
+		{};
+
 		bool Value_True = true;
 		bool Value_False = false;
+		uint64_t Value_Zero = 0;
 		
 		Object Null;
 		Object Nil;
 		Object True;
 		Object False;
+		Object Zero;
 	};
 
 	extern StaticObject Static;

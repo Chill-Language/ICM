@@ -62,7 +62,7 @@ namespace ICM
 					return S({}, T_Number); // Void -> N
 				}
 				ObjectPtr func(const DataList &list) const {
-					return ObjectPtr(new Number(NumberType(0)));
+					return ObjectPtr(&Static.Zero);
 				}
 			};
 
@@ -215,7 +215,7 @@ namespace ICM
 			ObjectPtr sort_f(const DataList &dl) {
 				auto &func = dl[1]->get<T_Function>()->getData();
 				// TODO
-				size_t id = getCallID(func, DataList({ new Number(NumberType(0)), new Number(NumberType(0)) }));
+				size_t id = getCallID(func, DataList({ &Static.Zero, &Static.Zero }));
 				const auto &rf = func[id];
 
 				Types::List *list = dl[0]->get<T_List>();
@@ -288,7 +288,7 @@ namespace ICM
 				ObjectPtr func(const DataList &list) const {
 					// TODO
 					auto &func = list[0]->get<T_Function>()->getData();
-					size_t id = getCallID(func, DataList({ new Number(NumberType(0)) }));
+					size_t id = getCallID(func, DataList({ &Static.Zero }));
 					const auto &rf = func[id];
 
 					size_t minsize = list[1]->get<T_List>()->size();
@@ -409,12 +409,12 @@ namespace ICM
 			}
 			ObjectPtr exit(const DataList &dl) {
 				std::exit(0);
-				return ObjectPtr(new Nil());
+				return ObjectPtr(&Static.Nil);
 			}
 			ObjectPtr exitv(const DataList &dl) {
 				// TODO
 				std::exit((int)dl[0]->dat<T_Number>()/*->getNum()*/);
-				return ObjectPtr(new Nil());
+				return ObjectPtr(&Static.Nil);
 			}
 		}
 
@@ -449,7 +449,7 @@ namespace ICM
 				ObjectPtr func(const DataList &list) const {
 					bool value = *list[0]->get<T_Boolean>();
 					setValue(value);
-					return ObjectPtr(new Nil());
+					return ObjectPtr(&Static.Nil);
 				}
 				virtual void setValue(bool value) const = 0;
 			};
