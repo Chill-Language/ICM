@@ -11,9 +11,7 @@ namespace ICM
 	inline Object* createObjectFromLiteral(const Instruction::Element &elt) {
 		return new Object(getLiteral(elt));
 	}
-	inline const string& getIdentName(size_t ident_index) {
-		return GlobalIdentTable.getName(ident_index);
-	}
+	const string& getIdentName(size_t ident_index);
 	const string& getIdentName(const Instruction::Element &elt);
 	// DyVarb
 

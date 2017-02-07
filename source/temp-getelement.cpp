@@ -23,10 +23,12 @@ namespace ICM
 		return getLiteral(*(ASTBase::Element*)&elt);
 	}
 	const string & getIdentName(const ASTBase::Element & elt) {
-		if (elt.isIdentType(I_Void))
-			return Compiler::GlobalIdentNameMap.getKey(elt.getIndex());
-		else
-			return GlobalIdentTable.getName(elt.getIndex());
+		IdentKey key = elt.isIdentType(I_Void) ? elt.getIndex() : GlobalIdentTable.getKey(elt.getIndex());
+		return Compiler::GlobalIdentNameMap.getKey(key);
+	}
+	const string& getIdentName(size_t ident_index) {
+		IdentKey key = GlobalIdentTable.getKey(ident_index);
+		return Compiler::GlobalIdentNameMap.getKey(key);
 	}
 	void setIdent(ASTBase::Element & elt, IdentType type, size_t index) {
 		elt = ASTBase::Element::Identifier(type, index);

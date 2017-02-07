@@ -172,21 +172,22 @@ public:
 public:
 	SerialBijectionMap() {}
 	bool insert(const _KTy &key) {
-		if (findKey(key) != size())
+		if (findKey(key) != size()) {
 			return false;
-
-		if (destroyable.empty()) {
-			keymap[key] = currcount;
-			data.push_back(key);
-			currcount++;
 		}
 		else {
-			size_t id = destroyable.front();
-			keymap[key] = id;
-			data[id] = key;
-			destroyable.pop_front();
+			_insert(key);
+			return true;
 		}
-		return true;
+	}
+	size_t insertRepeat(const _KTy &key) {
+		size_t index = findKey(key);
+		if (index == size()) {
+			return _insert(key);
+		}
+		else {
+			return index;
+		}
 	}
 	size_t currentIndex() const {
 		return destroyable.empty() ? currcount : destroyable.front();
@@ -242,6 +243,21 @@ private:
 	void _erase(const _KTy &key, size_t id) {
 		keymap.erase(key);
 		destroyable.push_back(id);
+	}
+	size_t _insert(const _KTy &key) {
+		if (destroyable.empty()) {
+			keymap[key] = currcount;
+			data.push_back(key);
+			currcount++;
+			return currcount - 1;
+		}
+		else {
+			size_t id = destroyable.front();
+			keymap[key] = id;
+			data[id] = key;
+			destroyable.pop_front();
+			return id;
+		}
 	}
 };
 END

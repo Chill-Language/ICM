@@ -30,19 +30,19 @@ namespace ICM
 		TypeUnit TypeIndex;
 	};
 
-
-	class IdentTable : private IndexTable<string, IdentTableUnit>
+	using IdentKey = size_t;
+	class IdentTable : private IndexTable<IdentKey, IdentTableUnit>
 	{
 	public:
 		IdentTable() {}
 
-		size_t insert(const string &name, IdentType type) {
-			size_t id = IndexTable::insert(name, IdentTableUnit(type));
+		size_t insert(const IdentKey &key, IdentType type) {
+			size_t id = IndexTable::insert(key, IdentTableUnit(type));
 			this->get(id).index = id;
 			return id;
 		}
-		size_t find(const string &name) const {
-			return IndexTable::find(name);
+		size_t find(const IdentKey &key) const {
+			return IndexTable::find(key);
 		}
 		IdentTableUnit& at(size_t index) {
 			return IndexTable::get(index);
@@ -50,7 +50,7 @@ namespace ICM
 		size_t size() const {
 			return IndexTable::size();
 		}
-		const string& getName(size_t index) const {
+		const IdentKey& getKey(size_t index) const {
 			return IndexTable::getKey(index);
 		}
 

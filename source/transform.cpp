@@ -272,23 +272,23 @@ namespace ICM
 
 		private:
 			void setIdentifier(Element &element) {
-				const string &name = getIdentName(element);
-				size_t index = GlobalIdentTable.find(name);
+				const IdentKey &key = element.getIndex();
+				size_t index = GlobalIdentTable.find(key);
 				if (index != GlobalIdentTable.size()) {
 					IdentTableUnit &itu = GlobalIdentTable.at(index);
 					setIdent(element, itu.type, index);
 				}
 				else {
-					index = GlobalIdentTable.insert(name, I_DyVarb);
+					index = GlobalIdentTable.insert(key, I_DyVarb);
 					setIdent(element, I_DyVarb, index);
 				}
 			}
 			void setKeyword(Element &element) {
 				if (isKey(element, list_)) {
-					setIdent(element, I_Function, GlobalIdentTable.find("list"));
+					setIdent(element, I_Function, GlobalIdentTable.find(GlobalIdentNameMap["list"]));
 				}
 				else if (isKey(element, disp_)) {
-					setIdent(element, I_Function, GlobalIdentTable.find("disp"));
+					setIdent(element, I_Function, GlobalIdentTable.find(GlobalIdentNameMap["disp"]));
 				}
 			}
 		};
