@@ -53,6 +53,9 @@ namespace ICM
 			bool operator==(const TypeType &tt) const {
 				return data == tt.data;
 			}
+			TypeUnit get() const {
+				return data;
+			}
 
 		private:
 			TypeUnit data;

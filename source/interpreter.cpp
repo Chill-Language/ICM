@@ -186,7 +186,9 @@ namespace ICM
 				}
 				case rest: {
 					Insts::Assign &inst = static_cast<Insts::Assign&>(*Inst);
-					setDyVarbRestType(inst.VTU, getType(inst.Data));
+					//(restrict a (type 5))
+					Object *data = getObject(inst.Data);
+					setDyVarbRestType(inst.VTU, data->dat<T_Type>().get());
 					break;
 				}
 				case cpys: {

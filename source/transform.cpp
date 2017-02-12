@@ -85,26 +85,26 @@ namespace ICM
 			}
 			bool compileKeyword(Node &node, Element &refelt) {
 				switch (node[0].getKeyword()) {
-				case if_:    return compileIf(node, refelt);
-				case for_:   return compileFor(node, refelt);
-				case while_: return compileWhile(node, refelt);
-				case loop_:  return compileLoop(node, refelt);
-				case do_:    return adjustNode(node, 1);
-				case list_:  return adjustNode(node, 1);
-				case p_:     return adjustNode(node, 1);
-				case call_:  return adjustNode(node, 1);
-				case disp_:  return compileDisp(node, refelt);
+				case if_:       return compileIf(node, refelt);
+				case for_:      return compileFor(node, refelt);
+				case while_:    return compileWhile(node, refelt);
+				case loop_:     return compileLoop(node, refelt);
+				case do_:       return adjustNode(node, 1);
+				case list_:     return adjustNode(node, 1);
+				case p_:        return adjustNode(node, 1);
+				case call_:     return adjustNode(node, 1);
+				case disp_:     return compileDisp(node, refelt);
 				case let_:
 				case set_:
 				case ref_:
-				case cpy_:   return compileLSRC(node, refelt);
+				case cpy_:      return compileLSRC(node, refelt);
 				case dim_:
-				case restrict_: return true;
-				default:     return error("Error with unkonwn Keyword.");
+				case restrict_: return compileRestrictDim(node, refelt);
+				default:        return error("Error with unkonwn Keyword.");
 				}
 			}
-			// (disp V|R)
-			// --> (disp V|R)
+			// (disp I|R)
+			// --> (disp I|R)
 			bool compileDisp(Node &node, Element &refelt) {
 				if (node.size() == 2) {
 					Element &e = node[1];
@@ -226,6 +226,21 @@ namespace ICM
 					}
 					else
 						return error("Syntax error in '" + ICM::to_string(key) + "'.");
+				}
+				else
+					return error("Syntax error in '" + ICM::to_string(key) + "'.");
+			}
+			// (restrict/dim I E)
+			bool compileRestrictDim(Node &node, Element &refelt) {
+				KeywordID key = node.front().getKeyword();
+
+				if (node.size() == 3) {
+					if (node[1].isIdent()) {
+						adjustElement(node[2]);
+						return true;
+					}
+					else
+						return error("var must be Identifier.");
 				}
 				else
 					return error("Syntax error in '" + ICM::to_string(key) + "'.");

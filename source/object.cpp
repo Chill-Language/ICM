@@ -71,7 +71,7 @@ namespace ICM
 	}
 	template <>
 	string to_string<T_Nil>(const void *data) {
-		return "Nil";
+		return "nil";
 	}
 	template <>
 	string to_string<T_Null>(const void *data) {
@@ -91,7 +91,7 @@ namespace ICM
 	}
 	template <>
 	string to_output<T_Nil>(const void *data) {
-		return "Nil";
+		return to_string<T_Nil>(data);
 	}
 	template <>
 	string to_output<T_Null>(const void *data) {
@@ -203,7 +203,6 @@ namespace ICM
 		using namespace Objects;
 		switch (type)
 		{
-		case ICM::T_Object:     return new Object;
 		case ICM::T_Nil:        return new Nil;
 		case ICM::T_Error:      return new Error;
 		case ICM::T_Keyword:    return new Objects::Keyword;
@@ -236,11 +235,6 @@ namespace ICM
 		{
 			return disp->get<T_Disperse>()->end();
 		}
-	}
-
-	bool operator==(TypeUnit t1, DefaultType t2)
-	{
-		return t1 == (TypeUnit)t2;
 	}
 
 	StaticObject Static;

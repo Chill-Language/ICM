@@ -56,5 +56,7 @@ namespace ICM
 
 	using TypeUnit = uint_t;
 	string to_string(DefaultType type);
-	bool operator==(TypeUnit t1, DefaultType t2);
+	inline bool operator==(TypeUnit t1, DefaultType t2) {
+		return t1 == (TypeUnit)t2;
+	}
 }

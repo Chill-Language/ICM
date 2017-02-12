@@ -257,7 +257,7 @@ namespace ICM
 				LoopBreakIDs.pop();
 				return true;
 			}
-			// (let/set/ref/cpy I x y R{n}), (ref/cpy I)
+			// (let/set/ref/cpy I E), (ref/cpy I)
 			bool createNodeLSRC(Node &node, Element &refelt) {
 				if (node.size() == 3) {
 					assert(node[1].isIdentType(I_DyVarb));
@@ -282,9 +282,9 @@ namespace ICM
 				}
 				return true;
 			}
+			// (dim I E)
 			bool createNodeDim(Node &node, Element &refelt) {
 				// TODO
-				assert(node.size() == 3);
 				assert(node[1].isIdentType(I_StVarb));
 				assert(node[2].isIdentType(I_Type));
 				Element &ident = node[1];
@@ -293,13 +293,14 @@ namespace ICM
 				InstList.push(new Insts::Assign(dim, ident_id, ConvertToInstElement(type)));
 				return true;
 			}
+			// (restrict I E)
 			bool createNodeRestrict(Node &node, Element &refelt) {
 				// TODO
-				assert(node.size() == 3);
 				assert(node[1].isIdentType(I_DyVarb));
-				assert(node[2].isIdentType(I_Type));
+				//assert(node[2].isIdentType(I_Type));
 				Element &ident = node[1];
 				Element &type = node[2];
+				createReferNode(type);
 				size_t ident_id = getIdentID(ident);
 				InstList.push(new Insts::Assign(rest, ident_id, ConvertToInstElement(type)));
 				return true;

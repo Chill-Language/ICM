@@ -8,26 +8,40 @@ namespace ICM
 	struct IdentTableUnit
 	{
 		IdentTableUnit(IdentType type = I_Void, size_t index = 0)
-			: type(type), index(index) {
-			DyVarb = &Static.Nil;
+			: type(type), index(index) { initialize(); }
+
+		void initialize() {
+			switch (type) {
+			case I_Data:
+				break;
+			case I_StVarb:
+				StVarb = nullptr;
+				dimtype = T_Null;
+				break;
+			case I_DyVarb:
+				DyVarb = &Static.Nil;
+				restype = T_Vary;
+				break;
+			default:
+				break;
+			}
 		}
 
 		IdentType type;
 		size_t index;
-		/*union {
-			Object  svdata; // Reference From StVarb
-			Object* dvref;  // Reference From DyVarb
-			size_t  rvref;  // Reference From ReVarb
-		};*/
 
-		TypeUnit restype = T_Vary; // Restrict Type
+		union {
+			TypeUnit dimtype;  // Dim Type for StVarb
+			TypeUnit restype;  // Restrict Type for DyVarb
+		};
 
-		// TODO
-		Object StVarb;
-		Object *DyVarb;
-		Object *Data;
-		size_t FunctionIndex;
-		TypeUnit TypeIndex;
+		union {
+			Object *StVarb;
+			Object *DyVarb;
+			Object *Data;
+			size_t FunctionIndex;
+			TypeUnit TypeIndex;
+		};
 	};
 
 	using IdentKey = size_t;
@@ -54,5 +68,36 @@ namespace ICM
 			return IndexTable::getKey(index);
 		}
 
+	};
+
+	enum IdentSpaceType
+	{
+		IS_Global,
+		IS_Namespace,
+		IS_Module,
+		IS_Function,
+		IS_Lambda,
+		IS_Struct,
+		IS_Expr,
+	};
+
+	struct IdentSpaceTableUnit
+	{
+		IdentSpaceTableUnit(size_t index, IdentSpaceType type, IdentSpaceTableUnit *father)
+			: index(index), type(type), father(father), data(new IdentTable) {}
+
+		size_t index;
+		IdentSpaceType type;
+		IdentSpaceTableUnit* father;
+		unique_ptr<IdentTable> data;
+	};
+
+	class IdentSpaceTable
+	{
+	public:
+		IdentSpaceTable() {}
+
+	private:
+		IdentSpaceType type;
 	};
 }
