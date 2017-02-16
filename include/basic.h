@@ -28,6 +28,8 @@
 // Declares
 using int_t = std::conditional_t<std::is_same<size_t, uint64_t>::value, int64_t, int32_t>;
 using uint_t = std::conditional_t<std::is_same<size_t, uint64_t>::value, uint64_t, uint32_t>;
+using inth_t = std::conditional_t<std::is_same<size_t, uint64_t>::value, int32_t, int16_t>;
+using uinth_t = std::conditional_t<std::is_same<size_t, uint64_t>::value, uint32_t, uint16_t>;
 
 // Using
 using std::string;

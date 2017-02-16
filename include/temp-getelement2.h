@@ -4,24 +4,6 @@
 
 namespace ICM
 {
-	// IdentTable
-	inline size_t findFromIdentTable(const IdentKey &key) {
-		return GlobalIdentTable.find(key);
-	}
-	inline size_t getIdentTableSize() {
-		return GlobalIdentTable.size();
-	}
-	inline IdentTableUnit& getFromIdentTable(size_t index) {
-		return GlobalIdentTable.at(index);
-	}
-	inline size_t insertFromIdentTable(const IdentKey &key, IdentType type) {
-		return GlobalIdentTable.insert(key, type);
-	}
-	inline auto getKeyFromIdentTable(size_t index) {
-		return GlobalIdentTable.getKey(index);
-	}
-
-
 	namespace Instruction { struct Element; }
 
 	Object getLiteral(const Instruction::Element & elt);

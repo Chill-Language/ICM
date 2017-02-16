@@ -149,6 +149,6 @@ namespace ICM
 	ObjectManager GlobalObjectManager;
 	SymbolTable GlobalSymbolTable;
 
-	IdentTable GlobalIdentTable;
 	FuncTable GlobalFunctionTable;
+	IdentManager GlobalIdentManager;
 }

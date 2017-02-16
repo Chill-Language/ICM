@@ -127,8 +127,3 @@ namespace ICM
 }
 
 #include "identtable.h"
-
-namespace ICM
-{
-	extern IdentTable GlobalIdentTable;
-}
