@@ -81,23 +81,61 @@ namespace ICM
 		IS_Expr,
 	};
 
-	struct IdentSpaceTableUnit
-	{
-		IdentSpaceTableUnit(size_t index, IdentSpaceType type, IdentSpaceTableUnit *father)
-			: index(index), type(type), father(father), data(new IdentTable) {}
+	using SpaceIndex = uint_t;
 
-		size_t index;
+	struct IdentIndex
+	{
+		IdentIndex(uint_t si, uint_t ii)
+			: space_id(si), ident_id(ii) {}
+
+		SpaceIndex space_id = 0;
+		uint_t ident_id = 0;
+	};
+
+	struct IdentSpaceUnit
+	{
+		IdentSpaceUnit(size_t index, IdentSpaceType type, SpaceIndex superior)
+			: index(index), type(type), superior(superior), data(new IdentTable()) {}
+
+		SpaceIndex index;
 		IdentSpaceType type;
-		IdentSpaceTableUnit* father;
+		SpaceIndex superior;
 		unique_ptr<IdentTable> data;
 	};
 
-	class IdentSpaceTable
+	class IdentManager
 	{
 	public:
-		IdentSpaceTable() {}
+		IdentManager() {
+			Table.push_back(IdentSpaceUnit(0, IS_Global, 0));
+			reset();
+		}
+
+		void addSpace(IdentSpaceType istype) {
+			SpaceIndex index = Table.size();
+			SpaceIndex superior = CurrentSpace->index;
+			Table.push_back(IdentSpaceUnit(index, istype, superior));
+			CurrentSpace = &Table.back();
+		}
+
+		IdentSpaceUnit& getSpace(SpaceIndex sindex) {
+			return Table.at(sindex);
+		}
+
+		IdentSpaceUnit& getCurrentSpace() {
+			return *CurrentSpace;
+		}
+
+		void reset() {
+			CurrentSpace = &Table.at(0);
+		}
 
 	private:
-		IdentSpaceType type;
+		IdentSpaceUnit *CurrentSpace;
+		vector<IdentSpaceUnit> Table;
+
+
 	};
+
+	extern IdentManager GlobalIdentManager;
 }

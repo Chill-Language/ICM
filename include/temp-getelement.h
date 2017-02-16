@@ -1,5 +1,4 @@
 #pragma once
-//#pragma message("===Compiling temp-getelement.h===")
 #include "object.h"
 
 namespace ICM

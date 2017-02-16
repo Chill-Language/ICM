@@ -23,11 +23,11 @@ namespace ICM
 		return getLiteral(*(ASTBase::Element*)&elt);
 	}
 	const string & getIdentName(const ASTBase::Element & elt) {
-		IdentKey key = elt.isIdentType(I_Void) ? elt.getIndex() : GlobalIdentTable.getKey(elt.getIndex());
+		IdentKey key = elt.isIdentType(I_Void) ? elt.getIndex() : getKeyFromIdentTable(elt.getIndex());
 		return Compiler::GlobalIdentNameMap.getKey(key);
 	}
 	const string& getIdentName(size_t ident_index) {
-		IdentKey key = GlobalIdentTable.getKey(ident_index);
+		IdentKey key = getKeyFromIdentTable(ident_index);
 		return Compiler::GlobalIdentNameMap.getKey(key);
 	}
 	void setIdent(ASTBase::Element & elt, IdentType type, size_t index) {
@@ -43,11 +43,11 @@ namespace ICM
 	}
 	TypeUnit getType(const Instruction::Element & elt) {
 		assert(elt.isIdentType(I_Type));
-		return GlobalIdentTable.at(elt.getIndex()).TypeIndex;
+		return getFromIdentTable(elt.getIndex()).TypeIndex;
 	}
 	FuncTableUnit & getFunction(const Instruction::Element & elt) {
 		assert(elt.isIdentType(I_Function));
-		return GlobalFunctionTable[GlobalIdentTable.at(elt.getIndex()).FunctionIndex];
+		return GlobalFunctionTable[getFromIdentTable(elt.getIndex()).FunctionIndex];
 	}
 	Object * getDyVarbData(const Instruction::Element & elt) {
 		assert(elt.isIdentType(I_DyVarb));
@@ -68,7 +68,7 @@ namespace ICM
 			return new Objects::Function(getFunction(elt).getID());
 		}
 		else if (elt.isIdentType(I_Type)) {
-			return new Objects::Type(GlobalIdentTable.at(elt.getIndex()).TypeIndex);
+			return new Objects::Type(getFromIdentTable(elt.getIndex()).TypeIndex);
 		}
 		return nullptr;
 	}

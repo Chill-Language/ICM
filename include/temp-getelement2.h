@@ -1,10 +1,27 @@
 #pragma once
-//#pragma message("===Compiling temp-getelement2.h===")
 #include "object.h"
 #include "tabledata.h"
 
 namespace ICM
 {
+	// IdentTable
+	inline size_t findFromIdentTable(const IdentKey &key) {
+		return GlobalIdentTable.find(key);
+	}
+	inline size_t getIdentTableSize() {
+		return GlobalIdentTable.size();
+	}
+	inline IdentTableUnit& getFromIdentTable(size_t index) {
+		return GlobalIdentTable.at(index);
+	}
+	inline size_t insertFromIdentTable(const IdentKey &key, IdentType type) {
+		return GlobalIdentTable.insert(key, type);
+	}
+	inline auto getKeyFromIdentTable(size_t index) {
+		return GlobalIdentTable.getKey(index);
+	}
+
+
 	namespace Instruction { struct Element; }
 
 	Object getLiteral(const Instruction::Element & elt);
@@ -16,8 +33,8 @@ namespace ICM
 	// DyVarb
 
 	inline void setDyVarbData(size_t ident_index, Object *data) {
-		assert(GlobalIdentTable.at(ident_index).type == I_DyVarb);
-		IdentTableUnit &itu = GlobalIdentTable.at(ident_index);
+		assert(getFromIdentTable(ident_index).type == I_DyVarb);
+		IdentTableUnit &itu = getFromIdentTable(ident_index);
 		if (itu.restype == T_Vary || itu.restype == data->type) {
 			itu.DyVarb = data;
 		}
@@ -26,19 +43,19 @@ namespace ICM
 		}
 	}
 	inline void setDyVarbResType(size_t ident_index, TypeUnit type) {
-		assert(GlobalIdentTable.at(ident_index).type == I_DyVarb);
-		IdentTableUnit &itu = GlobalIdentTable.at(ident_index);
+		assert(getFromIdentTable(ident_index).type == I_DyVarb);
+		IdentTableUnit &itu = getFromIdentTable(ident_index);
 		itu.restype = type;
 	}
 	inline Object* getDyVarbData(size_t ident_index) {
-		assert(GlobalIdentTable.at(ident_index).type == I_DyVarb);
-		return GlobalIdentTable.at(ident_index).DyVarb;
+		assert(getFromIdentTable(ident_index).type == I_DyVarb);
+		return getFromIdentTable(ident_index).DyVarb;
 	}
 	Object* getDyVarbData(const Instruction::Element &elt);
 
 	inline void setDyVarbRestType(size_t ident_index, TypeUnit type) {
-		assert(GlobalIdentTable.at(ident_index).type == I_DyVarb);
-		IdentTableUnit &itu = GlobalIdentTable.at(ident_index);
+		assert(getFromIdentTable(ident_index).type == I_DyVarb);
+		IdentTableUnit &itu = getFromIdentTable(ident_index);
 		itu.restype = type;
 	}
 	FuncTableUnit& getFunction(const Instruction::Element &elt);
@@ -46,12 +63,12 @@ namespace ICM
 	// Data
 
 	inline void setConstData(size_t ident_index, Object *data) {
-		assert(GlobalIdentTable.at(ident_index).type == I_Data);
-		GlobalIdentTable.at(ident_index).Data = data;
+		assert(getFromIdentTable(ident_index).type == I_Data);
+		getFromIdentTable(ident_index).Data = data;
 	}
 	inline Object* getConstData(size_t ident_index) {
-		assert(GlobalIdentTable.at(ident_index).type == I_Data);
-		return GlobalIdentTable.at(ident_index).Data;
+		assert(getFromIdentTable(ident_index).type == I_Data);
+		return getFromIdentTable(ident_index).Data;
 	}
 	TypeUnit getType(const Instruction::Element &elt);
 	Object* getIdentData(const Instruction::Element &elt);

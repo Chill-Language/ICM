@@ -3,6 +3,8 @@
 #include "analysisbase.h"
 #include "objectdef.h"
 
+#include "temp-getelement2.h"
+
 namespace ICM
 {
 	namespace Compiler
@@ -100,6 +102,7 @@ namespace ICM
 				case cpy_:      return compileLSRC(node, refelt);
 				case dim_:
 				case restrict_: return compileRestrictDim(node, refelt);
+				case define_:   return compileDefine(node, refelt);
 				default:        return error("Error with unkonwn Keyword.");
 				}
 			}
@@ -245,6 +248,21 @@ namespace ICM
 				else
 					return error("Syntax error in '" + ICM::to_string(key) + "'.");
 			}
+			// (define I E)
+			bool compileDefine(Node &node, Element &refelt) {
+				KeywordID key = node.front().getKeyword();
+
+				if (node.size() == 3) {
+					if (node[1].isIdent()) {
+						adjustElement(node[2]);
+						return true;
+					}
+					else
+						return error("var must be Identifier.");
+				}
+				else
+					return error("Syntax error in '" + ICM::to_string(key) + "'.");
+			}
 		};
 
 		class IdentifierAnalysis : public AnalysisBase
@@ -288,22 +306,22 @@ namespace ICM
 		private:
 			void setIdentifier(Element &element) {
 				const IdentKey &key = element.getIndex();
-				size_t index = GlobalIdentTable.find(key);
-				if (index != GlobalIdentTable.size()) {
-					IdentTableUnit &itu = GlobalIdentTable.at(index);
+				size_t index = findFromIdentTable(key);
+				if (index != getIdentTableSize()) {
+					IdentTableUnit &itu = getFromIdentTable(index);
 					setIdent(element, itu.type, index);
 				}
 				else {
-					index = GlobalIdentTable.insert(key, I_DyVarb);
+					index = insertFromIdentTable(key, I_DyVarb);
 					setIdent(element, I_DyVarb, index);
 				}
 			}
 			void setKeyword(Element &element) {
 				if (isKey(element, list_)) {
-					setIdent(element, I_Function, GlobalIdentTable.find(GlobalIdentNameMap["list"]));
+					setIdent(element, I_Function, findFromIdentTable(GlobalIdentNameMap["list"]));
 				}
 				else if (isKey(element, disp_)) {
-					setIdent(element, I_Function, GlobalIdentTable.find(GlobalIdentNameMap["disp"]));
+					setIdent(element, I_Function, findFromIdentTable(GlobalIdentNameMap["disp"]));
 				}
 			}
 		};
