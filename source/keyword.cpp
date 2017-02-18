@@ -17,16 +17,16 @@ namespace ICM
 		addDefFuncs(GlobalFunctionTable);
 		//
 		for (const auto &var : GlobalFunctionTable) {
-			size_t id = insertFromIdentTable(Compiler::GlobalIdentNameMap[var.first], I_Function);
-			getFromIdentTable(id).FunctionIndex = GlobalFunctionTable.find(var.first);
+			IdentBasicIndex id = insertFromCurrentIdentTable(Compiler::GlobalIdentNameMap[var.first], I_Function);
+			getFromCurrentIdentTable(id).FunctionIndex = GlobalFunctionTable.find(var.first);
 		}
-		setDyVarbData(insertFromIdentTable(Compiler::GlobalIdentNameMap["true"], I_DyVarb), &Static.True);
-		setDyVarbData(insertFromIdentTable(Compiler::GlobalIdentNameMap["false"], I_DyVarb), &Static.False);
+		setDyVarbData(IdentIndex{ 0, insertFromCurrentIdentTable(Compiler::GlobalIdentNameMap["true"], I_DyVarb) }, &Static.True);
+		setDyVarbData(IdentIndex{ 0, insertFromCurrentIdentTable(Compiler::GlobalIdentNameMap["false"], I_DyVarb) }, &Static.False);
 		// Import TypeInfoTable
 		for (const auto &elt : TypeInfoTable) {
 			const TypeInfo &info = elt.second;
-			size_t id = insertFromIdentTable(Compiler::GlobalIdentNameMap[info.name], I_Type);
-			getFromIdentTable(id).TypeIndex = info.index;
+			IdentBasicIndex id = insertFromCurrentIdentTable(Compiler::GlobalIdentNameMap[info.name], I_Type);
+			getFromCurrentIdentTable(id).TypeIndex = info.index;
 		}
 
 		// TODO : Memory leak

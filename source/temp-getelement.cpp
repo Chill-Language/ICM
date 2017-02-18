@@ -23,39 +23,42 @@ namespace ICM
 		return getLiteral(*(ASTBase::Element*)&elt);
 	}
 	const string & getIdentName(const ASTBase::Element & elt) {
-		IdentKey key = elt.isIdentType(I_Void) ? elt.getIndex() : getKeyFromIdentTable(elt.getIndex());
+		IdentKey key = elt.isIdentType(I_Void) ? elt.getIndex() : getKeyFromIdentTable(elt.getIdentIndex());
 		return Compiler::GlobalIdentNameMap.getKey(key);
 	}
 	const string& getIdentName(size_t ident_index) {
+		return Compiler::GlobalIdentNameMap.getKey(ident_index);
+	}
+	const string& getIdentName(const IdentIndex &ident_index) {
 		IdentKey key = getKeyFromIdentTable(ident_index);
 		return Compiler::GlobalIdentNameMap.getKey(key);
 	}
 	void setIdent(ASTBase::Element & elt, IdentType type, size_t index) {
 		elt = ASTBase::Element::Identifier(type, index);
 	}
-	size_t getIdentID(const ASTBase::Element & elt) {
+	const IdentIndex& getIdentID(const ASTBase::Element & elt) {
 		assert(!elt.isIdentType(I_Void));
-		return elt.getIndex();
+		return elt.getIdentIndex();
 	}
 	Object * getConstData(const Instruction::Element & elt) {
 		assert(elt.isIdentType(I_Data));
-		return getConstData(elt.getIndex());
+		return getConstData(elt.getIdentIndex());
 	}
 	TypeUnit getType(const Instruction::Element & elt) {
 		assert(elt.isIdentType(I_Type));
-		return getFromIdentTable(elt.getIndex()).TypeIndex;
+		return getFromIdentTable(elt.getIdentIndex()).TypeIndex;
 	}
 	FuncTableUnit & getFunction(const Instruction::Element & elt) {
 		assert(elt.isIdentType(I_Function));
-		return GlobalFunctionTable[getFromIdentTable(elt.getIndex()).FunctionIndex];
+		return GlobalFunctionTable[getFromIdentTable(elt.getIdentIndex()).FunctionIndex];
 	}
 	Object * getDyVarbData(const Instruction::Element & elt) {
 		assert(elt.isIdentType(I_DyVarb));
-		return getDyVarbData(elt.getIndex());
+		return getDyVarbData(elt.getIdentIndex());
 	}
 	const string& getIdentName(const Instruction::Element &elt) {
 		assert(!elt.isIdentType(I_Void));
-		return getIdentName(elt.getIndex());
+		return getIdentName(elt.getIdentIndex());
 	}
 	Object* getIdentData(const Instruction::Element &elt) {
 		if (elt.isIdentType(I_DyVarb)) {
@@ -68,7 +71,7 @@ namespace ICM
 			return new Objects::Function(getFunction(elt).getID());
 		}
 		else if (elt.isIdentType(I_Type)) {
-			return new Objects::Type(getFromIdentTable(elt.getIndex()).TypeIndex);
+			return new Objects::Type(getFromIdentTable(elt.getIdentIndex()).TypeIndex);
 		}
 		return nullptr;
 	}

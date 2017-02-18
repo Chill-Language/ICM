@@ -236,7 +236,7 @@ namespace ICM
 				Element &ve = node[3];
 				Element &Rdo = node[4];
 
-				size_t id = getIdentID(I);
+				const IdentIndex &id = getIdentID(I);
 				setDyVarbData(id, &Static.Zero); // TODO
 
 				createReferNode(vb);
@@ -263,7 +263,7 @@ namespace ICM
 					assert(node[1].isIdentType(I_DyVarb));
 					Element &ident = node[1];
 					Element &value = node[2];
-					size_t ident_id = getIdentID(ident);
+					const IdentIndex &ident_id = getIdentID(ident);
 					ICM::Instruction::Instruction inst;
 					switch (node[0].getKeyword()) {
 					case Keyword::let_: inst = let; break;
@@ -289,7 +289,7 @@ namespace ICM
 				assert(node[2].isIdentType(I_Type));
 				Element &ident = node[1];
 				Element &type = node[2];
-				size_t ident_id = getIdentID(ident);
+				const IdentIndex &ident_id = getIdentID(ident);
 				InstList.push(new Insts::Assign(dim, ident_id, ConvertToInstElement(type)));
 				return true;
 			}
@@ -301,7 +301,7 @@ namespace ICM
 				Element &ident = node[1];
 				Element &type = node[2];
 				createReferNode(type);
-				size_t ident_id = getIdentID(ident);
+				const IdentIndex &ident_id = getIdentID(ident);
 				InstList.push(new Insts::Assign(rest, ident_id, ConvertToInstElement(type)));
 				return true;
 			}

@@ -89,6 +89,9 @@ namespace ICM
 		IdentSpaceIndex space_index;
 		IdentBasicIndex ident_index;
 	};
+	inline string to_string(const IdentIndex &ii) {
+		return "(" + std::to_string(ii.space_index), + ", " + std::to_string(ii.ident_index) + ")";
+	}
 
 	struct IdentSpaceUnit
 	{
@@ -131,6 +134,7 @@ namespace ICM
 			return getCurrentSpace().getIdentTable();
 		}
 
+
 		void reset() {
 			CurrentSpace = &Table.at(0);
 		}
@@ -143,24 +147,44 @@ namespace ICM
 	};
 
 	extern IdentManager GlobalIdentManager;
-
 	// IdentTable
 	inline IdentTable& getCurrentIdentTable() {
 		return GlobalIdentManager.getCurrentIdentTable();
 	}
-	inline size_t findFromIdentTable(const IdentKey &key) {
-		return getCurrentIdentTable().find(key);
+	inline IdentTable& getIdentTable(const IdentSpaceIndex &isid) {
+		return GlobalIdentManager.getSpace(isid).getIdentTable();
 	}
-	inline size_t getIdentTableSize() {
+	inline IdentSpaceIndex getCurrentIdentSpaceIndex() {
+		return GlobalIdentManager.getCurrentSpace().index;
+	}
+	inline IdentBasicIndex findFromCurrentIdentTable(const IdentKey &key) {
+		return (IdentBasicIndex)getCurrentIdentTable().find(key);
+	}
+	inline IdentBasicIndex findFromIdentTable(IdentSpaceIndex isid, const IdentKey &key) {
+		return (IdentBasicIndex)getIdentTable(isid).find(key);
+	}
+	inline size_t getIdentTableSize(IdentSpaceIndex isid) {
+		return getIdentTable(isid).size();
+	}
+	inline size_t getCurrentIdentTableSize() {
 		return getCurrentIdentTable().size();
 	}
-	inline IdentTableUnit& getFromIdentTable(size_t index) {
+	inline IdentBasicIndex insertFromCurrentIdentTable(const IdentKey &key, IdentType type) {
+		return (IdentBasicIndex)getCurrentIdentTable().insert(key, type);
+	}
+	inline IdentBasicIndex insertFromIdentTable(IdentSpaceIndex isid, const IdentKey &key, IdentType type) {
+		return (IdentBasicIndex)getIdentTable(isid).insert(key, type);
+	}
+	inline size_t ConvertIdentIndexToSizeT(const IdentIndex &ii) {
+		return reinterpret_cast<const size_t&>(ii);
+	}
+	inline IdentTableUnit& getFromCurrentIdentTable(size_t index) {
 		return getCurrentIdentTable().at(index);
 	}
-	inline size_t insertFromIdentTable(const IdentKey &key, IdentType type) {
-		return getCurrentIdentTable().insert(key, type);
+	inline IdentTableUnit& getFromIdentTable(const IdentIndex &index) {
+		return getIdentTable(index.space_index).at(index.ident_index);
 	}
-	inline auto getKeyFromIdentTable(size_t index) {
-		return getCurrentIdentTable().getKey(index);
+	inline auto getKeyFromIdentTable(const IdentIndex &index) {
+		return getIdentTable(index.space_index).getKey(index.ident_index);
 	}
 }

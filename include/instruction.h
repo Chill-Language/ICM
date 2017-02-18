@@ -116,6 +116,7 @@ namespace ICM
 			// Get/Set
 			void setRefer(size_t id) { assert(isRefer()); setIndex(id); }
 			size_t getRefer() const { assert(isRefer()); return getIndex(); }
+			const IdentIndex& getIdentIndex() const { return reinterpret_cast<const IdentIndex&>(index); }
 			TypeUnit getLiteralType() const { assert(isLiteral()); return getSubType(); }
 			size_t getIndetType() const { assert(isIdent()); return getSubType(); }
 			Keyword::KeywordID getKeyword() const { assert(isKeyword()); return (Keyword::KeywordID)getSubType(); }
@@ -250,9 +251,9 @@ namespace ICM
 
 			struct Assign : public InstructionData
 			{
-				Assign(Instruction inst, size_t VTUID, const Element &elt)
+				Assign(Instruction inst, const IdentIndex &VTUID, const Element &elt)
 					: InstructionData(inst), VTU(VTUID), Data(elt) {}
-				size_t VTU;
+				IdentIndex VTU;
 				Element Data;
 
 			private:
@@ -296,24 +297,24 @@ namespace ICM
 
 			struct Inc : public InstDataBase<inc>
 			{
-				Inc(size_t VTU) : VTU(VTU) {}
-				size_t VTU;
+				Inc(const IdentIndex &VTU) : VTU(VTU) {}
+				IdentIndex VTU;
 			private:
 				string getToString() const { return getIdentName(VTU); }
 			};
 
 			struct Compare : public InstructionData
 			{
-				Compare(Instruction inst, size_t VTU, const Element &Data)
+				Compare(Instruction inst, const IdentIndex &VTU, const Element &Data)
 					: InstructionData(inst), VTU(VTU), Data(Data) {}
-				size_t VTU;
+				IdentIndex VTU;
 				Element Data;
 			protected:
 				string getToString() const { return getIdentName(VTU) + ", " + ICM::to_string(Data); }
 			};
 			struct JumpCompare : public Compare
 			{
-				JumpCompare(Instruction inst, size_t VTU, const Element &Data)
+				JumpCompare(Instruction inst, const IdentIndex &VTU, const Element &Data)
 					: Compare(inst, VTU, Data) {}
 				size_t Index;
 			private:

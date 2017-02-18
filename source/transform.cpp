@@ -306,22 +306,25 @@ namespace ICM
 		private:
 			void setIdentifier(Element &element) {
 				const IdentKey &key = element.getIndex();
-				size_t index = findFromIdentTable(key);
-				if (index != getIdentTableSize()) {
-					IdentTableUnit &itu = getFromIdentTable(index);
-					setIdent(element, itu.type, index);
+				IdentSpaceIndex sid = getCurrentIdentSpaceIndex();
+				IdentBasicIndex index = findFromIdentTable(sid, key);
+				if (index != getIdentTableSize(sid)) {
+					IdentIndex ii = { sid, index };
+					IdentTableUnit &itu = getFromIdentTable(ii);
+					setIdent(element, itu.type, ConvertIdentIndexToSizeT(ii));
 				}
 				else {
-					index = insertFromIdentTable(key, I_DyVarb);
-					setIdent(element, I_DyVarb, index);
+					index = insertFromIdentTable(sid, key, I_DyVarb);
+					IdentIndex ii = { sid, index };
+					setIdent(element, I_DyVarb, ConvertIdentIndexToSizeT(ii));
 				}
 			}
 			void setKeyword(Element &element) {
 				if (isKey(element, list_)) {
-					setIdent(element, I_Function, findFromIdentTable(GlobalIdentNameMap["list"]));
+					setIdent(element, I_Function, ConvertIdentIndexToSizeT(IdentIndex{ 0, findFromCurrentIdentTable(GlobalIdentNameMap["list"]) }));
 				}
 				else if (isKey(element, disp_)) {
-					setIdent(element, I_Function, findFromIdentTable(GlobalIdentNameMap["disp"]));
+					setIdent(element, I_Function, ConvertIdentIndexToSizeT(IdentIndex{ 0, findFromCurrentIdentTable(GlobalIdentNameMap["disp"]) }));
 				}
 			}
 		};
