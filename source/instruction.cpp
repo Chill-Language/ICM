@@ -197,7 +197,6 @@ namespace ICM
 
 			// (? BE E1 E2)
 			bool createNodeIfe(Node &node, Element &refelt) {
-				println(node);
 				Element &Bexp = node[1];
 				Element &E1 = node[2];
 				Element &E2 = node[3];

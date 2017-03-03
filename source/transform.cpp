@@ -165,11 +165,16 @@ namespace ICM
 			// (? BE E1 E2)
 			// --> (? BE E1 E2)
 			bool compileIfe(Node &node, Element &refelt) {
-				if (node.size() == 4) {
+				if (node.size() >= 3) {
 					Element &bexp = node[1];
 					checkBoolExp(adjustElement(bexp));
 					adjustElement(node[2]);
-					adjustElement(node[3]);
+					if (node.size() == 4) {
+						adjustElement(node[3]);
+					}
+					else {
+						node.push_back(Element::Identifier(GlobalIdentNameMap["nil"]));
+					}
 					return true;
 				}
 				else
