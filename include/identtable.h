@@ -86,6 +86,9 @@ namespace ICM
 
 	struct IdentIndex
 	{
+		IdentIndex(IdentSpaceIndex sid = 0, IdentBasicIndex iid = 0)
+			: space_index(sid), ident_index(iid) {}
+
 		IdentSpaceIndex space_index;
 		IdentBasicIndex ident_index;
 	};

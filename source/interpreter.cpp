@@ -2,6 +2,7 @@
 #include "interpreter.h"
 #include "objectdef.h"
 #include "temp-getelement2.h"
+#include <ctime>
 
 namespace ICM
 {
@@ -65,8 +66,8 @@ namespace ICM
 			const FuncTableUnit *ftup;
 
 			Instruction::Element &front = Data.front();
-			if (front.isIdentType(I_Function)) {
-				ftup = &getFunction(front);
+			if (front.isIdentType(I_StFunc)) {
+				ftup = &getStFunc(front);
 			}
 			else if (front.isIdentType(I_DyVarb) || front.isRefer()) {
 				Object *fp = getObject(front);
@@ -92,6 +93,7 @@ namespace ICM
 
 		Object* run() {
 			size_t ProgramCounter = 0;
+			std::srand(static_cast<unsigned>(std::time(0)));
 			while (true) {
 				using namespace Instruction;
 				auto &Inst = InstList[ProgramCounter];

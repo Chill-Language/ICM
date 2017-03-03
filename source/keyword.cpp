@@ -17,7 +17,7 @@ namespace ICM
 		addDefFuncs(GlobalFunctionTable);
 		//
 		for (const auto &var : GlobalFunctionTable) {
-			IdentBasicIndex id = insertFromCurrentIdentTable(Compiler::GlobalIdentNameMap[var.first], I_Function);
+			IdentBasicIndex id = insertFromCurrentIdentTable(Compiler::GlobalIdentNameMap[var.first], I_StFunc);
 			getFromCurrentIdentTable(id).FunctionIndex = GlobalFunctionTable.find(var.first);
 		}
 		setDyVarbData(IdentIndex{ 0, insertFromCurrentIdentTable(Compiler::GlobalIdentNameMap["true"], I_DyVarb) }, &Static.True);
@@ -43,6 +43,7 @@ namespace ICM
 		{ "cpy",      Keyword::cpy_      },
 		{ "ref",      Keyword::ref_      },
 		{ "if",       Keyword::if_       },
+		{ "?",        Keyword::ife_      },
 		{ "then",     Keyword::then_     },
 		{ "else",     Keyword::else_     },
 		{ "elsif",    Keyword::elsif_    },

@@ -41,7 +41,7 @@ namespace ICM
 		IdentTableUnit &itu = getFromIdentTable(ident_index);
 		itu.restype = type;
 	}
-	FuncTableUnit& getFunction(const Instruction::Element &elt);
+	FuncTableUnit& getStFunc(const Instruction::Element &elt);
 
 	// Data
 

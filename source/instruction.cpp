@@ -45,7 +45,7 @@ namespace ICM
 
 	namespace Compiler
 	{
-		bool PrintCompilingProcess2 = false;
+		bool PrintCompilingProcess2 = !false;
 
 		using namespace ICM::Instruction;
 
@@ -89,6 +89,7 @@ namespace ICM
 				case call_:     return createNodeCall(node, refelt);
 				case do_:       return createNodeDo(node, refelt);
 				case if_:       return createNodeIf(node, refelt);
+				case ife_:      return createNodeIfe(node, refelt);
 				case while_:    return createNodeWhile(node, refelt);
 				case loop_:     return createNodeLoop(node, refelt);
 				case for_:      return createNodeFor(node, refelt);
@@ -124,6 +125,10 @@ namespace ICM
 				return true;
 			}
 
+			bool isSingleElement(const Element &elt) {
+				return elt.isLiteral() || elt.isIdentType(I_StFunc) || elt.isIdentType(I_DyVarb);
+			}
+
 			// (do ...)
 			bool createNodeDo(Node &node, Element &refelt) {
 				assert(node[0].getKeyword() == do_);
@@ -131,7 +136,7 @@ namespace ICM
 					if (e.isRefer()) {
 						createNode(GetRefer(e), e);
 					}
-					else if (e.isLiteral() || e.isIdentType(I_Function) || e.isIdentType(I_DyVarb)) {
+					else if (isSingleElement(e)) {
 						InstList.push(new Insts::Store(ConvertToInstElement(e)));
 					}
 					else if (isKey(e, break_)) {
@@ -178,6 +183,45 @@ namespace ICM
 					p->Index = index;
 				}
 				refelt.setRefer(index);
+				return true;
+			}
+
+			void createReferNodeAndSingleElement(Element &elt) {
+				if (isSingleElement(elt)) {
+					InstList.push(new Insts::Store(ConvertToInstElement(elt)));
+				}
+				else {
+					createReferNode(elt);
+				}
+			}
+
+			// (? BE E1 E2)
+			bool createNodeIfe(Node &node, Element &refelt) {
+				println(node);
+				Element &Bexp = node[1];
+				Element &E1 = node[2];
+				Element &E2 = node[3];
+
+				createReferNode(Bexp);
+
+				auto *inst = new Insts::JumpNot();
+				inst->Data = ConvertToInstElement(Bexp);
+				InstList.push(inst);
+
+				createReferNodeAndSingleElement(E1);
+
+
+				auto *instje = new Insts::Jump();
+				InstList.push(instje);
+				inst->Index = NextInstID();
+
+				createReferNodeAndSingleElement(E2);
+
+				instje->Index = NextInstID();
+
+				InstList.push(sing);
+
+				refelt.setRefer(CurrInstID());
 				return true;
 			}
 

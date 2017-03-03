@@ -6,7 +6,8 @@ namespace ICM
 		// Data
 		I_Data,
 		// Function
-		I_Function,
+		I_StFunc,   // Static Function
+		I_DyFunc,   // Dynamic Function
 		// Variable
 		I_DyVarb,   // Dynamic Variable
 		I_StVarb,   // Static Variable

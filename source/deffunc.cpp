@@ -111,6 +111,17 @@ namespace ICM
 					return ObjectPtr(new Number((int_t)rr.getNum()));
 				}
 			};
+			struct Gcd : public FI
+			{
+			private:
+				S sign() const {
+					return S({ T_Number, T_Number }, T_Number); // (N N) -> N
+				}
+				ObjectPtr func(const DataList &list) const {
+					const auto &rr = Common::Number::gcd(list[0]->dat<T_Number>(), list[1]->dat<T_Number>());
+					return ObjectPtr(new Number(rr));
+				}
+			};
 
 			struct Inc : public FI
 			{
@@ -119,9 +130,8 @@ namespace ICM
 					return S({ T_Number }, T_Number); // N -> N
 				}
 				ObjectPtr func(const DataList &list) const {
-					auto &r1 = list[0]->dat<T_Number>();
-					r1 += 1;
-					return list[0];
+					const auto &r1 = list[0]->dat<T_Number>();
+					return ObjectPtr(new Number(r1 + 1));
 				}
 			};
 			struct Dec : public FI
@@ -131,9 +141,8 @@ namespace ICM
 					return S({ T_Number }, T_Number); // N -> N
 				}
 				ObjectPtr func(const DataList &list) const {
-					auto &r1 = list[0]->dat<T_Number>();
-					r1 -= 1;
-					return list[0];
+					const auto &r1 = list[0]->dat<T_Number>();
+					return ObjectPtr(new Number(r1 - 1));
 				}
 			};
 		}
@@ -366,6 +375,35 @@ namespace ICM
 			};
 		}
 
+		namespace IO
+		{
+			ObjectPtr read(const DataList &dl) {
+				static char buffer[0xff] = { 0 };
+				fgets(buffer, 0xff, stdin);
+				return ObjectPtr(new String(buffer));
+			}
+			ObjectPtr rand(const DataList &dl) {
+				auto ii = dl[0]->dat<T_Number>();
+				int i = std::rand() % ii;
+				return ObjectPtr(new Number(i));
+			}
+		}
+
+		namespace Convert
+		{
+			struct StringToNumber : public FI
+			{
+			private:
+				S sign() const {
+					return S({ T_String }, T_Number); // S -> N
+				}
+				ObjectPtr func(const DataList &list) const {
+					TypeBase::NumberType num = (TypeBase::NumberType)Common::Number::to_rational(list[0]->dat<T_String>().c_str()).getNum();
+					return ObjectPtr(new Objects::Number(num));
+				}
+			};
+		}
+
 		//=======================================
 		// * System
 		//=======================================
@@ -501,6 +539,7 @@ namespace ICM
 		DefFuncTable.insert("/", LST{ new Calc::Div() });
 		DefFuncTable.insert("mod", LST{ new Calc::Mod() });
 		DefFuncTable.insert("rem", LST{ new Calc::Rem() });
+		DefFuncTable.insert("gcd", LST{ new Calc::Gcd() });
 
 		DefFuncTable.insert("=", LST{ new Comp::Equ() });
 		DefFuncTable.insert("<", LST{ new Comp::NumSmallS() });
@@ -508,8 +547,8 @@ namespace ICM
 		DefFuncTable.insert(">", LST{ new Comp::NumLargeL() });
 		DefFuncTable.insert(">=", LST{ new Comp::NumLargeE() });
 
-		//DefFuncTable.insert("inc", LST{ new Calc::Inc() });
-		//DefFuncTable.insert("dec", LST{ new Calc::Dec() });
+		DefFuncTable.insert("inc", LST{ new Calc::Inc() });
+		DefFuncTable.insert("dec", LST{ new Calc::Dec() });
 		DefFuncTable.insert("++", "inc");
 		DefFuncTable.insert("--", "dec");
 
@@ -532,6 +571,7 @@ namespace ICM
 		DefFuncTable.insert("swap", LST{ new Lists::Swap() });
 		DefFuncTable.insert("at", LST{ new Lists::At() });
 		DefFuncTable.insert("set", LST{ new Lists::Set() });
+		DefFuncTable.insert("string->number", LST{ new Convert::StringToNumber() });
 		DefFuncTable.insert("call", Lst{
 			F(System::call, S({ T_Function }, T_Vary)),    // F -> V
 			F(System::call, S({ T_Function, T_Vary }, T_Vary, true)),    // (F V*) -> V
@@ -551,6 +591,12 @@ namespace ICM
 		DefFuncTable.insert("not", LST{ new DefFunc::BoolCalc::Not() });
 		DefFuncTable.insert("dcall", Lst{
 			F(System::dcall, S({ T_Vary, T_Function, T_Vary }, T_Vary)), // (Var F Var) -> Var
+		});
+		DefFuncTable.insert("gets", Lst{
+			F(IO::read, S({}, T_String)), // Void -> String
+		});
+		DefFuncTable.insert("rand", Lst{
+			F(IO::rand, S({ T_Number }, T_Number)), // Number -> Number
 		});
 		DefFuncTable.insert("type", LST{ new System::Type() });
 		DefFuncTable.insert("exit", Lst{

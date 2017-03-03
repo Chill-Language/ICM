@@ -7,6 +7,26 @@
 
 namespace ICM
 {
+
+	bool getCompiletimeData(const ASTBase::Element &elt, Object &value) {
+		if (elt.isLiteral()) {
+			value = getLiteral(elt);
+			return true;
+		}
+		else if (elt.isIdent()) {
+			if (elt.isIdentType(I_StFunc)) {
+				//value = getStFunc(elt);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	bool getCompiletimeFunc(const ASTBase::Element &elt, FuncTableUnit &ftu) {
+		//getStFunc(elt);
+		return true;
+	}
+
 	Object getLiteral(const ASTBase::Element &elt) {
 		assert(elt.isLiteral());
 		void *dat = Compiler::GlobalElementPool.get(elt.getIndex());
@@ -33,9 +53,6 @@ namespace ICM
 		IdentKey key = getKeyFromIdentTable(ident_index);
 		return Compiler::GlobalIdentNameMap.getKey(key);
 	}
-	void setIdent(ASTBase::Element & elt, IdentType type, size_t index) {
-		elt = ASTBase::Element::Identifier(type, index);
-	}
 	const IdentIndex& getIdentID(const ASTBase::Element & elt) {
 		assert(!elt.isIdentType(I_Void));
 		return elt.getIdentIndex();
@@ -48,8 +65,8 @@ namespace ICM
 		assert(elt.isIdentType(I_Type));
 		return getFromIdentTable(elt.getIdentIndex()).TypeIndex;
 	}
-	FuncTableUnit & getFunction(const Instruction::Element & elt) {
-		assert(elt.isIdentType(I_Function));
+	FuncTableUnit & getStFunc(const Instruction::Element & elt) {
+		assert(elt.isIdentType(I_StFunc));
 		return GlobalFunctionTable[getFromIdentTable(elt.getIdentIndex()).FunctionIndex];
 	}
 	Object * getDyVarbData(const Instruction::Element & elt) {
@@ -67,8 +84,8 @@ namespace ICM
 		else if (elt.isIdentType(I_Data)) {
 			return getConstData(elt);
 		}
-		else if (elt.isIdentType(I_Function)) {
-			return new Objects::Function(getFunction(elt).getID());
+		else if (elt.isIdentType(I_StFunc)) {
+			return new Objects::Function(getStFunc(elt).getID());
 		}
 		else if (elt.isIdentType(I_Type)) {
 			return new Objects::Type(getFromIdentTable(elt.getIdentIndex()).TypeIndex);

@@ -88,6 +88,7 @@ namespace ICM
 			bool compileKeyword(Node &node, Element &refelt) {
 				switch (node[0].getKeyword()) {
 				case if_:       return compileIf(node, refelt);
+				case ife_:      return compileIfe(node, refelt);
 				case for_:      return compileFor(node, refelt);
 				case while_:    return compileWhile(node, refelt);
 				case loop_:     return compileLoop(node, refelt);
@@ -160,6 +161,19 @@ namespace ICM
 					dolist.push_back(e);
 				}
 				return true;
+			}
+			// (? BE E1 E2)
+			// --> (? BE E1 E2)
+			bool compileIfe(Node &node, Element &refelt) {
+				if (node.size() == 4) {
+					Element &bexp = node[1];
+					checkBoolExp(adjustElement(bexp));
+					adjustElement(node[2]);
+					adjustElement(node[3]);
+					return true;
+				}
+				else
+					return error("Syntax error in '?'.");
 			}
 			// (loop E...)
 			// --> (loop R{do E...})
@@ -265,6 +279,25 @@ namespace ICM
 			}
 		};
 
+		class CompiletimeEvaluate : public AnalysisBase
+		{
+		public:
+			CompiletimeEvaluate(NodeTable &Table) : AnalysisBase(Table) {}
+
+			bool eval(Element &element, Object &result) {
+
+			}
+			bool isIdentDefined(Element &element) {
+				assert(element.isIdent());
+
+			}
+
+		private:
+			Object* call(Function::FuncObject &func, DataList &list) {
+				return func.call(list).get();
+			}
+		};
+
 		class IdentifierAnalysis : public AnalysisBase
 		{
 		public:
@@ -285,6 +318,23 @@ namespace ICM
 			void setIdentSub(Node &node) {
 				if (PrintCompilingProcess)
 					println(to_string(node));
+				// define
+				if (node[0].isKeyword()) {
+					if (node[0].getKeyword() == define_) {
+						println("Making Define...");
+						Element &ident = node[1];
+						IdentSpaceIndex sid = getCurrentIdentSpaceIndex();
+						IdentIndex ii = { sid };
+
+						println(ident);
+						setIdent(ident, I_Data, ii);
+					}
+					else if (node[0].getKeyword() == module_) {
+						println("Making Module...");
+						println(node[1]);
+					}
+				}
+				// other
 				bool change = false;
 				for (size_t i : range(0, node.size())) {
 					Element &e = node[i];
@@ -304,28 +354,39 @@ namespace ICM
 			}
 
 		private:
+			bool isIdentDefined(const IdentKey &key, IdentIndex &iid) {
+				IdentBasicIndex index = findFromIdentTable(iid.space_index, key);
+				if (index != getIdentTableSize(iid.space_index)) {
+					iid.ident_index = index;
+					return true;
+				}
+				return false;
+			}
 			void setIdentifier(Element &element) {
 				const IdentKey &key = element.getIndex();
-				IdentSpaceIndex sid = getCurrentIdentSpaceIndex();
-				IdentBasicIndex index = findFromIdentTable(sid, key);
-				if (index != getIdentTableSize(sid)) {
-					IdentIndex ii = { sid, index };
+				IdentIndex ii(getCurrentIdentSpaceIndex());
+				if (isIdentDefined(key, ii)) {
 					IdentTableUnit &itu = getFromIdentTable(ii);
-					setIdent(element, itu.type, ConvertIdentIndexToSizeT(ii));
+					setIdent(element, itu.type, ii);
 				}
 				else {
-					index = insertFromIdentTable(sid, key, I_DyVarb);
-					IdentIndex ii = { sid, index };
-					setIdent(element, I_DyVarb, ConvertIdentIndexToSizeT(ii));
+					ii.ident_index = insertFromIdentTable(ii.space_index, key, I_DyVarb);
+					setIdent(element, I_DyVarb, ii);
 				}
 			}
 			void setKeyword(Element &element) {
 				if (isKey(element, list_)) {
-					setIdent(element, I_Function, ConvertIdentIndexToSizeT(IdentIndex{ 0, findFromCurrentIdentTable(GlobalIdentNameMap["list"]) }));
+					setIdent(element, I_StFunc, getGlobalFunctionIdentIndex("list"));
 				}
 				else if (isKey(element, disp_)) {
-					setIdent(element, I_Function, ConvertIdentIndexToSizeT(IdentIndex{ 0, findFromCurrentIdentTable(GlobalIdentNameMap["disp"]) }));
+					setIdent(element, I_StFunc, getGlobalFunctionIdentIndex("disp"));
 				}
+			}
+			void setIdent(ASTBase::Element &elt, IdentType type, const IdentIndex &index) {
+				elt = ASTBase::Element::Identifier(type, ConvertIdentIndexToSizeT(index));
+			}
+			IdentIndex getGlobalFunctionIdentIndex(const string &name) {
+				return { 0, findFromIdentTable(0, GlobalIdentNameMap[name]) };
 			}
 		};
 
