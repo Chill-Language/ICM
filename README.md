@@ -12,7 +12,8 @@ Hello World!
 
 # How To Build
 
-***You should ensure that your compiler support C++14.***<br>
+***You should ensure that your compiler support C++14.***
+
 If you have cmake & gcc, you can input these commands:
 
 ```
