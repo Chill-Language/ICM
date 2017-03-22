@@ -46,13 +46,13 @@ If '***a***' is a function, or it is a variable with a value of function, using 
 
 ```lisp
 ; Example :
-(defun a [n] (+ n 1)) ; define a function named 'a', with an argument named 'n', to return the value of the expression '(+ n 1)'
-(defun b [n] (- n 2))
-(defun add_func [fa fb n] (+ (fa n) (fb n)))
+(defunc a [n] (+ n 1)) ; define a function named 'a', with an argument named 'n', to return the value of the expression '(+ n 1)'
+(defunc b [n] (- n 2))
+(defunc add_func [fa fb n] (+ (fa n) (fb n)))
 (add_func a b n)
 
 ; Same As :
-(defun add_func [n] (+ (+ n 1) (- n 2)))
+(defunc add_func [n] (+ (+ n 1) (- n 2)))
 (add_func n)
 ```
 
