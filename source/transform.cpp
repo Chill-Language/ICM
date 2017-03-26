@@ -331,12 +331,12 @@ namespace ICM
 						IdentSpaceIndex sid = getCurrentIdentSpaceIndex();
 						IdentIndex ii = { sid };
 
-						println(ident);
+						println(to_string(ident));
 						setIdent(ident, I_Data, ii);
 					}
 					else if (node[0].getKeyword() == module_) {
 						println("Making Module...");
-						println(node[1]);
+						println(to_string(node[1]));
 					}
 				}
 				// other
@@ -389,9 +389,6 @@ namespace ICM
 			}
 			void setIdent(ASTBase::Element &elt, IdentType type, const IdentIndex &index) {
 				elt = ASTBase::Element::Identifier(type, ConvertIdentIndexToSizeT(index));
-			}
-			IdentIndex getGlobalFunctionIdentIndex(const string &name) {
-				return { 0, findFromIdentTable(0, GlobalIdentNameMap[name]) };
 			}
 		};
 

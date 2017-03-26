@@ -55,4 +55,8 @@ namespace ICM
 	}
 	TypeUnit getType(const Instruction::Element &elt);
 	Object* getIdentData(const Instruction::Element &elt);
+
+
+	IdentIndex getGlobalFunctionIdentIndex(const string &name);
+	IdentIndex insertGlobalDyVarbIdentIndex(const string & name);
 }

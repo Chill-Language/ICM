@@ -20,8 +20,8 @@ namespace ICM
 			IdentBasicIndex id = insertFromCurrentIdentTable(Compiler::GlobalIdentNameMap[var.first], I_StFunc);
 			getFromCurrentIdentTable(id).FunctionIndex = GlobalFunctionTable.find(var.first);
 		}
-		setDyVarbData(IdentIndex{ 0, insertFromCurrentIdentTable(Compiler::GlobalIdentNameMap["true"], I_DyVarb) }, &Static.True);
-		setDyVarbData(IdentIndex{ 0, insertFromCurrentIdentTable(Compiler::GlobalIdentNameMap["false"], I_DyVarb) }, &Static.False);
+		setDyVarbData(insertGlobalDyVarbIdentIndex("true"), &Static.True);
+		setDyVarbData(insertGlobalDyVarbIdentIndex("false"), &Static.False);
 		// Import TypeInfoTable
 		for (const auto &elt : TypeInfoTable) {
 			const TypeInfo &info = elt.second;

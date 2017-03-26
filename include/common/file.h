@@ -37,6 +37,8 @@ public:
 		: filename(filename), tbmode(tbmode), rwmode(rwmode) {
 		priOpen();
 	}
+	File(FILE *fp, TBMode tbmode = Text, RWMode rwmode = ReadWrite)
+		: file(fp), tbmode(tbmode), rwmode(rwmode) {}
 	File& open(const std::string &filename) {
 		this->filename = filename;
 		priOpen();
@@ -109,6 +111,30 @@ public:
 		setPostBegin();
 		fread(tmp, sizeof(char), size(), file.get());
 		return tmp.to_string();
+	}
+	FILE* c_ptr() const {
+		return file.get();
+	}
+	std::string getline() {
+		std::string result;
+		const size_t size = 0xff;
+
+		while (true) {
+			char buffer[size] = { 0 };
+			fgets(buffer, size, file.get());
+
+			char c = buffer[size - 2];
+			if (c == '\x00' || c == '\x0A') {
+				buffer[strlen(buffer) - 1] = '\0';
+				result += std::string(buffer);
+				break;
+			}
+			else {
+				result += std::string(buffer);
+			}
+		}
+
+		return result;
 	}
 
 private:

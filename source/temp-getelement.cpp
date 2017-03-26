@@ -92,4 +92,10 @@ namespace ICM
 		}
 		return nullptr;
 	}
+	IdentIndex getGlobalFunctionIdentIndex(const string & name) {
+		return { 0, findFromIdentTable(0, Compiler::GlobalIdentNameMap[name]) };
+	}
+	IdentIndex insertGlobalDyVarbIdentIndex(const string & name) {
+		return { 0, insertFromIdentTable(0, Compiler::GlobalIdentNameMap[name], I_DyVarb) };
+	}
 }

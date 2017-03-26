@@ -45,7 +45,7 @@ namespace ICM
 
 	namespace Compiler
 	{
-		bool PrintCompilingProcess2 = !false;
+		bool PrintCompilingProcess2 = false;
 
 		using namespace ICM::Instruction;
 
