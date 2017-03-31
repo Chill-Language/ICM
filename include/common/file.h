@@ -117,7 +117,7 @@ public:
 	}
 	std::string getline() {
 		std::string result;
-		const size_t size = 0xff;
+		const size_t size = 0x100;
 
 		while (true) {
 			char buffer[size] = { 0 };
@@ -125,7 +125,9 @@ public:
 
 			char c = buffer[size - 2];
 			if (c == '\x00' || c == '\x0A') {
-				buffer[strlen(buffer) - 1] = '\0';
+				size_t i = strlen(buffer) - 1;
+				if (buffer[i] == '\n')
+					buffer[i] = '\0';
 				result += std::string(buffer);
 				break;
 			}
