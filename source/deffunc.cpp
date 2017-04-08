@@ -379,7 +379,7 @@ namespace ICM
 		{
 			ObjectPtr read(const DataList &dl) {
 				static char buffer[0xff] = { 0 };
-				fgets(buffer, 0xff, stdin);
+				std::fgets(buffer, 0xff, stdin);
 				return ObjectPtr(new String(buffer));
 			}
 			ObjectPtr rand(const DataList &dl) {

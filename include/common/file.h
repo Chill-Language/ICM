@@ -88,7 +88,7 @@ public:
 		return s != EOF && s != 0;
 	}
 	bool getft(char *dst, size_t len) {
-		int s = fscanf(file.get(), "%s", dst, len);
+		int s = fscanf(file.get(), "%s", dst);
 		return s != EOF && s != 0;
 	}
 
