@@ -58,6 +58,15 @@ namespace ICM
 		DEFTYPE(Test, Test);
 
 #undef DEFTYPE
+
+#define DEFTYPE(_T, _TE) template <> struct CType<_T> { constexpr static TypeUnit index = T_##_TE; };
+
+		DEFTYPE(int, Number);
+		DEFTYPE(double, Double);
+		DEFTYPE(float, Float);
+		DEFTYPE(unsigned, UInt);
+
+#undef DEFTYPE
 	}
 
 	namespace Objects

@@ -3,6 +3,7 @@
 #include "keyword.h"
 #include "objectdef.h"
 #include "config.h"
+#include "runtime-caller.h"
 
 namespace ICM
 {
@@ -11,6 +12,56 @@ namespace ICM
 
 	namespace DefFunc
 	{
+		using FuncResult = Runtime::FuncResult;
+		using FuncArgument = Runtime::FuncArgument;
+		using FuncCaller = Runtime::FuncCaller;
+
+		template <FuncCaller f>
+		ObjectPtr callfunc(FuncArgument list) {
+			Object *res = new Object;
+			f(*res, list);
+			return ObjectPtr(res);
+		}
+
+		namespace CFunc
+		{
+			int iadd(int a, int b) { return a + b; }
+			int isub(int a, int b) { return a - b; }
+			int imul(int a, int b) { return a * b; }
+			int idiv(int a, int b) { return a / b; }
+
+			using F = ICM::Function::FuncObject;
+			using FI = ICM::Function::FuncInitObject;
+			using S = ICM::Function::Signature;
+			using T = ICM::TypeObject;
+
+			void addDefFuncs(FuncTable &DefFuncTable)
+			{
+				// TODO
+				using namespace ICM::DefFunc;
+				using Lst = std::initializer_list<F>;
+				using LST = std::initializer_list<FI*>;
+
+				DefFuncTable.insert("iadd", Lst{
+					F(callfunc<Runtime::Caller<::List<int, int>, int>::Type::call<iadd>>,
+					S({ T_Number, T_Number }, T_Number)),
+				});
+				DefFuncTable.insert("isub", Lst{
+					F(callfunc<Runtime::Caller<::List<int, int>, int>::Type::call<isub>>,
+					S({ T_Number, T_Number }, T_Number)),
+				});
+				DefFuncTable.insert("imul", Lst{
+					F(callfunc<Runtime::Caller<::List<int, int>, int>::Type::call<imul>>,
+					S({ T_Number, T_Number }, T_Number)),
+				});
+				DefFuncTable.insert("idiv", Lst{
+					F(callfunc<Runtime::Caller<::List<int, int>, int>::Type::call<idiv>>,
+					S({ T_Number, T_Number }, T_Number)),
+				});
+			}
+		}
+
+
 		ObjectPtr callDefFunc(const string &name, const DataList &dl) {
 			if (GlobalFunctionTable.find(name))
 				return checkCall(GlobalFunctionTable[name], dl);
@@ -528,6 +579,8 @@ namespace ICM
 		using Lst = std::initializer_list<F>;
 		using LST = std::initializer_list<FI*>;
 
+		CFunc::addDefFuncs(DefFuncTable);
+
 		DefFuncTable.insert("+", LST{
 			new Calc::Add<T_Void>(),
 			new Calc::Add<T_Number>(),
@@ -610,5 +663,17 @@ namespace ICM
 		DefFuncTable.insert("Config.SetPrintIntervalTime", LST{ new DefFunc::Config::PrintIntervalTime() });
 		DefFuncTable.insert("Config.PrintAST", LST{ new DefFunc::Config::PrintAST() });
 		DefFuncTable.insert("Config.PrintOrder", LST{ new DefFunc::Config::PrintOrder() });
+	}
+
+	namespace DefFunc2
+	{
+		// Function Standard Model
+		// call Result FunctionName Arguments ...
+
+
+	}
+
+	void addDefFuncs2(FuncTable &DefFuncTable) {
+
 	}
 }

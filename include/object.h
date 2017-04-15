@@ -15,6 +15,11 @@ namespace ICM
 		//===========================================================
 		using TypeName = const char* const;
 		template <TypeUnit> struct TType { using Type = void; static TypeName Name; };
+
+		//===========================================================
+		// * Template CType
+		//===========================================================
+		template <typename> struct CType { constexpr static TypeUnit index = T_Null; };
 	}
 	template <TypeUnit T> using TType = Types::TType<T>;
 
