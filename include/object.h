@@ -138,9 +138,9 @@ namespace ICM
 			Zero(T_Number, (void*)&Value_Zero)
 		{};
 
-		const static bool Value_True = true;
-		const static bool Value_False = false;
-		const static uint64_t Value_Zero = 0;
+		const static bool Value_True;
+		const static bool Value_False;
+		const static uint64_t Value_Zero;
 		
 		Object Null;
 		Object Nil;

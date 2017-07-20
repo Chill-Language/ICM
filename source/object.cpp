@@ -237,4 +237,8 @@ namespace ICM
 	}
 
 	StaticObject Static;
+
+	const bool StaticObject::Value_True = true;
+	const bool StaticObject::Value_False = false;
+	const uint64_t StaticObject::Value_Zero = 0;
 }
