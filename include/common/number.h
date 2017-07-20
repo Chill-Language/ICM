@@ -9,7 +9,7 @@
 #include <cmath>
 #include <string>
 
-SYSTEM BEGIN
+SYSTEM_BEGIN
 namespace Number
 {
 	//--------------------
@@ -75,6 +75,6 @@ namespace Number
 	std::string to_string(const Rational &rat);
 	Rational to_rational(const std::string &str);
 }
-END
+SYSTEM_END
 
 #endif

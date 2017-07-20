@@ -1,10 +1,9 @@
 #include "basic.h"
 #include "object.h"
-#include "keyword.h"
+#include "typeobject.h"
+#include "function.h"
+#include "typebase.h"
 #include "tabledata.h"
-#include "parser.h"
-#include "instruction.h"
-#include "temp-getelement.h"
 
 namespace ICM
 {
@@ -33,46 +32,6 @@ namespace ICM
 			}
 		}
 	}
-	string to_string(Parser::MatchType type)
-	{
-		using namespace Parser;
-
-		switch (type) {
-		case MT_Null:       return "Null";
-		case MT_Blank:      return "Blank";
-		case MT_Comment:    return "Comment";
-		case MT_LBracket:   return "LBracket";
-		case MT_RBracket:   return "RBracket";
-		case MT_LSBracket:  return "LSBracket";
-		case MT_RSBracket:  return "RSBracket";
-		case MT_LLBracket:  return "LLBracket";
-		case MT_RLBracket:  return "RLBracket";
-		case MT_Identifier: return "Identifier";
-		case MT_Suffix:     return "Suffix";
-		case MT_Keyword:    return "Keyword";
-		case MT_Number:     return "Number";
-		case MT_Boolean:    return "Boolean";
-		case MT_String:     return "String";
-		case MT_DSymbol:    return "DSymbol";
-		default:            return "UnfoundType";
-		}
-	}
-	string to_string(Keyword::KeywordID key)
-	{
-		size_t id = GlobalKeywordTable.findValue(key);
-		if (id != GlobalKeywordTable.size())
-			return GlobalKeywordTable.getData(id).first;
-		else
-			return "UnfoundKeyword";
-	}
-	string to_string(Instruction::Instruction inst)
-	{
-		size_t id = Instruction::InstructionName.findKey(inst);
-		if (id != Instruction::InstructionName.size())
-			return Instruction::InstructionName.getValue(id);
-		else
-			return "UnknowInstruction";
-	}
 	string to_string(const ObjectPtr &obj) {
 		return obj.to_string();
 	}
@@ -84,17 +43,6 @@ namespace ICM
 	}
 	string to_string(const vector<Object*> &list) {
 		return Convert::to_string<'[', ']'>(list.begin(), list.end(), [](const Object* obj) { return obj->to_string(); });
-	}
-	// MatchResult
-	string to_string(const Parser::MatchResult &mr) {
-		// Main
-		string str;
-		str.append("(");
-		str.append(ICM::to_string(mr.getType()));
-		str.append(", \'");
-		str.append(mr.getString());
-		str.append("')");
-		return str;
 	}
 	// Function
 	string to_string(const Function::Signature::List &list) {
@@ -130,95 +78,5 @@ namespace ICM
 	string to_string(const TypeBase::FunctionType& ft)
 	{
 		return TypeBase::to_string(ft);
-	}
-	//=======================================
-	// * AST
-	//=======================================
-	string to_string(const AST::Element &element) {
-		if (element.isLiteral())
-			return "D(" + getLiteral(element).to_string_code() + ")";
-		else if (element.isRefer())
-			return "R{" + std::to_string(element.getRefer()) + "}";
-		else if (element.isKeyword())
-			return "K(" + ICM::to_string(element.getKeyword()) + ")";
-		else if (element.isIdentType(I_DyVarb))
-			return "V(" + getIdentName(element) + ")";
-		else if (element.isIdentType(I_StFunc))
-			return "F(" + getIdentName(element) + ")";
-		else if (element.isIdent())
-			return "I(" + getIdentName(element) + ")";
-		else
-			return "UnkonwnElement";
-	}
-	string to_string_2(const AST::Element &element) {
-		if (element.isLiteral())
-			return getLiteral(element).to_string_code();
-		else if (element.isRefer())
-			return "{" + std::to_string(element.getRefer()) + "}";
-		else if (element.isKeyword())
-			return ICM::to_string(element.getKeyword());
-		else if (element.isIdentType(I_DyVarb))
-			return getIdentName(element);
-		else if (element.isIdentType(I_StFunc))
-			return getIdentName(element);
-		else if (element.isIdent())
-			return getIdentName(element);
-		else
-			return "UnkonwnElement";
-	}
-	string to_string(const vector<AST::Element> &vec) {
-		return Convert::to_string(vec.begin(), vec.end(), [](const auto &e) { return ICM::to_string(e); });
-	}
-	string to_string(const AST::Node &node) {
-		string str("[" + std::to_string(node.getIndex()) + "]: " + "(" + to_string((const vector<AST::Element> &)node) + ")");
-		return str;
-	}
-	string to_string(const AST &ast) {
-		string str("{AST:");
-		if (ast.empty())
-			str.append("NIL");
-		else {
-			for (const auto &e : ast.getTableRange()) {
-				str.append("\n ");
-				str.append(ICM::to_string(*e));
-			}
-		}
-		str.append("\n}");
-		return str;
-	}
-	// Old
-	string to_string_old(const AST::Element &element) {
-		if (element.isLiteral())
-			return "D(" + getLiteral(element).to_string() + ")";
-		else
-			return "R[" + std::to_string(element.getRefer()) + "]";
-	}
-	string to_string_old(const AST::Node &node) {
-		string str = "<N(" + std::to_string(node.getIndex()) + "):";
-		for (auto &e : node)
-			str.append(" " + to_string(e));
-		str.append(">");
-		return str;
-	}
-	string to_string_old(const AST &ast) {
-		string str("{AST:");
-		if (ast.empty())
-			str.append("NIL");
-		else {
-			for (const auto &e : ast.getTableRange()) {
-				str.append("\n ");
-				str.append(ICM::to_string(*e));
-			}
-		}
-		str.append("\n}");
-		return str;
-	}
-
-
-	string to_string(const Instruction::Element &elt) {
-		return to_string(*(ASTBase::Element*)&elt);
-	}
-	string to_string(const vector<Instruction::Element> &elt) {
-		return to_string(*(vector<ASTBase::Element>*)&elt);
 	}
 }

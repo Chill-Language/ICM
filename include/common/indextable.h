@@ -8,7 +8,7 @@
 #include "macro.h"
 #include "bijectionmap.h"
 
-SYSTEM BEGIN
+SYSTEM_BEGIN
 template <typename _KTy, typename _VTy>
 class IndexTable
 {
@@ -39,10 +39,10 @@ public:
 	_VTy& operator[](size_t id) {
 		return data[id];
 	}
-	const _VTy& get(size_t id) const {
+	const _VTy& at(size_t id) const {
 		return data[id];
 	}
-	_VTy& get(size_t id) {
+	_VTy& at(size_t id) {
 		return data[id];
 	}
 	_KTy& getKey(size_t id) {
@@ -94,6 +94,6 @@ private:
 	SerialBijectionMap<_KTy> keymap;
 	std::vector<_VTy> data;
 };
-END
+SYSTEM_END
 
 #endif

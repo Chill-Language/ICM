@@ -9,7 +9,7 @@
 #include <string>
 #include "prints.h"
 
-SYSTEM BEGIN
+SYSTEM_BEGIN
 template <typename T, typename Iter>
 class RangeBase
 {
@@ -119,6 +119,6 @@ inline std::string to_string(const RangeBase<T1, T2> &r)
 
 	return "range(" + to_string(r._begin) + "," + to_string(r._end) + ")";
 }
-END
+SYSTEM_END
 
 #endif

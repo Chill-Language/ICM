@@ -8,7 +8,7 @@
 #include "macro.h"
 #include <ctime>
 
-SYSTEM BEGIN
+SYSTEM_BEGIN
 class Timer
 {
 public:
@@ -22,6 +22,6 @@ public:
 
 	clock_t time;
 };
-END
+SYSTEM_END
 
 #endif

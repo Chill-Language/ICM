@@ -11,7 +11,7 @@
 #include <cstdlib>
 #include <cstring>
 
-SYSTEM BEGIN
+SYSTEM_BEGIN
 #if _ITERATOR_DEBUG_LEVEL != 0
 template <typename T>
 class pointer_iterator : public std::iterator<std::random_access_iterator_tag, T, ptrdiff_t, T*, T&>
@@ -72,15 +72,6 @@ namespace Memory
 		return length * sizeof(T);
 	}
 
-	// New/Delete
-	template <typename T>
-	inline T* new_(size_t length) {
-		return new T[length]();
-	}
-	template <typename T>
-	inline void delete_(T *p) {
-		delete[] p;
-	}
 	// Alloc/Free
 	template <typename T = byte>
 	inline T* alloc(size_t length) {
@@ -90,6 +81,42 @@ namespace Memory
 	inline void free(T *p) {
 		std::free(p);
 	}
+	// New/Delete
+	template <typename T>
+	inline T* new_(size_t length) {
+		return new T[length]();
+	}
+	template <typename T>
+	inline void new_n(T *data, size_t length) {
+		for (size_t i = 0; i < length; i++) {
+			new (data + i) T();
+		}
+	}
+	template <typename T>
+	inline void delete_(T *p) {
+		delete[] p;
+	}
+	template <typename T>
+	inline void delete_n(T *p, size_t n) {
+		for (size_t i = 0; i < n; i++) {
+			p[i]. ~T();
+		}
+		free(p);
+	}
+
+	template <typename T>
+	inline void copy_n(T *data, T *begin, size_t length) {
+		for (size_t i = 0; i < length; i++) {
+			new (data + i) T(*(begin + i));
+		}
+	}
+	template <typename T, typename Iter>
+		inline void copy_n(T *data, Iter begin, size_t length) {
+		for (size_t i = 0; i < length; i++) {
+			new (data + i) T(*(begin + i));
+		}
+	}
+
 	// Construct/Destruct
 	template <typename T>
 	inline void construct(T *data) {
@@ -127,6 +154,6 @@ namespace Memory
 			return copyTo(new_<T>(length), from, length);
 	}
 }
-END
+SYSTEM_END
 
 #endif

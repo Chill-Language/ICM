@@ -179,6 +179,9 @@ namespace ICM
 				void setArgs() {
 					isargs = true;
 				}
+				Node* getParent() const {
+					return parent;
+				}
 
 			private:
 				TypeObjectPtr data;

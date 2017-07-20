@@ -25,7 +25,7 @@ struct PushFrontN<LNs<Ns...>, N> { using Type = LNs<N, Ns...>; };
 
 namespace Runtime
 {
-	using FuncResult = ICM::Object&;
+	using FuncResult = ICM::Object*&;
 	using FuncArgument = const ICM::DataList&;
 	using FuncCaller = void(FuncResult, FuncArgument);
 
@@ -35,7 +35,10 @@ namespace Runtime
 
 	template <typename T>
 	inline void setResult(FuncResult res, T &&data) {
-		res = ICM::Object(ICM::Types::CType<T>::index, new T(data));
+		// TODO
+		static T sdata;
+		sdata = data;
+		res = new ICM::Object(ICM::Types::CType<T>::index, &sdata);
 	}
 
 	template <typename T, size_t N>
@@ -93,6 +96,15 @@ namespace Runtime
 		template <_TR(*f) (void)>
 		inline static void call(FuncResult res, FuncArgument argv) {
 			setResult<_TR>(res, f());
+		}
+	};
+	
+	template <>
+	struct CallerBase<void, void>
+	{
+		template <void(*f) (void)>
+		inline static void call(FuncResult res, FuncArgument argv) {
+			f();
 		}
 	};
 

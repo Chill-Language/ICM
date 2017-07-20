@@ -23,16 +23,18 @@ namespace ICM
 	}
 	template <TypeUnit T> using TType = Types::TType<T>;
 
+	using DataPointer = void*;
+
 	//=============================================
 	// * Struct TypeInfo
 	//=============================================
 	struct TypeInfo
 	{
-		using ConFunc = void(void*);
-		using DesFunc = void(void*);
-		using CpyFunc = void(void*, const void*);
-		using EquFunc = bool(const void*, const void*);
-		using TosFunc = std::string(const void*);
+		using ConFunc = void(DataPointer);
+		using DesFunc = void(DataPointer);
+		using CpyFunc = void(DataPointer, const DataPointer);
+		using EquFunc = bool(const DataPointer, const DataPointer);
+		using TosFunc = std::string(const DataPointer);
 
 		TypeUnit index;
 		const char* name;
@@ -47,13 +49,13 @@ namespace ICM
 		TosFunc* to_output;
 		TosFunc* to_string_code;
 
-		void* alloc() const {
+		DataPointer alloc() const {
 			return Memory::alloc(size);
 		}
-		void* mcopy(const void *src) const {
+		DataPointer mcopy(const DataPointer src) const {
 			return Memory::mcopy(alloc(), src, size);
 		}
-		void* copy(const void *src) const {
+		DataPointer copy(const DataPointer src) const {
 			void *dst = alloc();
 			ncopy(dst, src);
 			return dst;
@@ -69,7 +71,7 @@ namespace ICM
 	struct Object
 	{
 	public:
-		Object(TypeUnit type = T_Null, void *data = nullptr) : type(type), data(data) {}
+		Object(TypeUnit type = T_Null, DataPointer data = nullptr) : type(type), data(data) {}
 
 #define CheckTypeInfo() assert(this && (this->type == 0 || TypeInfoTable.find(this->type) != TypeInfoTable.end()))
 
@@ -116,7 +118,7 @@ namespace ICM
 		bool isType(TypeUnit _TU) const { return type == _TU; }
 		
 		TypeUnit type = T_Null;
-		void *data = nullptr;
+		DataPointer data = nullptr;
 		// All data should be copyable, have no shared resource.
 
 		// Methods for data
@@ -131,14 +133,14 @@ namespace ICM
 		StaticObject() :
 			Null(),
 			Nil(T_Nil),
-			True(T_Boolean, &Value_True),
-			False(T_Boolean, &Value_False),
-			Zero(T_Number, &Value_Zero)
+			True(T_Boolean, (void*)&Value_True),
+			False(T_Boolean, (void*)&Value_False),
+			Zero(T_Number, (void*)&Value_Zero)
 		{};
 
-		bool Value_True = true;
-		bool Value_False = false;
-		uint64_t Value_Zero = 0;
+		const static bool Value_True = true;
+		const static bool Value_False = false;
+		const static uint64_t Value_Zero = 0;
 		
 		Object Null;
 		Object Nil;

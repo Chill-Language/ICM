@@ -59,58 +59,58 @@ namespace ICM
 	}
 
 	template <TypeUnit _TU>
-	string to_string(const void *data) {
+	string to_string(const DataPointer data) {
 		using std::to_string;
 		using Common::Convert::to_string;
 		using TypeBase::to_string;
 		return to_string(*get<_TU>((void*)data));
 	}
 	template <>
-	string to_string<T_Test>(const void *data) {
+	string to_string<T_Test>(const DataPointer data) {
 		return "Test";
 	}
 	template <>
-	string to_string<T_Nil>(const void *data) {
+	string to_string<T_Nil>(const DataPointer data) {
 		return "nil";
 	}
 	template <>
-	string to_string<T_Null>(const void *data) {
+	string to_string<T_Null>(const DataPointer data) {
 		return "Null";
 	}
 	template <TypeUnit _TU>
-	string to_output(const void *data) {
+	string to_output(const DataPointer data) {
 		return TypeBase::to_output<typename TType<_TU>::Type>(*get<_TU>((void*)data));
 	}
 	template <TypeUnit _TU>
-	string to_string_code(const void *data) {
+	string to_string_code(const DataPointer data) {
 		return TypeBase::to_string_code<typename TType<_TU>::Type>(*get<_TU>((void*)data));
 	}
 	template <>
-	string to_output<T_Test>(const void *data) {
+	string to_output<T_Test>(const DataPointer data) {
 		return "Test";
 	}
 	template <>
-	string to_output<T_Nil>(const void *data) {
+	string to_output<T_Nil>(const DataPointer data) {
 		return to_string<T_Nil>(data);
 	}
 	template <>
-	string to_output<T_Null>(const void *data) {
+	string to_output<T_Null>(const DataPointer data) {
 		return "Null";
 	}
 	template <>
-	string to_string_code<T_Test>(const void *data) {
+	string to_string_code<T_Test>(const DataPointer data) {
 		return "Test";
 	}
 	template <>
-	string to_string_code<T_Nil>(const void *data) {
+	string to_string_code<T_Nil>(const DataPointer data) {
 		return "Nil";
 	}
 	template <>
-	string to_string_code<T_Null>(const void *data) {
+	string to_string_code<T_Null>(const DataPointer data) {
 		return "Null";
 	}
 	template <TypeUnit _TU>
-	bool equal(const void *dat1, const void *dat2) {
+	inline bool equal(const DataPointer dat1, const DataPointer dat2) {
 		using Type = typename TType<_TU>::Type;
 		return *(Type*)dat1 == *(Type*)dat2;
 	}
@@ -119,14 +119,14 @@ namespace ICM
 	//=======================================
 #define TEMPFUNC template <TypeUnit _TU> inline
 	// construct/destruct
-	TEMPFUNC void construct(void *data) {
+	TEMPFUNC void construct(DataPointer data) {
 		new (data) typename TType<_TU>::Type();
 	}
-	TEMPFUNC void destruct(void *data) {
+	TEMPFUNC void destruct(DataPointer data) {
 		using T = typename TType<_TU>::Type;
 		get<_TU>(data)->~T();
 	}
-	TEMPFUNC void ncopy(void *dst, const void *src) {
+	TEMPFUNC void ncopy(DataPointer dst, const DataPointer src) {
 		using T = typename TType<_TU>::Type;
 		new (dst) T(*static_cast<const T*>(src));
 	}
@@ -136,7 +136,7 @@ namespace ICM
 
 	template <TypeUnit _TU>
 	TypeInfo initTypeInfo() {
-		return{
+		return {
 			_TU,
 			TType<_TU>::Name,
 			sizeof(typename TType<_TU>::Type),
@@ -146,7 +146,7 @@ namespace ICM
 			equal<_TU>,
 			to_string<_TU>,
 			to_output<_TU>,
-			to_string_code<_TU>,
+			to_string_code<_TU>
 		};
 	}
 
@@ -166,7 +166,6 @@ namespace ICM
 		TypeInfoPair<T_Symbol>(),
 		// Identifier Types
 		TypeInfoPair<T_Function>(),
-		TypeInfoPair<T_Keyword>(),
 		TypeInfoPair<T_Type>(),
 		// List Types
 		//TypeInfoPair<T_Array>(),

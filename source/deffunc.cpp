@@ -4,6 +4,7 @@
 #include "objectdef.h"
 #include "config.h"
 #include "runtime-caller.h"
+#include "random.h"
 
 namespace ICM
 {
@@ -19,16 +20,16 @@ namespace ICM
 		template <FuncCaller f>
 		ObjectPtr callfunc(FuncArgument list) {
 			Object *res = new Object;
-			f(*res, list);
+			f(res, list);
 			return ObjectPtr(res);
 		}
 
 		namespace CFunc
 		{
-			int iadd(int a, int b) { return a + b; }
-			int isub(int a, int b) { return a - b; }
-			int imul(int a, int b) { return a * b; }
-			int idiv(int a, int b) { return a / b; }
+			int_t iadd(int_t a, int_t b) { return a + b; }
+			int_t isub(int_t a, int_t b) { return a - b; }
+			int_t imul(int_t a, int_t b) { return a * b; }
+			int_t idiv(int_t a, int_t b) { return a / b; }
 
 			using F = ICM::Function::FuncObject;
 			using FI = ICM::Function::FuncInitObject;
@@ -43,19 +44,19 @@ namespace ICM
 				using LST = std::initializer_list<FI*>;
 
 				DefFuncTable.insert("iadd", Lst{
-					F(callfunc<Runtime::Caller<::List<int, int>, int>::Type::call<iadd>>,
+					F(callfunc<Runtime::Caller<::List<int_t, int_t>, int_t>::Type::call<iadd>>,
 					S({ T_Number, T_Number }, T_Number)),
 				});
 				DefFuncTable.insert("isub", Lst{
-					F(callfunc<Runtime::Caller<::List<int, int>, int>::Type::call<isub>>,
+					F(callfunc<Runtime::Caller<::List<int_t, int_t>, int_t>::Type::call<isub>>,
 					S({ T_Number, T_Number }, T_Number)),
 				});
 				DefFuncTable.insert("imul", Lst{
-					F(callfunc<Runtime::Caller<::List<int, int>, int>::Type::call<imul>>,
+					F(callfunc<Runtime::Caller<::List<int_t, int_t>, int_t>::Type::call<imul>>,
 					S({ T_Number, T_Number }, T_Number)),
 				});
 				DefFuncTable.insert("idiv", Lst{
-					F(callfunc<Runtime::Caller<::List<int, int>, int>::Type::call<idiv>>,
+					F(callfunc<Runtime::Caller<::List<int_t, int_t>, int_t>::Type::call<idiv>>,
 					S({ T_Number, T_Number }, T_Number)),
 				});
 			}
@@ -77,7 +78,7 @@ namespace ICM
 		using S = ICM::Function::Signature;
 		using T = ICM::TypeObject;
 
-		using ObjectLightList = Common::lightlist<Object*>;
+		using Objectlightlist = Common::lightlist<Object*>;
 
 		//=======================================
 		// * Calculate
@@ -435,7 +436,7 @@ namespace ICM
 			}
 			ObjectPtr rand(const DataList &dl) {
 				auto ii = dl[0]->dat<T_Number>();
-				int i = std::rand() % ii;
+				int i = random_base(ii, std::rand);
 				return ObjectPtr(new Number(i));
 			}
 		}

@@ -1,7 +1,7 @@
 #include "basic.h"
 #include "number.h"
 
-SYSTEM BEGIN
+SYSTEM_BEGIN
 namespace Number
 {
 	//--------------------
@@ -153,4 +153,4 @@ namespace Number
 			return Rational(std::stoll(str));
 	}
 }
-END
+SYSTEM_END

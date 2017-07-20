@@ -11,7 +11,7 @@
 #include <deque>
 #include <initializer_list>
 
-SYSTEM BEGIN
+SYSTEM_BEGIN
 template <typename _KTy, typename _VTy>
 class BijectionMap
 {
@@ -21,20 +21,84 @@ public:
 	using key_type = _KTy;
 	using mapped_type = _VTy;
 	using value_type = _CPTy;
+private:
+	template <typename _MTy>
+	class iterator_base {
+	public:
+		iterator_base(_MTy *data, size_t count = 0)
+			: data(data), count(count) {}
+
+		auto& operator*() {
+			return get();
+		}
+		auto* operator->() {
+			return &get();
+		}
+		auto& operator*() const {
+			return get();
+		}
+		auto* operator->() const {
+			return &get();
+		}
+		iterator_base& operator++() {
+			++count;
+			return *this;
+		}
+		iterator_base& operator--() {
+			--count;
+			return *this;
+		}
+		bool operator==(const iterator_base &iter) const {
+			return data == iter.data && count == iter.count;
+		}
+		bool operator!=(const iterator_base &iter) const {
+			return data != iter.data || count != iter.count;
+		}
+		bool operator>(const iterator_base &iter) const {
+			return count > iter.count;
+		}
+		bool operator>=(const iterator_base &iter) const {
+			return count >= iter.count;
+		}
+		bool operator<(const iterator_base &iter) const {
+			return count < iter.count;
+		}
+		bool operator<=(const iterator_base &iter) const {
+			return count <= iter.count;
+		}
+
+	private:
+		_MTy *data;
+		size_t count;
+		auto& get() {
+			return data->getData(count);
+		}
+		const auto& get() const {
+			return data->getData(count);
+		}
+		friend class BijectionMap;
+	};
+public:
+	using iterator = iterator_base<BijectionMap>;
+	using const_iterator = iterator_base<const BijectionMap>;
+
 public:
 	BijectionMap() {}
 	BijectionMap(const std::initializer_list<value_type> &il) {
 		for (const value_type &e : il)
 			insert(e.first, e.second);
 	}
-	bool insert(const _KTy &key, const _VTy &val) {
-		if (findKey(key) != size() || findValue(val) != size())
-			return false;
+	iterator insert(const _KTy &key, const _VTy &val) {
+		if (findKey(key) != size() || findValue(val) != size()) {
+			return end();
+		}
 
+		iterator result(this);
 		if (destroyable.empty()) {
 			keymap[key] = currcount;
 			valmap[val] = currcount;
 			data.push_back(std::make_pair(key, val));
+			result = iterator(this, currcount);
 			currcount++;
 		}
 		else {
@@ -42,9 +106,10 @@ public:
 			keymap[key] = id;
 			valmap[val] = id;
 			data[id] = std::make_pair(key, val);
+			result = iterator(this, id);
 			destroyable.pop_front();
 		}
-		return true;
+		return result;
 	}
 	size_t currentIndex() const {
 		return destroyable.empty() ? currcount : destroyable.front();
@@ -64,11 +129,22 @@ public:
 		_erase(key, val, id);
 		return true;
 	}
+	bool erase(const iterator &iter) {
+		assert(iter.data == this);
+		size_t id = iter.count;
+		const _KTy &key = iter->first;
+		const _VTy &val = iter->second;
+		_erase(key, val, id);
+		return true;
+	}
 	size_t findKey(const _KTy &key) const {
 		return _find(keymap, key);
 	}
 	size_t findValue(const _VTy &val) const {
 		return _find(valmap, val);
+	}
+	_PTy& getData(size_t id) {
+		return data[id];
 	}
 	const _PTy& getData(size_t id) const {
 		return data[id];
@@ -85,6 +161,31 @@ public:
 	}
 	bool empty() const {
 		return data.empty();
+	}
+	// Iterator
+	iterator begin() {
+		return iterator(this, 0);
+	}
+	iterator end() {
+		return iterator(this, size());
+	}
+	const_iterator begin() const {
+		return cbegin();
+	}
+	const_iterator end() const {
+		return cend();
+	}
+	const_iterator cbegin() {
+		return const_cast<const BijectionMap *>(this)->cbegin();
+	}
+	const_iterator cend() {
+		return const_cast<const BijectionMap *>(this)->cend();
+	}
+	const_iterator cbegin() const {
+		return const_iterator(this, 0);
+	}
+	const_iterator cend() const {
+		return const_iterator(this, size());
 	}
 
 private:
@@ -125,7 +226,7 @@ public:
 			data.insert(e.first, e.second);
 	}
 	bool insert(const _KTy &key, const _VTy &val) {
-		return data.insert(key, val);
+		return data.insert(key, val) != data.end();
 	}
 	bool eraseKey(const _KTy &key) {
 		return data.erase(key);
@@ -260,6 +361,6 @@ private:
 		}
 	}
 };
-END
+SYSTEM_END
 
 #endif

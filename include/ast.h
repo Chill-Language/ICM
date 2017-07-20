@@ -76,7 +76,7 @@ namespace ICM
 		{
 		public:
 			explicit Node(size_t id) : index(id) {}
-			Node(size_t id, vector<Element> &&VeE) : index(id), vector<Element>(VeE) {}
+			Node(size_t id, vector<Element> &&VeE) : vector<Element>(VeE), index(id) {}
 
 			void push_front(const Element &elt) {
 				this->insert(this->begin(), elt);

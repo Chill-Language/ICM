@@ -10,7 +10,7 @@
 #include <string>
 #include <memory>
 
-SYSTEM BEGIN
+SYSTEM_BEGIN
 class charptr
 {
 public:
@@ -31,6 +31,6 @@ private:
 	size_t _capacity;
 	std::shared_ptr<char> data;
 };
-END
+SYSTEM_END
 
 #endif

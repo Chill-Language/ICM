@@ -52,14 +52,14 @@ namespace ICM
 
 		size_t insert(const IdentKey &key, IdentType type) {
 			size_t id = IndexTable::insert(key, IdentTableUnit(type));
-			this->get(id).index = id;
+			this->at(id).index = id;
 			return id;
 		}
 		size_t find(const IdentKey &key) const {
 			return IndexTable::find(key);
 		}
 		IdentTableUnit& at(size_t index) {
-			return IndexTable::get(index);
+			return IndexTable::at(index);
 		}
 		size_t size() const {
 			return IndexTable::size();

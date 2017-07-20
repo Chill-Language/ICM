@@ -8,7 +8,7 @@
 #include "macro.h"
 #include "memory.h"
 
-SYSTEM BEGIN
+SYSTEM_BEGIN
 class BytePool
 {
 public:
@@ -70,6 +70,6 @@ struct ByteSet
 		return bytes[(index + (int)sizeof(_VTy)) % (int)sizeof(_VTy)];
 	}
 };
-END
+SYSTEM_END
 
 #endif

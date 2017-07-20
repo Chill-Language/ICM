@@ -9,7 +9,7 @@
 #include "macro.h"
 #include <string>
 
-SYSTEM BEGIN
+SYSTEM_BEGIN
 namespace Convert
 {
 	// Format
@@ -160,6 +160,6 @@ namespace Output
 		exit(-1);
 	}
 }
-END
+SYSTEM_END
 
 #endif

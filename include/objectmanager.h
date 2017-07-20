@@ -179,10 +179,11 @@ namespace ICM
 		}
 		size_t add(const string &str) {
 			size_t id = MapData.currentIndex();
-			if (MapData.insert(str, id))
+			auto iter = MapData.insert(str, id);
+			if (iter != MapData.end())
 				return id;
 			else
-				return find(str);
+				return iter->second;
 		}
 		const string& get(size_t id) {
 			return MapData.getKey(id);

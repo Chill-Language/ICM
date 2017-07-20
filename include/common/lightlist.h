@@ -8,16 +8,21 @@
 #include "macro.h"
 #include "memory.h"
 
-SYSTEM BEGIN
+SYSTEM_BEGIN
+template <typename T>
+class lightlist_creater;
+
 template <typename T>
 class lightlist
 {
 public:
 	using iterator = T*;
+	using creater = lightlist_creater<T>;
 public:
 	lightlist() = default;
 
 	explicit lightlist(size_t capacity)
+		// This means lightlist can be used for value type (have no destructor).
 		: _capacity(capacity), data(Memory::alloc<T>(_capacity), Memory::free<T>) {}
 
 	lightlist(const std::initializer_list<T> &il)
@@ -35,9 +40,11 @@ public:
 		std::copy_n(begin, _capacity, _PointerIterator(data.get()));
 	}
 
-	template <typename Container>
-	explicit lightlist(const Container &con)
-		: lightlist(con.begin(), con.end()) {}
+	template <typename Iter>
+	lightlist(Iter begin, Iter end, size_t capacity)
+		: lightlist(capacity) {
+		std::copy(begin, end, _PointerIterator(data.get()));
+	}
 
 	template <size_t N>
 	explicit lightlist(T (&arr)[N])
@@ -57,6 +64,9 @@ public:
 
 	T& operator[](size_t id) { return data.get()[id]; }
 	const T& operator[](size_t id) const { return data.get()[id]; }
+
+	T& at(size_t id) { assert(id < size()); return this->operator[](id); }
+	const T& at(size_t id) const { assert(id < size()); return this->operator[](id); }
 
 	T& front() { return *begin(); }
 	const T& front() const { return *begin(); }
@@ -108,6 +118,6 @@ private:
 	size_t _count;
 	lightlist<T> _data;
 };
-END
+SYSTEM_END
 
 #endif

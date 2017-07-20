@@ -16,5 +16,7 @@ namespace ICM
 		I_Type,
 		// Struct
 		I_Struct,
+		// Module
+		I_Module,
 	};
 }

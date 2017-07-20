@@ -12,7 +12,7 @@
 #include <cstring>
 #include <string>
 
-SYSTEM BEGIN
+SYSTEM_BEGIN
 class File
 {
 	using FilePtr = std::shared_ptr<FILE>;
@@ -222,6 +222,6 @@ private:
 	}
 #endif
 };
-END
+SYSTEM_END
 
 #endif
