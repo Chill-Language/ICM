@@ -1,7 +1,7 @@
 #include "basic.h"
-#include "transform.h"
-#include "analysisbase.h"
-#include "objectdef.h"
+#include "compiler/transform.h"
+#include "compiler/analysisbase.h"
+//#include "runtime/objectdef.h"
 
 #include "temp-getelement.h"
 
@@ -284,7 +284,7 @@ namespace ICM
 			}
 		};
 
-		class CompiletimeEvaluate : public AnalysisBase
+		/*class CompiletimeEvaluate : public AnalysisBase
 		{
 		public:
 			CompiletimeEvaluate(NodeTable &Table) : AnalysisBase(Table) {}
@@ -301,7 +301,7 @@ namespace ICM
 			Object* call(Function::FuncObject &func, DataList &list) {
 				return func.call(list).get();
 			}
-		};
+		};*/
 
 		class IdentifierAnalysis : public AnalysisBase
 		{

@@ -1,8 +1,8 @@
 #include "basic.h"
-#include "object.h"
-#include "typeobject.h"
-#include "function.h"
-#include "typebase.h"
+#include "runtime/object.h"
+#include "runtime/typeobject.h"
+#include "runtime/function.h"
+#include "runtime/typebase.h"
 #include "tabledata.h"
 
 namespace ICM

@@ -1,7 +1,7 @@
 #pragma once
 #include "basic.h"
 #include "parser/identifier.h"
-#include "object.h"
+#include "runtime/object.h"
 
 namespace ICM
 {

@@ -1,6 +1,6 @@
 #include "basic.h"
-#include "typebase.h"
-#include "objectdef.h"
+#include "runtime/typebase.h"
+#include "runtime/objectdef.h"
 
 namespace ICM
 {

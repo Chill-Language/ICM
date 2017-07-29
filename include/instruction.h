@@ -2,7 +2,7 @@
 #include "basic.h"
 #include "parser/keyword.h"
 #include "tabledata.h"
-#include "typebase.h"
+#include "runtime/typebase.h"
 
 #include "temp-getelement2.h"
 

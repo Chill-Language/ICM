@@ -1,7 +1,7 @@
 #include "basic.h"
 #include "instruction.h"
 #include "temp-getelement.h"
-#include "objectdef.h"
+#include "runtime/objectdef.h"
 
 namespace ICM
 {

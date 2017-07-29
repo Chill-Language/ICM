@@ -1,10 +1,10 @@
 #include "basic.h"
-#include "deffunc.h"
-#include "parser/keyword.h"
-#include "objectdef.h"
-#include "config.h"
-#include "runtime-caller.h"
 #include "random.h"
+#include "runtime/deffunc.h"
+#include "parser/keyword.h"
+#include "runtime/objectdef.h"
+#include "runtime/runtime-caller.h"
+#include "config.h"
 
 namespace ICM
 {

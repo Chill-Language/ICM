@@ -1,5 +1,5 @@
 #include "basic.h"
-#include "typeobject.h"
+#include "runtime/typeobject.h"
 #include "parser/keyword.h"
 #include "tabledata.h"
 

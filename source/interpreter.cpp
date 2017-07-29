@@ -1,6 +1,6 @@
 #include "basic.h"
 #include "interpreter.h"
-#include "objectdef.h"
+#include "runtime/objectdef.h"
 #include "temp-getelement2.h"
 #include <ctime>
 

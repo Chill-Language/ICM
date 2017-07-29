@@ -1,6 +1,6 @@
 #pragma once
 #include "basic.h"
-#include "object.h"
+#include "runtime/object.h"
 #include "number.h"
 #include "parser/keyword.h"
 #include "tabledata.h"

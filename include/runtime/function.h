@@ -1,6 +1,6 @@
 #pragma once
-#include "object.h"
-#include "typeobject.h"
+#include "runtime/object.h"
+#include "runtime/typeobject.h"
 
 namespace ICM
 {

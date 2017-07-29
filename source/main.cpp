@@ -4,7 +4,7 @@
 #include "config.h"
 #include "interpreter.h"
 #include "instruction.h"
-#include "transform.h"
+#include "compiler/transform.h"
 #include "timer.h"
 #include "temp-getelement.h"
 

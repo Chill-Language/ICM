@@ -1,6 +1,6 @@
 #include "basic.h"
-#include "object.h"
-#include "objectmanager.h"
+#include "runtime/object.h"
+#include "runtime/objectmanager.h"
 #include "config.h"
 #include "tabledata.h"
 

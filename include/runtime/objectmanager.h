@@ -1,6 +1,5 @@
 #pragma once
 #include "basic.h"
-#include "bijectionmap.h"
 #include "parser/objectenum.h"
 
 namespace ICM

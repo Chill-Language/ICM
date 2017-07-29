@@ -1,5 +1,5 @@
 #pragma once
-#include "object.h"
+#include "runtime/object.h"
 #include "identtable.h"
 #include "parser/literal.h"
 
