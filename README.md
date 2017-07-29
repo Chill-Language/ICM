@@ -17,7 +17,9 @@ Hello World!
 If you have cmake & gcc, you can input these commands:
 
 ```
-cmake .
+mkdir build
+cd build
+cmake ..
 make
 ```
 

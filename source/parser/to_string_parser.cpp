@@ -1,5 +1,6 @@
 #include "basic.h"
-#include "parser.h"
+#include "parser/parser.h"
+#include "parser/keywordtable.h"
 
 namespace ICM
 {
@@ -37,5 +38,13 @@ namespace ICM
 		str.append(mr.getString());
 		str.append("')");
 		return str;
+	}
+	string to_string(Keyword::KeywordID key)
+	{
+		size_t id = GlobalKeywordTable.findValue(key);
+		if (id != GlobalKeywordTable.size())
+			return GlobalKeywordTable.getData(id).first;
+		else
+			return "UnfoundKeyword";
 	}
 }

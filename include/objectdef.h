@@ -61,8 +61,8 @@ namespace ICM
 
 #define DEFTYPE(_T, _TE) template <> struct CType<_T> { constexpr static TypeUnit index = T_##_TE; };
 
-		//DEFTYPE(int, Number);
-		DEFTYPE(int_t, Number);
+		DEFTYPE(int32_t, Number);
+		DEFTYPE(int64_t, Number);
 		DEFTYPE(double, Double);
 		DEFTYPE(float, Float);
 		DEFTYPE(unsigned, UInt);

@@ -1,6 +1,6 @@
 #pragma once
 #include "basic.h"
-#include "keyword.h"
+#include "parser/keyword.h"
 #include "tabledata.h"
 #include "typebase.h"
 

@@ -1,6 +1,6 @@
 #include "basic.h"
 #include "deffunc.h"
-#include "keyword.h"
+#include "parser/keyword.h"
 #include "objectdef.h"
 #include "config.h"
 #include "runtime-caller.h"

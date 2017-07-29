@@ -1,5 +1,5 @@
 #pragma once
-#include "ast.h"
+#include "parser/ast.h"
 
 namespace ICM
 {

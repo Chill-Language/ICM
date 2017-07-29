@@ -1,11 +1,11 @@
 #include "basic.h"
-#include "parser.h"
+#include "parser/literal.h"
+#include "parser/parser.h"
 #include "config.h"
 #include "interpreter.h"
 #include "instruction.h"
 #include "transform.h"
 #include "timer.h"
-#include "literal.h"
 
 extern size_t CheckCallCount;
 using namespace ICM;

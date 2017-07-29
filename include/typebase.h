@@ -2,9 +2,9 @@
 #include "basic.h"
 #include "object.h"
 #include "number.h"
-#include "keyword.h"
+#include "parser/keyword.h"
 #include "tabledata.h"
-#include "literal.h"
+#include "parser/literal.h"
 
 namespace ICM
 {

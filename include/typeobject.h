@@ -1,6 +1,6 @@
 #pragma once
 #include "basic.h"
-#include "objectenum.h"
+#include "parser/objectenum.h"
 
 namespace ICM
 {

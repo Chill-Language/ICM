@@ -130,4 +130,9 @@ namespace ICM
 	}
 }
 
+inline void putError(const char *msg) {
+	puts(msg);
+	exit(1);
+}
+
 #endif

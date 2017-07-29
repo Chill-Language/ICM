@@ -1,18 +1,10 @@
 #include "basic.h"
-#include "ast.h"
+#include "parser/ast.h"
 #include "tabledata.h"
 #include "temp-getelement.h"
 
 namespace ICM
 {
-	string to_string(Keyword::KeywordID key)
-	{
-		size_t id = GlobalKeywordTable.findValue(key);
-		if (id != GlobalKeywordTable.size())
-			return GlobalKeywordTable.getData(id).first;
-		else
-			return "UnfoundKeyword";
-	}
 	//=======================================
 	// * AST
 	//=======================================

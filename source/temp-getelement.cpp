@@ -1,9 +1,7 @@
 #include "basic.h"
-#include "ast.h"
-#include "objectdef.h"
-#include "instruction.h"
+#include "parser/ast.h"
+#include "parser/literal.h"
 #include "temp-getelement.h"
-#include "temp-getelement2.h"
 
 namespace ICM
 {
@@ -22,11 +20,6 @@ namespace ICM
 		return false;
 	}
 
-	bool getCompiletimeFunc(const ASTBase::Element &elt, FuncTableUnit &ftu) {
-		//getStFunc(elt);
-		return true;
-	}
-
 	Object getLiteral(const ASTBase::Element &elt) {
 		assert(elt.isLiteral());
 		void *dat = Compiler::GlobalElementPool.get(elt.getIndex());
@@ -39,11 +32,8 @@ namespace ICM
 		TypeUnit type = elt.getLiteralType();
 		return Object(type, TypeInfoTable[type].copy(dat)); // TODO
 	}
-	Object getLiteral(const Instruction::Element & elt) {
-		return getLiteral(*(ASTBase::Element*)&elt);
-	}
 	const string & getIdentName(const ASTBase::Element & elt) {
-		IdentKey key = elt.isIdentType(I_Void) ? elt.getIndex() : getKeyFromIdentTable(elt.getIdentIndex());
+		IdentKey key = elt.isIdentType(I_Void) ? elt.getIndex() : getKeyFromIdentTable(getIdentID(elt));
 		return Compiler::GlobalIdentNameMap.getKey(key);
 	}
 	const string& getIdentName(size_t ident_index) {
@@ -53,44 +43,15 @@ namespace ICM
 		IdentKey key = getKeyFromIdentTable(ident_index);
 		return Compiler::GlobalIdentNameMap.getKey(key);
 	}
+
+	bool issame(const IdentIndex &t1, const IdentIndex &t2) {
+		return (t1.ident_index == t2.ident_index) && (t1.space_index == t2.space_index);
+	}
+
 	const IdentIndex& getIdentID(const ASTBase::Element & elt) {
 		assert(!elt.isIdentType(I_Void));
-		return elt.getIdentIndex();
-	}
-	Object * getConstData(const Instruction::Element & elt) {
-		assert(elt.isIdentType(I_Data));
-		return getConstData(elt.getIdentIndex());
-	}
-	TypeUnit getType(const Instruction::Element & elt) {
-		assert(elt.isIdentType(I_Type));
-		return getFromIdentTable(elt.getIdentIndex()).TypeIndex;
-	}
-	FuncTableUnit & getStFunc(const Instruction::Element & elt) {
-		assert(elt.isIdentType(I_StFunc));
-		return GlobalFunctionTable[getFromIdentTable(elt.getIdentIndex()).FunctionIndex];
-	}
-	Object * getDyVarbData(const Instruction::Element & elt) {
-		assert(elt.isIdentType(I_DyVarb));
-		return getDyVarbData(elt.getIdentIndex());
-	}
-	const string& getIdentName(const Instruction::Element &elt) {
-		assert(!elt.isIdentType(I_Void));
-		return getIdentName(elt.getIdentIndex());
-	}
-	Object* getIdentData(const Instruction::Element &elt) {
-		if (elt.isIdentType(I_DyVarb)) {
-			return getDyVarbData(elt);
-		}
-		else if (elt.isIdentType(I_Data)) {
-			return getConstData(elt);
-		}
-		else if (elt.isIdentType(I_StFunc)) {
-			return new Objects::Function(getStFunc(elt).getID());
-		}
-		else if (elt.isIdentType(I_Type)) {
-			return new Objects::Type(getFromIdentTable(elt.getIdentIndex()).TypeIndex);
-		}
-		return nullptr;
+		// TODO : It causes unknown change to elt.
+		return reinterpret_cast<const IdentIndex&>(elt.getIndex());
 	}
 	IdentIndex getGlobalFunctionIdentIndex(const string & name) {
 		return { 0, findFromIdentTable(0, Compiler::GlobalIdentNameMap[name]) };

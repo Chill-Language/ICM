@@ -3,7 +3,6 @@
 #include "keyword.h"
 #include "objectenum.h"
 #include "identifier.h"
-#include "identtable.h"
 
 namespace ICM
 {
@@ -47,12 +46,11 @@ namespace ICM
 
 			// Get/Set Index
 			void setIndex(size_t id) { index = id; }
-			size_t getIndex() const { return index; }
+			const size_t& getIndex() const { return index; }
 
 			// Get/Set
 			void setRefer(size_t id) { assert(isRefer()); setIndex(id); }
 			size_t getRefer() const { assert(isRefer()); return getIndex(); }
-			const IdentIndex& getIdentIndex() const { return reinterpret_cast<const IdentIndex&>(index); }
 			TypeUnit getLiteralType() const { assert(isLiteral()); return getSubType(); }
 			size_t getIndetType() const { assert(isIdent()); return getSubType(); }
 			Keyword::KeywordID getKeyword() const { assert(isKeyword()); return (Keyword::KeywordID)getSubType(); }

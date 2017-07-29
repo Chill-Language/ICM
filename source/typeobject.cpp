@@ -1,6 +1,6 @@
 #include "basic.h"
 #include "typeobject.h"
-#include "keyword.h"
+#include "parser/keyword.h"
 #include "tabledata.h"
 
 namespace ICM

@@ -1,9 +1,6 @@
 #pragma once
 #include "basic.h"
-#include "object.h"
 #include "function.h"
-#include "keyword.h"
-#include "identifier.h"
 
 namespace ICM
 {
@@ -122,7 +119,6 @@ namespace ICM
 	};
 
 	extern FuncTable GlobalFunctionTable;
-	extern BijectionKVMap<string, ICM::Keyword::KeywordID> GlobalKeywordTable;
 
 }
 

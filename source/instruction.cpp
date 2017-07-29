@@ -2,7 +2,7 @@
 #include "instruction.h"
 #include "objectdef.h"
 #include "analysisbase.h"
-#include "literal.h"
+#include "parser/literal.h"
 
 namespace ICM
 {

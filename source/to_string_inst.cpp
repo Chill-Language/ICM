@@ -1,5 +1,5 @@
 #include "basic.h"
-#include "ast.h"
+#include "parser/ast.h"
 #include "instruction.h"
 
 namespace ICM
