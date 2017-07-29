@@ -24,6 +24,7 @@ namespace ICM
 	template <TypeUnit T> using TType = Types::TType<T>;
 
 	using DataPointer = void*;
+	using ConstDataPointer = const void*;
 
 	//=============================================
 	// * Struct TypeInfo
@@ -32,9 +33,9 @@ namespace ICM
 	{
 		using ConFunc = void(DataPointer);
 		using DesFunc = void(DataPointer);
-		using CpyFunc = void(DataPointer, const DataPointer);
-		using EquFunc = bool(const DataPointer, const DataPointer);
-		using TosFunc = std::string(const DataPointer);
+		using CpyFunc = void(DataPointer, ConstDataPointer);
+		using EquFunc = bool(ConstDataPointer, ConstDataPointer);
+		using TosFunc = std::string(ConstDataPointer);
 
 		TypeUnit index;
 		const char* name;
@@ -52,10 +53,10 @@ namespace ICM
 		DataPointer alloc() const {
 			return Memory::alloc(size);
 		}
-		DataPointer mcopy(const DataPointer src) const {
+		DataPointer mcopy(ConstDataPointer src) const {
 			return Memory::mcopy(alloc(), src, size);
 		}
-		DataPointer copy(const DataPointer src) const {
+		DataPointer copy(ConstDataPointer src) const {
 			void *dst = alloc();
 			ncopy(dst, src);
 			return dst;

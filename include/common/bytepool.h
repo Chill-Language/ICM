@@ -30,6 +30,10 @@ public:
 	T* get(size_t index) {
 		return reinterpret_cast<T*>(data.data() + index);
 	}
+	template <typename T = void>
+	const T* get(size_t index) const {
+		return reinterpret_cast<const T*>(data.data() + index);
+	}
 	template <typename T>
 	T& dat(size_t index) {
 		return *get<T>(index);

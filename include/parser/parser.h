@@ -1,6 +1,7 @@
 #pragma once
 #include "ast.h"
 #include "keyword.h"
+#include "literal.h"
 
 namespace ICM
 {
@@ -81,6 +82,6 @@ namespace ICM
 
 	namespace Parser
 	{
-		bool createAST(Match &match, AST &ast);
+		bool createAST(Match &match, AST &ast, Compiler::ElementPool &EP);
 	}
 }

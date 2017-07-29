@@ -3,6 +3,7 @@
 #include "objectdef.h"
 #include "analysisbase.h"
 #include "parser/literal.h"
+#include "temp-getelement.h"
 
 namespace ICM
 {

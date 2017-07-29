@@ -5,5 +5,5 @@ namespace ICM
 {
 	struct Object;
 
-	Object* Run(Instruction::InstructionList &instlist);
+	Object* Run(Instruction::InstructionList &instlist, const Compiler::ElementPool &EP);
 }

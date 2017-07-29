@@ -6,6 +6,7 @@
 #include "instruction.h"
 #include "transform.h"
 #include "timer.h"
+#include "temp-getelement.h"
 
 extern size_t CheckCallCount;
 using namespace ICM;
@@ -76,15 +77,14 @@ namespace ICM
 	}
 }
 
-vector<Instruction::InstructionList> Compile(const char *text)
+vector<Instruction::InstructionList> Compile(const char *text, Compiler::ElementPool &EP)
 {
-	Compiler::GlobalElementPool.clear();
 	vector<Instruction::InstructionList> VeI;
 
 	Parser::Match match(text);
 	while (!match.isend()) {
 		AST ast;
-		bool result = Parser::createAST(match, ast);
+		bool result = Parser::createAST(match, ast, EP);
 		if (result && !ast.empty()) {
 			/*if (LoopMatch) {
 			if (GlobalConfig.PrintAST)
@@ -106,12 +106,12 @@ vector<Instruction::InstructionList> Compile(const char *text)
 	return VeI;
 }
 
-void Run(vector<Instruction::InstructionList> &VeI, bool printResult)
+void Run(vector<Instruction::InstructionList> &VeI, bool printResult, const Compiler::ElementPool &EP)
 {
 	Timer t;
 
 	for (auto &instlist : VeI) {
-		Object *result = ICM::Run(instlist);
+		Object *result = ICM::Run(instlist, EP);
 
 		if (printResult)
 			println("=> ", result ? result->to_output() : "Null", "\n");
@@ -156,6 +156,9 @@ int main(int argc, char *argv[])
 	// Init Text
 	charptr text(LoopMatch ? charptr(0xff) : charptr(init_text));
 
+
+	Compiler::ElementPool EP;
+
 	// Loop
 	do {
 		// Input
@@ -167,8 +170,8 @@ int main(int argc, char *argv[])
 		else {
 			//println("Input: \n", text.to_string());
 		}
-		auto instlist = Compile(text);
-		Run(instlist, LoopMatch);
+		auto instlist = Compile(text, EP);
+		Run(instlist, LoopMatch, EP);
 
 	} while (LoopMatch);
 

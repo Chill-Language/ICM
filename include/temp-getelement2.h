@@ -6,9 +6,9 @@ namespace ICM
 {
 	namespace Instruction { struct Element; }
 
-	Object getLiteral(const Instruction::Element & elt);
-	inline Object* createObjectFromLiteral(const Instruction::Element &elt) {
-		return new Object(getLiteral(elt));
+	Object getLiteral(const Instruction::Element & elt, const Compiler::ElementPool &);
+	inline Object* createObjectFromLiteral(const Instruction::Element &elt, const Compiler::ElementPool &EP) {
+		return new Object(getLiteral(elt, EP));
 	}
 	const string& getIdentName(size_t ident_index);
 	const string& getIdentName(const IdentIndex &ident_index);
@@ -55,8 +55,4 @@ namespace ICM
 	}
 	TypeUnit getType(const Instruction::Element &elt);
 	Object* getIdentData(const Instruction::Element &elt);
-
-
-	IdentIndex getGlobalFunctionIdentIndex(const string &name);
-	IdentIndex insertGlobalDyVarbIdentIndex(const string & name);
 }

@@ -283,15 +283,15 @@ namespace ICM
 {
 	namespace Parser
 	{
-		AST::Element createElementData(MatchType type, const string &str)
+		AST::Element createElementData(MatchType type, const string &str, Compiler::ElementPool &EP)
 		{
 			switch (type) {
 			case MT_Boolean:
-				return AST::Element::Literal(T_Boolean, Compiler::GlobalElementPool.setBoolean(str == "T"));
+				return AST::Element::Literal(T_Boolean, EP.setBoolean(str == "T"));
 			case MT_Number:
-				return AST::Element::Literal(T_Number, Compiler::GlobalElementPool.setNumber((int_t)(Common::Number::to_rational(str.c_str()).getNum() / Common::Number::to_rational(str.c_str()).getDen())));
+				return AST::Element::Literal(T_Number, EP.setNumber((int_t)(Common::Number::to_rational(str.c_str()).getNum() / Common::Number::to_rational(str.c_str()).getDen())));
 			case MT_String:
-				return AST::Element::Literal(T_String, Compiler::GlobalElementPool.setString(str.c_str(), str.size() + 1));
+				return AST::Element::Literal(T_String, EP.setString(str.c_str(), str.size() + 1));
 			case MT_Keyword:
 				return AST::Element::Keyword(GlobalKeywordTable.getValue(str));
 			case MT_Identifier:
@@ -301,7 +301,7 @@ namespace ICM
 			}
 		}
 
-		bool createAST(Match &match, AST &ast)
+		bool createAST(Match &match, AST &ast, Compiler::ElementPool &EP)
 		{
 			MatchResult mr = match.matchNext();
 
@@ -355,7 +355,7 @@ namespace ICM
 					//	printf("Error '%s' is not function in line(%d).\n", mr.getString().c_str(), match.getCurLineNum());
 					//	return false;
 					//}
-					ast.pushData(createElementData(mr.getType(), mr.getString()));
+					ast.pushData(createElementData(mr.getType(), mr.getString(), EP));
 					firstMatchBraket = false;
 					break;
 				default:

@@ -64,7 +64,6 @@ namespace ICM
 			}
 		};
 
-		extern ElementPool GlobalElementPool;
 		extern SerialBijectionMap<string> GlobalIdentNameMap;
 	}
 

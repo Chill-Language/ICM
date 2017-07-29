@@ -6,9 +6,9 @@
 namespace ICM
 {
 
-	bool getCompiletimeData(const ASTBase::Element &elt, Object &value) {
+	bool getCompiletimeData(const ASTBase::Element &elt, Object &value, const Compiler::ElementPool &EP) {
 		if (elt.isLiteral()) {
-			value = getLiteral(elt);
+			value = getLiteral(elt, EP);
 			return true;
 		}
 		else if (elt.isIdent()) {
@@ -20,11 +20,11 @@ namespace ICM
 		return false;
 	}
 
-	Object getLiteral(const ASTBase::Element &elt) {
+	Object getLiteral(const ASTBase::Element &elt, const Compiler::ElementPool &EP) {
 		assert(elt.isLiteral());
-		void *dat = Compiler::GlobalElementPool.get(elt.getIndex());
+		const void* dat = EP.get(elt.getIndex());
 		if (elt.getLiteralType() == T_String) {
-			dat = new Compiler::Literal::StringType(static_cast<char*>(dat)); // TODO
+			dat = new Compiler::Literal::StringType(const_cast<char*>(static_cast<const char*>(dat))); // TODO
 		}
 		else if (elt.getLiteralType() == T_Nil) {
 			dat = nullptr;

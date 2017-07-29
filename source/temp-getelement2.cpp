@@ -5,8 +5,8 @@
 
 namespace ICM
 {
-	Object getLiteral(const Instruction::Element & elt) {
-		return getLiteral(*(ASTBase::Element*)&elt);
+	Object getLiteral(const Instruction::Element & elt, const Compiler::ElementPool &EP) {
+		return getLiteral(*(ASTBase::Element*)&elt, EP);
 	}
 	Object * getConstData(const Instruction::Element & elt) {
 		assert(elt.isIdentType(I_Data));

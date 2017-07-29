@@ -9,12 +9,12 @@ namespace ICM
 	class Interpreter
 	{
 	public:
-		Interpreter(Instruction::InstructionList &InstList)
-			: InstList(InstList), TempResult(InstList.size(), &Static.Null) {}
+		Interpreter(Instruction::InstructionList &InstList, const Compiler::ElementPool &EP)
+			: InstList(InstList), TempResult(InstList.size(), &Static.Null), EP(EP) {}
 
 		Object* getObject(const Instruction::Element &element) {
 			if (element.isLiteral()) {
-				return createObjectFromLiteral(element);
+				return createObjectFromLiteral(element, EP);
 			}
 			else if (element.isRefer()) {
 				return TempResult[element.getRefer()];
@@ -157,7 +157,7 @@ namespace ICM
 				case ref: {
 					Insts::Assign &inst = static_cast<Insts::Assign&>(*Inst);
 					if (inst.Data.isLiteral()) {
-						setDyVarbData(inst.VTU, createObjectFromLiteral(inst.Data));
+						setDyVarbData(inst.VTU, createObjectFromLiteral(inst.Data, EP));
 					}
 					else if (inst.Data.isRefer()) {
 						setDyVarbData(inst.VTU, TempResult[inst.Data.getRefer()]);
@@ -300,6 +300,7 @@ namespace ICM
 		Instruction::InstructionList& InstList;
 		Object* Result = &Static.Nil;
 		vector<Object*> TempResult;
+		const Compiler::ElementPool &EP;
 
 		struct {
 			struct {
@@ -309,8 +310,8 @@ namespace ICM
 		} Global;
 	};
 
-	Object * Run(Instruction::InstructionList & instlist) {
-		Interpreter interpreter(instlist);
+	Object * Run(Instruction::InstructionList & instlist, const Compiler::ElementPool &EP) {
+		Interpreter interpreter(instlist, EP);
 		return interpreter.run();
 	}
 
