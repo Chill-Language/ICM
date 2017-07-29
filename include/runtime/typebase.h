@@ -1,10 +1,10 @@
 #pragma once
 #include "basic.h"
-#include "runtime/object.h"
 #include "number.h"
 #include "parser/keyword.h"
-#include "tabledata.h"
 #include "parser/literal.h"
+#include "runtime/object.h"
+#include "runtime/functable.h"
 
 namespace ICM
 {

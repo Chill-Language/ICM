@@ -105,21 +105,6 @@ namespace ICM
 		map<string, size_t> keymap;
 	};
 
-	void createIdentTable();
-
-	//=======================================
-	// * Class StringTable
-	//=======================================
-	class StringTable
-	{
-	public:
-		
-	private:
-		SerialBijectionMap<string> data;
-	};
-
 	extern FuncTable GlobalFunctionTable;
 
 }
-
-#include "identtable.h"

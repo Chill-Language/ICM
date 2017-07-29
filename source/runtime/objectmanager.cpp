@@ -1,8 +1,9 @@
 #include "basic.h"
 #include "runtime/object.h"
 #include "runtime/objectmanager.h"
+#include "runtime/functable.h"
+#include "runtime/identtable.h"
 #include "config.h"
-#include "tabledata.h"
 
 namespace ICM
 {

@@ -3,7 +3,7 @@
 #include "runtime/deffunc.h"
 #include "parser/keyword.h"
 #include "runtime/objectdef.h"
-#include "runtime/runtime-caller.h"
+#include "runtime/caller.h"
 #include "config.h"
 
 namespace ICM
@@ -280,11 +280,10 @@ namespace ICM
 				const auto &rf = func[id];
 
 				Types::List *list = dl[0]->get<T_List>();
-				Object *r;
+				ObjectPtr r;
 				std::sort(list->begin(), list->end(), [&](const ObjectPtr &a, const ObjectPtr &b) -> bool {
-					rf.callL(r, { a.get(), b.get() });
+					r = rf.call({ a.get(), b.get() });
 					bool rr = *r->get<T_Boolean>();
-					delete r;
 					return rr;
 				});
 				return ObjectPtr(dl[0]);

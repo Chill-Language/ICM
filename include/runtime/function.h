@@ -58,9 +58,6 @@ namespace ICM
 				// If there was a crash, make sure that the pointer 'func' is effective.
 				return func(dl);
 			}
-			void callL(Object* &ro, const LDataList &l) const {
-				Lfunc(ro, l);
-			}
 
 			string to_string() const {
 				return ICM::to_string(sign);

@@ -19,7 +19,7 @@ namespace ICM
 		DefaultType getType() const {
 			return type;
 		}
-		const Function::Signature& getSign() const {
+		const ICM::Function::Signature& getSign() const {
 			return *sign;
 		}
 		void setFuncTableUnit(const FuncTableUnit *functableunit) {
@@ -45,7 +45,7 @@ namespace ICM
 
 	private:
 		DefaultType type;
-		Function::Signature* sign = nullptr;
+		ICM::Function::Signature* sign = nullptr;
 		const FuncTableUnit *functableunit = nullptr;
 	};
 

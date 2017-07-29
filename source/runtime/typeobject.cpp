@@ -1,7 +1,7 @@
 #include "basic.h"
-#include "runtime/typeobject.h"
 #include "parser/keyword.h"
-#include "tabledata.h"
+#include "runtime/typeobject.h"
+#include "runtime/functable.h"
 
 namespace ICM
 {

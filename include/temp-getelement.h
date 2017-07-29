@@ -1,6 +1,6 @@
 #pragma once
 #include "runtime/object.h"
-#include "identtable.h"
+#include "runtime/identtable.h"
 #include "parser/literal.h"
 
 namespace ICM
