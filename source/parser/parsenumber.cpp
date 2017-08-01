@@ -9,7 +9,7 @@
 
 // ** Float (long double): 
 // * (+-) <0 [bodx]> [0-9]* . <[0-9]*>
-// * (+-) [0-9]* e (+-) [0-9]* <(+-) [0-9]*>
+// * (+-) [0-9]* [eE] (+-) [0-9]* <(+-) [0-9]*>
 // Examples :
 //   0. = 0.0
 //   0x10. = 16.0
@@ -196,7 +196,7 @@ namespace ICM
 					return parseFloat(front.to_string(), ptr, value, minus, format);
 				}
 
-				if (*end == 'e') {
+				if (*end == 'e' || *end == 'E') {
 					if (format != f_dec)
 						return nt_unknown;
 
