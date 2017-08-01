@@ -1,6 +1,24 @@
 #include "basic.h"
 #include "parser/parsenumber.h"
 
+// ** Integer (int64_t [default] / uint64_t):
+// * (+-) <0 [bodx]> [0-9,a-F,A-F]* (iu)
+// Examples :
+//   0xff = 0xffi = 255 = 255i -> int16
+//   0xffu = 255u -> uint8
+
+// ** Float (long double): 
+// * (+-) <0 [bodx]> [0-9]* . <[0-9]*>
+// * (+-) [0-9]* e (+-) [0-9]* <(+-) [0-9]*>
+// Examples :
+//   0. = 0.0
+//   0x10. = 16.0
+//   0x10.5 = 16.3125
+//   10e1 = 100
+//   10e+1 = 100
+//   10e1+1 = 101
+//   10e+1+1 = 101
+
 namespace ICM
 {
 	namespace Parser
