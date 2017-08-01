@@ -38,7 +38,7 @@ public:
 		priOpen();
 	}
 	File(FILE *fp, TBMode tbmode = Text, RWMode rwmode = ReadWrite)
-		: file(fp), tbmode(tbmode), rwmode(rwmode) {}
+		: file(fp, [](FILE*) {}), tbmode(tbmode), rwmode(rwmode) {}
 	File& open(const std::string &filename) {
 		this->filename = filename;
 		priOpen();
