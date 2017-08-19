@@ -20,12 +20,13 @@ public:
 	using creater = lightlist_creater<T>;
 public:
 	lightlist() = default;
+	lightlist(const lightlist &) = default;
 
 	explicit lightlist(size_t capacity)
 		// This means lightlist can be used for value type (have no destructor).
 		: _capacity(capacity), data(Memory::alloc<T>(_capacity), Memory::free<T>) {}
 
-	lightlist(const std::initializer_list<T> &il)
+	explicit lightlist(const std::initializer_list<T> &il)
 		: lightlist(il.begin(), il.end()) {}
 
 	template <typename Iter>
@@ -50,9 +51,6 @@ public:
 	explicit lightlist(T (&arr)[N])
 		: lightlist(std::begin(arr), std::end(arr)) {}
 
-	explicit lightlist(const T &t)
-		: lightlist({ t }) {}
-
 	~lightlist() {}
 
 	T* begin() { return data.get(); }
@@ -62,8 +60,11 @@ public:
 	const T* cbegin() const { return data.get(); }
 	const T* cend() const { return data.get() + _capacity; }
 
-	T& operator[](size_t id) { return data.get()[id]; }
-	const T& operator[](size_t id) const { return data.get()[id]; }
+	T* get(size_t index) { return data.get() + index; }
+	const T* get(size_t index) const { return data.get() + index; }
+
+	T& operator[](size_t id) { return *get(id); }
+	const T& operator[](size_t id) const { return *get(id); }
 
 	T& at(size_t id) { assert(id < size()); return this->operator[](id); }
 	const T& at(size_t id) const { assert(id < size()); return this->operator[](id); }
@@ -86,7 +87,7 @@ template <typename T>
 class lightlist_creater
 {
 public:
-	lightlist_creater(size_t n) : _count(0), _data(n) {}
+	explicit lightlist_creater(size_t n) : _count(0), _data(n) {}
 
 	void push_back(const T &e) {
 		_data[_count++] = e;
@@ -102,7 +103,13 @@ public:
 			_data[i].~T();
 		_count = 0;
 	}
-	lightlist<T> data() const {
+	lightlist<T>& data() {
+		return _data;
+	}
+	const lightlist<T>& data() const {
+		return _data;
+	}
+	lightlist<T> resize_data() const {
 		lightlist<T> ndata(_data);
 		ndata.resize(_count);
 		return ndata;

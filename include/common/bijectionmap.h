@@ -28,6 +28,8 @@ private:
 		iterator_base(_MTy *data, size_t count = 0)
 			: data(data), count(count) {}
 
+		using value_type = typename std::conditional<std::is_const<_MTy>::value, const _PTy, _PTy>::type;
+
 		auto& operator*() {
 			return get();
 		}
@@ -40,6 +42,12 @@ private:
 		auto* operator->() const {
 			return &get();
 		}
+		auto& operator[](std::ptrdiff_t diff) {
+			return get(diff);
+		}
+		const auto& operator[](std::ptrdiff_t diff) const {
+			return get(diff);
+		}
 		iterator_base& operator++() {
 			++count;
 			return *this;
@@ -47,6 +55,12 @@ private:
 		iterator_base& operator--() {
 			--count;
 			return *this;
+		}
+		iterator_base operator+(std::ptrdiff_t diff) {
+			return iterator_base(data, count + diff);
+		}
+		iterator_base operator-(std::ptrdiff_t diff) {
+			return iterator_base(data, count - diff);
 		}
 		bool operator==(const iterator_base &iter) const {
 			return data == iter.data && count == iter.count;
@@ -70,11 +84,11 @@ private:
 	private:
 		_MTy *data;
 		size_t count;
-		auto& get() {
-			return data->getData(count);
+		auto& get(std::ptrdiff_t diff = 0) {
+			return data->getData(count + diff);
 		}
-		const auto& get() const {
-			return data->getData(count);
+		const auto& get(std::ptrdiff_t diff = 0) const {
+			return data->getData(count + diff);
 		}
 		friend class BijectionMap;
 	};
