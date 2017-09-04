@@ -1,4 +1,4 @@
-// Name:	file.h
+// Name:    file.h
 // Date:    08/25/2016
 // Version: 2.0.0.0
 
@@ -11,6 +11,7 @@
 #include <cstdio>
 #include <cstring>
 #include <string>
+#include <list>
 
 SYSTEM_BEGIN
 class File
@@ -31,14 +32,15 @@ public:
 	};
 
 public:
-	File(TBMode tbmode = Text, RWMode rwmode = ReadWrite)
+	explicit File(TBMode tbmode = Text, RWMode rwmode = ReadWrite)
 		: tbmode(tbmode), rwmode(rwmode) {}
-	File(const std::string &filename, TBMode tbmode = Text, RWMode rwmode = ReadWrite)
+	explicit File(const std::string &filename, TBMode tbmode = Text, RWMode rwmode = ReadWrite)
 		: filename(filename), tbmode(tbmode), rwmode(rwmode) {
 		priOpen();
 	}
-	File(FILE *fp, TBMode tbmode = Text, RWMode rwmode = ReadWrite)
+	explicit File(FILE *fp, TBMode tbmode = Text, RWMode rwmode = ReadWrite)
 		: file(fp, [](FILE*) {}), tbmode(tbmode), rwmode(rwmode) {}
+
 	File& open(const std::string &filename) {
 		this->filename = filename;
 		priOpen();
@@ -116,11 +118,14 @@ public:
 		return file.get();
 	}
 	std::string getline() {
-		std::string result;
+		std::list<std::unique_ptr<char>> strlist;
 		const size_t size = 0x100;
+		size_t length = 0;
 
 		while (true) {
-			char buffer[size] = { 0 };
+			strlist.push_back(std::unique_ptr<char>(new char[size]()));
+			char *buffer = strlist.back().get();
+
 			fgets(buffer, size, file.get());
 
 			char c = buffer[size - 2];
@@ -128,12 +133,23 @@ public:
 				size_t i = strlen(buffer) - 1;
 				if (buffer[i] == '\n')
 					buffer[i] = '\0';
-				result += std::string(buffer);
+				length += i;
 				break;
 			}
 			else {
-				result += std::string(buffer);
+				length += size;
 			}
+		}
+
+		std::string result(length + 1, '\0');
+
+		auto iter = result.begin();
+
+		for (auto &str : strlist) {
+			size_t step = length < size ? length : size;
+			std::copy_n(str.get(), step, iter);
+			iter += step;
+			length -= step;
 		}
 
 		return result;
