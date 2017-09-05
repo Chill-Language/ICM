@@ -11,9 +11,9 @@
 #define S_WINDOWS 1
 #define S_LINUX   2
 
-#ifdef _WIN32
+#if (defined _WIN32)
 #	define SYSTEM_PLATFORM S_WINDOWS
-#else
+#elif (defined linux)
 #	define SYSTEM_PLATFORM S_LINUX
 #endif
 
