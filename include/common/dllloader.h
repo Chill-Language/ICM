@@ -47,12 +47,22 @@ public:
 		DLLPointer data;
 	};
 
+	DLLLoader() : _errcode((ErrorCode)(0)) {}
+
 	explicit DLLLoader(Path name, int flag = 0)
-		: data(create(name, flag, _errcode), close) {}
+		: data(dllcreate(name, flag, _errcode), DLLLoader::dllclose) {}
+
+	void open(Path name, int flag = 0) {
+		DLLData *ptr = dllcreate(name, flag, _errcode);
+		this->data = std::shared_ptr<DLLData>(ptr, DLLLoader::dllclose);
+	}
+	void close() {
+		this->data = nullptr;
+	}
 
 	template <typename T = void>
-	T* getfunc(const char *func_name) const {
-		return reinterpret_cast<T*>(DLLLoader::getfunc(*data, func_name));
+	T* get(const char *func_name) const {
+		return reinterpret_cast<T*>(DLLLoader::dllgetfunc(*data, func_name));
 	}
 
 	bool bad() const {
@@ -64,7 +74,7 @@ public:
 
 private:
 
-	static DLLData* create(Path name, int flag, ErrorCode &errcode) {
+	static DLLData* dllcreate(Path name, int flag, ErrorCode &errcode) {
 		bool error = false;
 
 #if SYSTEM_PLATFORM == S_WINDOWS
@@ -84,7 +94,7 @@ private:
 		return error ? nullptr : new DLLData{ ptr };
 	}
 
-	static void close(DLLData *data) {
+	static void dllclose(DLLData *data) {
 		if (data == nullptr) return;
 
 #if SYSTEM_PLATFORM == S_WINDOWS
@@ -94,7 +104,7 @@ private:
 #endif
 	}
 
-	static void* getfunc(DLLData data, const char *func_name) {
+	static void* dllgetfunc(DLLData data, const char *func_name) {
 #if SYSTEM_PLATFORM == S_WINDOWS
 		return (void*)GetProcAddress(data.data, func_name);
 #elif SYSTEM_PLATFORM == S_LINUX
