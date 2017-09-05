@@ -76,6 +76,7 @@ private:
 
 	static DLLData* dllcreate(Path name, int flag, ErrorCode &errcode) {
 		bool error = false;
+		errcode = (ErrorCode)(0);
 
 #if SYSTEM_PLATFORM == S_WINDOWS
 		auto ptr = LoadLibrary(name);
