@@ -6,7 +6,6 @@
 #ifndef _SYSTEM_DLLLOADER_H_
 #define _SYSTEM_DLLLOADER_H_
 #include "macro.h"
-#include <cassert>
 #include <memory>
 
 #define S_WINDOWS 1
@@ -30,64 +29,82 @@ class DLLLoader
 public:
 
 #if SYSTEM_PLATFORM == S_WINDOWS
-	using DLLData = HINSTANCE;
-#elif SYSTEM_PLATFORM == S_LINUX
-	using DLLData = void*;
-#endif
-
-#if SYSTEM_PLATFORM == S_WINDOWS
+	using DLLPointer = HINSTANCE;
+	using ErrorCode = DWORD;
 #	ifdef UNICODE
 	using Path = LPCWSTR;
 #	else
 	using Path = LPCSTR;
 #	endif
 #elif SYSTEM_PLATFORM == S_LINUX
+	using DLLPointer = void*;
+	using ErrorCode = const char *;
 	using Path = const char*;
 #endif
 
-	explicit DLLLoader(Path name, int flag = 0)
-		: data(create(name, flag), close) {}
+	struct DLLData
+	{
+		DLLPointer data;
+	};
 
-	template <typename T>
+	explicit DLLLoader(Path name, int flag = 0)
+		: data(create(name, flag, _errcode), close) {}
+
+	template <typename T = void>
 	T* getfunc(const char *func_name) const {
 		return reinterpret_cast<T*>(DLLLoader::getfunc(*data, func_name));
 	}
 
 	bool bad() const {
-		return *data == nullptr;
+		return data == nullptr;
 	}
-
+	ErrorCode errcode() const {
+		return _errcode;
+	}
 
 private:
 
-	static void* getfunc(DLLData data, const char *func_name) {
-		assert(data != nullptr);
+	static DLLData* create(Path name, int flag, ErrorCode &errcode) {
+		bool error = false;
+
 #if SYSTEM_PLATFORM == S_WINDOWS
-		return (void*)GetProcAddress(data, func_name);
+		auto ptr = LoadLibrary(name);
+		if (ptr == nullptr) {
+			error = true;
+			errcode = GetLastError();
+		}
 #elif SYSTEM_PLATFORM == S_LINUX
-		return dlsym(data, func_name);
+		auto ptr = dlopen(name, flag);
+		if (ptr == nullptr || (errcode = dlerror()) != nullptr) {
+			error = true;
+			errcode = dlerror();
+		}
 #endif
+
+		return error ? nullptr : new DLLData{ ptr };
 	}
 
 	static void close(DLLData *data) {
+		if (data == nullptr) return;
+
 #if SYSTEM_PLATFORM == S_WINDOWS
-		FreeLibrary(*data);
+		FreeLibrary(data->data);
 #elif SYSTEM_PLATFORM == S_LINUX
-		dlclose(*data);
+		dlclose(data->data);
 #endif
 	}
-	static DLLData* create(Path name, int flag = 0) {
-#if SYSTEM_PLATFORM == S_WINDOWS
-		auto ptr = LoadLibrary(name);
-#elif SYSTEM_PLATFORM == S_LINUX
-		auto ptr = dlopen(name, flag);
-#endif
 
-		return new DLLData(ptr);
+	static void* getfunc(DLLData data, const char *func_name) {
+#if SYSTEM_PLATFORM == S_WINDOWS
+		return (void*)GetProcAddress(data.data, func_name);
+#elif SYSTEM_PLATFORM == S_LINUX
+		return dlsym(data.data, func_name);
+#endif
 	}
 
 private:
 	std::shared_ptr<DLLData> data;
+	ErrorCode _errcode;
 };
 SYSTEM_END
 
