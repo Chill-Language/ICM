@@ -13,7 +13,7 @@
 
 #if (defined _WIN32)
 #	define SYSTEM_PLATFORM S_WINDOWS
-#elif (defined linux)
+#elif (defined __linux__)
 #	define SYSTEM_PLATFORM S_LINUX
 #endif
 
