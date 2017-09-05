@@ -9,7 +9,7 @@
 #include <cstdlib>
 
 SYSTEM_BEGIN
-int random_base(int n, int (*rand)(void))
+inline int random_base(int n, int (*rand)(void))
 {
 	int rand_result;
 	int rand_max = RAND_MAX / n * n;
@@ -18,11 +18,11 @@ int random_base(int n, int (*rand)(void))
 	} while (rand_result >= rand_max);
 	return rand_result % n;
 }
-int random(int n)
+inline int random(int n)
 {
 	return random_base(n, std::rand);
 }
-int random(int begin, int end)
+inline int random(int begin, int end)
 {
 	return random(end - begin) + begin;
 }
