@@ -7,6 +7,7 @@
 #define _SYSTEM_DLLLOADER_H_
 #include "macro.h"
 #include <memory>
+#include <type_traits>
 
 #define S_WINDOWS 1
 #define S_LINUX   2
@@ -41,11 +42,7 @@ public:
 	using ErrorCode = const char *;
 	using Path = const char*;
 #endif
-
-	struct DLLData
-	{
-		DLLPointer data;
-	};
+	using DLLData = typename std::remove_pointer<DLLPointer>::type;
 
 	DLLLoader() : _errcode((ErrorCode)(0)) {}
 
@@ -53,7 +50,7 @@ public:
 		: data(dllcreate(name, flag, _errcode), DLLLoader::dllclose) {}
 
 	void open(Path name, int flag = 0) {
-		DLLData *ptr = dllcreate(name, flag, _errcode);
+		DLLPointer ptr = dllcreate(name, flag, _errcode);
 		this->data = std::shared_ptr<DLLData>(ptr, DLLLoader::dllclose);
 	}
 	void close() {
@@ -62,7 +59,7 @@ public:
 
 	template <typename T = void>
 	T* get(const char *func_name) const {
-		return reinterpret_cast<T*>(DLLLoader::dllgetfunc(*data, func_name));
+		return reinterpret_cast<T*>(DLLLoader::dllgetfunc(data.get(), func_name));
 	}
 
 	bool bad() const {
@@ -74,7 +71,7 @@ public:
 
 private:
 
-	static DLLData* dllcreate(Path name, int flag, ErrorCode &errcode) {
+	static DLLPointer dllcreate(Path name, int flag, ErrorCode &errcode) {
 		bool error = false;
 		errcode = (ErrorCode)(0);
 
@@ -92,24 +89,24 @@ private:
 		}
 #endif
 
-		return error ? nullptr : new DLLData{ ptr };
+		return error ? nullptr : ptr;
 	}
 
-	static void dllclose(DLLData *data) {
+	static void dllclose(DLLPointer data) {
 		if (data == nullptr) return;
 
 #if SYSTEM_PLATFORM == S_WINDOWS
-		FreeLibrary(data->data);
+		FreeLibrary(data);
 #elif SYSTEM_PLATFORM == S_LINUX
-		dlclose(data->data);
+		dlclose(data);
 #endif
 	}
 
-	static void* dllgetfunc(DLLData data, const char *func_name) {
+	static void* dllgetfunc(DLLPointer data, const char *func_name) {
 #if SYSTEM_PLATFORM == S_WINDOWS
-		return (void*)GetProcAddress(data.data, func_name);
+		return (void*)GetProcAddress(data, func_name);
 #elif SYSTEM_PLATFORM == S_LINUX
-		return dlsym(data.data, func_name);
+		return dlsym(data, func_name);
 #endif
 	}
 
