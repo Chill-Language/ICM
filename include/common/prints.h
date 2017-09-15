@@ -156,7 +156,7 @@ namespace Output
 	// PutError
 	inline void putError(const char *msg)
 	{
-		println(msg);
+		fprintf(stderr, "%s\n", msg);
 		exit(-1);
 	}
 }

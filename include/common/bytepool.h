@@ -9,6 +9,7 @@
 #include "memory.h"
 #include "lightlist.h"
 #include <vector>
+#include <memory>
 
 SYSTEM_BEGIN
 class BytePoolFixed

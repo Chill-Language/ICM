@@ -13,6 +13,9 @@
 
 SYSTEM_BEGIN
 #if _ITERATOR_DEBUG_LEVEL != 0
+SYSTEM_END
+#include <iterator>
+SYSTEM_BEGIN
 template <typename T>
 class pointer_iterator : public std::iterator<std::random_access_iterator_tag, T, ptrdiff_t, T*, T&>
 {

@@ -47,6 +47,43 @@ protected:
 	T _begin, _end;
 };
 
+template <typename T, typename Iter>
+class RangeBaseReverse
+{
+public:
+	using type = T;
+	using iterator = Iter;
+public:
+	RangeBaseReverse(const T &bg, const T &ed) : _begin(bg), _end(ed) {}
+	// Data Method
+	Iter begin() const {
+		return _begin;
+	}
+	Iter end() const {
+		return _end;
+	}
+	bool operator==(const RangeBaseReverse &r) const {
+		return _begin == r._begin && _end == r._end;
+	}
+
+	// Calculation
+	size_t size() const {
+		return _begin - _end;
+	}
+
+	bool include(const T &n) const {
+		return n <= _begin && n > _end;
+	}
+	bool include(const RangeBaseReverse &r) const {
+		return _begin >= r._begin && _end <= r._end;
+	}
+
+	template <typename R, typename F> friend std::string to_string(const RangeBase<R, F> &r);
+
+protected:
+	T _begin, _end;
+};
+
 template <typename T>
 class RIterator
 {
@@ -71,6 +108,31 @@ private:
 };
 
 template <typename T>
+class RIteratorReverse
+{
+public:
+	RIteratorReverse(T value) : value(value) {}
+	operator T() const {
+		return value;
+	}
+	T operator*() const {
+		return value;
+	}
+	bool operator!=(const RIteratorReverse& i) const {
+		RIteratorReverse rir(i);
+		++rir;
+		return value != rir.value;
+	}
+	const RIteratorReverse& operator++() {
+		--value;
+		return *this;
+	}
+
+private:
+	T value;
+};
+
+template <typename T>
 class Range : public RangeBase<T, RIterator<T>>
 {
 public:
@@ -78,6 +140,17 @@ public:
 
 	T operator[](size_t i) const {
 		return this->_begin + i;
+	}
+};
+
+template <typename T>
+class RangeReverse : public RangeBaseReverse<T, RIteratorReverse<T>>
+{
+public:
+	RangeReverse(const T &bg, const T &ed) : RangeBaseReverse<T, RIteratorReverse<T>>(bg, ed) {}
+
+	T operator[](size_t i) const {
+		return this->_end + i;
 	}
 };
 
@@ -103,6 +176,24 @@ inline Range<T> range(const T &a, const T &b)
 inline Range<size_t> range(int a, size_t b)
 {
 	return Range<size_t>(a, b);
+}
+inline Range<size_t> range(size_t a, int b)
+{
+	return Range<size_t>(a, b);
+}
+
+template <typename T>
+inline RangeReverse<T> ranger(const T &a, const T &b)
+{
+	return RangeReverse<T>(a, b);
+}
+inline RangeReverse<size_t> ranger(int a, size_t b)
+{
+	return RangeReverse<size_t>(a, b);
+}
+inline RangeReverse<size_t> ranger(size_t a, int b)
+{
+	return RangeReverse<size_t>(a, b);
 }
 
 template <typename T>

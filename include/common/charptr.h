@@ -23,6 +23,7 @@ public:
 	operator const char*() const { return data.get(); }
 	char& operator[](size_t id) { return data.get()[id]; }
 	const char& operator[](size_t id) const { return data.get()[id]; }
+	void set(size_t begin, const char *str) { Memory::copyTo(data.get() + begin, str, strlen(str)); } // Unsafe
 	std::string to_string() const { return data.get(); }
 	charptr* clone() const { return new charptr(data.get(), _capacity); }
 	size_t capacity() const { return _capacity; }

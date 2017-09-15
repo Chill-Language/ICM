@@ -7,7 +7,7 @@
 #define _SYSTEM_DYARRAY_H_
 #include "macro.h"
 #include "memory.h"
-#include "cstdio"
+#include <cstdio>
 
 SYSTEM_BEGIN
 template <typename T>

@@ -60,8 +60,8 @@ public:
 	const T* cbegin() const { return data.get(); }
 	const T* cend() const { return data.get() + _capacity; }
 
-	T* get(size_t index) { return data.get() + index; }
-	const T* get(size_t index) const { return data.get() + index; }
+	T* get(size_t index = 0) { return data.get() + index; }
+	const T* get(size_t index = 0) const { return data.get() + index; }
 
 	T& operator[](size_t id) { return *get(id); }
 	const T& operator[](size_t id) const { return *get(id); }
