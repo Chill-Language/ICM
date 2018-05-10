@@ -282,7 +282,7 @@ namespace ICM
 				Types::List *list = dl[0]->get<T_List>();
 				ObjectPtr r;
 				std::sort(list->begin(), list->end(), [&](const ObjectPtr &a, const ObjectPtr &b) -> bool {
-					r = rf.call({ a.get(), b.get() });
+					r = rf.call(DataList{ a.get(), b.get() });
 					bool rr = *r->get<T_Boolean>();
 					return rr;
 				});
