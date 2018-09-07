@@ -16,11 +16,12 @@ namespace ICM
 			return true;
 		if (parT.isFunc()) {
 			if (argT.isFunc()) {
-				auto &ps = parT.getSign();
-				auto &as = argT.getSign();
-				if (&ps) {
-					if (&as)
+				if (parT.haveSign()) {
+					auto &ps = parT.getSign();
+					if (argT.haveSign()) {
+						auto &as = argT.getSign();
 						return ps.checkType(as);
+					}
 					else {
 						auto &ft = argT.getFuncTableUnit();
 						for (size_t i : Range<size_t>(0, ft.size()))

@@ -20,7 +20,11 @@ namespace ICM
 			return type;
 		}
 		const ICM::Function::Signature& getSign() const {
+			assert(sign);
 			return *sign;
+		}
+		bool haveSign() const {
+			return sign != nullptr;
 		}
 		void setFuncTableUnit(const FuncTableUnit *functableunit) {
 			this->functableunit = functableunit;
