@@ -1,6 +1,5 @@
 #pragma once
 #include "basic.h"
-#include "bytepool.h"
 
 namespace ICM
 {

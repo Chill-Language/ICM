@@ -2,7 +2,6 @@
 #include "parser/parser.h"
 #include "parser/keywordtable.h"
 #include "parser/literal.h"
-#include "number.h"
 
 namespace ICM
 {
@@ -289,7 +288,7 @@ namespace ICM
 			case MT_Boolean:
 				return AST::Element::Literal(T_Boolean, EP.setBoolean(str == "T"));
 			case MT_Number:
-				return AST::Element::Literal(T_Number, EP.setNumber((int_t)(Common::Number::to_rational(str.c_str()).getNum() / Common::Number::to_rational(str.c_str()).getDen())));
+				return AST::Element::Literal(T_Number, EP.setNumber((int_t)(Common::Number::to_rational<long long>(str).num() / Common::Number::to_rational<long long>(str).den())));
 			case MT_String:
 				return AST::Element::Literal(T_String, EP.setString(str.c_str(), str.size() + 1));
 			case MT_Keyword:

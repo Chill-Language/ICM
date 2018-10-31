@@ -1,0 +1,3 @@
+[submodule "prilib"]
+	path = prilib
+	url = https://github.com/ChillMagic/PrivateLibrary

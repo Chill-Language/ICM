@@ -1,6 +1,5 @@
 #pragma once
 #include "basic.h"
-#include "number.h"
 #include "parser/keyword.h"
 #include "parser/literal.h"
 #include "runtime/object.h"

@@ -5,7 +5,6 @@
 #include "interpreter.h"
 #include "instruction.h"
 #include "compiler/transform.h"
-#include "timer.h"
 #include "temp-getelement.h"
 
 extern size_t CheckCallCount;
@@ -145,7 +144,7 @@ int main(int argc, char *argv[])
 		println("ICM 0.3");
 	}
 	else {
-		File file(argv[1], File::Text);
+		TextFile file(argv[1]);
 		if (file.bad()) {
 			println("Error in open file ", argv[1], ".");
 			return -1;

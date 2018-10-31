@@ -1,5 +1,4 @@
 #include "basic.h"
-#include "random.h"
 #include "runtime/deffunc.h"
 #include "parser/keyword.h"
 #include "runtime/objectdef.h"
@@ -149,7 +148,7 @@ namespace ICM
 				}
 				ObjectPtr func(const DataList &list) const {
 					const auto &rr = Common::Number::mod(list[0]->dat<T_Number>(), list[1]->dat<T_Number>());
-					return ObjectPtr(new Number((int_t)rr.getNum()));
+					return ObjectPtr(new Number((int_t)rr.num()));
 				}
 			};
 			struct Rem : public FI
@@ -160,7 +159,7 @@ namespace ICM
 				}
 				ObjectPtr func(const DataList &list) const {
 					const auto &rr = Common::Number::rem(list[0]->dat<T_Number>(), list[1]->dat<T_Number>());
-					return ObjectPtr(new Number((int_t)rr.getNum()));
+					return ObjectPtr(new Number((int_t)rr.num()));
 				}
 			};
 			struct Gcd : public FI
@@ -171,7 +170,7 @@ namespace ICM
 				}
 				ObjectPtr func(const DataList &list) const {
 					const auto &rr = Common::Number::gcd(list[0]->dat<T_Number>(), list[1]->dat<T_Number>());
-					return ObjectPtr(new Number(rr));
+					return ObjectPtr(new Number((int_t)rr.num()));
 				}
 			};
 
@@ -449,7 +448,7 @@ namespace ICM
 					return S({ T_String }, T_Number); // S -> N
 				}
 				ObjectPtr func(const DataList &list) const {
-					TypeBase::NumberType num = (TypeBase::NumberType)Common::Number::to_rational(list[0]->dat<T_String>().c_str()).getNum();
+					TypeBase::NumberType num = (TypeBase::NumberType)Common::Number::to_rational<long long>(list[0]->dat<T_String>().c_str()).num();
 					return ObjectPtr(new Objects::Number(num));
 				}
 			};
