@@ -16,7 +16,7 @@
 #include <bitset>
 #include <utility>
 //  common
-#include "prilib.h"
+#include "../prilib/prilib.h"
 
 // Declares
 using int_t = std::conditional_t<std::is_same<size_t, uint64_t>::value, int64_t, int32_t>;
